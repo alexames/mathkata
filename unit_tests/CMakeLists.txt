@@ -11,47 +11,27 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.14)
 
-set_compiler_flags_for_external_libraries()
-add_subdirectory(${dependencies_gtest_dir} googletest)
-restore_compiler_flags()
+# Add googletest.
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/../dependencies/googletest
+                 ${CMAKE_CURRENT_BINARY_DIR}/googletest EXCLUDE_FROM_ALL)
 
-set(gtest_incdir ${dependencies_gtest_dir}/include)
-if(EXISTS "${dependencies_gtest_dir}/../../third_party")
-  set(gtest_hack_incdir "${dependencies_gtest_dir}/../..")
-endif()
-set(gtest_libdir ${dependencies_gtest_dir})
-
-# Include helper functions and macros used by Google Test.
-include(${gtest_libdir}/cmake/internal_utils.cmake)
-config_compiler_and_linker()
-string(REPLACE "-W4" "-W3" cxx_default "${cxx_default}")
-string(REPLACE "-Wshadow" "" cxx_default "${cxx_default}")
-string(REPLACE "-Wextra" "" cxx_default "${cxx_default}")
-
-# This is the directory into which the executables are built.
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-
-include_directories(${gtest_incdir}
-                    ${gtest_hack_incdir}
-                    ${CMAKE_CURRENT_LIST_DIR}
-                    ${CMAKE_CURRENT_LIST_DIR}/..)
-
-# Common libraries for tests.
-if(NOT MSVC)
-  find_package(Threads)
-endif()
-set(COMMON_LIBS "gtest;${CMAKE_THREAD_LIBS_INIT}")
+include(GoogleTest)
 
 # Generate a rule to build a unit test executable ${test_name} with
 # source file ${source}.  For details of additional arguments, see
 # mathfu_configure_flags().
 function(test_executable test_name source)
-  cxx_executable_with_flags(${test_name} "${cxx_default}" "${COMMON_LIBS}"
-    ${source} ${MATHFU_HEADERS})
+  add_executable(${test_name} ${source} ${MATHFU_HEADERS})
+  target_include_directories(${test_name} PRIVATE
+    ${CMAKE_CURRENT_LIST_DIR}
+    ${CMAKE_CURRENT_LIST_DIR}/..)
+  target_link_libraries(${test_name} PRIVATE GTest::gtest)
   mathfu_configure_flags(${test_name} ${ARGN})
   mathfu_enable_warnings(${test_name})
+  gtest_discover_tests(${test_name})
 endfunction()
 
 # Generate a rule to build unit test executables.  This only builds
