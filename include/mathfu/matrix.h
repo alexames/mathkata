@@ -310,7 +310,7 @@ class Matrix {
   ///
   /// @param a Array of values that the matrix will be iniitlized to.
   explicit inline Matrix(const T* const a) {
-    MATHFU_MAT_OPERATION((data_[i] = Vector<T, Rows>(&a[i * Cols])));
+    MATHFU_MAT_OPERATION((data_[i] = Vector<T, Rows>(&a[i * Rows])));
   }
 
   /// @brief Create a Matrix from an array of "Cols", "Rows" element packed

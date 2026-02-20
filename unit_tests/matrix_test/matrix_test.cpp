@@ -1112,6 +1112,32 @@ void Mat4ToAndFromAffine_Test(const T&) {
 
 TEST_SCALAR_F(Mat4ToAndFromAffine, FLOAT_PRECISION, DOUBLE_PRECISION)
 
+// Test constructing a non-square matrix from a pointer array.
+// This verifies that the stride is Rows (not Cols) for column-major layout.
+template <class T>
+void MatrixPointerConstructorNonSquare_Test(const T& precision) {
+  // A 4x3 matrix (4 rows, 3 cols) stored column-major:
+  // Column 0: {1, 2, 3, 4}, Column 1: {5, 6, 7, 8}, Column 2: {9, 10, 11, 12}
+  const T data[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+  mathfu::Matrix<T, 4, 3> mat(data);
+  // Verify each element using (row, col) access.
+  EXPECT_NEAR(mat(0, 0), T(1), precision);
+  EXPECT_NEAR(mat(1, 0), T(2), precision);
+  EXPECT_NEAR(mat(2, 0), T(3), precision);
+  EXPECT_NEAR(mat(3, 0), T(4), precision);
+  EXPECT_NEAR(mat(0, 1), T(5), precision);
+  EXPECT_NEAR(mat(1, 1), T(6), precision);
+  EXPECT_NEAR(mat(2, 1), T(7), precision);
+  EXPECT_NEAR(mat(3, 1), T(8), precision);
+  EXPECT_NEAR(mat(0, 2), T(9), precision);
+  EXPECT_NEAR(mat(1, 2), T(10), precision);
+  EXPECT_NEAR(mat(2, 2), T(11), precision);
+  EXPECT_NEAR(mat(3, 2), T(12), precision);
+}
+
+TEST_SCALAR_F(MatrixPointerConstructorNonSquare, FLOAT_PRECISION,
+              DOUBLE_PRECISION)
+
 // Test extracting the 3x3 rotation Matrix portion from a 4x4 Matrix.
 template <class T>
 void Mat4ToRotationMatrix_Test(const T&) {
