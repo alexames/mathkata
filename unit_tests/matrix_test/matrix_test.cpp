@@ -1127,6 +1127,40 @@ void Mat4ToRotationMatrix_Test(const T&) {
 
 TEST_SCALAR_F(Mat4ToRotationMatrix, FLOAT_PRECISION, DOUBLE_PRECISION)
 
+// Test that RotationX/Y/Z produce correct results with double precision.
+// This verifies that the trig functions use std::cos/std::sin (which handle
+// double) rather than cosf/sinf (which truncate to float).
+template <class T>
+void RotationPrecision_Test(const T& precision) {
+  typedef mathfu::Matrix<T, 3> Mat3;
+  const T angle = static_cast<T>(1.0);
+  const T c = std::cos(angle);
+  const T s = std::sin(angle);
+
+  Mat3 rx = Mat3::RotationX(angle);
+  EXPECT_NEAR(rx(0, 0), T(1), precision);
+  EXPECT_NEAR(rx(1, 1), c, precision);
+  EXPECT_NEAR(rx(2, 1), s, precision);
+  EXPECT_NEAR(rx(1, 2), -s, precision);
+  EXPECT_NEAR(rx(2, 2), c, precision);
+
+  Mat3 ry = Mat3::RotationY(angle);
+  EXPECT_NEAR(ry(0, 0), c, precision);
+  EXPECT_NEAR(ry(2, 0), -s, precision);
+  EXPECT_NEAR(ry(1, 1), T(1), precision);
+  EXPECT_NEAR(ry(0, 2), s, precision);
+  EXPECT_NEAR(ry(2, 2), c, precision);
+
+  Mat3 rz = Mat3::RotationZ(angle);
+  EXPECT_NEAR(rz(0, 0), c, precision);
+  EXPECT_NEAR(rz(1, 0), s, precision);
+  EXPECT_NEAR(rz(0, 1), -s, precision);
+  EXPECT_NEAR(rz(1, 1), c, precision);
+  EXPECT_NEAR(rz(2, 2), T(1), precision);
+}
+
+TEST_SCALAR_F(RotationPrecision, FLOAT_PRECISION, DOUBLE_PRECISION)
+
 // This will test converting from a translation into a matrix and back again.
 // Test the compilation of basic matrix operations given in the sample file.
 // This will test transforming a vector with a matrix.
