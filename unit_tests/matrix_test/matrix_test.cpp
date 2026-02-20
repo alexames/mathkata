@@ -1127,6 +1127,24 @@ void Mat4ToRotationMatrix_Test(const T&) {
 
 TEST_SCALAR_F(Mat4ToRotationMatrix, FLOAT_PRECISION, DOUBLE_PRECISION)
 
+// Test HadamardProduct (component-wise multiplication).
+template <class T, int d>
+void HadamardProduct_Test(const T& precision) {
+  mathfu::Matrix<T, d> m1;
+  mathfu::Matrix<T, d> m2;
+  for (int i = 0; i < d * d; ++i) {
+    m1[i] = static_cast<T>(i + 1);
+    m2[i] = static_cast<T>(d * d - i);
+  }
+  mathfu::Matrix<T, d> result =
+      mathfu::Matrix<T, d>::HadamardProduct(m1, m2);
+  for (int i = 0; i < d * d; ++i) {
+    EXPECT_NEAR(result[i], m1[i] * m2[i], precision);
+  }
+}
+
+TEST_ALL_F(HadamardProduct, FLOAT_PRECISION, DOUBLE_PRECISION)
+
 // This will test converting from a translation into a matrix and back again.
 // Test the compilation of basic matrix operations given in the sample file.
 // This will test transforming a vector with a matrix.
