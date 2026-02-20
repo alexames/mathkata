@@ -63,40 +63,40 @@ typedef Vector<uint, 3> uint3;
 typedef Vector<uint, 4> uint4;
 
 /// 1x1 <code>float</code> Matrix.
-typedef Matrix<float, 2, 2> float1x1;
+typedef Matrix<float, 1, 1> float1x1;
 /// 2x2 <code>float</code> Matrix.
 typedef Matrix<float, 2, 2> float2x2;
 /// 3x3 <code>float</code> Matrix.
 typedef Matrix<float, 3, 3> float3x3;
-/// 3x3 <code>float</code> Matrix.
+/// 4x4 <code>float</code> Matrix.
 typedef Matrix<float, 4, 4> float4x4;
 
 /// 1x1 <code>double</code> Matrix.
-typedef Matrix<double, 2, 2> double1x1;
+typedef Matrix<double, 1, 1> double1x1;
 /// 2x2 <code>double</code> Matrix.
 typedef Matrix<double, 2, 2> double2x2;
 /// 3x3 <code>double</code> Matrix.
 typedef Matrix<double, 3, 3> double3x3;
-/// 3x3 <code>double</code> Matrix.
+/// 4x4 <code>double</code> Matrix.
 typedef Matrix<double, 4, 4> double4x4;
 
 /// 1x1 <code>int</code> Matrix.
-typedef Matrix<int, 2, 2> int1x1;
+typedef Matrix<int, 1, 1> int1x1;
 /// 2x2 <code>int</code> Matrix.
 typedef Matrix<int, 2, 2> int2x2;
 /// 3x3 <code>int</code> Matrix.
 typedef Matrix<int, 3, 3> int3x3;
-/// 3x3 <code>int</code> Matrix.
+/// 4x4 <code>int</code> Matrix.
 typedef Matrix<int, 4, 4> int4x4;
 
-/// 1x1 <code>int</code> Matrix.
-typedef Matrix<int, 2, 2> uint1x1;
-/// 2x2 <code>int</code> Matrix.
-typedef Matrix<int, 2, 2> uint2x2;
-/// 3x3 <code>int</code> Matrix.
-typedef Matrix<int, 3, 3> uint3x3;
-/// 3x3 <code>int</code> Matrix.
-typedef Matrix<int, 4, 4> uint4x4;
+/// 1x1 <code>uint</code> Matrix.
+typedef Matrix<uint, 1, 1> uint1x1;
+/// 2x2 <code>uint</code> Matrix.
+typedef Matrix<uint, 2, 2> uint2x2;
+/// 3x3 <code>uint</code> Matrix.
+typedef Matrix<uint, 3, 3> uint3x3;
+/// 4x4 <code>uint</code> Matrix.
+typedef Matrix<uint, 4, 4> uint4x4;
 
 /// @brief Calculate the cross product of two 3-dimensional Vectors.
 ///
