@@ -612,7 +612,7 @@ void Perspective_Test(const T& precision) {
           atan(static_cast<T>(1)) * 2, 1, -2, 2, 1),
       mathfu::Matrix<T, 4>(1, 0, 0, 0,
                            0, 1, 0, 0,
-                           0, 0, -0.5, -1,
+                           0, 0, 0, -1,
                            0, 0, 2, 0),
     },
   };
@@ -621,6 +621,81 @@ void Perspective_Test(const T& precision) {
       kTestCases, sizeof(kTestCases) / sizeof(kTestCases[0]), precision);
 }
 TEST_SCALAR_F(Perspective, FLOAT_PRECISION, DOUBLE_PRECISION * 10)
+
+// Test that the OpenGL perspective matrix maps the near plane to z = -1
+// and the far plane to z = 1.
+template <class T>
+void PerspectiveOpenGLDepth_Test(const T& precision) {
+  const T fovy = static_cast<T>(M_PI) / 4;  // 45 degrees
+  const T aspect = static_cast<T>(1.5);
+  const T znear = static_cast<T>(0.1);
+  const T zfar = static_cast<T>(100.0);
+  const T handedness = static_cast<T>(1);
+
+  mathfu::Matrix<T, 4> proj = mathfu::Matrix<T, 4>::Perspective(
+      fovy, aspect, znear, zfar, handedness, mathfu::DepthRange::kOpenGL);
+
+  // Transform a point on the near plane (z = -znear in view space for RH).
+  mathfu::Vector<T, 4> near_point(0, 0, -znear, 1);
+  mathfu::Vector<T, 4> near_clip = proj * near_point;
+  T near_ndc_z = near_clip.z / near_clip.w;
+  EXPECT_NEAR(near_ndc_z, static_cast<T>(-1), precision);
+
+  // Transform a point on the far plane (z = -zfar in view space for RH).
+  mathfu::Vector<T, 4> far_point(0, 0, -zfar, 1);
+  mathfu::Vector<T, 4> far_clip = proj * far_point;
+  T far_ndc_z = far_clip.z / far_clip.w;
+  EXPECT_NEAR(far_ndc_z, static_cast<T>(1), precision);
+}
+TEST_SCALAR_F(PerspectiveOpenGLDepth, 1e-5f, 1e-10)
+
+// Test that the DirectX perspective matrix maps the near plane to z = 0
+// and the far plane to z = 1.
+template <class T>
+void PerspectiveDirectXDepth_Test(const T& precision) {
+  const T fovy = static_cast<T>(M_PI) / 4;  // 45 degrees
+  const T aspect = static_cast<T>(1.5);
+  const T znear = static_cast<T>(0.1);
+  const T zfar = static_cast<T>(100.0);
+  const T handedness = static_cast<T>(1);
+
+  mathfu::Matrix<T, 4> proj = mathfu::Matrix<T, 4>::Perspective(
+      fovy, aspect, znear, zfar, handedness, mathfu::DepthRange::kDirectX);
+
+  // Transform a point on the near plane (z = -znear in view space for RH).
+  mathfu::Vector<T, 4> near_point(0, 0, -znear, 1);
+  mathfu::Vector<T, 4> near_clip = proj * near_point;
+  T near_ndc_z = near_clip.z / near_clip.w;
+  EXPECT_NEAR(near_ndc_z, static_cast<T>(0), precision);
+
+  // Transform a point on the far plane (z = -zfar in view space for RH).
+  mathfu::Vector<T, 4> far_point(0, 0, -zfar, 1);
+  mathfu::Vector<T, 4> far_clip = proj * far_point;
+  T far_ndc_z = far_clip.z / far_clip.w;
+  EXPECT_NEAR(far_ndc_z, static_cast<T>(1), precision);
+}
+TEST_SCALAR_F(PerspectiveDirectXDepth, 1e-5f, 1e-10)
+
+// Test that the default Perspective (no DepthRange argument) uses OpenGL
+// convention, matching the explicit OpenGL call.
+template <class T>
+void PerspectiveDefaultIsOpenGL_Test(const T& precision) {
+  const T fovy = static_cast<T>(M_PI) / 3;
+  const T aspect = static_cast<T>(1.6);
+  const T znear = static_cast<T>(1.0);
+  const T zfar = static_cast<T>(500.0);
+  const T handedness = static_cast<T>(1);
+
+  mathfu::Matrix<T, 4> default_proj =
+      mathfu::Matrix<T, 4>::Perspective(fovy, aspect, znear, zfar, handedness);
+  mathfu::Matrix<T, 4> opengl_proj = mathfu::Matrix<T, 4>::Perspective(
+      fovy, aspect, znear, zfar, handedness, mathfu::DepthRange::kOpenGL);
+
+  for (int i = 0; i < 16; ++i) {
+    EXPECT_NEAR(default_proj[i], opengl_proj[i], precision);
+  }
+}
+TEST_SCALAR_F(PerspectiveDefaultIsOpenGL, FLOAT_PRECISION, DOUBLE_PRECISION)
 
 // Test orthographic matrix calculation.
 template <class T>
@@ -693,6 +768,90 @@ void Ortho_Test(const T& precision) {
       kTestCases, sizeof(kTestCases) / sizeof(kTestCases[0]), precision);
 }
 TEST_SCALAR_F(Ortho, FLOAT_PRECISION, DOUBLE_PRECISION)
+
+// Test that the OpenGL orthographic matrix maps the near plane to z = -1
+// and the far plane to z = 1.
+template <class T>
+void OrthoOpenGLDepth_Test(const T& precision) {
+  const T left = static_cast<T>(-10);
+  const T right = static_cast<T>(10);
+  const T bottom = static_cast<T>(-10);
+  const T top = static_cast<T>(10);
+  const T znear = static_cast<T>(1);
+  const T zfar = static_cast<T>(100);
+  const T handedness = static_cast<T>(1);
+
+  mathfu::Matrix<T, 4> proj =
+      mathfu::Matrix<T, 4>::Ortho(left, right, bottom, top, znear, zfar,
+                                  handedness, mathfu::DepthRange::kOpenGL);
+
+  // Transform a point on the near plane (z = -znear in view space for RH).
+  mathfu::Vector<T, 4> near_point(0, 0, -znear, 1);
+  mathfu::Vector<T, 4> near_clip = proj * near_point;
+  T near_ndc_z = near_clip.z / near_clip.w;
+  EXPECT_NEAR(near_ndc_z, static_cast<T>(-1), precision);
+
+  // Transform a point on the far plane (z = -zfar in view space for RH).
+  mathfu::Vector<T, 4> far_point(0, 0, -zfar, 1);
+  mathfu::Vector<T, 4> far_clip = proj * far_point;
+  T far_ndc_z = far_clip.z / far_clip.w;
+  EXPECT_NEAR(far_ndc_z, static_cast<T>(1), precision);
+}
+TEST_SCALAR_F(OrthoOpenGLDepth, 1e-5f, 1e-10)
+
+// Test that the DirectX orthographic matrix maps the near plane to z = 0
+// and the far plane to z = 1.
+template <class T>
+void OrthoDirectXDepth_Test(const T& precision) {
+  const T left = static_cast<T>(-10);
+  const T right = static_cast<T>(10);
+  const T bottom = static_cast<T>(-10);
+  const T top = static_cast<T>(10);
+  const T znear = static_cast<T>(1);
+  const T zfar = static_cast<T>(100);
+  const T handedness = static_cast<T>(1);
+
+  mathfu::Matrix<T, 4> proj =
+      mathfu::Matrix<T, 4>::Ortho(left, right, bottom, top, znear, zfar,
+                                  handedness, mathfu::DepthRange::kDirectX);
+
+  // Transform a point on the near plane (z = -znear in view space for RH).
+  mathfu::Vector<T, 4> near_point(0, 0, -znear, 1);
+  mathfu::Vector<T, 4> near_clip = proj * near_point;
+  T near_ndc_z = near_clip.z / near_clip.w;
+  EXPECT_NEAR(near_ndc_z, static_cast<T>(0), precision);
+
+  // Transform a point on the far plane (z = -zfar in view space for RH).
+  mathfu::Vector<T, 4> far_point(0, 0, -zfar, 1);
+  mathfu::Vector<T, 4> far_clip = proj * far_point;
+  T far_ndc_z = far_clip.z / far_clip.w;
+  EXPECT_NEAR(far_ndc_z, static_cast<T>(1), precision);
+}
+TEST_SCALAR_F(OrthoDirectXDepth, 1e-5f, 1e-10)
+
+// Test that the default Ortho (no DepthRange argument) uses OpenGL convention,
+// matching the explicit OpenGL call.
+template <class T>
+void OrthoDefaultIsOpenGL_Test(const T& precision) {
+  const T left = static_cast<T>(-5);
+  const T right = static_cast<T>(5);
+  const T bottom = static_cast<T>(-5);
+  const T top = static_cast<T>(5);
+  const T znear = static_cast<T>(0.5);
+  const T zfar = static_cast<T>(200);
+  const T handedness = static_cast<T>(1);
+
+  mathfu::Matrix<T, 4> default_proj = mathfu::Matrix<T, 4>::Ortho(
+      left, right, bottom, top, znear, zfar, handedness);
+  mathfu::Matrix<T, 4> opengl_proj =
+      mathfu::Matrix<T, 4>::Ortho(left, right, bottom, top, znear, zfar,
+                                  handedness, mathfu::DepthRange::kOpenGL);
+
+  for (int i = 0; i < 16; ++i) {
+    EXPECT_NEAR(default_proj[i], opengl_proj[i], precision);
+  }
+}
+TEST_SCALAR_F(OrthoDefaultIsOpenGL, FLOAT_PRECISION, DOUBLE_PRECISION)
 
 // Test look-at matrix calculation.
 template <class T>

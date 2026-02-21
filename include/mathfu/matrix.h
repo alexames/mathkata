@@ -94,6 +94,15 @@
 
 namespace mathfu {
 
+/// @brief Specifies the depth range convention for projection matrices.
+///
+/// OpenGL maps z to [-1, 1] (signed normalized device coordinates).
+/// DirectX maps z to [0, 1] (unsigned normalized device coordinates).
+enum class DepthRange {
+  kOpenGL,  ///< z maps to [-1, 1] (OpenGL / Vulkan with VK_KHR_maintenance1)
+  kDirectX  ///< z maps to [0, 1] (DirectX / Metal / Vulkan default)
+};
+
 /// @cond MATHFU_INTERNAL
 template <class T, int Rows, int Cols = Rows>
 class Matrix;
@@ -111,10 +120,11 @@ static inline Matrix<T, Rows, Cols> OuterProductHelper(
     const Vector<T, Rows>& v1, const Vector<T, Cols>& v2);
 template <class T>
 inline Matrix<T, 4, 4> PerspectiveHelper(T fovy, T aspect, T znear, T zfar,
-                                         T handedness);
+                                         T handedness, DepthRange depth_range);
 template <class T>
 static inline Matrix<T, 4, 4> OrthoHelper(T left, T right, T bottom, T top,
-                                          T znear, T zfar, T handedness);
+                                          T znear, T zfar, T handedness,
+                                          DepthRange depth_range);
 template <class T>
 static inline Matrix<T, 4, 4> LookAtHelper(const Vector<T, 3>& at,
                                            const Vector<T, 3>& eye,
@@ -808,10 +818,14 @@ class Matrix {
   /// @param znear Near plane location.
   /// @param zfar Far plane location.
   /// @param handedness 1.0f for RH, -1.0f for LH
+  /// @param depth_range DepthRange::kOpenGL for z in [-1,1] (default),
+  ///                    DepthRange::kDirectX for z in [0,1].
   /// @return 4x4 perspective Matrix.
-  static inline Matrix<T, 4, 4> Perspective(T fovy, T aspect, T znear, T zfar,
-                                            T handedness = 1) {
-    return PerspectiveHelper(fovy, aspect, znear, zfar, handedness);
+  static inline Matrix<T, 4, 4> Perspective(
+      T fovy, T aspect, T znear, T zfar, T handedness = 1,
+      DepthRange depth_range = DepthRange::kOpenGL) {
+    return PerspectiveHelper(fovy, aspect, znear, zfar, handedness,
+                             depth_range);
   }
 
   /// @brief Create a 4x4 orthographic Matrix.
@@ -823,10 +837,14 @@ class Matrix {
   /// @param znear Near plane location.
   /// @param zfar Far plane location.
   /// @param handedness 1.0f for RH, -1.0f for LH
+  /// @param depth_range DepthRange::kOpenGL for z in [-1,1] (default),
+  ///                    DepthRange::kDirectX for z in [0,1].
   /// @return 4x4 orthographic Matrix.
-  static inline Matrix<T, 4, 4> Ortho(T left, T right, T bottom, T top, T znear,
-                                      T zfar, T handedness = 1) {
-    return OrthoHelper(left, right, bottom, top, znear, zfar, handedness);
+  static inline Matrix<T, 4, 4> Ortho(
+      T left, T right, T bottom, T top, T znear, T zfar, T handedness = 1,
+      DepthRange depth_range = DepthRange::kOpenGL) {
+    return OrthoHelper(left, right, bottom, top, znear, zfar, handedness,
+                       depth_range);
   }
 
   /// @brief Create a 3-dimensional camera Matrix.
@@ -1407,31 +1425,66 @@ bool InverseHelper(const Matrix<T, 4, 4>& m, Matrix<T, 4, 4>* const inverse,
 /// @endcond
 
 /// @cond MATHFU_INTERNAL
-/// Create a 4x4 perpective matrix.
+/// Create a 4x4 perspective matrix.
+///
+/// OpenGL convention (z maps to [-1, 1]):
+///   m[2][2] = (znear + zfar) / (znear - zfar)
+///   m[3][2] = (2 * znear * zfar) / (znear - zfar)
+///
+/// DirectX convention (z maps to [0, 1]):
+///   m[2][2] = zfar / (znear - zfar)
+///   m[3][2] = (znear * zfar) / (znear - zfar)
 template <class T>
 inline Matrix<T, 4, 4> PerspectiveHelper(T fovy, T aspect, T znear, T zfar,
-                                         T handedness) {
+                                         T handedness, DepthRange depth_range) {
   const T y = T(1) / std::tan(fovy * T(0.5));
   const T x = y / aspect;
   const T zdist = (znear - zfar);
-  const T zfar_per_zdist = zfar / zdist;
-  return Matrix<T, 4, 4>(x, 0, 0, 0, 0, y, 0, 0, 0, 0,
-                         zfar_per_zdist * handedness, T(-1) * handedness, 0, 0,
-                         T(2) * znear * zfar_per_zdist, 0);
+  T zz, zw;
+  if (depth_range == DepthRange::kOpenGL) {
+    // OpenGL: near plane -> z = -1, far plane -> z = 1
+    zz = (znear + zfar) / zdist;
+    zw = T(2) * znear * zfar / zdist;
+  } else {
+    // DirectX: near plane -> z = 0, far plane -> z = 1
+    zz = zfar / zdist;
+    zw = znear * zfar / zdist;
+  }
+  return Matrix<T, 4, 4>(x, 0, 0, 0, 0, y, 0, 0, 0, 0, zz * handedness,
+                         T(-1) * handedness, 0, 0, zw, 0);
 }
 /// @endcond
 
 /// @cond MATHFU_INTERNAL
 /// Create a 4x4 orthographic matrix.
+///
+/// OpenGL convention (z maps to [-1, 1]):
+///   m[2][2] = -2 / (zfar - znear)
+///   m[3][2] = -(zfar + znear) / (zfar - znear)
+///
+/// DirectX convention (z maps to [0, 1]):
+///   m[2][2] = -1 / (zfar - znear)
+///   m[3][2] = -znear / (zfar - znear)
 template <class T>
 static inline Matrix<T, 4, 4> OrthoHelper(T left, T right, T bottom, T top,
-                                          T znear, T zfar, T handedness) {
+                                          T znear, T zfar, T handedness,
+                                          DepthRange depth_range) {
+  const T zdist = zfar - znear;
+  T zz, zw;
+  if (depth_range == DepthRange::kOpenGL) {
+    // OpenGL: near plane -> z = -1, far plane -> z = 1
+    zz = -handedness * static_cast<T>(2) / zdist;
+    zw = -(zfar + znear) / zdist;
+  } else {
+    // DirectX: near plane -> z = 0, far plane -> z = 1
+    zz = -handedness * static_cast<T>(1) / zdist;
+    zw = -znear / zdist;
+  }
   return Matrix<T, 4, 4>(static_cast<T>(2) / (right - left), 0, 0, 0, 0,
-                         static_cast<T>(2) / (top - bottom), 0, 0, 0, 0,
-                         -handedness * static_cast<T>(2) / (zfar - znear), 0,
+                         static_cast<T>(2) / (top - bottom), 0, 0, 0, 0, zz, 0,
                          -(right + left) / (right - left),
-                         -(top + bottom) / (top - bottom),
-                         -(zfar + znear) / (zfar - znear), static_cast<T>(1));
+                         -(top + bottom) / (top - bottom), zw,
+                         static_cast<T>(1));
 }
 /// @endcond
 
