@@ -1,26 +1,25 @@
 /*
-* Copyright 2014 Google Inc. All rights reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright 2014 Google Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 #include "mathfu/quaternion.h"
-#include "mathfu/constants.h"
-#include "mathfu/io.h"
 
 #include <math.h>
 
 #include "gtest/gtest.h"
-
+#include "mathfu/constants.h"
+#include "mathfu/io.h"
 #include "precision.h"
 
 namespace {
@@ -40,9 +39,8 @@ class QuaternionTests : public ::testing::Test {
     MY_TEST##_Test<double>(DOUBLE_PRECISION); \
   }
 
-#define EXPECT_NEAR_VEC3(v1, v2, abs_error)             \
-  EXPECT_TRUE(IsNearVector((v1), (v2), (abs_error)))    \
-      << v1 << "\n" << v2 << "\n"
+#define EXPECT_NEAR_VEC3(v1, v2, abs_error) \
+  EXPECT_TRUE(IsNearVector((v1), (v2), (abs_error))) << v1 << "\n" << v2 << "\n"
 
 #define EXPECT_EQ_QUAT(q1, q2)               \
   {                                          \
@@ -50,13 +48,12 @@ class QuaternionTests : public ::testing::Test {
     EXPECT_EQ((q1).vector(), (q2).vector()); \
   }
 
-#define EXPECT_NEAR_QUAT(q1, q2, abs_error)             \
-  EXPECT_TRUE(IsNearQuat((q1), (q2), (abs_error)))      \
-      << q1 << "\n" << q2 << "\n"
+#define EXPECT_NEAR_QUAT(q1, q2, abs_error) \
+  EXPECT_TRUE(IsNearQuat((q1), (q2), (abs_error))) << q1 << "\n" << q2 << "\n"
 
-#define EXPECT_NEAR_ORIENTATION(q1, q2, abs_error)        \
-  EXPECT_TRUE(IsNearOrientation((q1), (q2), (abs_error))) \
-      << q1 << "\n" << q2 << "\n"
+#define EXPECT_NEAR_ORIENTATION(q1, q2, abs_error)                      \
+  EXPECT_TRUE(IsNearOrientation((q1), (q2), (abs_error))) << q1 << "\n" \
+                                                          << q2 << "\n"
 
 AssertionResult IsNearDouble(double val1, double val2, double abs_error) {
   const double diff = std::fabs(val1 - val2);
@@ -64,13 +61,13 @@ AssertionResult IsNearDouble(double val1, double val2, double abs_error) {
     return ::testing::AssertionSuccess();
   }
   return ::testing::AssertionFailure()
-      << "The difference between " << val1 << " and " << val2
-      << " is " << diff << ", which exceeds " << abs_error << ".";
+         << "The difference between " << val1 << " and " << val2 << " is "
+         << diff << ", which exceeds " << abs_error << ".";
 }
 
-template<class T, int d>
-AssertionResult IsNearVector(
-     mathfu::Vector<T, d> v1, mathfu::Vector<T, d> v2, double abs_error) {
+template <class T, int d>
+AssertionResult IsNearVector(mathfu::Vector<T, d> v1, mathfu::Vector<T, d> v2,
+                             double abs_error) {
   for (int i = 0; i < d; ++i) {
     AssertionResult result = IsNearDouble(v1[i], v2[i], abs_error);
     if (!result) {
@@ -80,9 +77,9 @@ AssertionResult IsNearVector(
   return ::testing::AssertionSuccess();
 }
 
-template<class T>
-AssertionResult IsNearQuat(
-     mathfu::Quaternion<T> q1, mathfu::Quaternion<T> q2, double abs_error) {
+template <class T>
+AssertionResult IsNearQuat(mathfu::Quaternion<T> q1, mathfu::Quaternion<T> q2,
+                           double abs_error) {
   {
     AssertionResult result = IsNearDouble(q1.scalar(), q2.scalar(), abs_error);
     if (!result) {
@@ -90,8 +87,7 @@ AssertionResult IsNearQuat(
     }
   }
   {
-    AssertionResult result =
-        IsNearVector(q1.vector(), q2.vector(), abs_error);
+    AssertionResult result = IsNearVector(q1.vector(), q2.vector(), abs_error);
     if (!result) {
       return result << " at .vector() " << q1 << " " << q2;
     }
@@ -102,9 +98,9 @@ AssertionResult IsNearQuat(
 // Unlike IsNearQuat, this test considers q and -q to be equivalent.
 // This is appropriate when treating quats as orientations (rather than
 // rotations).
-template<class T>
-AssertionResult IsNearOrientation(
-     mathfu::Quaternion<T> q1, mathfu::Quaternion<T> q2, double abs_error) {
+template <class T>
+AssertionResult IsNearOrientation(mathfu::Quaternion<T> q1,
+                                  mathfu::Quaternion<T> q2, double abs_error) {
   // Put them both into the same hemisphere.
   if (mathfu::Quaternion<T>::DotProduct(q1, q2) < 0) {
     q2 = mathfu::Quaternion<T>(-q2.scalar(), -q2.vector());
@@ -113,7 +109,7 @@ AssertionResult IsNearOrientation(
 }
 
 // Test our test helpers.
-template<class T>
+template <class T>
 void TestHelpers_Test(const T& precision) {
   (void)precision;
   using Quaternion = mathfu::Quaternion<T>;
@@ -143,6 +139,54 @@ void ConstAccessor_Test(const T& precision) {
   EXPECT_EQ(static_cast<T>(0.19), quaternion[3]);
 }
 TEST_ALL_F(ConstAccessor)
+
+// Test equality operator for quaternions.
+template <class T>
+void Equality_Test(const T& precision) {
+  (void)precision;
+  const mathfu::Quaternion<T> q1(static_cast<T>(0.50), static_cast<T>(0.76),
+                                 static_cast<T>(0.38), static_cast<T>(0.19));
+  const mathfu::Quaternion<T> q2(static_cast<T>(0.50), static_cast<T>(0.76),
+                                 static_cast<T>(0.38), static_cast<T>(0.19));
+  const mathfu::Quaternion<T> q3(static_cast<T>(0.10), static_cast<T>(0.76),
+                                 static_cast<T>(0.38), static_cast<T>(0.19));
+  // Identical quaternions should be equal.
+  EXPECT_TRUE(q1 == q2);
+  EXPECT_FALSE(q1 != q2);
+  // Quaternions with different scalar parts should not be equal.
+  EXPECT_FALSE(q1 == q3);
+  EXPECT_TRUE(q1 != q3);
+}
+TEST_ALL_F(Equality)
+
+// Test inequality operator for quaternions with differing vector components.
+template <class T>
+void Inequality_Test(const T& precision) {
+  (void)precision;
+  const mathfu::Quaternion<T> q1(static_cast<T>(1), static_cast<T>(2),
+                                 static_cast<T>(3), static_cast<T>(4));
+  // Differ in first vector element.
+  const mathfu::Quaternion<T> q2(static_cast<T>(1), static_cast<T>(9),
+                                 static_cast<T>(3), static_cast<T>(4));
+  // Differ in second vector element.
+  const mathfu::Quaternion<T> q3(static_cast<T>(1), static_cast<T>(2),
+                                 static_cast<T>(9), static_cast<T>(4));
+  // Differ in third vector element.
+  const mathfu::Quaternion<T> q4(static_cast<T>(1), static_cast<T>(2),
+                                 static_cast<T>(3), static_cast<T>(9));
+  EXPECT_TRUE(q1 != q2);
+  EXPECT_TRUE(q1 != q3);
+  EXPECT_TRUE(q1 != q4);
+  EXPECT_FALSE(q1 == q2);
+  EXPECT_FALSE(q1 == q3);
+  EXPECT_FALSE(q1 == q4);
+  // Identity should equal itself.
+  EXPECT_TRUE(mathfu::Quaternion<T>::identity
+              == mathfu::Quaternion<T>::identity);
+  EXPECT_FALSE(mathfu::Quaternion<T>::identity
+               != mathfu::Quaternion<T>::identity);
+}
+TEST_ALL_F(Inequality)
 
 // Test accessing the scalar component of the quaternion using the scalar
 // accessor.
@@ -344,22 +388,20 @@ void MultQuatFloatFlipsQuat_Test(const T& precision) {
   const double epsilon = 1e-5;
 
   // Test the flipping behavior directly.
-  const Quaternion bigQuat = Quaternion::FromAngleAxis(
-      static_cast<T>(mathfu::kPi * 1.5), up);
+  const Quaternion bigQuat =
+      Quaternion::FromAngleAxis(static_cast<T>(mathfu::kPi * 1.5), up);
   EXPECT_NEAR_QUAT(Quaternion(-bigQuat.scalar(), -bigQuat.vector()),
-                   bigQuat * 1,
-                   epsilon);
+                   bigQuat * 1, epsilon);
 
   // Test the claim made in the documentation:
   // "For example, you are not guaranteed that (q * 2) * .5 and q * (2 * .5)
   //  are the same orientation, let alone the same quaternion."
-  const Quaternion base = Quaternion::FromAngleAxis(
-      static_cast<T>(mathfu::kPi * .75), up);
+  const Quaternion base =
+      Quaternion::FromAngleAxis(static_cast<T>(mathfu::kPi * .75), up);
   const Quaternion q1 = (base * 2) * .5f;
   const Quaternion q2 = base * (2 * .5f);
   EXPECT_NEAR_QUAT(
-      q1,
-      Quaternion::FromAngleAxis(static_cast<T>(mathfu::kPi * -.25), up),
+      q1, Quaternion::FromAngleAxis(static_cast<T>(mathfu::kPi * -.25), up),
       epsilon);
   EXPECT_NEAR_QUAT(q2, base, epsilon);
   EXPECT_FALSE(IsNearOrientation(q1, q2, epsilon));
@@ -589,11 +631,11 @@ template <class T>
 void LookAt_Test(const T& precision) {
   const T one = static_cast<T>(1);
   const T zero = static_cast<T>(0);
-  EXPECT_NEAR_QUAT(mathfu::Quaternion<T>::identity,
-                   mathfu::Quaternion<T>::LookAt(
-                       mathfu::Vector<T, 3>(zero, zero, one),
-                       mathfu::Vector<T, 3>(zero, one, zero)),
-                   precision);
+  EXPECT_NEAR_QUAT(
+      mathfu::Quaternion<T>::identity,
+      mathfu::Quaternion<T>::LookAt(mathfu::Vector<T, 3>(zero, zero, one),
+                                    mathfu::Vector<T, 3>(zero, one, zero)),
+      precision);
 }
 TEST_ALL_F(LookAt)
 
@@ -608,18 +650,27 @@ void FromEulerAnglesSplit_Test(const T& precision) {
 }
 TEST_ALL_F(FromEulerAnglesSplit)
 
-const float kSlerpTestAnglesInDegrees[] {
-  // Slerp algorithms commonly have trouble with angles near zero.
-  // To give a sense of what that means for common quaternion-dot cutoffs:
-  // - Quaternion dot of .99999 = .512 degrees
-  // - Quaternion dot of .9999 = 1.62 degrees
-  // - Quaternion dot of .9995 = 3.62 degrees
-  0, .5f, 1.5f, 3.5f,
-  80,
-  // 180 has no numerical problems, unless there's a bug. But worth checking.
-  179, 180, 181,
-  // Slerp is ill-defined at angles near 360.
-  359, 359.5f, 360, 360.5f, 361,
+const float kSlerpTestAnglesInDegrees[]{
+    // Slerp algorithms commonly have trouble with angles near zero.
+    // To give a sense of what that means for common quaternion-dot cutoffs:
+    // - Quaternion dot of .99999 = .512 degrees
+    // - Quaternion dot of .9999 = 1.62 degrees
+    // - Quaternion dot of .9995 = 3.62 degrees
+    0,
+    .5f,
+    1.5f,
+    3.5f,
+    80,
+    // 180 has no numerical problems, unless there's a bug. But worth checking.
+    179,
+    180,
+    181,
+    // Slerp is ill-defined at angles near 360.
+    359,
+    359.5f,
+    360,
+    360.5f,
+    361,
 };
 
 // Tests that Slerp returns unit-length quaternions.
@@ -632,8 +683,8 @@ void SlerpResultIsUnit_Test(const T& precision) {
   const float kLengthEpsilon = 5e-6f;
 
   for (float angle : kSlerpTestAnglesInDegrees) {
-    const Quaternion q2 = Quaternion::FromAngleAxis(
-        angle * mathfu::kDegreesToRadians, axis);
+    const Quaternion q2 =
+        Quaternion::FromAngleAxis(angle * mathfu::kDegreesToRadians, axis);
 
     Quaternion slerp_result = Quaternion::Slerp(Quaternion::identity, q2, .5f);
     const T slerp_length = slerp_result.Normalize();
