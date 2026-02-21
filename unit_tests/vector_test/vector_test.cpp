@@ -15,12 +15,15 @@
  */
 #include "mathfu/vector.h"
 
+#include <climits>
+#include <cstdint>
 #include <sstream>
 #include <string>
 
 #include "gtest/gtest.h"
 #include "mathfu/constants.h"
 #include "mathfu/io.h"
+#include "mathfu/utilities.h"
 #include "precision.h"
 
 class VectorTests : public ::testing::Test {
@@ -790,6 +793,147 @@ TEST_F(VectorTests, Angle_AntiParallelDoesNotReturnNaN) {
   angle = Vec3::Angle(a, b);
   EXPECT_FALSE(std::isnan(angle));
   EXPECT_NEAR(angle, 0.0f, FLOAT_PRECISION);
+}
+
+// Tests scalar RoundUpToPowerOf2 for int32_t.
+TEST_F(VectorTests, RoundUpToPowerOf2_Int32) {
+  // Zero returns zero.
+  EXPECT_EQ(mathfu::RoundUpToPowerOf2(static_cast<int32_t>(0)), 0);
+
+  // One returns one (already a power of 2).
+  EXPECT_EQ(mathfu::RoundUpToPowerOf2(static_cast<int32_t>(1)), 1);
+
+  // Powers of 2 remain unchanged.
+  EXPECT_EQ(mathfu::RoundUpToPowerOf2(static_cast<int32_t>(2)), 2);
+  EXPECT_EQ(mathfu::RoundUpToPowerOf2(static_cast<int32_t>(4)), 4);
+  EXPECT_EQ(mathfu::RoundUpToPowerOf2(static_cast<int32_t>(64)), 64);
+  EXPECT_EQ(mathfu::RoundUpToPowerOf2(static_cast<int32_t>(1024)), 1024);
+  EXPECT_EQ(mathfu::RoundUpToPowerOf2(static_cast<int32_t>(1 << 30)),
+            (1 << 30));
+
+  // Non-powers of 2 round up.
+  EXPECT_EQ(mathfu::RoundUpToPowerOf2(static_cast<int32_t>(3)), 4);
+  EXPECT_EQ(mathfu::RoundUpToPowerOf2(static_cast<int32_t>(5)), 8);
+  EXPECT_EQ(mathfu::RoundUpToPowerOf2(static_cast<int32_t>(6)), 8);
+  EXPECT_EQ(mathfu::RoundUpToPowerOf2(static_cast<int32_t>(7)), 8);
+  EXPECT_EQ(mathfu::RoundUpToPowerOf2(static_cast<int32_t>(9)), 16);
+  EXPECT_EQ(mathfu::RoundUpToPowerOf2(static_cast<int32_t>(100)), 128);
+  EXPECT_EQ(mathfu::RoundUpToPowerOf2(static_cast<int32_t>(1000)), 1024);
+  EXPECT_EQ(mathfu::RoundUpToPowerOf2(static_cast<int32_t>(1025)), 2048);
+}
+
+// Tests scalar RoundUpToPowerOf2 for uint32_t.
+TEST_F(VectorTests, RoundUpToPowerOf2_Uint32) {
+  EXPECT_EQ(mathfu::RoundUpToPowerOf2(static_cast<uint32_t>(0)),
+            static_cast<uint32_t>(0));
+  EXPECT_EQ(mathfu::RoundUpToPowerOf2(static_cast<uint32_t>(1)),
+            static_cast<uint32_t>(1));
+  EXPECT_EQ(mathfu::RoundUpToPowerOf2(static_cast<uint32_t>(2)),
+            static_cast<uint32_t>(2));
+  EXPECT_EQ(mathfu::RoundUpToPowerOf2(static_cast<uint32_t>(3)),
+            static_cast<uint32_t>(4));
+  EXPECT_EQ(mathfu::RoundUpToPowerOf2(static_cast<uint32_t>(5)),
+            static_cast<uint32_t>(8));
+  EXPECT_EQ(mathfu::RoundUpToPowerOf2(static_cast<uint32_t>(255)),
+            static_cast<uint32_t>(256));
+  EXPECT_EQ(mathfu::RoundUpToPowerOf2(static_cast<uint32_t>(1u << 31)),
+            static_cast<uint32_t>(1u << 31));
+}
+
+// Tests scalar RoundUpToPowerOf2 for int64_t.
+TEST_F(VectorTests, RoundUpToPowerOf2_Int64) {
+  EXPECT_EQ(mathfu::RoundUpToPowerOf2(static_cast<int64_t>(0)),
+            static_cast<int64_t>(0));
+  EXPECT_EQ(mathfu::RoundUpToPowerOf2(static_cast<int64_t>(1)),
+            static_cast<int64_t>(1));
+  EXPECT_EQ(mathfu::RoundUpToPowerOf2(static_cast<int64_t>(2)),
+            static_cast<int64_t>(2));
+  EXPECT_EQ(mathfu::RoundUpToPowerOf2(static_cast<int64_t>(3)),
+            static_cast<int64_t>(4));
+  EXPECT_EQ(mathfu::RoundUpToPowerOf2(static_cast<int64_t>(5)),
+            static_cast<int64_t>(8));
+
+  // Test values beyond 32-bit range.
+  int64_t large = static_cast<int64_t>(1) << 32;
+  EXPECT_EQ(mathfu::RoundUpToPowerOf2(large), large);
+  EXPECT_EQ(mathfu::RoundUpToPowerOf2(large + 1), large * 2);
+  EXPECT_EQ(mathfu::RoundUpToPowerOf2(large - 1), large);
+
+  int64_t very_large = static_cast<int64_t>(1) << 62;
+  EXPECT_EQ(mathfu::RoundUpToPowerOf2(very_large), very_large);
+  EXPECT_EQ(mathfu::RoundUpToPowerOf2(very_large - 1), very_large);
+}
+
+// Tests scalar RoundUpToPowerOf2 for uint64_t.
+TEST_F(VectorTests, RoundUpToPowerOf2_Uint64) {
+  EXPECT_EQ(mathfu::RoundUpToPowerOf2(static_cast<uint64_t>(0)),
+            static_cast<uint64_t>(0));
+  EXPECT_EQ(mathfu::RoundUpToPowerOf2(static_cast<uint64_t>(1)),
+            static_cast<uint64_t>(1));
+  EXPECT_EQ(mathfu::RoundUpToPowerOf2(static_cast<uint64_t>(3)),
+            static_cast<uint64_t>(4));
+
+  // Test values beyond 32-bit range.
+  uint64_t large = static_cast<uint64_t>(1) << 32;
+  EXPECT_EQ(mathfu::RoundUpToPowerOf2(large), large);
+  EXPECT_EQ(mathfu::RoundUpToPowerOf2(large + 1), large * 2);
+  EXPECT_EQ(mathfu::RoundUpToPowerOf2(large - 1), large);
+
+  uint64_t very_large = static_cast<uint64_t>(1) << 63;
+  EXPECT_EQ(mathfu::RoundUpToPowerOf2(very_large), very_large);
+  EXPECT_EQ(mathfu::RoundUpToPowerOf2(very_large - 1), very_large);
+}
+
+// Tests scalar RoundUpToPowerOf2 for int16_t.
+TEST_F(VectorTests, RoundUpToPowerOf2_Int16) {
+  EXPECT_EQ(mathfu::RoundUpToPowerOf2(static_cast<int16_t>(0)),
+            static_cast<int16_t>(0));
+  EXPECT_EQ(mathfu::RoundUpToPowerOf2(static_cast<int16_t>(1)),
+            static_cast<int16_t>(1));
+  EXPECT_EQ(mathfu::RoundUpToPowerOf2(static_cast<int16_t>(3)),
+            static_cast<int16_t>(4));
+  EXPECT_EQ(mathfu::RoundUpToPowerOf2(static_cast<int16_t>(255)),
+            static_cast<int16_t>(256));
+  EXPECT_EQ(mathfu::RoundUpToPowerOf2(static_cast<int16_t>(1 << 14)),
+            static_cast<int16_t>(1 << 14));
+}
+
+// Tests scalar RoundUpToPowerOf2 for uint8_t.
+TEST_F(VectorTests, RoundUpToPowerOf2_Uint8) {
+  EXPECT_EQ(mathfu::RoundUpToPowerOf2(static_cast<uint8_t>(0)),
+            static_cast<uint8_t>(0));
+  EXPECT_EQ(mathfu::RoundUpToPowerOf2(static_cast<uint8_t>(1)),
+            static_cast<uint8_t>(1));
+  EXPECT_EQ(mathfu::RoundUpToPowerOf2(static_cast<uint8_t>(2)),
+            static_cast<uint8_t>(2));
+  EXPECT_EQ(mathfu::RoundUpToPowerOf2(static_cast<uint8_t>(3)),
+            static_cast<uint8_t>(4));
+  EXPECT_EQ(mathfu::RoundUpToPowerOf2(static_cast<uint8_t>(127)),
+            static_cast<uint8_t>(128));
+  EXPECT_EQ(mathfu::RoundUpToPowerOf2(static_cast<uint8_t>(128)),
+            static_cast<uint8_t>(128));
+}
+
+// Tests scalar RoundUpToPowerOf2 for all int values from 0 to 1024.
+TEST_F(VectorTests, RoundUpToPowerOf2_Exhaustive_Int32) {
+  int32_t expected = 0;
+  for (int32_t i = 0; i <= 1024; ++i) {
+    // Compute expected: smallest power of 2 >= i (with 0 mapping to 0).
+    if (i == 0) {
+      expected = 0;
+    } else if (i == 1) {
+      expected = 1;
+    } else if ((i & (i - 1)) == 0) {
+      // i is already a power of 2.
+      expected = i;
+    } else {
+      // Find next power of 2.
+      expected = 1;
+      while (expected < i) expected <<= 1;
+    }
+    EXPECT_EQ(mathfu::RoundUpToPowerOf2(i), expected)
+        << "Failed for input " << i;
+  }
 }
 
 // Tests the RoundUpToPowerOf2 function for vectors.
