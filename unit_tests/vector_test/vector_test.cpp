@@ -776,6 +776,23 @@ TEST_F(VectorTests, Angle_Vector3) {
   EXPECT_NEAR(Vec3::Angle(a, b), mathfu::kPi, FLOAT_PRECISION * 1000.f);
 }
 
+// Test that AngleHelper does not return NaN for anti-parallel vectors where
+// floating point rounding pushes cos_val slightly below -1.
+TEST_F(VectorTests, Angle_AntiParallelDoesNotReturnNaN) {
+  using Vec3 = mathfu::Vector<float, 3>;
+  Vec3 a(1, 0, 0);
+  Vec3 b(-1, 0, 0);
+  float angle = Vec3::Angle(a, b);
+  EXPECT_FALSE(std::isnan(angle));
+  EXPECT_NEAR(angle, mathfu::kPi, FLOAT_PRECISION);
+
+  // Also test with parallel vectors (cos_val near +1).
+  b = Vec3(1, 0, 0);
+  angle = Vec3::Angle(a, b);
+  EXPECT_FALSE(std::isnan(angle));
+  EXPECT_NEAR(angle, 0.0f, FLOAT_PRECISION);
+}
+
 // Tests the RoundUpToPowerOf2 function for vectors.
 // Given a vector, it should return a vector whose elements are rounded up to
 // the nearest power of 2.
