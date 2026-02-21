@@ -1343,6 +1343,39 @@ void ToType_Test(const T& precision) {
 }
 TEST_ALL_F(ToType, 0.0f, 0.0)
 
+// This will test a roundtrip through FromType() and ToType().
+// Converts SimpleMatrix -> Matrix -> SimpleMatrix and verifies the values
+// are preserved. This exercises the memcpy-based type-punning path.
+template <class T, int d>
+void FromTypeToTypeRoundtrip_Test(const T& precision) {
+  typedef SimpleMatrix<T, d> CompatibleT;
+  typedef mathfu::Matrix<T, d> MatrixT;
+
+  CompatibleT original;
+  for (int i = 0; i < d * d; ++i) {
+    original.values[i] = static_cast<T>(i * precision + static_cast<T>(1));
+  }
+
+#ifdef MATHFU_COMPILE_WITH_PADDING
+  // With padding, vec3s take up 4-floats worth of memory, so byte-wise
+  // conversion won't work.
+  if (sizeof(CompatibleT) != sizeof(MatrixT)) {
+    EXPECT_EQ(d, 3);
+    return;
+  }
+#endif  // MATHFU_COMPILE_WITH_PADDING
+
+  // SimpleMatrix -> Matrix -> SimpleMatrix
+  const MatrixT matrix = MatrixT::FromType(original);
+  const CompatibleT roundtripped =
+      MatrixT::template ToType<CompatibleT>(matrix);
+
+  for (int i = 0; i < d * d; ++i) {
+    EXPECT_EQ(original.values[i], roundtripped.values[i]);
+  }
+}
+TEST_ALL_F(FromTypeToTypeRoundtrip, 0.0f, 0.0)
+
 template <class T, int d>
 void OutputStream_Test(const T&) {
   mathfu::Matrix<T, d> matrix;

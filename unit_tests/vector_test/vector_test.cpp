@@ -978,6 +978,31 @@ void ToType_Test(const T& precision) {
 TEST_ALL_F(ToType)
 TEST_ALL_INTS_F(ToType)
 
+// This will test a roundtrip through FromType() and ToType().
+// Converts SimpleVector -> Vector -> SimpleVector and verifies the values
+// are preserved. This exercises the memcpy-based type-punning path.
+template <class T, int d>
+void FromTypeToTypeRoundtrip_Test(const T& precision) {
+  typedef SimpleVector<T, d> CompatibleT;
+  typedef mathfu::Vector<T, d> VectorT;
+
+  CompatibleT original;
+  for (int i = 0; i < d; ++i) {
+    original.values[i] = static_cast<T>(i * precision + static_cast<T>(1));
+  }
+
+  // SimpleVector -> Vector -> SimpleVector
+  const VectorT vector = VectorT::FromType(original);
+  const CompatibleT roundtripped =
+      VectorT::template ToType<CompatibleT>(vector);
+
+  for (int i = 0; i < d; ++i) {
+    EXPECT_EQ(original.values[i], roundtripped.values[i]);
+  }
+}
+TEST_ALL_F(FromTypeToTypeRoundtrip)
+TEST_ALL_INTS_F(FromTypeToTypeRoundtrip)
+
 // Test output stream operator.
 template <class T, int d>
 void OutputStream_Test(const T&) {
