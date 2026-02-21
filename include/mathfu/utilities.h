@@ -230,25 +230,6 @@ volatile __attribute__((weak)) const char *kMathFuVersionString =
 #endif  // !defined(_WIN32) && !defined(__CYGWIN__)
 
 /// @cond MATHFU_INTERNAL
-template <bool>
-struct static_assert_util;
-template <>
-struct static_assert_util<true> {};
-/// @endcond
-
-/// @addtogroup mathfu_utilities
-/// @{
-/// @def MATHFU_STATIC_ASSERT
-/// @brief Compile time assert for pre-C++11 compilers.
-///
-/// For example:
-/// <blockquote><code>
-/// MATHFU_STATIC_ASSERT(0 == 1);
-/// </code></blockquote> will result in a compile error.
-#define MATHFU_STATIC_ASSERT(x) static_assert_util<(x)>()
-/// @}
-
-/// @cond MATHFU_INTERNAL
 /// Unroll an loop up to 4 iterations, where iterator is the identifier
 /// used in each operation (e.g "i"), number_of_iterations is a constant which
 /// specifies the number of times to perform the operation and "operation" is
