@@ -1,31 +1,29 @@
 /*
-* Copyright 2014 Google Inc. All rights reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright 2014 Google Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 #include "mathfu/matrix.h"
-
-#include "mathfu/io.h"
-#include "mathfu/quaternion.h"
-#include "mathfu/utilities.h"
-#include "mathfu/vector.h"
 
 #include <cmath>
 #include <sstream>
 #include <string>
 
 #include "gtest/gtest.h"
-
+#include "mathfu/io.h"
+#include "mathfu/quaternion.h"
+#include "mathfu/utilities.h"
+#include "mathfu/vector.h"
 #include "precision.h"
 static const float kUnProjectFloatPrecision = 0.0012f;
 static const double kLookAtDoublePrecision = 1e-8;
@@ -290,12 +288,8 @@ void Mult_Test(const T& precision) {
   }
 }
 TEST_ALL_F(Mult, FLOAT_PRECISION, DOUBLE_PRECISION)
-TEST_F(MatrixTests, Mult_float_5) {
-  Mult_Test<float, 5>(FLOAT_PRECISION);
-}
-TEST_F(MatrixTests, Mult_double_5) {
-  Mult_Test<double, 5>(DOUBLE_PRECISION);
-}
+TEST_F(MatrixTests, Mult_float_5) { Mult_Test<float, 5>(FLOAT_PRECISION); }
+TEST_F(MatrixTests, Mult_double_5) { Mult_Test<double, 5>(DOUBLE_PRECISION); }
 
 // This will test the outer product of two vectors. The template parameter d
 // corresponds to the number of rows and columns.
@@ -339,10 +333,8 @@ void InverseNonInvertible_Test(const T& precision) {
   const size_t matrix_size = sizeof(m) / sizeof(m[0]);
   static const T kDeterminantThreshold =
       mathfu::Constants<T>::GetDeterminantThreshold();
-  static const T kDeterminantThresholdSmall =
-      kDeterminantThreshold / 100;
-  static const T kDeterminantThresholdLarge =
-      kDeterminantThreshold * 100;
+  static const T kDeterminantThresholdSmall = kDeterminantThreshold / 100;
+  static const T kDeterminantThresholdLarge = kDeterminantThreshold * 100;
   static const T kDeterminantThresholdInverse = 1 / kDeterminantThreshold;
   static const T kDeterminantThresholdInverseSmall =
       kDeterminantThresholdInverse / 100;
@@ -409,10 +401,8 @@ void InverseSmallScale_Test(const T& precision) {
   (void)precision;
   static const T kDeterminantThreshold =
       mathfu::Constants<T>::GetDeterminantThreshold();
-  static const T kDeterminantThresholdSmall =
-      kDeterminantThreshold / 100;
-  static const T kDeterminantThresholdLarge =
-      kDeterminantThreshold * 100;
+  static const T kDeterminantThresholdSmall = kDeterminantThreshold / 100;
+  static const T kDeterminantThresholdLarge = kDeterminantThreshold * 100;
 
   // The scale of the determinant grows with the square for 2x2 matrices, and
   // with the cube for both 3x3 and 4x4 matrices.
@@ -426,8 +416,8 @@ void InverseSmallScale_Test(const T& precision) {
   {
     for (int i = 0; i != d; ++i) matrix(i, i) = kScaleMin / 2;
     EXPECT_FALSE(matrix.InverseWithDeterminantCheck(&inverse_matrix));
-    EXPECT_TRUE(matrix.InverseWithDeterminantCheck(
-        &inverse_matrix, kDeterminantThresholdSmall));
+    EXPECT_TRUE(matrix.InverseWithDeterminantCheck(&inverse_matrix,
+                                                   kDeterminantThresholdSmall));
     EXPECT_FALSE(matrix.InverseWithDeterminantCheck(
         &inverse_matrix, kDeterminantThresholdLarge));
   }
@@ -436,8 +426,8 @@ void InverseSmallScale_Test(const T& precision) {
   {
     for (int i = 0; i != d; ++i) matrix(i, i) = kScaleMin * 2;
     EXPECT_TRUE(matrix.InverseWithDeterminantCheck(&inverse_matrix));
-    EXPECT_TRUE(matrix.InverseWithDeterminantCheck(
-        &inverse_matrix, kDeterminantThresholdSmall));
+    EXPECT_TRUE(matrix.InverseWithDeterminantCheck(&inverse_matrix,
+                                                   kDeterminantThresholdSmall));
     EXPECT_FALSE(matrix.InverseWithDeterminantCheck(
         &inverse_matrix, kDeterminantThresholdLarge));
   }
@@ -1087,8 +1077,9 @@ void Mat4ToAndFromAffine_Test(const T&) {
   // Perform a normal mat4 * mat4 multiplication and compare its result with
   // multiplications involving conversions.
   const Mat4 mat4_multiplication = indices4 * indices4;
-  const Mat4 affine_multiplication = Mat4::FromAffineTransform(indices_affine) *
-                                     Mat4::FromAffineTransform(indices_affine);
+  const Mat4 affine_multiplication =
+      Mat4::FromAffineTransform(indices_affine)
+      * Mat4::FromAffineTransform(indices_affine);
   const Mat4 affine_and_mat4_multiplication =
       indices4 * Mat4::FromAffineTransform(indices_affine);
 
@@ -1195,8 +1186,7 @@ void HadamardProduct_Test(const T& precision) {
     m1[i] = static_cast<T>(i + 1);
     m2[i] = static_cast<T>(d * d - i);
   }
-  mathfu::Matrix<T, d> result =
-      mathfu::Matrix<T, d>::HadamardProduct(m1, m2);
+  mathfu::Matrix<T, d> result = mathfu::Matrix<T, d>::HadamardProduct(m1, m2);
   for (int i = 0; i < d * d; ++i) {
     EXPECT_NEAR(result[i], m1[i] * m2[i], precision);
   }
@@ -1259,6 +1249,35 @@ void NotEqual_Test(const T& precision) {
   EXPECT_TRUE(expected != close);
 }
 TEST_ALL_F(NotEqual, FLOAT_PRECISION, DOUBLE_PRECISION)
+
+// Test that operator== and operator!= correctly detect differences in each
+// individual element of the matrix. This verifies that the inequality check
+// uses logical OR (short-circuit) rather than bitwise OR, and that every
+// element position is properly compared.
+template <class T, int d>
+void EqualityPerElement_Test(const T& precision) {
+  (void)precision;
+  mathfu::Matrix<T, d> base;
+  for (int i = 0; i < d * d; ++i) {
+    base[i] = static_cast<T>(i + 1);
+  }
+
+  // A copy should be equal.
+  mathfu::Matrix<T, d> copy(base);
+  EXPECT_TRUE(base == copy);
+  EXPECT_FALSE(base != copy);
+
+  // Changing any single element should make the matrices not equal.
+  for (int i = 0; i < d * d; ++i) {
+    mathfu::Matrix<T, d> modified(base);
+    modified[i] = base[i] + static_cast<T>(100);
+    EXPECT_FALSE(base == modified)
+        << "Element " << i << " difference not detected by operator==";
+    EXPECT_TRUE(base != modified)
+        << "Element " << i << " difference not detected by operator!=";
+  }
+}
+TEST_ALL_F(EqualityPerElement, FLOAT_PRECISION, DOUBLE_PRECISION)
 
 // Simple class that represents a possible compatible type for a vector.
 // That is, it's just an array of T of length d, so can be loaded and
