@@ -42,6 +42,7 @@
 // MSVC decides that "Cols" *is* constant when unrolling the operation
 // loop.
 #pragma warning(disable : 4127)  // conditional expression is constant
+#pragma warning(disable : 4100)  // unreferenced formal parameter
 #pragma warning(disable : 4789)  // buffer overrun
 #if _MSC_VER >= 1900             // MSVC 2015
 #pragma warning(disable : 4456)  // allow shadowing in unrolled loops
@@ -134,8 +135,7 @@ template <class T>
 static inline bool UnProjectHelper(const Vector<T, 3>& window_coord,
                                    const Matrix<T, 4, 4>& model_view,
                                    const Matrix<T, 4, 4>& projection,
-                                   const float window_width,
-                                   const float window_height,
+                                   const T window_width, const T window_height,
                                    Vector<T, 3>& result);
 
 template <typename T, int Rows, int Cols, typename CompatibleT>
@@ -892,8 +892,7 @@ class Matrix {
   static inline bool UnProject(const Vector<T, 3>& window_coord,
                                const Matrix<T, 4, 4>& model_view,
                                const Matrix<T, 4, 4>& projection,
-                               const float window_width,
-                               const float window_height,
+                               const T window_width, const T window_height,
                                Vector<T, 3>* result) {
     return UnProjectHelper(window_coord, model_view, projection, window_width,
                            window_height, *result);
@@ -1274,6 +1273,7 @@ inline bool InverseHelper(const Matrix<T, Rows, Cols>& m,
                           Matrix<T, Rows, Cols>* const inverse, T det_thresh) {
   assert(false);
   (void)m;
+  (void)det_thresh;
   *inverse = T::Identity();
   return false;
 }
@@ -1556,8 +1556,7 @@ template <class T>
 static inline bool UnProjectHelper(const Vector<T, 3>& window_coord,
                                    const Matrix<T, 4, 4>& model_view,
                                    const Matrix<T, 4, 4>& projection,
-                                   const float window_width,
-                                   const float window_height,
+                                   const T window_width, const T window_height,
                                    Vector<T, 3>& result) {
   if (window_coord.z < static_cast<T>(0)
       || window_coord.z > static_cast<T>(1)) {
