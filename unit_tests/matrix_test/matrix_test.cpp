@@ -838,13 +838,37 @@ void UnProject_Test(const T& precision) {
                         0,          0,   static_cast<T>(-1.00001991), -1,
                         0,          0,  static_cast<T>(-0.200001985),  0);
   // clang-format on
-  mathfu::Vector<T, 3> result = mathfu::Matrix<T, 4, 4>::UnProject(
-      mathfu::Vector<T, 3>(754, 1049, 1), modelView, projection, 1600, 1200);
+  mathfu::Vector<T, 3> result;
+  bool success = mathfu::Matrix<T, 4, 4>::UnProject(
+      mathfu::Vector<T, 3>(754, 1049, 1), modelView, projection, 1600, 1200,
+      &result);
+  EXPECT_TRUE(success);
   EXPECT_NEAR(result.x, 319.00242400912055, 300.0 * precision);
   EXPECT_NEAR(result.y, 3113.7409399625253, 3000.0 * precision);
   EXPECT_NEAR(result.z, 10035.303114023569, 10000.0 * precision);
 }
 TEST_SCALAR_F(UnProject, kUnProjectFloatPrecision, DOUBLE_PRECISION)
+
+// Test UnProject returns false for a singular (all-zero) matrix.
+template <class T>
+void UnProject_SingularMatrix_Test(const T& precision) {
+  (void)precision;
+  // A zero matrix is singular and cannot be inverted.
+  mathfu::Matrix<T, 4, 4> singular =
+      mathfu::Matrix<T, 4, 4>(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+  mathfu::Matrix<T, 4, 4> identity = mathfu::Matrix<T, 4, 4>::Identity();
+  mathfu::Vector<T, 3> window_coord(400, 300, static_cast<T>(0.5));
+  mathfu::Vector<T, 3> result;
+  // Singular model-view matrix.
+  bool success_mv = mathfu::Matrix<T, 4, 4>::UnProject(
+      window_coord, singular, identity, 800, 600, &result);
+  EXPECT_FALSE(success_mv);
+  // Singular projection matrix.
+  bool success_proj = mathfu::Matrix<T, 4, 4>::UnProject(
+      window_coord, identity, singular, 800, 600, &result);
+  EXPECT_FALSE(success_proj);
+}
+TEST_SCALAR_F(UnProject_SingularMatrix, FLOAT_PRECISION, DOUBLE_PRECISION)
 
 // Test matrix transposition.
 template <class T, int d>

@@ -867,16 +867,19 @@ class Matrix {
   /// @param projection The projection matrix.
   /// @param window_width Width of the window.
   /// @param window_height Height of the window.
-  /// @return the mapped 3D position in object space.
-  static inline Vector<T, 3> UnProject(const Vector<T, 3>& window_coord,
-                                       const Matrix<T, 4, 4>& model_view,
-                                       const Matrix<T, 4, 4>& projection,
-                                       const float window_width,
-                                       const float window_height) {
-    Vector<T, 3> result;
-    UnProjectHelper(window_coord, model_view, projection, window_width,
-                    window_height, result);
-    return result;
+  /// @param result Output: the mapped 3D position in object space.
+  /// @return Whether the unprojection succeeded. This can fail if the
+  /// model-view-projection matrix is singular (not invertible), or if
+  /// the homogeneous coordinate w is zero, or if the window_coord z
+  /// value is outside the [0, 1] range.
+  static inline bool UnProject(const Vector<T, 3>& window_coord,
+                               const Matrix<T, 4, 4>& model_view,
+                               const Matrix<T, 4, 4>& projection,
+                               const float window_width,
+                               const float window_height,
+                               Vector<T, 3>* result) {
+    return UnProjectHelper(window_coord, model_view, projection, window_width,
+                           window_height, *result);
   }
 
   /// @brief Multiply a Vector by a Matrix.
@@ -1511,7 +1514,11 @@ static inline bool UnProjectHelper(const Vector<T, 3>& window_coord,
     // 1: far plane
     return false;
   }
-  Matrix<T, 4, 4> matrix = (projection * model_view).Inverse();
+  Matrix<T, 4, 4> mvp = projection * model_view;
+  Matrix<T, 4, 4> matrix;
+  if (!mvp.InverseWithDeterminantCheck(&matrix)) {
+    return false;
+  }
   Vector<T, 4> standardized = Vector<T, 4>(
       static_cast<T>(2) * (window_coord.x - window_width) / window_width
           + static_cast<T>(1),
