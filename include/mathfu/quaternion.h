@@ -174,8 +174,9 @@ class Quaternion {
     // ToAngleAxis may return slightly non-normal axes in unstable cases.
     // It should arguably handle that internally, allowing us to remove
     // the Normalized() here.
-    return Quaternion<T>(cos(0.5f * angle),
-                         axis.Normalized() * static_cast<T>(sin(0.5f * angle)));
+    return Quaternion<T>(
+        cos(T(0.5) * angle),
+        axis.Normalized() * static_cast<T>(sin(T(0.5) * angle)));
   }
 
   /// @brief Multiply a Vector by this Quaternion.
@@ -187,8 +188,8 @@ class Quaternion {
   /// @return Rotated Vector.
   inline Vector<T, 3> operator*(const Vector<T, 3>& v1) const {
     T ss = s_ + s_;
-    return ss * Vector<T, 3>::CrossProduct(v_, v1) + (ss * s_ - 1) * v1
-           + 2 * Vector<T, 3>::DotProduct(v_, v1) * v_;
+    return ss * Vector<T, 3>::CrossProduct(v_, v1) + (ss * s_ - T(1)) * v1
+           + T(2) * Vector<T, 3>::DotProduct(v_, v1) * v_;
   }
 
   /// @brief Normalize this quaternion (in-place).
@@ -196,7 +197,7 @@ class Quaternion {
   /// @return Length of the quaternion.
   inline T Normalize() {
     T length = sqrt(s_ * s_ + Vector<T, 3>::DotProduct(v_, v_));
-    T scale = (1 / length);
+    T scale = (T(1) / length);
     s_ *= scale;
     v_ *= scale;
     return length;
@@ -244,7 +245,7 @@ class Quaternion {
     } else {
       *out_axis = axis;
     }
-    *out_angle = 2 * atan2(axis_length, s_);
+    *out_angle = T(2) * atan2(axis_length, s_);
   }
 
   /// @brief Convert this Quaternion to 3 Euler Angles.
@@ -254,7 +255,7 @@ class Quaternion {
   inline Vector<T, 3> ToEulerAngles() const {
     Matrix<T, 3> m(ToMatrix());
     T cos2 = m[0] * m[0] + m[1] * m[1];
-    if (cos2 < 1e-6f) {
+    if (cos2 < static_cast<T>(1e-6)) {
       return Vector<T, 3>(
           0,
           m[2] < 0 ? static_cast<T>(0.5 * M_PI) : static_cast<T>(-0.5 * M_PI),
@@ -273,9 +274,10 @@ class Quaternion {
     const T x2 = v_[0] * v_[0], y2 = v_[1] * v_[1], z2 = v_[2] * v_[2];
     const T sx = s_ * v_[0], sy = s_ * v_[1], sz = s_ * v_[2];
     const T xz = v_[0] * v_[2], yz = v_[1] * v_[2], xy = v_[0] * v_[1];
-    return Matrix<T, 3>(1 - 2 * (y2 + z2), 2 * (xy + sz), 2 * (xz - sy),
-                        2 * (xy - sz), 1 - 2 * (x2 + z2), 2 * (sx + yz),
-                        2 * (sy + xz), 2 * (yz - sx), 1 - 2 * (x2 + y2));
+    return Matrix<T, 3>(
+        T(1) - T(2) * (y2 + z2), T(2) * (xy + sz), T(2) * (xz - sy),
+        T(2) * (xy - sz), T(1) - T(2) * (x2 + z2), T(2) * (sx + yz),
+        T(2) * (sy + xz), T(2) * (yz - sx), T(1) - T(2) * (x2 + y2));
   }
 
   /// @brief Convert to a 4x4 Matrix.
@@ -285,10 +287,11 @@ class Quaternion {
     const T x2 = v_[0] * v_[0], y2 = v_[1] * v_[1], z2 = v_[2] * v_[2];
     const T sx = s_ * v_[0], sy = s_ * v_[1], sz = s_ * v_[2];
     const T xz = v_[0] * v_[2], yz = v_[1] * v_[2], xy = v_[0] * v_[1];
-    return Matrix<T, 4>(1 - 2 * (y2 + z2), 2 * (xy + sz), 2 * (xz - sy), 0.0f,
-                        2 * (xy - sz), 1 - 2 * (x2 + z2), 2 * (sx + yz), 0.0f,
-                        2 * (sy + xz), 2 * (yz - sx), 1 - 2 * (x2 + y2), 0.0f,
-                        0.0f, 0.0f, 0.0f, 1.0f);
+    return Matrix<T, 4>(T(1) - T(2) * (y2 + z2), T(2) * (xy + sz),
+                        T(2) * (xz - sy), T(0), T(2) * (xy - sz),
+                        T(1) - T(2) * (x2 + z2), T(2) * (sx + yz), T(0),
+                        T(2) * (sy + xz), T(2) * (yz - sx),
+                        T(1) - T(2) * (x2 + y2), T(0), T(0), T(0), T(0), T(1));
   }
 
   /// @brief Create a Quaternion from an angle and axis.
@@ -342,25 +345,25 @@ class Quaternion {
   static Quaternion<T> FromMatrix(const Matrix<T, 3>& m) {
     const T trace = m(0, 0) + m(1, 1) + m(2, 2);
     if (trace > 0) {
-      const T s = sqrt(trace + 1) * 2;
-      const T oneOverS = 1 / s;
-      return Quaternion<T>(static_cast<T>(0.25) * s, (m[5] - m[7]) * oneOverS,
+      const T s = sqrt(trace + T(1)) * T(2);
+      const T oneOverS = T(1) / s;
+      return Quaternion<T>(T(0.25) * s, (m[5] - m[7]) * oneOverS,
                            (m[6] - m[2]) * oneOverS, (m[1] - m[3]) * oneOverS);
     } else if (m[0] > m[4] && m[0] > m[8]) {
-      const T s = sqrt(m[0] - m[4] - m[8] + 1) * 2;
-      const T oneOverS = 1 / s;
-      return Quaternion<T>((m[5] - m[7]) * oneOverS, static_cast<T>(0.25) * s,
+      const T s = sqrt(m[0] - m[4] - m[8] + T(1)) * T(2);
+      const T oneOverS = T(1) / s;
+      return Quaternion<T>((m[5] - m[7]) * oneOverS, T(0.25) * s,
                            (m[3] + m[1]) * oneOverS, (m[6] + m[2]) * oneOverS);
     } else if (m[4] > m[8]) {
-      const T s = sqrt(m[4] - m[0] - m[8] + 1) * 2;
-      const T oneOverS = 1 / s;
+      const T s = sqrt(m[4] - m[0] - m[8] + T(1)) * T(2);
+      const T oneOverS = T(1) / s;
       return Quaternion<T>((m[6] - m[2]) * oneOverS, (m[3] + m[1]) * oneOverS,
-                           static_cast<T>(0.25) * s, (m[5] + m[7]) * oneOverS);
+                           T(0.25) * s, (m[5] + m[7]) * oneOverS);
     } else {
-      const T s = sqrt(m[8] - m[0] - m[4] + 1) * 2;
-      const T oneOverS = 1 / s;
+      const T s = sqrt(m[8] - m[0] - m[4] + T(1)) * T(2);
+      const T oneOverS = T(1) / s;
       return Quaternion<T>((m[1] - m[3]) * oneOverS, (m[6] + m[2]) * oneOverS,
-                           (m[5] + m[7]) * oneOverS, static_cast<T>(0.25) * s);
+                           (m[5] + m[7]) * oneOverS, T(0.25) * s);
     }
   }
 
@@ -372,25 +375,25 @@ class Quaternion {
   static Quaternion<T> FromMatrix(const Matrix<T, 4>& m) {
     const T trace = m(0, 0) + m(1, 1) + m(2, 2);
     if (trace > 0) {
-      const T s = sqrt(trace + 1) * 2;
-      const T oneOverS = 1 / s;
-      return Quaternion<T>(static_cast<T>(0.25) * s, (m[6] - m[9]) * oneOverS,
+      const T s = sqrt(trace + T(1)) * T(2);
+      const T oneOverS = T(1) / s;
+      return Quaternion<T>(T(0.25) * s, (m[6] - m[9]) * oneOverS,
                            (m[8] - m[2]) * oneOverS, (m[1] - m[4]) * oneOverS);
     } else if (m[0] > m[5] && m[0] > m[10]) {
-      const T s = sqrt(m[0] - m[5] - m[10] + 1) * 2;
-      const T oneOverS = 1 / s;
-      return Quaternion<T>((m[6] - m[9]) * oneOverS, static_cast<T>(0.25) * s,
+      const T s = sqrt(m[0] - m[5] - m[10] + T(1)) * T(2);
+      const T oneOverS = T(1) / s;
+      return Quaternion<T>((m[6] - m[9]) * oneOverS, T(0.25) * s,
                            (m[4] + m[1]) * oneOverS, (m[8] + m[2]) * oneOverS);
     } else if (m[5] > m[10]) {
-      const T s = sqrt(m[5] - m[0] - m[10] + 1) * 2;
-      const T oneOverS = 1 / s;
+      const T s = sqrt(m[5] - m[0] - m[10] + T(1)) * T(2);
+      const T oneOverS = T(1) / s;
       return Quaternion<T>((m[8] - m[2]) * oneOverS, (m[4] + m[1]) * oneOverS,
-                           static_cast<T>(0.25) * s, (m[6] + m[9]) * oneOverS);
+                           T(0.25) * s, (m[6] + m[9]) * oneOverS);
     } else {
-      const T s = sqrt(m[10] - m[0] - m[5] + 1) * 2;
-      const T oneOverS = 1 / s;
+      const T s = sqrt(m[10] - m[0] - m[5] + T(1)) * T(2);
+      const T oneOverS = T(1) / s;
       return Quaternion<T>((m[1] - m[4]) * oneOverS, (m[8] + m[2]) * oneOverS,
-                           (m[6] + m[9]) * oneOverS, static_cast<T>(0.25) * s);
+                           (m[6] + m[9]) * oneOverS, T(0.25) * s);
     }
   }
 
@@ -417,9 +420,10 @@ class Quaternion {
   /// @result Quaternion containing the result.
   static inline Quaternion<T> Slerp(const Quaternion<T>& q1,
                                     const Quaternion<T>& q2, T s1) {
-    if (q1.s_ * q2.s_ + Vector<T, 3>::DotProduct(q1.v_, q2.v_) > 0.9999f) {
-      return Quaternion<T>(q1.s_ * (1 - s1) + q2.s_ * s1,
-                           q1.v_ * (1 - s1) + q2.v_ * s1)
+    if (q1.s_ * q2.s_ + Vector<T, 3>::DotProduct(q1.v_, q2.v_)
+        > static_cast<T>(0.9999)) {
+      return Quaternion<T>(q1.s_ * (T(1) - s1) + q2.s_ * s1,
+                           q1.v_ * (T(1) - s1) + q2.v_ * s1)
           .Normalized();
     }
     return q1 * ((q1.Inverse() * q2) * s1);
@@ -486,8 +490,7 @@ class Quaternion {
     // actually compute the angle we want:
     Vector<T, 3> cross_product = Vector<T, 3>::CrossProduct(start, end);
 
-    return Quaternion<T>(static_cast<T>(1.0) + dot_product, cross_product)
-        .Normalized();
+    return Quaternion<T>(T(1) + dot_product, cross_product).Normalized();
   }
 
   /// @brief Returns the a Quaternion that rotates from start to end.
@@ -574,14 +577,13 @@ class Quaternion {
     // If the vectors point in opposite directions, return a 180 degree
     // rotation, on an arbitrary axis.
     if (dot_product <= static_cast<T>(-0.99999847691)) {
-      return Quaternion<T>(0, PerpendicularVector(start));
+      return Quaternion<T>(T(0), PerpendicularVector(start));
     }
     // Degenerate cases have been handled, so if we're here, we have to
     // actually compute the angle we want:
     Vector<T, 3> cross_product = Vector<T, 3>::CrossProduct(start, end);
 
-    return Quaternion<T>(static_cast<T>(1.0) + dot_product, cross_product)
-        .Normalized();
+    return Quaternion<T>(T(1) + dot_product, cross_product).Normalized();
   }
 
   /// @brief Returns a quaternion looking at forward vector with an up vector.

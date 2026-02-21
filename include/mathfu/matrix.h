@@ -459,7 +459,7 @@ class Matrix {
   /// @param s Scalar to divide this Matrix with.
   /// @return Matrix containing the result.
   inline Matrix<T, Rows, Cols> operator/(T s) const {
-    return (*this) * (1 / s);
+    return (*this) * (T(1) / s);
   }
 
   /// @brief Multiply this Matrix with another Matrix.
@@ -516,7 +516,9 @@ class Matrix {
   ///
   /// @param s Scalar to divide this Matrix by.
   /// @return Reference to this class.
-  inline Matrix<T, Rows, Cols>& operator/=(T s) { return (*this) *= (1 / s); }
+  inline Matrix<T, Rows, Cols>& operator/=(T s) {
+    return (*this) *= (T(1) / s);
+  }
 
   /// @brief Multiply this Matrix with another Matrix (in-place).
   ///
@@ -1040,7 +1042,7 @@ inline Vector<T, 4> operator*(const Matrix<T, 4, 4>& m, const Vector<T, 4>& v) {
 /// @related mathfu::Matrix
 template <class T>
 inline Vector<T, 3> operator*(const Matrix<T, 4, 4>& m, const Vector<T, 3>& v) {
-  Vector<T, 4> v4(v[0], v[1], v[2], 1);
+  Vector<T, 4> v4(v[0], v[1], v[2], T(1));
   v4 = m * v4;
   return Vector<T, 3>(v4[0] / v4[3], v4[1] / v4[3], v4[2] / v4[3]);
 }
@@ -1162,9 +1164,9 @@ inline void TimesHelper(const Matrix<T, 4, 4>& m1, const Matrix<T, 4, 4>& m2,
 /// @tparam Cols Number of Cols in the returned Matrix.
 template <class T, int Rows, int Cols>
 inline Matrix<T, Rows, Cols> IdentityHelper() {
-  Matrix<T, Rows, Cols> return_matrix(0.f);
+  Matrix<T, Rows, Cols> return_matrix(T(0));
   int min_d = Rows < Cols ? Rows : Cols;
-  for (int i = 0; i < min_d; ++i) return_matrix(i, i) = 1;
+  for (int i = 0; i < min_d; ++i) return_matrix(i, i) = T(1);
   return return_matrix;
 }
 /// @endcond
@@ -1268,7 +1270,7 @@ inline bool InverseHelper(const Matrix<T, 2, 2>& m,
   if (check_invertible && fabs(determinant) < det_thresh) {
     return false;
   }
-  T inverseDeterminant = 1 / determinant;
+  T inverseDeterminant = T(1) / determinant;
   (*inverse)[0] = inverseDeterminant * m[3];
   (*inverse)[1] = -inverseDeterminant * m[1];
   (*inverse)[2] = -inverseDeterminant * m[2];
@@ -1293,7 +1295,7 @@ inline bool InverseHelper(const Matrix<T, 3, 3>& m,
       sub11, sub12, sub13, m[6] * m[5] - m[3] * m[8], m[0] * m[8] - m[6] * m[2],
       m[3] * m[2] - m[0] * m[5], m[3] * m[7] - m[6] * m[4],
       m[6] * m[1] - m[0] * m[7], m[0] * m[4] - m[3] * m[1]);
-  *(inverse) *= 1 / determinant;
+  *(inverse) *= T(1) / determinant;
   return true;
 }
 /// @endcond
@@ -1365,7 +1367,7 @@ bool InverseHelper(const Matrix<T, 4, 4>& m, Matrix<T, 4, 4>* const inverse,
     return false;
   }
   // This will compute the inverse using the row, column, and 3x3 submatrix.
-  T inv = -1 / pivot_value;
+  T inv = T(-1) / pivot_value;
   row *= inv;
   matrix += Matrix<T, 3>::OuterProduct(column, row);
   Matrix<T, 3> mat_inverse;
@@ -1410,13 +1412,13 @@ bool InverseHelper(const Matrix<T, 4, 4>& m, Matrix<T, 4, 4>* const inverse,
 template <class T>
 inline Matrix<T, 4, 4> PerspectiveHelper(T fovy, T aspect, T znear, T zfar,
                                          T handedness) {
-  const T y = 1 / std::tan(fovy * static_cast<T>(.5));
+  const T y = T(1) / std::tan(fovy * T(0.5));
   const T x = y / aspect;
   const T zdist = (znear - zfar);
   const T zfar_per_zdist = zfar / zdist;
   return Matrix<T, 4, 4>(x, 0, 0, 0, 0, y, 0, 0, 0, 0,
-                         zfar_per_zdist * handedness, -1 * handedness, 0, 0,
-                         2.0f * znear * zfar_per_zdist, 0);
+                         zfar_per_zdist * handedness, T(-1) * handedness, 0, 0,
+                         T(2) * znear * zfar_per_zdist, 0);
 }
 /// @endcond
 
