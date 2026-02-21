@@ -605,6 +605,7 @@ class Quaternion {
   ///
   /// @param forward The forward vector (Vector to face).
   /// @param up The up vector.
+  /// @param handedness 1.0f for RH, -1.0f for LH.
   /// @param Forward and up do not have to be orthogonal.
   /// @param Forward and up cannot be parallel.
   /// @param Forward and up cannot be zero vectors.
@@ -616,9 +617,9 @@ class Quaternion {
   /// The params can be represented with zero-vector as source and
   /// forward-vector as destination.
   static inline Quaternion<T> LookAt(const Vector<T, 3>& forward,
-                                     const Vector<T, 3>& up) {
-    return FromMatrix(
-        Matrix<T, 3>::LookAt(forward, Vector<T, 3>(static_cast<T>(0)), up));
+                                     const Vector<T, 3>& up, T handedness = 1) {
+    return FromMatrix(Matrix<T, 3>::LookAt(
+        forward, Vector<T, 3>(static_cast<T>(0)), up, handedness));
   }
 
   /// @brief Contains a quaternion doing the identity transform.

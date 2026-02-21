@@ -837,11 +837,10 @@ class Matrix {
   /// y-axis is up.
   /// @param handedness 1.0f for RH, -1.0f for LH.
   /// @return 3-dimensional camera Matrix.
-  /// TODO: Change default handedness to +1 so that it matches Perspective().
   static inline Matrix<T, 4, 4> LookAt(const Vector<T, 3>& at,
                                        const Vector<T, 3>& eye,
                                        const Vector<T, 3>& up,
-                                       T handedness = -1) {
+                                       T handedness = 1) {
     return LookAtHelper(at, eye, up, handedness);
   }
 

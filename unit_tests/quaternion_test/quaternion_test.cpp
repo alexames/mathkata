@@ -631,10 +631,26 @@ template <class T>
 void LookAt_Test(const T& precision) {
   const T one = static_cast<T>(1);
   const T zero = static_cast<T>(0);
+  // Default (right-handed): looking along +z with up +y produces a 180-degree
+  // rotation around the y-axis.
+  EXPECT_NEAR_QUAT(
+      mathfu::Quaternion<T>(zero, zero, one, zero),
+      mathfu::Quaternion<T>::LookAt(mathfu::Vector<T, 3>(zero, zero, one),
+                                    mathfu::Vector<T, 3>(zero, one, zero)),
+      precision);
+  // Explicit right-handed should match the default.
+  EXPECT_NEAR_QUAT(
+      mathfu::Quaternion<T>::LookAt(mathfu::Vector<T, 3>(zero, zero, one),
+                                    mathfu::Vector<T, 3>(zero, one, zero)),
+      mathfu::Quaternion<T>::LookAt(mathfu::Vector<T, 3>(zero, zero, one),
+                                    mathfu::Vector<T, 3>(zero, one, zero), one),
+      precision);
+  // Explicit left-handed: looking along +z with up +y produces identity.
   EXPECT_NEAR_QUAT(
       mathfu::Quaternion<T>::identity,
       mathfu::Quaternion<T>::LookAt(mathfu::Vector<T, 3>(zero, zero, one),
-                                    mathfu::Vector<T, 3>(zero, one, zero)),
+                                    mathfu::Vector<T, 3>(zero, one, zero),
+                                    static_cast<T>(-1)),
       precision);
 }
 TEST_ALL_F(LookAt)
