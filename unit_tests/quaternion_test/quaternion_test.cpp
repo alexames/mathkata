@@ -140,6 +140,38 @@ void ConstAccessor_Test(const T& precision) {
 }
 TEST_ALL_F(ConstAccessor)
 
+// Test reading and writing elements via operator[].
+// Index 0 maps to the scalar (s_), indices 1-3 map to the vector (v_[0-2]).
+template <class T>
+void MutableAccessor_Test(const T& precision) {
+  (void)precision;
+  mathfu::Quaternion<T> quaternion(static_cast<T>(0.50), static_cast<T>(0.76),
+                                   static_cast<T>(0.38), static_cast<T>(0.19));
+
+  // Verify reading via operator[] matches the scalar and vector accessors.
+  EXPECT_EQ(quaternion.scalar(), quaternion[0]);
+  EXPECT_EQ(quaternion.vector()[0], quaternion[1]);
+  EXPECT_EQ(quaternion.vector()[1], quaternion[2]);
+  EXPECT_EQ(quaternion.vector()[2], quaternion[3]);
+
+  // Modify the scalar component via operator[].
+  quaternion[0] = static_cast<T>(1.0);
+  EXPECT_EQ(static_cast<T>(1.0), quaternion[0]);
+  EXPECT_EQ(static_cast<T>(1.0), quaternion.scalar());
+
+  // Modify vector components via operator[].
+  quaternion[1] = static_cast<T>(2.0);
+  quaternion[2] = static_cast<T>(3.0);
+  quaternion[3] = static_cast<T>(4.0);
+  EXPECT_EQ(static_cast<T>(2.0), quaternion[1]);
+  EXPECT_EQ(static_cast<T>(3.0), quaternion[2]);
+  EXPECT_EQ(static_cast<T>(4.0), quaternion[3]);
+  EXPECT_EQ(static_cast<T>(2.0), quaternion.vector()[0]);
+  EXPECT_EQ(static_cast<T>(3.0), quaternion.vector()[1]);
+  EXPECT_EQ(static_cast<T>(4.0), quaternion.vector()[2]);
+}
+TEST_ALL_F(MutableAccessor)
+
 // Test equality operator for quaternions.
 template <class T>
 void Equality_Test(const T& precision) {
