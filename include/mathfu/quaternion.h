@@ -409,8 +409,12 @@ class Quaternion {
   /// This method always gives you the "short way around" interpolation. If you
   /// need mathematical Slerp(), use ToAngleAxisFull() and FromAngleAxis().
   ///
-  /// @param q1 Start Quaternion.
-  /// @param q2 End Quaternion.
+  /// @note Both input quaternions must be unit quaternions (normalized).
+  /// Results are undefined for non-unit quaternions. Call Normalize() on each
+  /// quaternion before passing it to Slerp if unsure.
+  ///
+  /// @param q1 Start Quaternion (must be normalized).
+  /// @param q2 End Quaternion (must be normalized).
   /// @param s1 The scalar value determining how far from q1 and q2 the
   /// resulting quaternion should be.  A value of 0 corresponds to q1 and a
   /// value of 1 corresponds to q2.
