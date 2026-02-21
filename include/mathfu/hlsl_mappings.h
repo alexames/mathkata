@@ -1,18 +1,18 @@
 /*
-* Copyright 2017 Google Inc. All rights reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright 2017 Google Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 #ifndef MATHFU_HLSL_MAPPINGS_H_
 #define MATHFU_HLSL_MAPPINGS_H_
 
@@ -26,9 +26,10 @@
 ///
 /// To simplify the use of MathFu template classes and make it possible to
 /// write code that looks similar to
-/// <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/bb509587(v=vs.85).aspx">HLSL</a> data types in C++,
-/// MathFu provides a set of data types that are similar in style to
-/// HLSL Vector and Matrix data types.
+/// <a
+/// href="https://msdn.microsoft.com/en-us/library/windows/desktop/bb509587(v=vs.85).aspx">HLSL</a>
+/// data types in C++, MathFu provides a set of data types that are similar in
+/// style to HLSL Vector and Matrix data types.
 
 /// @brief Namespace for MathFu library.
 namespace mathfu {
@@ -37,9 +38,8 @@ namespace mathfu {
 /// @{
 
 /// Scalar unsigned integer
-typedef unsigned int   uint;
-typedef unsigned int   dword;
-typedef unsigned short half;
+typedef unsigned int uint;
+typedef unsigned int dword;
 
 /// 2-dimensional <code>float</code> Vector.
 typedef Vector<float, 2> float2;
@@ -103,9 +103,9 @@ typedef Matrix<uint, 4, 4> uint4x4;
 /// @param v1 Vector to multiply
 /// @param v2 Vector to multiply
 /// @return 3-dimensional vector that contains the result.
-template<class T>
+template <class T>
 inline Vector<T, 3> cross(const Vector<T, 3>& v1, const Vector<T, 3>& v2) {
-  return Vector<T, 3>::CrossProduct(v1,v2);
+  return Vector<T, 3>::CrossProduct(v1, v2);
 }
 
 /// @brief Calculate the dot product of two N-dimensional Vectors of any type.
@@ -113,16 +113,16 @@ inline Vector<T, 3> cross(const Vector<T, 3>& v1, const Vector<T, 3>& v2) {
 /// @param v1 Vector to multiply
 /// @param v2 Vector to multiply
 /// @return Scalar dot product result.
-template<class TV>
+template <class TV>
 inline typename TV::Scalar dot(const TV& v1, const TV& v2) {
-  return TV::DotProduct(v1,v2);
+  return TV::DotProduct(v1, v2);
 }
 
 /// @brief Normalize an N-dimensional Vector of an arbitrary type.
 ///
 /// @param v1 Vector to normalize.
 /// @return Normalized vector.
-template<class TV>
+template <class TV>
 inline TV normalize(const TV& v1) {
   return v1.Normalized();
 }
