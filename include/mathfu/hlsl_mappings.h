@@ -108,6 +108,16 @@ inline Vector<T, 3> cross(const Vector<T, 3>& v1, const Vector<T, 3>& v2) {
   return Vector<T, 3>::CrossProduct(v1, v2);
 }
 
+/// @brief Calculate the 2D pseudo cross product of two 2-dimensional Vectors.
+///
+/// @param v1 Vector to multiply
+/// @param v2 Vector to multiply
+/// @return Scalar cross product result.
+template <class T>
+inline T cross(const Vector<T, 2>& v1, const Vector<T, 2>& v2) {
+  return Vector<T, 2>::CrossProduct(v1, v2);
+}
+
 /// @brief Calculate the dot product of two N-dimensional Vectors of any type.
 ///
 /// @param v1 Vector to multiply
