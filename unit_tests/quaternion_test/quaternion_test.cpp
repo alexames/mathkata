@@ -310,16 +310,45 @@ void Conversion_Test(const T& precision) {
 }
 TEST_ALL_F(Conversion)
 
-// This will test inverting a quaternion and verify that their combination
-// corresponds to a rotation of 0.
+// This will test the conjugate of a quaternion and verify that it negates the
+// vector part while preserving the scalar part.
 template <class T>
-void Inverse_Test(const T& precision) {
+void Conjugate_Test(const T& precision) {
+  (void)precision;
   mathfu::Quaternion<T> q(static_cast<T>(1.4), static_cast<T>(6.3),
                           static_cast<T>(8.5), static_cast<T>(5.9));
-  mathfu::Vector<T, 3> v((q.Inverse() * q).ToEulerAngles());
-  EXPECT_NEAR(0, v[0], precision);
-  EXPECT_NEAR(0, v[1], precision);
-  EXPECT_NEAR(0, v[2], precision);
+  mathfu::Quaternion<T> conj = q.Conjugate();
+  EXPECT_EQ(q.scalar(), conj.scalar());
+  EXPECT_EQ(-q.vector()[0], conj.vector()[0]);
+  EXPECT_EQ(-q.vector()[1], conj.vector()[1]);
+  EXPECT_EQ(-q.vector()[2], conj.vector()[2]);
+}
+TEST_ALL_F(Conjugate)
+
+// This will test inverting a quaternion and verify that q * q.Inverse() yields
+// the identity quaternion for both unit and non-unit quaternions.
+template <class T>
+void Inverse_Test(const T& precision) {
+  const double epsilon = static_cast<double>(precision) * 10;
+
+  // Test with a non-unit quaternion.
+  mathfu::Quaternion<T> q1(static_cast<T>(1.4), static_cast<T>(6.3),
+                           static_cast<T>(8.5), static_cast<T>(5.9));
+  mathfu::Quaternion<T> product1 = q1 * q1.Inverse();
+  EXPECT_NEAR_QUAT(mathfu::Quaternion<T>::identity, product1, epsilon);
+
+  // Also test q.Inverse() * q.
+  mathfu::Quaternion<T> product2 = q1.Inverse() * q1;
+  EXPECT_NEAR_QUAT(mathfu::Quaternion<T>::identity, product2, epsilon);
+
+  // Test with a unit quaternion.
+  mathfu::Vector<T, 3> axis(static_cast<T>(4.3), static_cast<T>(7.6),
+                            static_cast<T>(1.2));
+  axis.Normalize();
+  mathfu::Quaternion<T> q2 =
+      mathfu::Quaternion<T>::FromAngleAxis(static_cast<T>(1.2), axis);
+  mathfu::Quaternion<T> product3 = q2 * q2.Inverse();
+  EXPECT_NEAR_QUAT(mathfu::Quaternion<T>::identity, product3, epsilon);
 }
 TEST_ALL_F(Inverse)
 
