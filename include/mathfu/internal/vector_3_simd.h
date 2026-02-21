@@ -89,7 +89,7 @@ class Vector<float, 3> {
                          static_cast<float>(v[1]), static_cast<float>(v[2]))
   }
 
-  inline Vector(const simd4f& v) { MATHFU_VECTOR3_STORE3(v, *this) }
+  explicit inline Vector(const simd4f& v) { MATHFU_VECTOR3_STORE3(v, *this) }
 
   explicit inline Vector(const float& s) {
     MATHFU_VECTOR3_INIT3(*this, s, s, s)
@@ -206,42 +206,50 @@ class Vector<float, 3> {
   }
 
   inline Vector<float, 3>& operator*=(const Vector<float, 3>& v) {
-    *this = simd4f_mul(MATHFU_VECTOR3_LOAD3(*this), MATHFU_VECTOR3_LOAD3(v));
+    MATHFU_VECTOR3_STORE3(
+        simd4f_mul(MATHFU_VECTOR3_LOAD3(*this), MATHFU_VECTOR3_LOAD3(v)), *this)
     return *this;
   }
 
   inline Vector<float, 3>& operator/=(const Vector<float, 3>& v) {
-    *this = simd4f_div(MATHFU_VECTOR3_LOAD3(*this), MATHFU_VECTOR3_LOAD3(v));
+    MATHFU_VECTOR3_STORE3(
+        simd4f_div(MATHFU_VECTOR3_LOAD3(*this), MATHFU_VECTOR3_LOAD3(v)), *this)
     return *this;
   }
 
   inline Vector<float, 3>& operator+=(const Vector<float, 3>& v) {
-    *this = simd4f_add(MATHFU_VECTOR3_LOAD3(*this), MATHFU_VECTOR3_LOAD3(v));
+    MATHFU_VECTOR3_STORE3(
+        simd4f_add(MATHFU_VECTOR3_LOAD3(*this), MATHFU_VECTOR3_LOAD3(v)), *this)
     return *this;
   }
 
   inline Vector<float, 3>& operator-=(const Vector<float, 3>& v) {
-    *this = simd4f_sub(MATHFU_VECTOR3_LOAD3(*this), MATHFU_VECTOR3_LOAD3(v));
+    MATHFU_VECTOR3_STORE3(
+        simd4f_sub(MATHFU_VECTOR3_LOAD3(*this), MATHFU_VECTOR3_LOAD3(v)), *this)
     return *this;
   }
 
   inline Vector<float, 3>& operator*=(const float& s) {
-    *this = simd4f_mul(MATHFU_VECTOR3_LOAD3(*this), simd4f_splat(s));
+    MATHFU_VECTOR3_STORE3(
+        simd4f_mul(MATHFU_VECTOR3_LOAD3(*this), simd4f_splat(s)), *this)
     return *this;
   }
 
   inline Vector<float, 3>& operator/=(const float& s) {
-    *this = simd4f_div(MATHFU_VECTOR3_LOAD3(*this), simd4f_splat(s));
+    MATHFU_VECTOR3_STORE3(
+        simd4f_div(MATHFU_VECTOR3_LOAD3(*this), simd4f_splat(s)), *this)
     return *this;
   }
 
   inline Vector<float, 3>& operator+=(const float& s) {
-    *this = simd4f_add(MATHFU_VECTOR3_LOAD3(*this), simd4f_splat(s));
+    MATHFU_VECTOR3_STORE3(
+        simd4f_add(MATHFU_VECTOR3_LOAD3(*this), simd4f_splat(s)), *this)
     return *this;
   }
 
   inline Vector<float, 3>& operator-=(const float& s) {
-    *this = simd4f_sub(MATHFU_VECTOR3_LOAD3(*this), simd4f_splat(s));
+    MATHFU_VECTOR3_STORE3(
+        simd4f_sub(MATHFU_VECTOR3_LOAD3(*this), simd4f_splat(s)), *this)
     return *this;
   }
 
@@ -267,7 +275,9 @@ class Vector<float, 3> {
 
   inline float Normalize() {
     const float length = Length();
-    *this = simd4f_mul(MATHFU_VECTOR3_LOAD3(*this), simd4f_splat(1 / length));
+    MATHFU_VECTOR3_STORE3(
+        simd4f_mul(MATHFU_VECTOR3_LOAD3(*this), simd4f_splat(1 / length)),
+        *this)
     return length;
   }
 
