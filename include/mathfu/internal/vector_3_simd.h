@@ -1,25 +1,25 @@
 /*
-* Copyright 2014 Google Inc. All rights reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright 2014 Google Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 #ifndef MATHFU_VECTOR_3_SIMD_H_
 #define MATHFU_VECTOR_3_SIMD_H_
 
+#include <math.h>
+
 #include "mathfu/internal/vector_3.h"
 #include "mathfu/utilities.h"
-
-#include <math.h>
 
 #ifdef MATHFU_COMPILE_WITH_SIMD
 #include "vectorial/simd4f.h"
@@ -40,13 +40,19 @@
 /// not.
 #ifdef MATHFU_COMPILE_WITH_PADDING
 #define MATHFU_VECTOR3_STORE3(simd_to_store, data) \
-  { (data).simd3 = simd_to_store; }
+  {                                                \
+    (data).simd3 = simd_to_store;                  \
+  }
 #define MATHFU_VECTOR3_LOAD3(data) (data).simd3
-#define MATHFU_VECTOR3_INIT3(data, v1, v2, v3) \
-  { (data).simd3 = simd4f_create(v1, v2, v3, 0); }
+#define MATHFU_VECTOR3_INIT3(data, v1, v2, v3)   \
+  {                                              \
+    (data).simd3 = simd4f_create(v1, v2, v3, 0); \
+  }
 #else
 #define MATHFU_VECTOR3_STORE3(simd_to_store, data) \
-  { simd4f_ustore3(simd_to_store, (data).data_); }
+  {                                                \
+    simd4f_ustore3(simd_to_store, (data).data_);   \
+  }
 #define MATHFU_VECTOR3_LOAD3(data) simd4f_uload3((data).data_)
 #define MATHFU_VECTOR3_INIT3(data, v1, v2, v3) \
   {                                            \
@@ -82,7 +88,7 @@ class Vector<float, 3> {
                          static_cast<float>(v[1]), static_cast<float>(v[2]))
   }
 
-  inline Vector(const simd4f& v) { MATHFU_VECTOR3_STORE3(v, *this) }
+  explicit inline Vector(const simd4f& v) { MATHFU_VECTOR3_STORE3(v, *this) }
 
   explicit inline Vector(const float& s) {
     MATHFU_VECTOR3_INIT3(*this, s, s, s)
@@ -199,42 +205,50 @@ class Vector<float, 3> {
   }
 
   inline Vector<float, 3>& operator*=(const Vector<float, 3>& v) {
-    *this = simd4f_mul(MATHFU_VECTOR3_LOAD3(*this), MATHFU_VECTOR3_LOAD3(v));
+    MATHFU_VECTOR3_STORE3(
+        simd4f_mul(MATHFU_VECTOR3_LOAD3(*this), MATHFU_VECTOR3_LOAD3(v)), *this)
     return *this;
   }
 
   inline Vector<float, 3>& operator/=(const Vector<float, 3>& v) {
-    *this = simd4f_div(MATHFU_VECTOR3_LOAD3(*this), MATHFU_VECTOR3_LOAD3(v));
+    MATHFU_VECTOR3_STORE3(
+        simd4f_div(MATHFU_VECTOR3_LOAD3(*this), MATHFU_VECTOR3_LOAD3(v)), *this)
     return *this;
   }
 
   inline Vector<float, 3>& operator+=(const Vector<float, 3>& v) {
-    *this = simd4f_add(MATHFU_VECTOR3_LOAD3(*this), MATHFU_VECTOR3_LOAD3(v));
+    MATHFU_VECTOR3_STORE3(
+        simd4f_add(MATHFU_VECTOR3_LOAD3(*this), MATHFU_VECTOR3_LOAD3(v)), *this)
     return *this;
   }
 
   inline Vector<float, 3>& operator-=(const Vector<float, 3>& v) {
-    *this = simd4f_sub(MATHFU_VECTOR3_LOAD3(*this), MATHFU_VECTOR3_LOAD3(v));
+    MATHFU_VECTOR3_STORE3(
+        simd4f_sub(MATHFU_VECTOR3_LOAD3(*this), MATHFU_VECTOR3_LOAD3(v)), *this)
     return *this;
   }
 
   inline Vector<float, 3>& operator*=(const float& s) {
-    *this = simd4f_mul(MATHFU_VECTOR3_LOAD3(*this), simd4f_splat(s));
+    MATHFU_VECTOR3_STORE3(
+        simd4f_mul(MATHFU_VECTOR3_LOAD3(*this), simd4f_splat(s)), *this)
     return *this;
   }
 
   inline Vector<float, 3>& operator/=(const float& s) {
-    *this = simd4f_div(MATHFU_VECTOR3_LOAD3(*this), simd4f_splat(s));
+    MATHFU_VECTOR3_STORE3(
+        simd4f_div(MATHFU_VECTOR3_LOAD3(*this), simd4f_splat(s)), *this)
     return *this;
   }
 
   inline Vector<float, 3>& operator+=(const float& s) {
-    *this = simd4f_add(MATHFU_VECTOR3_LOAD3(*this), simd4f_splat(s));
+    MATHFU_VECTOR3_STORE3(
+        simd4f_add(MATHFU_VECTOR3_LOAD3(*this), simd4f_splat(s)), *this)
     return *this;
   }
 
   inline Vector<float, 3>& operator-=(const float& s) {
-    *this = simd4f_sub(MATHFU_VECTOR3_LOAD3(*this), simd4f_splat(s));
+    MATHFU_VECTOR3_STORE3(
+        simd4f_sub(MATHFU_VECTOR3_LOAD3(*this), simd4f_splat(s)), *this)
     return *this;
   }
 
@@ -260,7 +274,9 @@ class Vector<float, 3> {
 
   inline float Normalize() {
     const float length = Length();
-    *this = simd4f_mul(MATHFU_VECTOR3_LOAD3(*this), simd4f_splat(1 / length));
+    MATHFU_VECTOR3_STORE3(
+        simd4f_mul(MATHFU_VECTOR3_LOAD3(*this), simd4f_splat(1 / length)),
+        *this)
     return length;
   }
 
