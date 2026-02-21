@@ -700,10 +700,20 @@ void LookAt_Test(const T& precision) {
   // clang-format off
   static const MatrixExpectation<T, 4, 4> kTestCases[] = {
     {
-      "origin along z",
+      "default RH origin along z",
       mathfu::Matrix<T, 4, 4>::LookAt(
           mathfu::Vector<T, 3>(0, 0, 1), mathfu::Vector<T, 3>(0, 0, 0),
           mathfu::Vector<T, 3>(0, 1, 0)),
+      mathfu::Matrix<T, 4, 4>(-1, 0, 0, 0,
+                               0, 1, 0, 0,
+                               0, 0, -1,0,
+                               0, 0, 0, 1),
+    },
+    {
+      "left-handed origin along z",
+      mathfu::Matrix<T, 4, 4>::LookAt(
+          mathfu::Vector<T, 3>(0, 0, 1), mathfu::Vector<T, 3>(0, 0, 0),
+          mathfu::Vector<T, 3>(0, 1, 0), -1),
       mathfu::Matrix<T, 4, 4>(1, 0, 0, 0,
                               0, 1, 0, 0,
                               0, 0, 1, 0,
