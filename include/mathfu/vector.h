@@ -19,6 +19,7 @@
 #include <math.h>
 
 #include <cmath>
+#include <cstring>
 
 #include "mathfu/utilities.h"
 
@@ -1014,60 +1015,30 @@ static inline T DotProductHelper(const Vector<T, 4>& v1,
 /// @cond MATHFU_INTERNAL
 template <typename T, int Dims, typename CompatibleT>
 static inline Vector<T, Dims> FromTypeHelper(const CompatibleT& compatible) {
-// C++11 is required for constructed unions.
-#if __cplusplus >= 201103L
-  // Use a union instead of reinterpret_cast to avoid aliasing bugs.
-  union ConversionUnion {
-    ConversionUnion() {}  // C++11.
-    CompatibleT compatible;
-    VectorPacked<T, Dims> packed;
-  } u;
-  static_assert(sizeof(u.compatible) == Dims * sizeof(T),
+  // Use memcpy to safely reinterpret between compatible types without
+  // undefined behavior. The compiler will optimize memcpy of small types
+  // into simple register moves.
+  VectorPacked<T, Dims> packed;
+  static_assert(sizeof(compatible) == sizeof(packed),
                 "Conversion size mismatch.");
-
-  // The read of `compatible` and write to `u.compatible` gets optimized away,
-  // and this becomes essentially a safe reinterpret_cast.
-  u.compatible = compatible;
-
-  // Call the packed vector constructor with the `compatible` data.
-  return Vector<T, Dims>(u.packed);
-#else
-  // Use the less-desirable memcpy technique if C++11 is not available.
-  // Most compilers understand memcpy deep enough to avoid replace the function
-  // call with a series of load/stores, which should then get optimized away,
-  // however in the worst case the optimize away may not happen.
-  // Note: Memcpy avoids aliasing bugs because it operates via unsigned char*,
-  // which is allowed to alias any type.
-  // See:
-  // http://stackoverflow.com/questions/15745030/type-punning-with-void-without-breaking-the-strict-aliasing-rule-in-c99
-  Vector<T, Dims> v;
-  assert(sizeof(compatible) == Dims * sizeof(T));
-  memcpy(&v, &compatible, sizeof(compatible));
-  return v;
-#endif  // __cplusplus >= 201103L
+  std::memcpy(&packed, &compatible, sizeof(packed));
+  return Vector<T, Dims>(packed);
 }
 /// @endcond
 
 /// @cond MATHFU_INTERNAL
 template <typename T, int Dims, typename CompatibleT>
 static inline CompatibleT ToTypeHelper(const Vector<T, Dims>& v) {
-// See FromTypeHelper() for comments.
-#if __cplusplus >= 201103L
-  union ConversionUnion {
-    ConversionUnion() {}
-    CompatibleT compatible;
-    VectorPacked<T, Dims> packed;
-  } u;
-  static_assert(sizeof(u.compatible) == Dims * sizeof(T),
+  // Use memcpy to safely reinterpret between compatible types without
+  // undefined behavior. The compiler will optimize memcpy of small types
+  // into simple register moves.
+  VectorPacked<T, Dims> packed;
+  static_assert(sizeof(CompatibleT) == sizeof(packed),
                 "Conversion size mismatch.");
-  v.Pack(&u.packed);
-  return u.compatible;
-#else
+  v.Pack(&packed);
   CompatibleT compatible;
-  assert(sizeof(compatible) == Dims * sizeof(T));
-  memcpy(&compatible, &v, sizeof(compatible));
+  std::memcpy(&compatible, &packed, sizeof(packed));
   return compatible;
-#endif  // __cplusplus >= 201103L
 }
 /// @endcond
 
