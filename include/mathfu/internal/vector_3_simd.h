@@ -41,7 +41,7 @@
 #ifdef MATHFU_COMPILE_WITH_PADDING
 #define MATHFU_VECTOR3_STORE3(simd_to_store, data) \
   {                                                \
-    (data).simd3 = simd_to_store;                  \
+    (data).simd3 = simd4f_zero_w(simd_to_store);   \
   }
 #define MATHFU_VECTOR3_LOAD3(data) (data).simd3
 #define MATHFU_VECTOR3_INIT3(data, v1, v2, v3)   \
