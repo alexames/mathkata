@@ -1,18 +1,18 @@
 /*
-* Copyright 2014 Google Inc. All rights reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright 2014 Google Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 #ifndef MATHFU_QUATERNION_H_
 #define MATHFU_QUATERNION_H_
 
@@ -22,10 +22,10 @@
 #endif                     // !defined(_USE_MATH_DEFINES)
 #endif                     // _WIN32
 
+#include <math.h>
+
 #include "mathfu/matrix.h"
 #include "mathfu/vector.h"
-
-#include <math.h>
 
 /// @file mathfu/quaternion.h
 /// @brief Quaternion class and functions.
@@ -123,6 +123,20 @@ class Quaternion {
     return *this;
   }
 
+  /// @brief Compare two Quaternions for equality.
+  ///
+  /// @param q Quaternion to compare against.
+  /// @return true if the scalar and vector components are equal.
+  inline bool operator==(const Quaternion<T>& q) const {
+    return s_ == q.s_ && v_ == q.v_;
+  }
+
+  /// @brief Compare two Quaternions for inequality.
+  ///
+  /// @param q Quaternion to compare against.
+  /// @return true if the scalar or vector components differ.
+  inline bool operator!=(const Quaternion<T>& q) const { return !(*this == q); }
+
   /// @brief Multiply this Quaternion with another Quaternion.
   ///
   /// @note This is equivalent to
@@ -173,8 +187,8 @@ class Quaternion {
   /// @return Rotated Vector.
   inline Vector<T, 3> operator*(const Vector<T, 3>& v1) const {
     T ss = s_ + s_;
-    return ss * Vector<T, 3>::CrossProduct(v_, v1) + (ss * s_ - 1) * v1 +
-           2 * Vector<T, 3>::DotProduct(v_, v1) * v_;
+    return ss * Vector<T, 3>::CrossProduct(v_, v1) + (ss * s_ - 1) * v1
+           + 2 * Vector<T, 3>::DotProduct(v_, v1) * v_;
   }
 
   /// @brief Normalize this quaternion (in-place).
@@ -285,9 +299,8 @@ class Quaternion {
   static Quaternion<T> FromAngleAxis(T angle, const Vector<T, 3>& axis) {
     const T halfAngle = static_cast<T>(0.5) * angle;
     Vector<T, 3> localAxis(axis);
-    return Quaternion<T>(
-        cos(halfAngle),
-        localAxis.Normalized() * static_cast<T>(sin(halfAngle)));
+    return Quaternion<T>(cos(halfAngle), localAxis.Normalized()
+                                             * static_cast<T>(sin(halfAngle)));
   }
 
   /// @brief Create a quaternion from 3 euler angles.
@@ -317,8 +330,7 @@ class Quaternion {
   /// @param y_rotation angle in radians to rotate by about the y axis.
   /// @param z_rotation angle in radians to rotate by about the z axis.
   /// @return Quaternion containing the result.
-  static Quaternion<T> FromEulerAngles(T x_rotation,
-                                       T y_rotation,
+  static Quaternion<T> FromEulerAngles(T x_rotation, T y_rotation,
                                        T z_rotation) {
     return FromEulerAngles(Vector<T, 3>(x_rotation, y_rotation, z_rotation));
   }
