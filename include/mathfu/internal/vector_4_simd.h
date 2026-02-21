@@ -202,12 +202,24 @@ class Vector<float, 4> {
 
   inline float Length() const { return simd4f_get_x(simd4f_length4(simd4)); }
 
+  /// @brief Normalize this vector in-place.
+  ///
+  /// The vector must have non-zero length. Normalizing a zero-length vector
+  /// produces undefined results.
+  ///
+  /// @return The length of this vector.
   inline float Normalize() {
     const float length = Length();
     simd4 = simd4f_mul(simd4, simd4f_splat(1 / length));
     return length;
   }
 
+  /// @brief Calculate the normalized version of this vector.
+  ///
+  /// The vector must have non-zero length. Normalizing a zero-length vector
+  /// produces undefined results.
+  ///
+  /// @return The normalized vector.
   inline Vector<float, 4> Normalized() const {
     return Vector<float, 4>(simd4f_normalize4(simd4));
   }
