@@ -40,6 +40,11 @@ class Vector<float, 2> {
   typedef float Scalar;
   static const int kDims = 2;
 
+  /// @brief Create an uninitialized Vector.
+  ///
+  /// The elements of the Vector are left uninitialized and have indeterminate
+  /// values. This is intentional for performance: use Vector(float) or the
+  /// component constructor if you need specific values.
   inline Vector() {}
 
   inline Vector(const Vector<float, 2>& v) { simd2 = v.simd2; }

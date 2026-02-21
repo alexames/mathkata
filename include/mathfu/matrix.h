@@ -185,6 +185,10 @@ template <class T, int Rows, int Cols>
 class Matrix {
  public:
   /// @brief Construct a Matrix of uninitialized values.
+  ///
+  /// The elements of the Matrix are left uninitialized and have indeterminate
+  /// values. This is intentional for performance: use Matrix(T), Identity(),
+  /// or one of the factory methods if you need specific values.
   inline Matrix() {}
 
   /// @brief Construct a Matrix from another Matrix copying each element.
