@@ -413,10 +413,16 @@ class Vector {
 
   /// @brief Normalize this vector in-place.
   ///
+  /// The vector must have non-zero length. Normalizing a zero-length vector
+  /// produces undefined results.
+  ///
   /// @return The length of this vector.
   inline T Normalize() { return NormalizeHelper(*this); }
 
   /// @brief Calculate the normalized version of this vector.
+  ///
+  /// The vector must have non-zero length. Normalizing a zero-length vector
+  /// produces undefined results.
   ///
   /// @return The normalized vector.
   inline Vector<T, Dims> Normalized() const { return NormalizedHelper(*this); }
@@ -867,6 +873,9 @@ inline T LengthHelper(const Vector<T, Dims>& v) {
 
 /// @brief Normalize a vector in-place.
 ///
+/// The vector must have non-zero length. Normalizing a zero-length vector
+/// produces undefined results.
+///
 /// @param v Vector to normalize.
 /// @return The length of the vector.
 template <class T, int Dims>
@@ -877,6 +886,9 @@ inline T NormalizeHelper(Vector<T, Dims>& v) {
 }
 
 /// @brief Calculate the normalized version of a vector.
+///
+/// The vector must have non-zero length. Normalizing a zero-length vector
+/// produces undefined results.
 ///
 /// @param v Vector to get the normalized version of.
 /// @return The normalized vector.

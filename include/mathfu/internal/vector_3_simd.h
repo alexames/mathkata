@@ -273,6 +273,12 @@ class Vector<float, 3> {
     return simd4f_get_x(simd4f_length3(MATHFU_VECTOR3_LOAD3(*this)));
   }
 
+  /// @brief Normalize this vector in-place.
+  ///
+  /// The vector must have non-zero length. Normalizing a zero-length vector
+  /// produces undefined results.
+  ///
+  /// @return The length of this vector.
   inline float Normalize() {
     const float length = Length();
     MATHFU_VECTOR3_STORE3(
@@ -281,6 +287,12 @@ class Vector<float, 3> {
     return length;
   }
 
+  /// @brief Calculate the normalized version of this vector.
+  ///
+  /// The vector must have non-zero length. Normalizing a zero-length vector
+  /// produces undefined results.
+  ///
+  /// @return The normalized vector.
   inline Vector<float, 3> Normalized() const {
     return Vector<float, 3>(simd4f_normalize3(MATHFU_VECTOR3_LOAD3(*this)));
   }

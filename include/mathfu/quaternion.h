@@ -193,6 +193,9 @@ class Quaternion {
 
   /// @brief Normalize this quaternion (in-place).
   ///
+  /// The quaternion must have non-zero length. Normalizing a zero-length
+  /// quaternion produces undefined results.
+  ///
   /// @return Length of the quaternion.
   inline T Normalize() {
     T length = sqrt(s_ * s_ + Vector<T, 3>::DotProduct(v_, v_));
@@ -203,6 +206,9 @@ class Quaternion {
   }
 
   /// @brief Calculate the normalized version of this quaternion.
+  ///
+  /// The quaternion must have non-zero length. Normalizing a zero-length
+  /// quaternion produces undefined results.
   ///
   /// @return The normalized quaternion.
   inline Quaternion<T> Normalized() const {
