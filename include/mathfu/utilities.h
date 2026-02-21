@@ -319,7 +319,7 @@ T Clamp(const T &x, const T &lower, const T &upper) {
 ///         (e.g float or double).
 template <class T, class T2>
 T Lerp(const T &range_start, const T &range_end, const T2 &percent) {
-  const T2 one_minus_percent = static_cast<T2>(1.0) - percent;
+  const T2 one_minus_percent = T2(1) - percent;
   return range_start * one_minus_percent + range_end * percent;
 }
 

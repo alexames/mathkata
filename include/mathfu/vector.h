@@ -904,7 +904,7 @@ inline Vector<T, Dims> NormalizedHelper(const Vector<T, Dims>& v) {
 template <class T, int Dims>
 inline Vector<T, Dims> LerpHelper(const Vector<T, Dims>& v1,
                                   const Vector<T, Dims>& v2, const T percent) {
-  const T one_minus_percent = static_cast<T>(1.0) - percent;
+  const T one_minus_percent = T(1) - percent;
   MATHFU_VECTOR_OPERATOR(one_minus_percent * v1[i] + percent * v2[i]);
 }
 
@@ -991,7 +991,7 @@ bool InRange2D(const Vector<T, 2>& val, const Vector<T, 2>& range_start,
 template <class T, int Dims>
 static inline T DotProductHelper(const Vector<T, Dims>& v1,
                                  const Vector<T, Dims>& v2) {
-  T result = 0;
+  T result = T(0);
   MATHFU_VECTOR_OPERATION(result += v1[i] * v2[i]);
   return result;
 }
