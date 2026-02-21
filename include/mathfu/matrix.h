@@ -1272,9 +1272,12 @@ static inline Matrix<T, 4, 4> OuterProductHelper(const Vector<T, 4>& v1,
 template <bool check_invertible, class T, int Rows, int Cols>
 inline bool InverseHelper(const Matrix<T, Rows, Cols>& m,
                           Matrix<T, Rows, Cols>* const inverse, T det_thresh) {
-  assert(false);
+  static_assert(sizeof(T) == 0,
+                "Matrix::Inverse() is only implemented for "
+                "2x2, 3x3, and 4x4 matrices");
   (void)m;
-  *inverse = T::Identity();
+  (void)inverse;
+  (void)det_thresh;
   return false;
 }
 /// @endcond
