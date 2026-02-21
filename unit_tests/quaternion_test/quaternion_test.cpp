@@ -672,14 +672,15 @@ void LookAt_Test(const T& precision) {
       mathfu::Quaternion<T>::LookAt(mathfu::Vector<T, 3>(zero, zero, one),
                                     mathfu::Vector<T, 3>(zero, one, zero)),
       mathfu::Quaternion<T>::LookAt(mathfu::Vector<T, 3>(zero, zero, one),
-                                    mathfu::Vector<T, 3>(zero, one, zero), one),
+                                    mathfu::Vector<T, 3>(zero, one, zero),
+                                    mathfu::Handedness::kRightHanded),
       precision);
   // Explicit left-handed: looking along +z with up +y produces identity.
   EXPECT_NEAR_QUAT(
       mathfu::Quaternion<T>::identity,
       mathfu::Quaternion<T>::LookAt(mathfu::Vector<T, 3>(zero, zero, one),
                                     mathfu::Vector<T, 3>(zero, one, zero),
-                                    static_cast<T>(-1)),
+                                    mathfu::Handedness::kLeftHanded),
       precision);
 }
 TEST_ALL_F(LookAt)
