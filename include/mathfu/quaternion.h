@@ -631,8 +631,14 @@ class Quaternion {
   /// forward-vector as destination.
   static inline Quaternion<T> LookAt(const Vector<T, 3>& forward,
                                      const Vector<T, 3>& up, T handedness = 1) {
-    return FromMatrix(Matrix<T, 3>::LookAt(
-        forward, Vector<T, 3>(static_cast<T>(0)), up, handedness));
+    // Matrix::LookAt produces a view matrix (world-to-camera transform).
+    // Its rotation part is the inverse of the camera's world orientation.
+    // Since the inverse of a unit quaternion is its conjugate, we conjugate
+    // the result to obtain the camera's orientation quaternion.
+    return FromMatrix(Matrix<T, 4>::LookAt(forward,
+                                           Vector<T, 3>(static_cast<T>(0)), up,
+                                           handedness))
+        .Conjugate();
   }
 
   /// @brief Contains a quaternion doing the identity transform.

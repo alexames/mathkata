@@ -658,29 +658,123 @@ TEST_ALL_F(OutputStream)
 
 template <class T>
 void LookAt_Test(const T& precision) {
+  using Quaternion = mathfu::Quaternion<T>;
+  using Vector3 = mathfu::Vector<T, 3>;
   const T one = static_cast<T>(1);
+  const T neg_one = static_cast<T>(-1);
   const T zero = static_cast<T>(0);
-  // Default (right-handed): looking along +z with up +y produces a 180-degree
-  // rotation around the y-axis.
-  EXPECT_NEAR_QUAT(
-      mathfu::Quaternion<T>(zero, zero, one, zero),
-      mathfu::Quaternion<T>::LookAt(mathfu::Vector<T, 3>(zero, zero, one),
-                                    mathfu::Vector<T, 3>(zero, one, zero)),
-      precision);
-  // Explicit right-handed should match the default.
-  EXPECT_NEAR_QUAT(
-      mathfu::Quaternion<T>::LookAt(mathfu::Vector<T, 3>(zero, zero, one),
-                                    mathfu::Vector<T, 3>(zero, one, zero)),
-      mathfu::Quaternion<T>::LookAt(mathfu::Vector<T, 3>(zero, zero, one),
-                                    mathfu::Vector<T, 3>(zero, one, zero), one),
-      precision);
-  // Explicit left-handed: looking along +z with up +y produces identity.
-  EXPECT_NEAR_QUAT(
-      mathfu::Quaternion<T>::identity,
-      mathfu::Quaternion<T>::LookAt(mathfu::Vector<T, 3>(zero, zero, one),
-                                    mathfu::Vector<T, 3>(zero, one, zero),
-                                    static_cast<T>(-1)),
-      precision);
+  const double epsilon = static_cast<double>(precision) * 10;
+  const Vector3 up(zero, one, zero);
+
+  // The default forward direction for right-handed coordinates is -Z,
+  // and for left-handed coordinates is +Z.
+
+  // ---- Right-handed (default handedness = 1) ----
+
+  // Looking along -Z (RH default forward) should give identity.
+  {
+    const Quaternion q =
+        Quaternion::LookAt(Vector3(zero, zero, neg_one), up, one);
+    EXPECT_NEAR_ORIENTATION(Quaternion::identity, q, epsilon);
+  }
+
+  // Looking along +Z (opposite of RH default forward) should give a
+  // 180-degree rotation around the Y axis.
+  {
+    const Quaternion q = Quaternion::LookAt(Vector3(zero, zero, one), up, one);
+    const Quaternion expected =
+        Quaternion::FromAngleAxis(static_cast<T>(M_PI), up);
+    EXPECT_NEAR_ORIENTATION(expected, q, epsilon);
+  }
+
+  // Looking along +X should give a 90-degree rotation around Y (turning
+  // from -Z forward to +X).
+  {
+    const Quaternion q = Quaternion::LookAt(Vector3(one, zero, zero), up, one);
+    const Quaternion expected =
+        Quaternion::FromAngleAxis(static_cast<T>(-M_PI / 2), up);
+    EXPECT_NEAR_ORIENTATION(expected, q, epsilon);
+  }
+
+  // Explicit right-handed should match the default (no handedness argument).
+  {
+    const Quaternion q_default =
+        Quaternion::LookAt(Vector3(one, zero, zero), up);
+    const Quaternion q_explicit =
+        Quaternion::LookAt(Vector3(one, zero, zero), up, one);
+    EXPECT_NEAR_QUAT(q_default, q_explicit, epsilon);
+  }
+
+  // ---- Left-handed (handedness = -1) ----
+
+  // Looking along +Z (LH default forward) should give identity.
+  {
+    const Quaternion q =
+        Quaternion::LookAt(Vector3(zero, zero, one), up, neg_one);
+    EXPECT_NEAR_ORIENTATION(Quaternion::identity, q, epsilon);
+  }
+
+  // Looking along -Z (opposite of LH default forward) should give a
+  // 180-degree rotation around the Y axis.
+  {
+    const Quaternion q =
+        Quaternion::LookAt(Vector3(zero, zero, neg_one), up, neg_one);
+    const Quaternion expected =
+        Quaternion::FromAngleAxis(static_cast<T>(M_PI), up);
+    EXPECT_NEAR_ORIENTATION(expected, q, epsilon);
+  }
+
+  // Looking along +X (LH) should give a 90-degree rotation around Y (turning
+  // from +Z forward to +X).
+  {
+    const Quaternion q =
+        Quaternion::LookAt(Vector3(one, zero, zero), up, neg_one);
+    const Quaternion expected =
+        Quaternion::FromAngleAxis(static_cast<T>(M_PI / 2), up);
+    EXPECT_NEAR_ORIENTATION(expected, q, epsilon);
+  }
+
+  // ---- Functional tests: applying the quaternion to the default forward
+  //      direction should yield the target forward direction ----
+
+  // RH default forward is -Z.
+  {
+    const Vector3 rh_forward(zero, zero, neg_one);
+    const Vector3 target(one, zero, zero);
+    const Quaternion q = Quaternion::LookAt(target, up, one);
+    const Vector3 result = q * rh_forward;
+    EXPECT_NEAR_VEC3(target, result, epsilon);
+  }
+
+  // LH default forward is +Z.
+  {
+    const Vector3 lh_forward(zero, zero, one);
+    const Vector3 target(one, zero, zero);
+    const Quaternion q = Quaternion::LookAt(target, up, neg_one);
+    const Vector3 result = q * lh_forward;
+    EXPECT_NEAR_VEC3(target, result, epsilon);
+  }
+
+  // ---- Unit length: the result should always be a unit quaternion ----
+  {
+    const Vector3 directions[] = {
+        Vector3(one, zero, zero),
+        Vector3(zero, zero, one),
+        Vector3(zero, zero, neg_one),
+        Vector3(neg_one, zero, zero),
+        Vector3(one, one, zero).Normalized(),
+        Vector3(one, zero, one).Normalized(),
+    };
+    for (const auto& dir : directions) {
+      const Quaternion q_rh = Quaternion::LookAt(dir, up, one);
+      T length_rh = Quaternion::DotProduct(q_rh, q_rh);
+      EXPECT_NEAR(static_cast<T>(1), length_rh, epsilon);
+
+      const Quaternion q_lh = Quaternion::LookAt(dir, up, neg_one);
+      T length_lh = Quaternion::DotProduct(q_lh, q_lh);
+      EXPECT_NEAR(static_cast<T>(1), length_lh, epsilon);
+    }
+  }
 }
 TEST_ALL_F(LookAt)
 
