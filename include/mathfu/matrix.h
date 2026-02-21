@@ -662,7 +662,7 @@ class Matrix {
   /// @return Matrix containing the result.
   static inline Matrix<T, Rows, Cols> HadamardProduct(
       const Matrix<T, Rows, Cols>& m1, const Matrix<T, Rows, Cols>& m2) {
-    MATHFU_MAT_OPERATOR(m1[i] * m2[i]);
+    MATHFU_MAT_OPERATOR(m1.data_[i] * m2.data_[i]);
   }
 
   /// @brief Calculate the identity Matrix.
