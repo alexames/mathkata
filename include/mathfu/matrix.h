@@ -541,10 +541,16 @@ class Matrix {
   ///
   /// This calculates the inverse Matrix such that
   /// <code>m * m.Inverse()</code> is the identity.
+  /// @pre The matrix must be invertible (non-zero determinant). In debug
+  ///      builds, an assertion failure is triggered for singular matrices.
+  ///      Use InverseWithDeterminantCheck() when invertibility is uncertain.
   /// @return Matrix containing the result.
   inline Matrix<T, Rows, Cols> Inverse() const {
     Matrix<T, Rows, Cols> inverse;
-    InverseHelper<false>(*this, &inverse, static_cast<T>(0));
+    bool invertible = InverseHelper<true>(
+        *this, &inverse, Constants<T>::GetDeterminantThreshold());
+    assert(invertible);
+    (void)invertible;
     return inverse;
   }
 
