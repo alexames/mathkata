@@ -22,7 +22,9 @@
 #include <stdlib.h>
 
 #include <algorithm>
+#include <climits>
 #include <memory>
+#include <type_traits>
 
 /// @file mathfu/utilities.h Utilities
 /// @brief Utility macros and functions.
@@ -427,27 +429,53 @@ inline int RandomInRange<int>(int range_start, int range_end) {
 }
 /// @endcond
 
-/// @brief Round a value up to the nearest power of 2.
+/// @brief Round a value up to the nearest power of 2 (integer overload).
 ///
-/// @param x Value to round up.
+/// For integer types, uses bit manipulation that works correctly for any
+/// integer width (8, 16, 32, 64-bit, etc.).
+///
+/// @note If @p x is 0, the return value is 0.
+/// @note If @p x is already a power of 2, it is returned unchanged.
+/// @note If the result would overflow the type (i.e. @p x is greater than
+///       the largest power of 2 representable by T), the behavior is
+///       undefined due to unsigned overflow wrapping to 0.
+///
+/// @param x Value to round up. Must be non-negative for signed types.
 /// @returns Value rounded up to the nearest power of 2.
 template <class T>
-T RoundUpToPowerOf2(T x) {
-  return static_cast<T>(
-      pow(static_cast<T>(2), ceil(log(x) / log(static_cast<T>(2)))));
+typename std::enable_if<std::is_integral<T>::value, T>::type RoundUpToPowerOf2(
+    T x) {
+  // Use unsigned arithmetic to avoid undefined behavior with signed shifts.
+  typedef typename std::make_unsigned<T>::type U;
+  if (x <= 1) return x;
+  U u = static_cast<U>(x - 1);
+  // Smear the highest set bit down to all lower bits. Each shift doubles the
+  // range of bits that are set, so we need log2(bit_width) iterations.
+  // We iterate over all possible shift amounts; for types smaller than the
+  // shift, the compiler will optimize away the redundant operations.
+  for (unsigned shift = 1; shift < sizeof(T) * CHAR_BIT; shift <<= 1) {
+    u |= u >> shift;
+  }
+  return static_cast<T>(u + 1);
 }
 
-/// @brief Specialized version of RoundUpToPowerOf2 for int32_t.
-template <>
-inline int32_t RoundUpToPowerOf2<>(int32_t x) {
-  x--;
-  x |= x >> 1;
-  x |= x >> 2;
-  x |= x >> 4;
-  x |= x >> 8;
-  x |= x >> 16;
-  x++;
-  return x;
+/// @brief Round a value up to the nearest power of 2 (floating-point
+/// overload).
+///
+/// For floating-point types, uses logarithmic computation.
+///
+/// @note If @p x is 0, the return value is 0.
+/// @note Results may be imprecise for very large floating-point values due
+///       to floating-point arithmetic limitations.
+///
+/// @param x Value to round up. Must be non-negative.
+/// @returns Value rounded up to the nearest power of 2.
+template <class T>
+typename std::enable_if<std::is_floating_point<T>::value, T>::type
+RoundUpToPowerOf2(T x) {
+  if (x <= 0) return x;
+  return static_cast<T>(
+      pow(static_cast<T>(2), ceil(log(x) / log(static_cast<T>(2)))));
 }
 
 /// @brief Round a value up to the type's alignment boundary.
