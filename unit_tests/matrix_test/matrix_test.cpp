@@ -1581,17 +1581,18 @@ void OutputStream_Test(const T&) {
 
   switch (d) {
     case 1:
-      EXPECT_EQ("(0)", ss.str());
+      EXPECT_EQ("((0))", ss.str());
       break;
     case 2:
-      EXPECT_EQ("(0, 1, 2, 3)", ss.str());
+      EXPECT_EQ("((0, 1), (2, 3))", ss.str());
       break;
     case 3:
-      EXPECT_EQ("(0, 1, 2, 3, 4, 5, 6, 7, 8)", ss.str());
+      EXPECT_EQ("((0, 1, 2), (3, 4, 5), (6, 7, 8))", ss.str());
       break;
     case 4:
-      EXPECT_EQ("(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)",
-                ss.str());
+      EXPECT_EQ(
+          "((0, 1, 2, 3), (4, 5, 6, 7), (8, 9, 10, 11), (12, 13, 14, 15))",
+          ss.str());
       break;
   }
 }
