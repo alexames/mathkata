@@ -1,18 +1,18 @@
 /*
-* Copyright 2014 Google Inc. All rights reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright 2014 Google Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 #ifndef MATHFU_UTILITIES_H_
 #define MATHFU_UTILITIES_H_
 
@@ -254,16 +254,24 @@ struct static_assert_util<true> {};
 #define MATHFU_UNROLLED_LOOP(iterator, number_of_iterations, operation) \
   {                                                                     \
     const int iterator = 0;                                             \
-    { operation; }                                                      \
+    {                                                                   \
+      operation;                                                        \
+    }                                                                   \
     if ((number_of_iterations) > 1) {                                   \
       const int iterator = 1;                                           \
-      { operation; }                                                    \
+      {                                                                 \
+        operation;                                                      \
+      }                                                                 \
       if ((number_of_iterations) > 2) {                                 \
         const int iterator = 2;                                         \
-        { operation; }                                                  \
+        {                                                               \
+          operation;                                                    \
+        }                                                               \
         if ((number_of_iterations) > 3) {                               \
           const int iterator = 3;                                       \
-          { operation; }                                                \
+          {                                                             \
+            operation;                                                  \
+          }                                                             \
           if ((number_of_iterations) > 4) {                             \
             for (int iterator = 4; iterator < (number_of_iterations);   \
                  ++iterator) {                                          \
@@ -367,8 +375,8 @@ inline T Random() {
 /// @cond MATHFU_INTERNAL
 template <>
 inline float Random() {
-  return static_cast<float>(rand() >> 8) /
-         (static_cast<float>((RAND_MAX >> 8) + 1));
+  return static_cast<float>(rand() >> 8)
+         / (static_cast<float>((RAND_MAX >> 8) + 1));
 }
 /// @endcond
 
@@ -442,13 +450,19 @@ inline int32_t RoundUpToPowerOf2<>(int32_t x) {
   return x;
 }
 
-/// @brief Round a value up to the type's size boundary.
+/// @brief Round a value up to the type's alignment boundary.
+///
+/// Uses the bitmask trick `(v + (align-1)) & ~(align-1)` which requires
+/// alignment to be a power of 2. This is guaranteed by the C++ standard for
+/// all types, but is documented here via static_assert for clarity.
 ///
 /// @param v Value to round up.
-/// @returns Value rounded up to the type's size boundary.
+/// @returns Value rounded up to the type's alignment boundary.
 template <typename T>
-uint32_t RoundUpToTypeBoundary(uint32_t v) {
-  return (v + sizeof(T) - 1) & ~(sizeof(T) - 1);
+size_t RoundUpToTypeBoundary(size_t v) {
+  static_assert((alignof(T) & (alignof(T) - 1)) == 0,
+                "alignof(T) must be a power of 2");
+  return (v + alignof(T) - 1) & ~(alignof(T) - 1);
 }
 
 /// @}
@@ -494,8 +508,8 @@ inline void *AllocateAligned(size_t n) {
   if (!buf) return NULL;
   // Align to next higher multiple of MATHFU_ALIGNMENT.
   uint8_t *aligned_buf = reinterpret_cast<uint8_t *>(
-      (reinterpret_cast<size_t>(buf) + MATHFU_ALIGNMENT) &
-      ~(MATHFU_ALIGNMENT - 1));
+      (reinterpret_cast<size_t>(buf) + MATHFU_ALIGNMENT)
+      & ~(MATHFU_ALIGNMENT - 1));
   // Write out original buffer pointer before aligned buffer.
   // The assert will fail if the allocator granularity is less than the pointer
   // size, or if MATHFU_ALIGNMENT doesn't fit two pointers.
@@ -596,16 +610,16 @@ class simd_allocator : public std::allocator<T> {
   void *operator new[](std::size_t n) { return mathfu::AllocateAligned(n); } \
   void operator delete(void *p) noexcept { mathfu::FreeAligned(p); }         \
   void operator delete[](void *p) noexcept { mathfu::FreeAligned(p); }       \
-  void *operator new(std::size_t n, const std::nothrow_t&) noexcept {        \
+  void *operator new(std::size_t n, const std::nothrow_t &) noexcept {       \
     return mathfu::AllocateAligned(n);                                       \
   }                                                                          \
-  void *operator new[](std::size_t n, const std::nothrow_t&) noexcept {      \
+  void *operator new[](std::size_t n, const std::nothrow_t &) noexcept {     \
     return mathfu::AllocateAligned(n);                                       \
   }                                                                          \
-  void operator delete(void *p, const std::nothrow_t&) noexcept {            \
+  void operator delete(void *p, const std::nothrow_t &) noexcept {           \
     mathfu::FreeAligned(p);                                                  \
   }                                                                          \
-  void operator delete[](void *p, const std::nothrow_t&) noexcept {          \
+  void operator delete[](void *p, const std::nothrow_t &) noexcept {         \
     mathfu::FreeAligned(p);                                                  \
   }
 
