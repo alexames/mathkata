@@ -1,18 +1,18 @@
 /*
-* Copyright 2016 Google Inc. All rights reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright 2016 Google Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 #ifndef MATHFU_INTERNAL_VECTOR_3_H_
 #define MATHFU_INTERNAL_VECTOR_3_H_
 
@@ -25,26 +25,22 @@ class Vector<T, 3> {
  public:
   typedef T Scalar;
   static const int Dims = 3;
+  static const int kDims = 3;
 
   inline Vector() {}
 
-  inline Vector(const Vector<T, 3>& v)
-      : x(v.x), y(v.y), z(v.z) {}
+  inline Vector(const Vector<T, 3>& v) : x(v.x), y(v.y), z(v.z) {}
 
   explicit inline Vector(const VectorPacked<T, 3>& v)
       : x(v.x), y(v.y), z(v.z) {}
 
-  explicit inline Vector(const T* a)
-      : x(a[0]), y(a[1]), z(a[2]) {}
+  explicit inline Vector(const T* a) : x(a[0]), y(a[1]), z(a[2]) {}
 
-  explicit inline Vector(T s)
-      : x(s), y(s), z(s) {}
+  explicit inline Vector(T s) : x(s), y(s), z(s) {}
 
-  inline Vector(T s1, T s2, T s3)
-      : x(s1), y(s2), z(s3) {}
+  inline Vector(T s1, T s2, T s3) : x(s1), y(s2), z(s3) {}
 
-  inline Vector(const Vector<T, 2>& v12, T s3)
-      : x(v12.x), y(v12.y), z(s3) {}
+  inline Vector(const Vector<T, 2>& v12, T s3) : x(v12.x), y(v12.y), z(s3) {}
 
   template <typename U>
   explicit inline Vector(const Vector<U, 3>& v)

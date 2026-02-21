@@ -1,18 +1,18 @@
 /*
-* Copyright 2016 Google Inc. All rights reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright 2016 Google Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 #ifndef MATHFU_INTERNAL_VECTOR_2_H_
 #define MATHFU_INTERNAL_VECTOR_2_H_
 
@@ -25,23 +25,19 @@ class Vector<T, 2> {
  public:
   typedef T Scalar;
   static const int Dims = 2;
+  static const int kDims = 2;
 
   inline Vector() {}
 
-  inline Vector(const Vector<T, 2>& v)
-      : x(v.x), y(v.y) {}
+  inline Vector(const Vector<T, 2>& v) : x(v.x), y(v.y) {}
 
-  explicit inline Vector(const VectorPacked<T, 2>& v)
-      : x(v.x), y(v.y) {}
+  explicit inline Vector(const VectorPacked<T, 2>& v) : x(v.x), y(v.y) {}
 
-  explicit inline Vector(const T* a)
-      : x(a[0]), y(a[1]) {}
+  explicit inline Vector(const T* a) : x(a[0]), y(a[1]) {}
 
-  explicit inline Vector(T s)
-      : x(s), y(s) {}
+  explicit inline Vector(T s) : x(s), y(s) {}
 
-  inline Vector(T s1, T s2)
-      : x(s1), y(s2) {}
+  inline Vector(T s1, T s2) : x(s1), y(s2) {}
 
   template <typename U>
   explicit inline Vector(const Vector<U, 2>& v)

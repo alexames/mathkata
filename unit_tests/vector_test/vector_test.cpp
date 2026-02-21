@@ -1,28 +1,27 @@
 /*
-* Copyright 2014 Google Inc. All rights reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright 2014 Google Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 #include "mathfu/vector.h"
-#include "mathfu/constants.h"
-#include "mathfu/io.h"
-
-#include "gtest/gtest.h"
-
-#include "precision.h"
 
 #include <sstream>
 #include <string>
+
+#include "gtest/gtest.h"
+#include "mathfu/constants.h"
+#include "mathfu/io.h"
+#include "precision.h"
 
 class VectorTests : public ::testing::Test {
  protected:
@@ -200,8 +199,8 @@ void InitializationPacked_Test(const T& precision) {
   }
   mathfu::Vector<T, d> unpacked(packed);
   for (int i = 0; i < d; ++i) {
-    EXPECT_NEAR(packed.data_[i], unpacked[i], static_cast<T>(0)) << "Element "
-                                                                << i;
+    EXPECT_NEAR(packed.data_[i], unpacked[i], static_cast<T>(0))
+        << "Element " << i;
   }
 }
 TEST_ALL_F(InitializationPacked)
@@ -913,7 +912,8 @@ void FromType_Test(const T& precision) {
     compatible.values[i] = static_cast<T>(i * precision);
   }
 
-  const mathfu::Vector<T, d> vector = mathfu::Vector<T, d>::FromType(compatible);
+  const mathfu::Vector<T, d> vector =
+      mathfu::Vector<T, d>::FromType(compatible);
 
   for (int i = 0; i < d; ++i) {
     EXPECT_EQ(compatible.values[i], vector[i]);
@@ -975,6 +975,14 @@ TEST_ALL_F(OutputStream)
 TEST_ALL_INTS_F(OutputStream)
 TEST_F(VectorTests, OutputStream_Test_float_1) {
   OutputStream_Test<float, 1>(0.0f);
+}
+
+// Test that the kDims static member is present and correct for each
+// specialization.
+TEST_F(VectorTests, kDims) {
+  EXPECT_EQ(mathfu::Vector<float, 2>::kDims, 2);
+  EXPECT_EQ(mathfu::Vector<float, 3>::kDims, 3);
+  EXPECT_EQ(mathfu::Vector<float, 4>::kDims, 4);
 }
 
 int main(int argc, char** argv) {

@@ -1,26 +1,26 @@
 /*
-* Copyright 2014 Google Inc. All rights reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright 2014 Google Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 #ifndef MATHFU_VECTOR_H_
 #define MATHFU_VECTOR_H_
 
 #include <math.h>
+
 #include <cmath>
 
 #include "mathfu/utilities.h"
-
 
 /// @file mathfu/vector.h Vector
 /// @brief Vector class and functions.
@@ -162,6 +162,8 @@ class Vector {
  public:
   /// @brief Element type to enable reference by other classes.
   typedef T Scalar;
+  /// @brief The number of dimensions in this Vector.
+  static const int kDims = Dims;
 
   /// @brief Create an uninitialized Vector.
   inline Vector() {}
@@ -942,11 +944,10 @@ inline T AngleHelper(const Vector<T, Dims>& v1, const Vector<T, Dims>& v2) {
 ///
 /// @tparam T Type of vector components to test.
 template <class T>
-bool InRange2D(const Vector<T, 2>& val,
-               const Vector<T, 2>& range_start,
+bool InRange2D(const Vector<T, 2>& val, const Vector<T, 2>& range_start,
                const Vector<T, 2>& range_end) {
-  return InRange(val[0], range_start[0], range_end[0]) &&
-         InRange(val[1], range_start[1], range_end[1]);
+  return InRange(val[0], range_start[0], range_end[0])
+         && InRange(val[1], range_start[1], range_end[1]);
 }
 
 /// @cond MATHFU_INTERNAL
