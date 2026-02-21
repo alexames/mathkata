@@ -360,7 +360,9 @@ class Matrix {
   /// the column accessed is i / Rows and the row is i % Rows.
   /// @return Const reference to the data.
   inline const T& operator[](const int i) const {
-    return const_cast<Matrix<T, Rows, Cols>*>(this)->operator[](i);
+    const int col = i / Rows;
+    const int row = i % Rows;
+    return data_[col][row];
   }
 
   /// @brief Access an element of the Matrix.
@@ -369,19 +371,9 @@ class Matrix {
   /// the column accessed is i / Rows and the row is i % Rows.
   /// @return Reference to the data that can be modified by the caller.
   inline T& operator[](const int i) {
-#if defined(MATHFU_COMPILE_WITH_PADDING)
-    // In this case Vector<T, 3> is padded, so the element offset must be
-    // accessed using the array operator.
-    if (Rows == 3) {
-      const int row = i % Rows;
-      const int col = i / Rows;
-      return data_[col][row];
-    } else {
-      return reinterpret_cast<T*>(data_)[i];
-    }
-#else
-    return reinterpret_cast<T*>(data_)[i];
-#endif  // defined(MATHFU_COMPILE_WITH_PADDING)
+    const int col = i / Rows;
+    const int row = i % Rows;
+    return data_[col][row];
   }
 
   /// @brief Pack the matrix to an array of "Rows" element vectors,
