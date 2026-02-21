@@ -102,13 +102,26 @@ class Quaternion {
   /// @param v Vector component.
   inline void set_vector(const Vector<T, 3>& v) { v_ = v; }
 
-  /// @brief Calculate the inverse Quaternion.
+  /// @brief Calculate the conjugate of this Quaternion.
   ///
-  /// This calculates the inverse such that <code>(q * q).Inverse()</code>
-  /// is the identity.
+  /// The conjugate negates the vector component of the quaternion.
+  /// For unit quaternions, the conjugate is equal to the inverse.
   ///
   /// @return Quaternion containing the result.
-  inline Quaternion<T> Inverse() const { return Quaternion<T>(s_, -v_); }
+  inline Quaternion<T> Conjugate() const { return Quaternion<T>(s_, -v_); }
+
+  /// @brief Calculate the inverse Quaternion.
+  ///
+  /// This calculates the inverse such that
+  /// <code>q * q.Inverse() == Quaternion::identity</code>
+  /// for any non-zero quaternion.
+  ///
+  /// @return Quaternion containing the result.
+  inline Quaternion<T> Inverse() const {
+    T norm_sq = s_ * s_ + Vector<T, 3>::DotProduct(v_, v_);
+    T inv_norm_sq = T(1) / norm_sq;
+    return Quaternion<T>(s_ * inv_norm_sq, -v_ * inv_norm_sq);
+  }
 
   /// @brief Add this Quaternion to another Quaternion.
   ///
@@ -441,7 +454,7 @@ class Quaternion {
                            q1.v_ * (T(1) - s1) + q2.v_ * s1)
           .Normalized();
     }
-    return q1 * ((q1.Inverse() * q2) * s1);
+    return q1 * ((q1.Conjugate() * q2) * s1);
   }
 
   /// @brief Access an element of the quaternion.
