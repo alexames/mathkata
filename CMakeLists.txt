@@ -59,11 +59,14 @@ function(mathfu_configure_flags target)
     # Add vectorial headers (SIMD abstraction layer).
     target_include_directories(${target}
       PRIVATE ${mathfu_dir}/dependencies/vectorial/include)
-    # Enable SSE4.1 when building with GCC / Clang on x86/x64.
+    # Enable SIMD flags when building with GCC / Clang.
     if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR
         CMAKE_CXX_COMPILER_ID MATCHES "Clang")
       if(CMAKE_SYSTEM_PROCESSOR MATCHES "(x86_64|AMD64|i[3-6]86)")
         target_compile_options(${target} PRIVATE -msse4.1)
+      elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "(arm|ARM)")
+        # Enable NEON for 32-bit ARM. AArch64 has NEON by default.
+        target_compile_options(${target} PRIVATE -mfpu=neon)
       endif()
     endif()
     # Enable SSE2 by default when building with MSVC for 32-bit targets.
