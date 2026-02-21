@@ -11,15 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-cmake_minimum_required(VERSION 2.8.12)
+cmake_minimum_required(VERSION 3.14)
 
-set(PROJECT_NAME MathFu)
-project(MathFu)
-
-# Call fplutil to get locations of dependencies and set common build settings.
-include("cmake/find_fplutil.cmake")
-include("${fplutil_dir}/buildutil/cmake_common.txt")
-set_common_build_variables()
+project(MathFu LANGUAGES CXX)
 
 # Options that control the build configuration.
 # To configure MathFu flags per build target, see the
@@ -44,15 +38,11 @@ set(mathfu_dir ${CMAKE_CURRENT_LIST_DIR} CACHE INTERNAL "mathfu directory")
 # If force_padding isn't specified padding is enabled based upon the
 # best general configuration for the target architecture.
 function(mathfu_configure_flags target)
-  if(fpl_ios)
-    set(enable_simd NO)
-  else()
-    set(enable_simd ${mathfu_enable_simd})
-  endif()
+  set(enable_simd ${mathfu_enable_simd})
 
   # Add required includes to the target.
   target_include_directories(${target}
-    PRIVATE ${mathfu_dir}/include ${dependencies_vectorial_dir}/include)
+    PRIVATE ${mathfu_dir}/include)
 
   # Parse optional arguments.
   set(additional_args ${ARGN})
@@ -66,12 +56,12 @@ function(mathfu_configure_flags target)
 
   # If the SIMD build option is enabled.
   if(enable_simd)
-    # Enable SSE4.1 when building with GCC / Clang.
-    # NOTE: It's also possible to build the library using using SSE2 with GCC /
-    # Clang, change -msse4.1 to -msse2.
+    # Enable SSE4.1 when building with GCC / Clang on x86/x64.
     if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR
-        CMAKE_COMPILER_IS_CLANGXX)
-      target_compile_options(${target} PRIVATE -msse4.1)
+        CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+      if(CMAKE_SYSTEM_PROCESSOR MATCHES "(x86_64|AMD64|i[3-6]86)")
+        target_compile_options(${target} PRIVATE -msse4.1)
+      endif()
     endif()
     # Enable SSE2 by default when building with MSVC for 32-bit targets.
     # Note that SSE2 is enabled by default for 64-bit targets, and the
@@ -83,55 +73,37 @@ function(mathfu_configure_flags target)
     if(DEFINED force_padding)
       if(force_padding)
         target_compile_definitions(${target} PRIVATE
-          -DMATHFU_COMPILE_FORCE_PADDING=1)
+          MATHFU_COMPILE_FORCE_PADDING=1)
       else()
         target_compile_definitions(${target} PRIVATE
-          -DMATHFU_COMPILE_FORCE_PADDING=0)
+          MATHFU_COMPILE_FORCE_PADDING=0)
       endif()
     endif()
   else()
     target_compile_definitions(${target} PRIVATE
-      -DMATHFU_COMPILE_WITHOUT_SIMD_SUPPORT)
+      MATHFU_COMPILE_WITHOUT_SIMD_SUPPORT)
   endif()
 endfunction()
 
-# Modify CMAKE_C_FLAGS and CMAKE_CXX_FLAGS to enable a maximum reasonable
-# warning level.
+# Enable a high warning level for the target.
 function(mathfu_enable_warnings target)
-  get_target_property(target_compile_flags ${target} COMPILE_FLAGS)
   if(MSVC)
     # C4127: conditional expression is constant
     # C4577: 'noexcept' used with no exception handling mode specified.
     target_compile_options(${target} PRIVATE /W4 /WX /wd4127 /wd4577)
   elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR
-      CMAKE_COMPILER_IS_CLANGXX)
-    # Set the maximum warning level for gcc.
+      CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     target_compile_options(${target} PRIVATE -Wall -Wextra -Werror
       -Wno-long-long -Wno-variadic-macros)
   endif()
 endfunction()
 
-# Macro defined here so that it can be used by all projects included
-macro(mathfu_set_ios_attributes project)
-  if(fpl_ios)
-    set_target_properties(${project} PROPERTIES
-      XCODE_ATTRIBUTE_SDKROOT "iphoneos")
-    set_target_properties(${project} PROPERTIES
-      XCODE_ATTRIBUTE_ARCHS "$(ARCHS_STANDARD)")
-    set_target_properties(${project} PROPERTIES
-      XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH "NO")
-    set_target_properties(${project} PROPERTIES
-      XCODE_ATTRIBUTE_VALID_ARCHS "$(ARCHS_STANDARD)")
-    set_target_properties(${project} PROPERTIES
-      XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET "8.0")
-  endif()
-endmacro(mathfu_set_ios_attributes)
-
-file(GLOB_RECURSE MATHFU_HEADERS ${CMAKE_CURRENT_LIST_DIR}/include/mathfu *.h)
+file(GLOB_RECURSE MATHFU_HEADERS ${CMAKE_CURRENT_LIST_DIR}/include/mathfu/*.h)
 
 if(mathfu_build_benchmarks)
   add_subdirectory(benchmarks)
 endif()
 if(mathfu_build_tests)
+  enable_testing()
   add_subdirectory(unit_tests)
 endif()
