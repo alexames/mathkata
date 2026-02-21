@@ -598,14 +598,6 @@ class simd_allocator : public std::allocator<T> {
   void deallocate(pointer p, size_type) { FreeAligned(p); }
 };
 
-#if defined(_MSC_VER)
-#if _MSC_VER <= 1800  // MSVC 2013
-#if !defined(noexcept)
-#define noexcept
-#endif  // !defined(noexcept)
-#endif  // _MSC_VER <= 1800
-#endif  //  defined(_MSC_VER)
-
 /// @def MATHFU_DEFINE_GLOBAL_SIMD_AWARE_NEW_DELETE
 /// @brief Macro which overrides the default new and delete allocators.
 ///
