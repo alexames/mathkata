@@ -47,6 +47,11 @@ template <class T>
 class Quaternion {
  public:
   /// @brief Construct an uninitialized Quaternion.
+  ///
+  /// The scalar and vector components of the Quaternion are left uninitialized
+  /// and have indeterminate values. This is intentional for performance: use
+  /// Quaternion(T, T, T, T) or Quaternion::identity if you need specific
+  /// values.
   inline Quaternion() {}
 
   /// @brief Construct a Quaternion from a copy.
