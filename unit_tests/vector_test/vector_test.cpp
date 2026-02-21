@@ -1046,6 +1046,179 @@ TEST_F(VectorTests, kDims) {
   EXPECT_EQ(mathfu::Vector<float, 4>::kDims, 4);
 }
 
+// Test that the SIMD padding lane (w / data_[3]) of Vector<float,3> is
+// consistently zero after construction and arithmetic operations.
+#if defined(MATHFU_COMPILE_WITH_PADDING)
+TEST_F(VectorTests, PaddingLaneZeroed_Constructors) {
+  // Constructor from three floats.
+  mathfu::Vector<float, 3> v3(1.0f, 2.0f, 3.0f);
+  EXPECT_EQ(0.0f, v3.data_[3]);
+
+  // Splat constructor.
+  mathfu::Vector<float, 3> vs(5.0f);
+  EXPECT_EQ(0.0f, vs.data_[3]);
+
+  // Constructor from float array.
+  float arr[] = {4.0f, 5.0f, 6.0f};
+  mathfu::Vector<float, 3> va(arr);
+  EXPECT_EQ(0.0f, va.data_[3]);
+
+  // Constructor from Vector<float,2> + float.
+  mathfu::Vector<float, 2> v2(1.0f, 2.0f);
+  mathfu::Vector<float, 3> v2f(v2, 3.0f);
+  EXPECT_EQ(0.0f, v2f.data_[3]);
+
+  // Copy constructor.
+  mathfu::Vector<float, 3> vc(v3);
+  EXPECT_EQ(0.0f, vc.data_[3]);
+
+  // Constructor from VectorPacked.
+  mathfu::VectorPacked<float, 3> packed;
+  packed.data_[0] = 7.0f;
+  packed.data_[1] = 8.0f;
+  packed.data_[2] = 9.0f;
+  mathfu::Vector<float, 3> vp(packed);
+  EXPECT_EQ(0.0f, vp.data_[3]);
+
+  // Constructor from integer vector.
+  mathfu::Vector<int, 3> vi(1, 2, 3);
+  mathfu::Vector<float, 3> vfi(vi);
+  EXPECT_EQ(0.0f, vfi.data_[3]);
+}
+
+TEST_F(VectorTests, PaddingLaneZeroed_Arithmetic) {
+  mathfu::Vector<float, 3> a(1.0f, 2.0f, 3.0f);
+  mathfu::Vector<float, 3> b(4.0f, 5.0f, 6.0f);
+
+  // Negation.
+  mathfu::Vector<float, 3> neg = -a;
+  EXPECT_EQ(0.0f, neg.data_[3]);
+
+  // Vector + Vector.
+  mathfu::Vector<float, 3> sum = a + b;
+  EXPECT_EQ(0.0f, sum.data_[3]);
+
+  // Vector - Vector.
+  mathfu::Vector<float, 3> diff = a - b;
+  EXPECT_EQ(0.0f, diff.data_[3]);
+
+  // Vector * Vector (Hadamard).
+  mathfu::Vector<float, 3> prod = a * b;
+  EXPECT_EQ(0.0f, prod.data_[3]);
+
+  // Vector / Vector.
+  mathfu::Vector<float, 3> quot = a / b;
+  EXPECT_EQ(0.0f, quot.data_[3]);
+
+  // Vector + scalar.
+  mathfu::Vector<float, 3> add_s = a + 10.0f;
+  EXPECT_EQ(0.0f, add_s.data_[3]);
+
+  // scalar + Vector.
+  mathfu::Vector<float, 3> s_add = 10.0f + a;
+  EXPECT_EQ(0.0f, s_add.data_[3]);
+
+  // Vector - scalar.
+  mathfu::Vector<float, 3> sub_s = a - 10.0f;
+  EXPECT_EQ(0.0f, sub_s.data_[3]);
+
+  // scalar - Vector.
+  mathfu::Vector<float, 3> s_sub = 10.0f - a;
+  EXPECT_EQ(0.0f, s_sub.data_[3]);
+
+  // Vector * scalar.
+  mathfu::Vector<float, 3> mul_s = a * 2.0f;
+  EXPECT_EQ(0.0f, mul_s.data_[3]);
+
+  // scalar * Vector.
+  mathfu::Vector<float, 3> s_mul = 2.0f * a;
+  EXPECT_EQ(0.0f, s_mul.data_[3]);
+
+  // Vector / scalar.
+  mathfu::Vector<float, 3> div_s = a / 2.0f;
+  EXPECT_EQ(0.0f, div_s.data_[3]);
+}
+
+TEST_F(VectorTests, PaddingLaneZeroed_CompoundAssignment) {
+  mathfu::Vector<float, 3> b(4.0f, 5.0f, 6.0f);
+
+  // +=Vector
+  mathfu::Vector<float, 3> v1(1.0f, 2.0f, 3.0f);
+  v1 += b;
+  EXPECT_EQ(0.0f, v1.data_[3]);
+
+  // -=Vector
+  mathfu::Vector<float, 3> v2(1.0f, 2.0f, 3.0f);
+  v2 -= b;
+  EXPECT_EQ(0.0f, v2.data_[3]);
+
+  // *=Vector
+  mathfu::Vector<float, 3> v3(1.0f, 2.0f, 3.0f);
+  v3 *= b;
+  EXPECT_EQ(0.0f, v3.data_[3]);
+
+  // /=Vector
+  mathfu::Vector<float, 3> v4(1.0f, 2.0f, 3.0f);
+  v4 /= b;
+  EXPECT_EQ(0.0f, v4.data_[3]);
+
+  // +=scalar
+  mathfu::Vector<float, 3> v5(1.0f, 2.0f, 3.0f);
+  v5 += 10.0f;
+  EXPECT_EQ(0.0f, v5.data_[3]);
+
+  // -=scalar
+  mathfu::Vector<float, 3> v6(1.0f, 2.0f, 3.0f);
+  v6 -= 10.0f;
+  EXPECT_EQ(0.0f, v6.data_[3]);
+
+  // *=scalar
+  mathfu::Vector<float, 3> v7(1.0f, 2.0f, 3.0f);
+  v7 *= 2.0f;
+  EXPECT_EQ(0.0f, v7.data_[3]);
+
+  // /=scalar
+  mathfu::Vector<float, 3> v8(1.0f, 2.0f, 3.0f);
+  v8 /= 2.0f;
+  EXPECT_EQ(0.0f, v8.data_[3]);
+}
+
+TEST_F(VectorTests, PaddingLaneZeroed_VectorOps) {
+  mathfu::Vector<float, 3> a(1.0f, 2.0f, 3.0f);
+  mathfu::Vector<float, 3> b(4.0f, 5.0f, 6.0f);
+
+  // CrossProduct.
+  mathfu::Vector<float, 3> cross = mathfu::Vector<float, 3>::CrossProduct(a, b);
+  EXPECT_EQ(0.0f, cross.data_[3]);
+
+  // Normalized.
+  mathfu::Vector<float, 3> normd = a.Normalized();
+  EXPECT_EQ(0.0f, normd.data_[3]);
+
+  // Normalize (in-place).
+  mathfu::Vector<float, 3> norm_in_place(a);
+  norm_in_place.Normalize();
+  EXPECT_EQ(0.0f, norm_in_place.data_[3]);
+
+  // HadamardProduct.
+  mathfu::Vector<float, 3> hadamard =
+      mathfu::Vector<float, 3>::HadamardProduct(a, b);
+  EXPECT_EQ(0.0f, hadamard.data_[3]);
+
+  // Lerp.
+  mathfu::Vector<float, 3> lerp = mathfu::Vector<float, 3>::Lerp(a, b, 0.5f);
+  EXPECT_EQ(0.0f, lerp.data_[3]);
+
+  // Max.
+  mathfu::Vector<float, 3> max_v = mathfu::Vector<float, 3>::Max(a, b);
+  EXPECT_EQ(0.0f, max_v.data_[3]);
+
+  // Min.
+  mathfu::Vector<float, 3> min_v = mathfu::Vector<float, 3>::Min(a, b);
+  EXPECT_EQ(0.0f, min_v.data_[3]);
+}
+#endif  // defined(MATHFU_COMPILE_WITH_PADDING)
+
 int main(int argc, char** argv) {
   ::testing::InitGoogleTest(&argc, argv);
   printf("%s (%s)\n", argv[0], MATHFU_BUILD_OPTIONS_STRING);
