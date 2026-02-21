@@ -1,25 +1,25 @@
 /*
-* Copyright 2014 Google Inc. All rights reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright 2014 Google Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 #ifndef MATHFU_VECTOR_2_SIMD_H_
 #define MATHFU_VECTOR_2_SIMD_H_
 
+#include <math.h>
+
 #include "mathfu/internal/vector_2.h"
 #include "mathfu/utilities.h"
-
-#include <math.h>
 
 /// @file mathfu/internal/vector_2_simd.h MathFu Vector<T, 2> Specialization
 /// @brief 2-dimensional specialization of mathfu::Vector for SIMD optimized
@@ -38,6 +38,7 @@ template <>
 class Vector<float, 2> {
  public:
   typedef float Scalar;
+  static const int kDims = 2;
 
   inline Vector() {}
 

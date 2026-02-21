@@ -183,6 +183,8 @@ class Vector {
  public:
   /// @brief Element type to enable reference by other classes.
   typedef T Scalar;
+  /// @brief The number of dimensions in this Vector.
+  static const int kDims = Dims;
 
   /// @brief Create an uninitialized Vector.
   inline Vector() {}
