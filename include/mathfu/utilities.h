@@ -85,7 +85,9 @@
 #define MATHFU_COMPILE_WITH_SIMD
 #elif defined(__ARM_NEON__)
 #define MATHFU_COMPILE_WITH_SIMD
-#elif defined(_M_IX86_FP)  // MSVC
+#elif defined(_M_X64) || defined(_M_AMD64)  // MSVC x64: SSE2 always available
+#define MATHFU_COMPILE_WITH_SIMD
+#elif defined(_M_IX86_FP)  // MSVC x86
 #if _M_IX86_FP >= 1        // SSE enabled
 #define MATHFU_COMPILE_WITH_SIMD
 #endif  // _M_IX86_FP >= 1

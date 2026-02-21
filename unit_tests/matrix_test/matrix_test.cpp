@@ -1112,6 +1112,32 @@ void Mat4ToAndFromAffine_Test(const T&) {
 
 TEST_SCALAR_F(Mat4ToAndFromAffine, FLOAT_PRECISION, DOUBLE_PRECISION)
 
+// Test constructing a non-square matrix from a pointer array.
+// This verifies that the stride is Rows (not Cols) for column-major layout.
+template <class T>
+void MatrixPointerConstructorNonSquare_Test(const T& precision) {
+  // A 4x3 matrix (4 rows, 3 cols) stored column-major:
+  // Column 0: {1, 2, 3, 4}, Column 1: {5, 6, 7, 8}, Column 2: {9, 10, 11, 12}
+  const T data[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+  mathfu::Matrix<T, 4, 3> mat(data);
+  // Verify each element using (row, col) access.
+  EXPECT_NEAR(mat(0, 0), T(1), precision);
+  EXPECT_NEAR(mat(1, 0), T(2), precision);
+  EXPECT_NEAR(mat(2, 0), T(3), precision);
+  EXPECT_NEAR(mat(3, 0), T(4), precision);
+  EXPECT_NEAR(mat(0, 1), T(5), precision);
+  EXPECT_NEAR(mat(1, 1), T(6), precision);
+  EXPECT_NEAR(mat(2, 1), T(7), precision);
+  EXPECT_NEAR(mat(3, 1), T(8), precision);
+  EXPECT_NEAR(mat(0, 2), T(9), precision);
+  EXPECT_NEAR(mat(1, 2), T(10), precision);
+  EXPECT_NEAR(mat(2, 2), T(11), precision);
+  EXPECT_NEAR(mat(3, 2), T(12), precision);
+}
+
+TEST_SCALAR_F(MatrixPointerConstructorNonSquare, FLOAT_PRECISION,
+              DOUBLE_PRECISION)
+
 // Test extracting the 3x3 rotation Matrix portion from a 4x4 Matrix.
 template <class T>
 void Mat4ToRotationMatrix_Test(const T&) {
@@ -1127,6 +1153,39 @@ void Mat4ToRotationMatrix_Test(const T&) {
 
 TEST_SCALAR_F(Mat4ToRotationMatrix, FLOAT_PRECISION, DOUBLE_PRECISION)
 
+// Test that RotationX/Y/Z produce correct results with double precision.
+// This verifies that the trig functions use std::cos/std::sin (which handle
+// double) rather than cosf/sinf (which truncate to float).
+template <class T>
+void RotationPrecision_Test(const T& precision) {
+  typedef mathfu::Matrix<T, 3> Mat3;
+  const T angle = static_cast<T>(1.0);
+  const T c = std::cos(angle);
+  const T s = std::sin(angle);
+
+  Mat3 rx = Mat3::RotationX(angle);
+  EXPECT_NEAR(rx(0, 0), T(1), precision);
+  EXPECT_NEAR(rx(1, 1), c, precision);
+  EXPECT_NEAR(rx(2, 1), s, precision);
+  EXPECT_NEAR(rx(1, 2), -s, precision);
+  EXPECT_NEAR(rx(2, 2), c, precision);
+
+  Mat3 ry = Mat3::RotationY(angle);
+  EXPECT_NEAR(ry(0, 0), c, precision);
+  EXPECT_NEAR(ry(2, 0), -s, precision);
+  EXPECT_NEAR(ry(1, 1), T(1), precision);
+  EXPECT_NEAR(ry(0, 2), s, precision);
+  EXPECT_NEAR(ry(2, 2), c, precision);
+
+  Mat3 rz = Mat3::RotationZ(angle);
+  EXPECT_NEAR(rz(0, 0), c, precision);
+  EXPECT_NEAR(rz(1, 0), s, precision);
+  EXPECT_NEAR(rz(0, 1), -s, precision);
+  EXPECT_NEAR(rz(1, 1), c, precision);
+  EXPECT_NEAR(rz(2, 2), T(1), precision);
+}
+
+TEST_SCALAR_F(RotationPrecision, FLOAT_PRECISION, DOUBLE_PRECISION)
 // Test HadamardProduct (component-wise multiplication).
 template <class T, int d>
 void HadamardProduct_Test(const T& precision) {

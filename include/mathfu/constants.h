@@ -123,9 +123,9 @@ static const Vector<double, 4> kAxisZ4d(0.0, 0.0, 1.0, 0.0);
 /// 4-dimensional <code>double</code> unit Vector pointing along the W axis.
 static const Vector<double, 4> kAxisW4d(0.0, 0.0, 0.0, 1.0);
 
-/// 2-dimensional <code>int</code> Vector of zeros.
-static const Vector<int, 2> kOnes2i(1, 1);
 /// 2-dimensional <code>int</code> Vector of ones.
+static const Vector<int, 2> kOnes2i(1, 1);
+/// 2-dimensional <code>int</code> Vector of zeros.
 static const Vector<int, 2> kZeros2i(0, 0);
 /// 2-dimensional <code>int</code> unit Vector pointing along the X axis.
 static const Vector<int, 2> kAxisX2i(1, 0);
@@ -149,9 +149,9 @@ static const Vector<int, 4> kZeros4i(0, 0, 0, 0);
 static const Vector<int, 4> kOnes4i(1, 1, 1 ,1);
 /// 4-dimensional <code>int</code> unit Vector pointing along the X axis.
 static const Vector<int, 4> kAxisX4i(1, 0, 0, 0);
-/// 4-dimensional <code>int</code> unit Vector pointing along the Z axis.
-static const Vector<int, 4> kAxisY4i(0, 1, 0, 0);
 /// 4-dimensional <code>int</code> unit Vector pointing along the Y axis.
+static const Vector<int, 4> kAxisY4i(0, 1, 0, 0);
+/// 4-dimensional <code>int</code> unit Vector pointing along the Z axis.
 static const Vector<int, 4> kAxisZ4i(0, 0, 1, 0);
 /// 4-dimensional <code>int</code> unit Vector pointing along the W axis.
 static const Vector<int, 4> kAxisW4i(0, 0, 0, 1);

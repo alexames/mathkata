@@ -928,8 +928,8 @@ inline T AngleHelper(const Vector<T, Dims>& v1, const Vector<T, Dims>& v2) {
     return T(0);
   }
   const T cos_val = Vector<T, Dims>::DotProduct(v1, v2) / divisor;
-  // If floating point error makes cos_val > 1, then acos will return nan.
-  return cos_val <= T(1) ? std::acos(cos_val) : T(0);
+  // Clamp to [-1, 1] to avoid NaN from acos due to floating point error.
+  return std::acos(Clamp(cos_val, T(-1), T(1)));
 }
 
 /// @brief Check if val is within [range_start..range_end), denoting a

@@ -310,7 +310,7 @@ class Matrix {
   ///
   /// @param a Array of values that the matrix will be iniitlized to.
   explicit inline Matrix(const T* const a) {
-    MATHFU_MAT_OPERATION((data_[i] = Vector<T, Rows>(&a[i * Cols])));
+    MATHFU_MAT_OPERATION((data_[i] = Vector<T, Rows>(&a[i * Rows])));
   }
 
   /// @brief Create a Matrix from an array of "Cols", "Rows" element packed
@@ -790,7 +790,7 @@ class Matrix {
   /// @param angle Angle (in radians).
   /// @return Matrix containing the result.
   static inline Matrix<T, 3> RotationX(T angle) {
-    return RotationX(Vector<T, 2>(cosf(angle), sinf(angle)));
+    return RotationX(Vector<T, 2>(std::cos(angle), std::sin(angle)));
   }
 
   /// @brief Create a 3x3 rotation Matrix from an angle (in radians) around
@@ -799,7 +799,7 @@ class Matrix {
   /// @param angle Angle (in radians).
   /// @return Matrix containing the result.
   static inline Matrix<T, 3> RotationY(T angle) {
-    return RotationY(Vector<T, 2>(cosf(angle), sinf(angle)));
+    return RotationY(Vector<T, 2>(std::cos(angle), std::sin(angle)));
   }
 
   /// @brief Create a 3x3 rotation Matrix from an angle (in radians)
@@ -808,7 +808,7 @@ class Matrix {
   /// @param angle Angle (in radians).
   /// @return Matrix containing the result.
   static inline Matrix<T, 3> RotationZ(T angle) {
-    return RotationZ(Vector<T, 2>(cosf(angle), sinf(angle)));
+    return RotationZ(Vector<T, 2>(std::cos(angle), std::sin(angle)));
   }
 
   /// @brief Create a 4x4 perspective Matrix.
