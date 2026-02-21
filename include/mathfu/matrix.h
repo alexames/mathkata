@@ -1,27 +1,27 @@
 /*
-* Copyright 2014 Google Inc. All rights reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright 2014 Google Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 #ifndef MATHFU_MATRIX_H_
 #define MATHFU_MATRIX_H_
 
-#include "mathfu/utilities.h"
-#include "mathfu/vector.h"
+#include <assert.h>
 
 #include <cmath>
 
-#include <assert.h>
+#include "mathfu/utilities.h"
+#include "mathfu/vector.h"
 
 /// @file mathfu/matrix.h
 /// @brief Matrix class and functions.
@@ -62,7 +62,7 @@
 /// This will perform a given OP on each matrix column and return the result
 #define MATHFU_MAT_OPERATOR(OP)                   \
   {                                               \
-    Matrix<T, Rows, Cols> result;              \
+    Matrix<T, Rows, Cols> result;                 \
     MATHFU_MAT_OPERATION(result.data_[i] = (OP)); \
     return result;                                \
   }
@@ -80,15 +80,15 @@
 /// @cond MATHFU_INTERNAL
 /// This macro will take the dot product for a row from data1 and a column from
 /// data2.
-#define MATHFU_MATRIX_4X4_DOT(data1, data2, r)               \
-  ((data1)[r] * (data2)[0] + (data1)[(r) + 4] * (data2)[1] + \
-   (data1)[(r) + 8] * (data2)[2] + (data1)[(r) + 12] * (data2)[3])
+#define MATHFU_MATRIX_4X4_DOT(data1, data2, r)             \
+  ((data1)[r] * (data2)[0] + (data1)[(r) + 4] * (data2)[1] \
+   + (data1)[(r) + 8] * (data2)[2] + (data1)[(r) + 12] * (data2)[3])
 /// @endcond
 
 /// @cond MATHFU_INTERNAL
-#define MATHFU_MATRIX_3X3_DOT(data1, data2, r, size)              \
-  ((data1)[r] * (data2)[0] + (data1)[(r) + (size)] * (data2)[1] + \
-   (data1)[(r) + 2 * (size)] * (data2)[2])
+#define MATHFU_MATRIX_3X3_DOT(data1, data2, r, size)            \
+  ((data1)[r] * (data2)[0] + (data1)[(r) + (size)] * (data2)[1] \
+   + (data1)[(r) + 2 * (size)] * (data2)[2])
 /// @endcond
 
 namespace mathfu {
@@ -99,9 +99,8 @@ class Matrix;
 template <class T, int Rows, int Cols>
 inline Matrix<T, Rows, Cols> IdentityHelper();
 template <bool check_invertible, class T, int Rows, int Cols>
-inline bool InverseHelper(
-    const Matrix<T, Rows, Cols>& m, Matrix<T, Rows, Cols>* const inverse,
-    T det_thresh);
+inline bool InverseHelper(const Matrix<T, Rows, Cols>& m,
+                          Matrix<T, Rows, Cols>* const inverse, T det_thresh);
 template <class T, int size1, int size2, int size3>
 inline void TimesHelper(const Matrix<T, size1, size2>& m1,
                         const Matrix<T, size2, size3>& m2,
@@ -129,7 +128,8 @@ static inline bool UnProjectHelper(const Vector<T, 3>& window_coord,
                                    Vector<T, 3>& result);
 
 template <typename T, int Rows, int Cols, typename CompatibleT>
-static inline Matrix<T, Rows, Cols> FromTypeHelper(const CompatibleT& compatible);
+static inline Matrix<T, Rows, Cols> FromTypeHelper(
+    const CompatibleT& compatible);
 
 template <typename T, int Rows, int Cols, typename CompatibleT>
 static inline CompatibleT ToTypeHelper(const Matrix<T, Rows, Cols>& m);
@@ -418,8 +418,7 @@ class Matrix {
   ///
   /// @param m Matrix to add to this Matrix.
   /// @return Matrix containing the result.
-  inline Matrix<T, Rows, Cols> operator+(
-      const Matrix<T, Rows, Cols>& m) const {
+  inline Matrix<T, Rows, Cols> operator+(const Matrix<T, Rows, Cols>& m) const {
     MATHFU_MAT_OPERATOR(data_[i] + m.data_[i]);
   }
 
@@ -427,8 +426,7 @@ class Matrix {
   ///
   /// @param m Matrix to subtract from this Matrix.
   /// @return Matrix containing the result.
-  inline Matrix<T, Rows, Cols> operator-(
-      const Matrix<T, Rows, Cols>& m) const {
+  inline Matrix<T, Rows, Cols> operator-(const Matrix<T, Rows, Cols>& m) const {
     MATHFU_MAT_OPERATOR(data_[i] - m.data_[i]);
   }
 
@@ -468,8 +466,7 @@ class Matrix {
   ///
   /// @param m Matrix to multiply with this Matrix.
   /// @return Matrix containing the result.
-  inline Matrix<T, Rows, Cols> operator*(
-      const Matrix<T, Rows, Cols>& m) const {
+  inline Matrix<T, Rows, Cols> operator*(const Matrix<T, Rows, Cols>& m) const {
     Matrix<T, Rows, Cols> result;
     TimesHelper(*this, m, &result);
     return result;
@@ -479,8 +476,7 @@ class Matrix {
   ///
   /// @param m Matrix to add to this Matrix.
   /// @return Reference to this class.
-  inline Matrix<T, Rows, Cols>& operator+=(
-      const Matrix<T, Rows, Cols>& m) {
+  inline Matrix<T, Rows, Cols>& operator+=(const Matrix<T, Rows, Cols>& m) {
     MATHFU_MAT_SELF_OPERATOR(data_[i] += m.data_[i]);
   }
 
@@ -488,8 +484,7 @@ class Matrix {
   ///
   /// @param m Matrix to subtract from this Matrix.
   /// @return Reference to this class.
-  inline Matrix<T, Rows, Cols>& operator-=(
-      const Matrix<T, Rows, Cols>& m) {
+  inline Matrix<T, Rows, Cols>& operator-=(const Matrix<T, Rows, Cols>& m) {
     MATHFU_MAT_SELF_OPERATOR(data_[i] -= m.data_[i]);
   }
 
@@ -521,16 +516,13 @@ class Matrix {
   ///
   /// @param s Scalar to divide this Matrix by.
   /// @return Reference to this class.
-  inline Matrix<T, Rows, Cols>& operator/=(T s) {
-    return (*this) *= (1 / s);
-  }
+  inline Matrix<T, Rows, Cols>& operator/=(T s) { return (*this) *= (1 / s); }
 
   /// @brief Multiply this Matrix with another Matrix (in-place).
   ///
   /// @param m Matrix to multiply with this Matrix.
   /// @return Reference to this class.
-  inline Matrix<T, Rows, Cols>& operator*=(
-      const Matrix<T, Rows, Cols>& m) {
+  inline Matrix<T, Rows, Cols>& operator*=(const Matrix<T, Rows, Cols>& m) {
     const Matrix<T, Rows, Cols> copy_of_this(*this);
     TimesHelper(copy_of_this, m, this);
     return *this;
@@ -574,8 +566,9 @@ class Matrix {
   inline Matrix<T, Cols, Rows> Transpose() const {
     Matrix<T, Cols, Rows> transpose;
     MATHFU_UNROLLED_LOOP(
-        i, Cols, MATHFU_UNROLLED_LOOP(
-                        j, Rows, transpose.GetColumn(j)[i] = GetColumn(i)[j]))
+        i, Cols,
+        MATHFU_UNROLLED_LOOP(j, Rows,
+                             transpose.GetColumn(j)[i] = GetColumn(i)[j]))
     return transpose;
   }
 
@@ -604,8 +597,7 @@ class Matrix {
   /// @return Vector with the scale along each local axis.
   inline Vector<T, 3> ScaleVector3D() const {
     MATHFU_STATIC_ASSERT(Rows >= 3 && Cols >= 3);
-    return Vector<T, 3>(data_[0].xyz().Length(),
-                        data_[1].xyz().Length(),
+    return Vector<T, 3>(data_[0].xyz().Length(), data_[1].xyz().Length(),
                         data_[2].xyz().Length());
   }
 
@@ -650,8 +642,8 @@ class Matrix {
   /// @brief Calculate the outer product of two Vectors.
   ///
   /// @return Matrix containing the result.
-  static inline Matrix<T, Rows, Cols> OuterProduct(
-      const Vector<T, Rows>& v1, const Vector<T, Cols>& v2) {
+  static inline Matrix<T, Rows, Cols> OuterProduct(const Vector<T, Rows>& v1,
+                                                   const Vector<T, Cols>& v2) {
     return OuterProductHelper(v1, v2);
   }
 
@@ -729,8 +721,7 @@ class Matrix {
   /// @param m 4x4 Matrix.
   /// @return rotation Matrix containing the result.
   static inline Matrix<T, 3> ToRotationMatrix(const Matrix<T, 4>& m) {
-    return Matrix<T, 3>(m[0], m[1], m[2], m[4], m[5], m[6], m[8], m[9],
-                        m[10]);
+    return Matrix<T, 3>(m[0], m[1], m[2], m[4], m[5], m[6], m[8], m[9], m[10]);
   }
 
   /// @brief Constructs a Matrix<float, 4> from an AffineTransform.
@@ -894,8 +885,8 @@ class Matrix {
   /// @param v Vector to multiply.
   /// @param m Matrix to multiply.
   /// @return Matrix containing the result.
-  friend inline Vector<T, Cols> operator*(
-      const Vector<T, Rows>& v, const Matrix<T, Rows, Cols>& m) {
+  friend inline Vector<T, Cols> operator*(const Vector<T, Rows>& v,
+                                          const Matrix<T, Rows, Cols>& m) {
     const int Dims = Cols;
     MATHFU_VECTOR_OPERATOR((Vector<T, Rows>::DotProduct(m.data_[i], v)));
   }
@@ -918,18 +909,20 @@ class Matrix {
 /// @{
 
 /// @cond MATHFU_INTERNAL
-template <int index> struct MathfuMatrixUnroller {
+template <int index>
+struct MathfuMatrixUnroller {
   template <class T, int Rows, int Cols>
   inline static bool NotEqual(const Matrix<T, Rows, Cols>& lhs,
-                       const Matrix<T, Rows, Cols>& rhs) {
-    return (lhs[index] != rhs[index]) |
-           MathfuMatrixUnroller<index-1>::NotEqual(lhs, rhs);
+                              const Matrix<T, Rows, Cols>& rhs) {
+    return (lhs[index] != rhs[index])
+           || MathfuMatrixUnroller<index - 1>::NotEqual(lhs, rhs);
   }
 };
-template <> struct MathfuMatrixUnroller<0> {
+template <>
+struct MathfuMatrixUnroller<0> {
   template <class T, int Rows, int Cols>
   inline static bool NotEqual(const Matrix<T, Rows, Cols>& lhs,
-                       const Matrix<T, Rows, Cols>& rhs) {
+                              const Matrix<T, Rows, Cols>& rhs) {
     return lhs[0] != rhs[0];
   }
 };
@@ -1259,8 +1252,7 @@ static inline Matrix<T, 4, 4> OuterProductHelper(const Vector<T, 4>& v1,
 /// Matrix is invertible.
 template <bool check_invertible, class T, int Rows, int Cols>
 inline bool InverseHelper(const Matrix<T, Rows, Cols>& m,
-                          Matrix<T, Rows, Cols>* const inverse,
-                          T det_thresh) {
+                          Matrix<T, Rows, Cols>* const inverse, T det_thresh) {
   assert(false);
   (void)m;
   *inverse = T::Identity();
@@ -1368,8 +1360,8 @@ bool InverseHelper(const Matrix<T, 4, 4>& m, Matrix<T, 4, 4>* const inverse,
         Matrix<T, 3>(m[4], m[5], m[6], m[8], m[9], m[10], m[12], m[13], m[14]);
   }
   T pivot_value = m[pivot_elem];
-  if (check_invertible &&
-      fabs(pivot_value) < Constants<T>::GetDeterminantThreshold()) {
+  if (check_invertible
+      && fabs(pivot_value) < Constants<T>::GetDeterminantThreshold()) {
     return false;
   }
   // This will compute the inverse using the row, column, and 3x3 submatrix.
@@ -1377,8 +1369,8 @@ bool InverseHelper(const Matrix<T, 4, 4>& m, Matrix<T, 4, 4>* const inverse,
   row *= inv;
   matrix += Matrix<T, 3>::OuterProduct(column, row);
   Matrix<T, 3> mat_inverse;
-  if (!InverseHelper<check_invertible>(matrix, &mat_inverse, det_thresh) &&
-      check_invertible) {
+  if (!InverseHelper<check_invertible>(matrix, &mat_inverse, det_thresh)
+      && check_invertible) {
     return false;
   }
   Vector<T, 3> col_inverse = mat_inverse * (column * inv);
@@ -1513,8 +1505,8 @@ static inline bool UnProjectHelper(const Vector<T, 3>& window_coord,
                                    const float window_width,
                                    const float window_height,
                                    Vector<T, 3>& result) {
-  if (window_coord.z < static_cast<T>(0) ||
-      window_coord.z > static_cast<T>(1)) {
+  if (window_coord.z < static_cast<T>(0)
+      || window_coord.z > static_cast<T>(1)) {
     // window_coord.z should be with in [0, 1]
     // 0: near plane
     // 1: far plane
@@ -1522,10 +1514,10 @@ static inline bool UnProjectHelper(const Vector<T, 3>& window_coord,
   }
   Matrix<T, 4, 4> matrix = (projection * model_view).Inverse();
   Vector<T, 4> standardized = Vector<T, 4>(
-      static_cast<T>(2) * (window_coord.x - window_width) / window_width +
-          static_cast<T>(1),
-      static_cast<T>(2) * (window_coord.y - window_height) / window_height +
-          static_cast<T>(1),
+      static_cast<T>(2) * (window_coord.x - window_width) / window_width
+          + static_cast<T>(1),
+      static_cast<T>(2) * (window_coord.y - window_height) / window_height
+          + static_cast<T>(1),
       static_cast<T>(2) * window_coord.z - static_cast<T>(1),
       static_cast<T>(1));
 
@@ -1540,7 +1532,8 @@ static inline bool UnProjectHelper(const Vector<T, 3>& window_coord,
 
 /// @cond MATHFU_INTERNAL
 template <typename T, int Rows, int Cols, typename CompatibleT>
-static inline Matrix<T, Rows, Cols> FromTypeHelper(const CompatibleT& compatible) {
+static inline Matrix<T, Rows, Cols> FromTypeHelper(
+    const CompatibleT& compatible) {
 // C++11 is required for constructed unions.
 #if __cplusplus >= 201103L
   // Use a union instead of reinterpret_cast to avoid aliasing bugs.
@@ -1549,7 +1542,8 @@ static inline Matrix<T, Rows, Cols> FromTypeHelper(const CompatibleT& compatible
     CompatibleT compatible;
     VectorPacked<T, Rows> packed[Cols];
   } u;
-  static_assert(sizeof(u.compatible) == sizeof(u.packed), "Conversion size mismatch.");
+  static_assert(sizeof(u.compatible) == sizeof(u.packed),
+                "Conversion size mismatch.");
 
   // The read of `compatible` and write to `u.compatible` gets optimized away,
   // and this becomes essentially a safe reinterpret_cast.
@@ -1584,7 +1578,8 @@ static inline CompatibleT ToTypeHelper(const Matrix<T, Rows, Cols>& m) {
     CompatibleT compatible;
     VectorPacked<T, Rows> packed[Cols];
   } u;
-  static_assert(sizeof(u.compatible) == sizeof(u.packed), "Conversion size mismatch.");
+  static_assert(sizeof(u.compatible) == sizeof(u.packed),
+                "Conversion size mismatch.");
   m.Pack(u.packed);
   return u.compatible;
 #else
