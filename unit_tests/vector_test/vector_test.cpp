@@ -1,28 +1,27 @@
 /*
-* Copyright 2014 Google Inc. All rights reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright 2014 Google Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 #include "mathfu/vector.h"
-#include "mathfu/constants.h"
-#include "mathfu/io.h"
-
-#include "gtest/gtest.h"
-
-#include "precision.h"
 
 #include <sstream>
 #include <string>
+
+#include "gtest/gtest.h"
+#include "mathfu/constants.h"
+#include "mathfu/io.h"
+#include "precision.h"
 
 class VectorTests : public ::testing::Test {
  protected:
@@ -200,8 +199,8 @@ void InitializationPacked_Test(const T& precision) {
   }
   mathfu::Vector<T, d> unpacked(packed);
   for (int i = 0; i < d; ++i) {
-    EXPECT_NEAR(packed.data_[i], unpacked[i], static_cast<T>(0)) << "Element "
-                                                                << i;
+    EXPECT_NEAR(packed.data_[i], unpacked[i], static_cast<T>(0))
+        << "Element " << i;
   }
 }
 TEST_ALL_F(InitializationPacked)
@@ -897,6 +896,42 @@ void NotEqual_Test(const T& precision) {
 TEST_ALL_F(NotEqual)
 TEST_ALL_INTS_F(NotEqual)
 
+// This will test the == operator for VectorPacked.
+template <class T, int d>
+void PackedEqual_Test(const T& precision) {
+  mathfu::VectorPacked<T, d> a;
+  mathfu::VectorPacked<T, d> b;
+  for (int i = 0; i < d; ++i) {
+    a.data_[i] = static_cast<T>(i * precision);
+    b.data_[i] = static_cast<T>(i * precision);
+  }
+  EXPECT_TRUE(a == b);
+
+  // Changing one element should make them unequal.
+  b.data_[0] = static_cast<T>(b.data_[0] + 1);
+  EXPECT_FALSE(a == b);
+}
+TEST_ALL_F(PackedEqual)
+TEST_ALL_INTS_F(PackedEqual)
+
+// This will test the != operator for VectorPacked.
+template <class T, int d>
+void PackedNotEqual_Test(const T& precision) {
+  mathfu::VectorPacked<T, d> a;
+  mathfu::VectorPacked<T, d> b;
+  for (int i = 0; i < d; ++i) {
+    a.data_[i] = static_cast<T>(i * precision);
+    b.data_[i] = static_cast<T>(i * precision);
+  }
+  EXPECT_FALSE(a != b);
+
+  // Changing one element should make them unequal.
+  b.data_[0] = static_cast<T>(b.data_[0] + 1);
+  EXPECT_TRUE(a != b);
+}
+TEST_ALL_F(PackedNotEqual)
+TEST_ALL_INTS_F(PackedNotEqual)
+
 // Simple class that represents a possible compatible type for a vector.
 // That is, it's just an array of T of length d, so can be loaded and
 // stored from mathfu::Vector<T,d> using ToType() and FromType().
@@ -913,7 +948,8 @@ void FromType_Test(const T& precision) {
     compatible.values[i] = static_cast<T>(i * precision);
   }
 
-  const mathfu::Vector<T, d> vector = mathfu::Vector<T, d>::FromType(compatible);
+  const mathfu::Vector<T, d> vector =
+      mathfu::Vector<T, d>::FromType(compatible);
 
   for (int i = 0; i < d; ++i) {
     EXPECT_EQ(compatible.values[i], vector[i]);
