@@ -16,6 +16,7 @@
 #include "mathfu/vector.h"
 
 #include <climits>
+#include <cmath>
 #include <cstdint>
 #include <sstream>
 #include <string>
@@ -104,6 +105,19 @@ template <class T, int d>
   }
 
   return ::testing::AssertionSuccess();
+}
+
+// Format a vector expression name and its value for assertion messages.
+template <class T, int d>
+std::string FormatVector(const char* expr, const mathfu::Vector<T, d>& v) {
+  std::ostringstream oss;
+  oss << expr << " (";
+  for (int i = 0; i < d; ++i) {
+    if (i > 0) oss << ", ";
+    oss << v[i];
+  }
+  oss << ")";
+  return oss.str();
 }
 
 // A predicate-formatter for asserting that compares 2 vectors are nealy equal
@@ -1185,9 +1199,9 @@ TEST_F(VectorTests, OutputStream_Test_float_1) {
 // Test that the kDims static member is present and correct for each
 // specialization.
 TEST_F(VectorTests, kDims) {
-  EXPECT_EQ(mathfu::Vector<float, 2>::kDims, 2);
-  EXPECT_EQ(mathfu::Vector<float, 3>::kDims, 3);
-  EXPECT_EQ(mathfu::Vector<float, 4>::kDims, 4);
+  EXPECT_EQ((mathfu::Vector<float, 2>::kDims), 2);
+  EXPECT_EQ((mathfu::Vector<float, 3>::kDims), 3);
+  EXPECT_EQ((mathfu::Vector<float, 4>::kDims), 4);
 }
 
 // Test that the SIMD padding lane (w / data_[3]) of Vector<float,3> is
