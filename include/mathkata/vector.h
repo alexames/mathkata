@@ -1258,7 +1258,7 @@ static inline Vector<T, Dims> FromTypeHelper(const CompatibleT& compatible) {
   VectorPacked<T, Dims> packed;
   static_assert(sizeof(compatible) == sizeof(packed),
                 "Conversion size mismatch.");
-  std::memcpy(&packed, &compatible, sizeof(packed));
+  std::memcpy(static_cast<void*>(&packed), &compatible, sizeof(packed));
   return Vector<T, Dims>(packed);
 }
 /// @endcond
@@ -1274,7 +1274,7 @@ static inline CompatibleT ToTypeHelper(const Vector<T, Dims>& v) {
                 "Conversion size mismatch.");
   v.Pack(&packed);
   CompatibleT compatible;
-  std::memcpy(&compatible, &packed, sizeof(packed));
+  std::memcpy(&compatible, static_cast<const void*>(&packed), sizeof(packed));
   return compatible;
 }
 /// @endcond
