@@ -16,7 +16,7 @@
 #ifndef MATHFU_VECTOR_3_SIMD_H_
 #define MATHFU_VECTOR_3_SIMD_H_
 
-#include <math.h>
+#include <cmath>
 
 #include "mathfu/internal/vector_3.h"
 #include "mathfu/utilities.h"

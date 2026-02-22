@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#define _USE_MATH_DEFINES  // For M_PI.
 #include "mathfu/sphere.h"
 
 #include <cmath>
+#include <numbers>
 
 #include "gtest/gtest.h"
 #include "mathfu/utilities.h"
@@ -366,7 +366,7 @@ void Area_Test(T precision) {
   mathfu::Vector<T, 2> center(static_cast<T>(0), static_cast<T>(0));
   T radius = static_cast<T>(5);
   mathfu::Sphere<T, 2> circle(center, radius);
-  T expected = static_cast<T>(M_PI) * static_cast<T>(25);
+  T expected = std::numbers::pi_v<T> * static_cast<T>(25);
   EXPECT_NEAR(static_cast<double>(circle.Area()), static_cast<double>(expected),
               static_cast<double>(precision));
 }
@@ -379,7 +379,7 @@ void AreaUnit_Test(T precision) {
   T radius = static_cast<T>(1);
   mathfu::Sphere<T, 2> circle(center, radius);
   EXPECT_NEAR(static_cast<double>(circle.Area()),
-              static_cast<double>(static_cast<T>(M_PI)),
+              static_cast<double>(std::numbers::pi_v<T>),
               static_cast<double>(precision));
 }
 TEST_2D_F(AreaUnit)
@@ -391,7 +391,7 @@ void Volume_Test(T precision) {
                               static_cast<T>(0));
   T radius = static_cast<T>(5);
   mathfu::Sphere<T, 3> sphere(center, radius);
-  T expected = (static_cast<T>(4) / static_cast<T>(3)) * static_cast<T>(M_PI)
+  T expected = (static_cast<T>(4) / static_cast<T>(3)) * std::numbers::pi_v<T>
                * radius * radius * radius;
   EXPECT_NEAR(static_cast<double>(sphere.Volume()),
               static_cast<double>(expected), static_cast<double>(precision));
@@ -405,7 +405,7 @@ void VolumeUnit_Test(T precision) {
                               static_cast<T>(0));
   T radius = static_cast<T>(1);
   mathfu::Sphere<T, 3> sphere(center, radius);
-  T expected = (static_cast<T>(4) / static_cast<T>(3)) * static_cast<T>(M_PI);
+  T expected = (static_cast<T>(4) / static_cast<T>(3)) * std::numbers::pi_v<T>;
   EXPECT_NEAR(static_cast<double>(sphere.Volume()),
               static_cast<double>(expected), static_cast<double>(precision));
 }

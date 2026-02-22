@@ -16,6 +16,7 @@
 #include "mathfu/matrix.h"
 
 #include <cmath>
+#include <numbers>
 #include <random>
 #include <sstream>
 #include <string>
@@ -655,7 +656,7 @@ TEST_SCALAR_F(Perspective, FLOAT_PRECISION, DOUBLE_PRECISION * 10)
 // and the far plane to z = 1.
 template <class T>
 void PerspectiveOpenGLDepth_Test(const T& precision) {
-  const T fovy = static_cast<T>(M_PI) / 4;  // 45 degrees
+  const T fovy = std::numbers::pi_v<T> / 4;  // 45 degrees
   const T aspect = static_cast<T>(1.5);
   const T znear = static_cast<T>(0.1);
   const T zfar = static_cast<T>(100.0);
@@ -681,7 +682,7 @@ TEST_SCALAR_F(PerspectiveOpenGLDepth, 1e-5f, 1e-10)
 // and the far plane to z = 1.
 template <class T>
 void PerspectiveDirectXDepth_Test(const T& precision) {
-  const T fovy = static_cast<T>(M_PI) / 4;  // 45 degrees
+  const T fovy = std::numbers::pi_v<T> / 4;  // 45 degrees
   const T aspect = static_cast<T>(1.5);
   const T znear = static_cast<T>(0.1);
   const T zfar = static_cast<T>(100.0);
@@ -707,7 +708,7 @@ TEST_SCALAR_F(PerspectiveDirectXDepth, 1e-5f, 1e-10)
 // convention, matching the explicit OpenGL call.
 template <class T>
 void PerspectiveDefaultIsOpenGL_Test(const T& precision) {
-  const T fovy = static_cast<T>(M_PI) / 3;
+  const T fovy = std::numbers::pi_v<T> / 3;
   const T aspect = static_cast<T>(1.6);
   const T znear = static_cast<T>(1.0);
   const T zfar = static_cast<T>(500.0);

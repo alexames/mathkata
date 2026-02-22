@@ -16,15 +16,9 @@
 #ifndef MATHFU_QUATERNION_H_
 #define MATHFU_QUATERNION_H_
 
-#ifdef _WIN32
-#if !defined(_USE_MATH_DEFINES)
-#define _USE_MATH_DEFINES  // For M_PI.
-#endif                     // !defined(_USE_MATH_DEFINES)
-#endif                     // _WIN32
-
-#include <math.h>
-
+#include <cmath>
 #include <limits>
+#include <numbers>
 
 #include "mathfu/matrix.h"
 #include "mathfu/vector.h"
@@ -306,10 +300,11 @@ class Quaternion {
     Matrix<T, 3> m(ToMatrix());
     T cos2 = m[0] * m[0] + m[1] * m[1];
     if (cos2 < static_cast<T>(1e-6)) {
-      return Vector<T, 3>(
-          0,
-          m[2] < 0 ? static_cast<T>(0.5 * M_PI) : static_cast<T>(-0.5 * M_PI),
-          -std::atan2(m[3], m[4]));
+      return Vector<T, 3>(0,
+                          m[2] < 0
+                              ? static_cast<T>(0.5) * std::numbers::pi_v<T>
+                              : static_cast<T>(-0.5) * std::numbers::pi_v<T>,
+                          -std::atan2(m[3], m[4]));
     } else {
       return Vector<T, 3>(std::atan2(m[5], m[8]),
                           std::atan2(-m[2], std::sqrt(cos2)),

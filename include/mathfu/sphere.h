@@ -16,8 +16,8 @@
 #ifndef MATHFU_SPHERE_H_
 #define MATHFU_SPHERE_H_
 
-#define _USE_MATH_DEFINES  // For M_PI.
 #include <cmath>
+#include <numbers>
 
 #include "mathfu/vector.h"
 
@@ -92,7 +92,7 @@ struct Sphere {
   /// @return The area of the circle (pi * r^2).
   inline T Area() const {
     static_assert(N == 2, "Area() is only defined for 2D circles (N=2).");
-    return static_cast<T>(M_PI) * radius * radius;
+    return std::numbers::pi_v<T> * radius * radius;
   }
 
   /// @brief Calculate the volume of a 3D sphere (N=3).
@@ -100,7 +100,7 @@ struct Sphere {
   /// @return The volume of the sphere (4/3 * pi * r^3).
   inline T Volume() const {
     static_assert(N == 3, "Volume() is only defined for 3D spheres (N=3).");
-    return (static_cast<T>(4) / static_cast<T>(3)) * static_cast<T>(M_PI)
+    return (static_cast<T>(4) / static_cast<T>(3)) * std::numbers::pi_v<T>
            * radius * radius * radius;
   }
 

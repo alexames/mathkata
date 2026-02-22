@@ -40,8 +40,8 @@ set(mathfu_dir ${CMAKE_CURRENT_LIST_DIR} CACHE INTERNAL "mathfu directory")
 function(mathfu_configure_flags target)
   set(enable_simd ${mathfu_enable_simd})
 
-  # Require C++17 for inline variables in constants.h.
-  target_compile_features(${target} PRIVATE cxx_std_17)
+  # Require C++20 for concepts and std::numbers.
+  target_compile_features(${target} PRIVATE cxx_std_20)
 
   # Add required includes to the target.
   target_include_directories(${target}

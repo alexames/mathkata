@@ -15,7 +15,8 @@
  */
 #include "mathfu/quaternion.h"
 
-#include <math.h>
+#include <cmath>
+#include <numbers>
 
 #include "gtest/gtest.h"
 #include "mathfu/constants.h"
@@ -303,9 +304,9 @@ void Conversion_Test(const T& precision) {
   // Euler Angles, and verify that they match
   mathfu::Quaternion<T> qea(mathfu::Quaternion<T>::FromEulerAngles(angles));
   mathfu::Vector<T, 3> convertedAngles(qea.ToEulerAngles());
-  EXPECT_NEAR(angles[0], M_PI + convertedAngles[0], precision);
-  EXPECT_NEAR(angles[1], M_PI - convertedAngles[1], precision);
-  EXPECT_NEAR(angles[2], M_PI + convertedAngles[2], precision);
+  EXPECT_NEAR(angles[0], std::numbers::pi_v<T> + convertedAngles[0], precision);
+  EXPECT_NEAR(angles[1], std::numbers::pi_v<T> - convertedAngles[1], precision);
+  EXPECT_NEAR(angles[2], std::numbers::pi_v<T> + convertedAngles[2], precision);
   // This will create a Quaternion from Axis Angle, convert back to
   // Axis Angle, and verify that they match.
   mathfu::Vector<T, 3> axis(static_cast<T>(4.3), static_cast<T>(7.6),
@@ -519,8 +520,10 @@ void Dot_Test(const T& precision) {
   mathfu::Vector<T, 3> axis(static_cast<T>(4.3), static_cast<T>(7.6),
                             static_cast<T>(1.2));
   axis.Normalize();
-  T angle1 = static_cast<T>(1.2), angle2 = static_cast<T>(angle1 + M_PI / 2.0),
-    angle3 = static_cast<T>(angle1 + M_PI), angle4 = static_cast<T>(0.7);
+  T angle1 = static_cast<T>(1.2),
+    angle2 = static_cast<T>(angle1 + std::numbers::pi_v<T> / 2),
+    angle3 = static_cast<T>(angle1 + std::numbers::pi_v<T>),
+    angle4 = static_cast<T>(0.7);
   mathfu::Quaternion<T> qaa1(
       mathfu::Quaternion<T>::FromAngleAxis(angle1, axis));
   mathfu::Quaternion<T> qaa2(
@@ -762,7 +765,7 @@ void LookAt_Test(const T& precision) {
     const Quaternion q =
         Quaternion::template LookAt<kRH>(Vector3(zero, zero, one), up);
     const Quaternion expected =
-        Quaternion::FromAngleAxis(static_cast<T>(M_PI), up);
+        Quaternion::FromAngleAxis(std::numbers::pi_v<T>, up);
     EXPECT_NEAR_ORIENTATION(expected, q, epsilon);
   }
 
@@ -772,7 +775,7 @@ void LookAt_Test(const T& precision) {
     const Quaternion q =
         Quaternion::template LookAt<kRH>(Vector3(one, zero, zero), up);
     const Quaternion expected =
-        Quaternion::FromAngleAxis(static_cast<T>(-M_PI / 2), up);
+        Quaternion::FromAngleAxis(-std::numbers::pi_v<T> / 2, up);
     EXPECT_NEAR_ORIENTATION(expected, q, epsilon);
   }
 
@@ -800,7 +803,7 @@ void LookAt_Test(const T& precision) {
     const Quaternion q =
         Quaternion::template LookAt<kLH>(Vector3(zero, zero, neg_one), up);
     const Quaternion expected =
-        Quaternion::FromAngleAxis(static_cast<T>(M_PI), up);
+        Quaternion::FromAngleAxis(std::numbers::pi_v<T>, up);
     EXPECT_NEAR_ORIENTATION(expected, q, epsilon);
   }
 
@@ -810,7 +813,7 @@ void LookAt_Test(const T& precision) {
     const Quaternion q =
         Quaternion::template LookAt<kLH>(Vector3(one, zero, zero), up);
     const Quaternion expected =
-        Quaternion::FromAngleAxis(static_cast<T>(M_PI / 2), up);
+        Quaternion::FromAngleAxis(std::numbers::pi_v<T> / 2, up);
     EXPECT_NEAR_ORIENTATION(expected, q, epsilon);
   }
 
