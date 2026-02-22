@@ -54,6 +54,8 @@ class Quaternion {
   /// @param q Quaternion to copy.
   constexpr Quaternion(const Quaternion<T>& q) : data_(q.data_) {}
 
+  constexpr Quaternion<T>& operator=(const Quaternion<T>& q) = default;
+
   /// @brief Construct a Quaternion using scalar values to initialize each
   /// element.
   ///
