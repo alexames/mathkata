@@ -223,14 +223,14 @@ class Quaternion {
                          axis.Normalized() * static_cast<T>(sin(half_angle)));
   }
 
-  /// @brief Multiply a Vector by this Quaternion.
+  /// @brief Rotate a Vector by this Quaternion.
   ///
   /// This will rotate the specified vector by the rotation specified by this
   /// Quaternion.
   ///
-  /// @param v1 Vector to multiply by this Quaternion.
+  /// @param v1 Vector to rotate.
   /// @return Rotated Vector.
-  inline Vector<T, 3> operator*(const Vector<T, 3>& v1) const {
+  inline Vector<T, 3> Rotate(const Vector<T, 3>& v1) const {
     T ss = s_ + s_;
     return ss * Vector<T, 3>::CrossProduct(v_, v1) + (ss * s_ - T(1)) * v1
            + T(2) * Vector<T, 3>::DotProduct(v_, v1) * v_;
