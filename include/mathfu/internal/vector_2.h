@@ -116,6 +116,11 @@ class Vector<T, 2> {
     return (v1 - v2).LengthSquared();
   }
 
+  static inline T CrossProduct(const Vector<T, 2>& v1,
+                               const Vector<T, 2>& v2) {
+    return CrossProductHelper(v1, v2);
+  }
+
   static inline T Angle(const Vector<T, 2>& v1, const Vector<T, 2>& v2) {
     return AngleHelper(v1, v2);
   }
