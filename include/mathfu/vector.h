@@ -31,6 +31,7 @@
 #if defined(_MSC_VER)
 #pragma warning(push)
 #pragma warning(disable : 4127)  // conditional expression is constant
+#pragma warning(disable : 4100)  // unreferenced formal parameter
 #if _MSC_VER >= 1900             // MSVC 2015
 #pragma warning(disable : 4456)  // allow shadowing in unrolled loops
 #endif                           // _MSC_VER >= 1900
@@ -238,7 +239,7 @@ class Vector {
   /// @param s1 Scalar value for the first element of the vector.
   /// @param s2 Scalar value for the second element of the vector.
   inline Vector(T s1, T s2) {
-    MATHFU_STATIC_ASSERT(Dims == 2);
+    static_assert(Dims == 2, "Dims must be 2");
     data_[0] = s1;
     data_[1] = s2;
   }
@@ -251,7 +252,7 @@ class Vector {
   /// @param s2 Scalar value for the second element of the vector.
   /// @param s3 Scalar value for the third element of the vector.
   inline Vector(T s1, T s2, T s3) {
-    MATHFU_STATIC_ASSERT(Dims == 3);
+    static_assert(Dims == 3, "Dims must be 3");
     data_[0] = s1;
     data_[1] = s2;
     data_[2] = s3;
@@ -264,7 +265,7 @@ class Vector {
   /// @param v12 Vector containing the first 2 values.
   /// @param s3 Scalar value for the third element of the vector.
   inline Vector(const Vector<T, 2>& v12, T s3) {
-    MATHFU_STATIC_ASSERT(Dims == 3);
+    static_assert(Dims == 3, "Dims must be 3");
     data_[0] = v12[0];
     data_[1] = v12[1];
     data_[2] = s3;
@@ -279,7 +280,7 @@ class Vector {
   /// @param s3 Scalar value for the third element of the vector.
   /// @param s4 Scalar value for the forth element of the vector.
   inline Vector(T s1, T s2, T s3, T s4) {
-    MATHFU_STATIC_ASSERT(Dims == 4);
+    static_assert(Dims == 4, "Dims must be 4");
     data_[0] = s1;
     data_[1] = s2;
     data_[2] = s3;
@@ -294,7 +295,7 @@ class Vector {
   /// @param vector3 Vector used to initialize the first 3 elements.
   /// @param value Value used to set the last element of the vector.
   inline Vector(const Vector<T, 3>& vector123, T s4) {
-    MATHFU_STATIC_ASSERT(Dims == 4);
+    static_assert(Dims == 4, "Dims must be 4");
     data_[0] = vector123[0];
     data_[1] = vector123[1];
     data_[2] = vector123[2];
@@ -308,7 +309,7 @@ class Vector {
   /// @param v12 Vector containing the first 2 values.
   /// @param v34 Vector containing the last 2 values.
   inline Vector(const Vector<T, 2>& v12, const Vector<T, 2>& v34) {
-    MATHFU_STATIC_ASSERT(Dims == 4);
+    static_assert(Dims == 4, "Dims must be 4");
     data_[0] = v12[0];
     data_[1] = v12[1];
     data_[2] = v34[0];
@@ -348,13 +349,85 @@ class Vector {
   /// @return A const reference to the accessed.
   inline const T& operator[](const int i) const { return data_[i]; }
 
+  /// @brief Access the first element of the vector.
+  ///
+  /// @note This method only works with vectors of 1 or more dimensions.
+  /// @return A reference to the first element.
+  inline T& x() {
+    static_assert(Dims >= 1, "x() requires >= 1D");
+    return data_[0];
+  }
+
+  /// @brief Access the first element of the vector.
+  ///
+  /// @note This method only works with vectors of 1 or more dimensions.
+  /// @return A const reference to the first element.
+  inline const T& x() const {
+    static_assert(Dims >= 1, "x() requires >= 1D");
+    return data_[0];
+  }
+
+  /// @brief Access the second element of the vector.
+  ///
+  /// @note This method only works with vectors of 2 or more dimensions.
+  /// @return A reference to the second element.
+  inline T& y() {
+    static_assert(Dims >= 2, "y() requires >= 2D");
+    return data_[1];
+  }
+
+  /// @brief Access the second element of the vector.
+  ///
+  /// @note This method only works with vectors of 2 or more dimensions.
+  /// @return A const reference to the second element.
+  inline const T& y() const {
+    static_assert(Dims >= 2, "y() requires >= 2D");
+    return data_[1];
+  }
+
+  /// @brief Access the third element of the vector.
+  ///
+  /// @note This method only works with vectors of 3 or more dimensions.
+  /// @return A reference to the third element.
+  inline T& z() {
+    static_assert(Dims >= 3, "z() requires >= 3D");
+    return data_[2];
+  }
+
+  /// @brief Access the third element of the vector.
+  ///
+  /// @note This method only works with vectors of 3 or more dimensions.
+  /// @return A const reference to the third element.
+  inline const T& z() const {
+    static_assert(Dims >= 3, "z() requires >= 3D");
+    return data_[2];
+  }
+
+  /// @brief Access the fourth element of the vector.
+  ///
+  /// @note This method only works with vectors of 4 or more dimensions.
+  /// @return A reference to the fourth element.
+  inline T& w() {
+    static_assert(Dims >= 4, "w() requires >= 4D");
+    return data_[3];
+  }
+
+  /// @brief Access the fourth element of the vector.
+  ///
+  /// @note This method only works with vectors of 4 or more dimensions.
+  /// @return A const reference to the fourth element.
+  inline const T& w() const {
+    static_assert(Dims >= 4, "w() requires >= 4D");
+    return data_[3];
+  }
+
   /// @brief GLSL style 3 element accessor.
   ///
   /// This only works with vectors that contain more than 3 elements.
   /// @returns A 3-dimensional Vector containing the first 3 elements of
   // this Vector.
   inline Vector<T, 3> xyz() {
-    MATHFU_STATIC_ASSERT(Dims > 3);
+    static_assert(Dims > 3, "Dims must be greater than 3");
     return Vector<T, 3>(data_[0], data_[1], data_[2]);
   }
 
@@ -364,7 +437,7 @@ class Vector {
   /// @returns A 3-dimensional Vector containing the first 3 elements of
   // this Vector.
   inline const Vector<T, 3> xyz() const {
-    MATHFU_STATIC_ASSERT(Dims > 3);
+    static_assert(Dims > 3, "Dims must be greater than 3");
     return Vector<T, 3>(data_[0], data_[1], data_[2]);
   }
 
@@ -373,7 +446,7 @@ class Vector {
   /// This only works with vectors that contain more than 2 elements.
   /// @returns A 2-dimensional Vector with the first 2 elements of this Vector.
   inline Vector<T, 2> xy() {
-    MATHFU_STATIC_ASSERT(Dims > 2);
+    static_assert(Dims > 2, "Dims must be greater than 2");
     return Vector<T, 2>(data_[0], data_[1]);
   }
 
@@ -382,7 +455,7 @@ class Vector {
   /// This only works with vectors that contain more than 2 elements.
   /// @returns A 2-dimensional Vector with the first 2 elements of this Vector.
   inline const Vector<T, 2> xy() const {
-    MATHFU_STATIC_ASSERT(Dims > 2);
+    static_assert(Dims > 2, "Dims must be greater than 2");
     return Vector<T, 2>(data_[0], data_[1]);
   }
 
@@ -391,7 +464,7 @@ class Vector {
   /// This only works with vectors that contain 4 elements.
   /// @returns A 2-dimensional Vector with the last 2 elements of this Vector.
   inline Vector<T, 2> zw() {
-    MATHFU_STATIC_ASSERT(Dims == 4);
+    static_assert(Dims == 4, "Dims must be 4");
     return Vector<T, 2>(data_[2], data_[3]);
   }
 
@@ -400,7 +473,7 @@ class Vector {
   /// This only works with vectors that contain 4 elements.
   /// @returns A 2-dimensional Vector with the last 2 elements of this Vector.
   inline const Vector<T, 2> zw() const {
-    MATHFU_STATIC_ASSERT(Dims == 4);
+    static_assert(Dims == 4, "Dims must be 4");
     return Vector<T, 2>(data_[2], data_[3]);
   }
 
@@ -483,6 +556,16 @@ class Vector {
     return HadamardProductHelper(v1, v2);
   }
 
+  /// @brief Calculate the componentwise division of two vectors.
+  ///
+  /// @param v1 First vector (numerator).
+  /// @param v2 Second vector (denominator).
+  /// @return The componentwise quotient of v1 and v2.
+  static inline Vector<T, Dims> HadamardDivide(const Vector<T, Dims>& v1,
+                                               const Vector<T, Dims>& v2) {
+    return HadamardDivideHelper(v1, v2);
+  }
+
   /// @brief Calculate the cross product of two vectors.
   ///
   /// Note that this function is only defined for 3-dimensional Vectors.
@@ -491,6 +574,17 @@ class Vector {
   /// @return The cross product of v1 and v2.
   static inline Vector<T, 3> CrossProduct(const Vector<T, 3>& v1,
                                           const Vector<T, 3>& v2) {
+    return CrossProductHelper(v1, v2);
+  }
+
+  /// @brief Calculate the 2D pseudo cross product of two vectors.
+  ///
+  /// Also known as the "perp dot product", this returns a scalar whose sign
+  /// indicates the winding order of v1 to v2.
+  /// @param v1 First vector.
+  /// @param v2 Second vector.
+  /// @return The scalar cross product of v1 and v2.
+  static inline T CrossProduct(const Vector<T, 2>& v1, const Vector<T, 2>& v2) {
     return CrossProductHelper(v1, v2);
   }
 
@@ -504,16 +598,6 @@ class Vector {
                                      const Vector<T, Dims>& v2,
                                      const T percent) {
     return LerpHelper(v1, v2, percent);
-  }
-
-  /// @brief Generates a random vector.
-  ///
-  /// The range of each component is bounded by min and max.
-  /// @param min Minimum value of the vector.
-  /// @param max Maximum value of the vector.
-  static inline Vector<T, Dims> RandomInRange(const Vector<T, Dims>& min,
-                                              const Vector<T, Dims>& max) {
-    return RandomInRangeHelper(min, max);
   }
 
   /// @brief Compare each component and returns max values.
@@ -571,6 +655,7 @@ class Vector {
 
   /// @brief Returns the angle between 2 vectors in radians.
   ///
+  /// @pre Both input vectors must be non-zero.
   /// @param v1 First vector.
   /// @param v2 Second vector.
   /// @return Angle between vectors v1 and v2.
@@ -681,30 +766,6 @@ inline Vector<T, Dims> operator-(T s, const Vector<T, Dims>& v) {
   MATHFU_VECTOR_OPERATOR(s - v.data_[i]);
 }
 
-/// @brief Multiply a vector by another Vector.
-///
-/// In line with GLSL, this performs component-wise multiplication.
-/// @param lhs First vector to use as a starting point.
-/// @param rhs Second vector to multiply by.
-/// @return A new Vector containing the result.
-template <class T, int Dims>
-inline Vector<T, Dims> operator*(const Vector<T, Dims>& lhs,
-                                 const Vector<T, Dims>& rhs) {
-  return HadamardProductHelper(lhs, rhs);
-}
-
-/// @brief Divide a vector by another Vector.
-///
-/// In line with GLSL, this performs component-wise division.
-/// @param lhs First vector to use as a starting point.
-/// @param rhs Second vector to divide by.
-/// @return A new Vector containing the result.
-template <class T, int Dims>
-inline Vector<T, Dims> operator/(const Vector<T, Dims>& lhs,
-                                 const Vector<T, Dims>& rhs) {
-  MATHFU_VECTOR_OPERATOR(lhs.data_[i] / rhs[i]);
-}
-
 /// @brief Add a vector with another Vector.
 ///
 /// @param lhs First vector to use as a starting point.
@@ -755,32 +816,6 @@ inline Vector<T, Dims> operator+(const Vector<T, Dims>& v, T s) {
 template <class T, int Dims>
 inline Vector<T, Dims> operator-(const Vector<T, Dims>& v, T s) {
   MATHFU_VECTOR_OPERATOR(v.data_[i] - s);
-}
-
-/// @brief Multiply (in-place) a vector with another Vector.
-///
-/// In line with GLSL, this performs component-wise multiplication.
-/// @param lhs First vector to use as a starting point.
-/// @param rhs Second vector to multiply by.
-/// @return A reference to the input <b>v</b> vector.
-template <class T, int Dims>
-inline Vector<T, Dims>& operator*=(Vector<T, Dims>& lhs,
-                                   const Vector<T, Dims>& rhs) {
-  MATHFU_VECTOR_OPERATION(lhs.data_[i] *= rhs[i]);
-  return lhs;
-}
-
-/// @brief Divide (in-place) a vector by another Vector.
-///
-/// In line with GLSL, this performs component-wise division.
-/// @param lhs First vector to use as a starting point.
-/// @param rhs Second vector to divide by.
-/// @return A reference to the input <b>v</b> vector.
-template <class T, int Dims>
-inline Vector<T, Dims>& operator/=(Vector<T, Dims>& lhs,
-                                   const Vector<T, Dims>& rhs) {
-  MATHFU_VECTOR_OPERATION(lhs.data_[i] /= rhs[i]);
-  return lhs;
 }
 
 /// @brief Add (in-place) a vector with another Vector.
@@ -862,6 +897,17 @@ inline Vector<T, Dims> HadamardProductHelper(const Vector<T, Dims>& v1,
   MATHFU_VECTOR_OPERATOR(v1[i] * v2[i]);
 }
 
+/// @brief Calculate the componentwise division of two vectors.
+///
+/// @param v1 First vector (numerator).
+/// @param v2 Second vector (denominator).
+/// @return The componentwise quotient of v1 and v2.
+template <class T, int Dims>
+inline Vector<T, Dims> HadamardDivideHelper(const Vector<T, Dims>& v1,
+                                            const Vector<T, Dims>& v2) {
+  MATHFU_VECTOR_OPERATOR(v1[i] / v2[i]);
+}
+
 /// @brief Calculate the cross product of two vectors.
 ///
 /// Note that this function is only defined for 3-dimensional Vectors.
@@ -874,6 +920,19 @@ inline Vector<T, 3> CrossProductHelper(const Vector<T, 3>& v1,
   return Vector<T, 3>(v1[1] * v2[2] - v1[2] * v2[1],
                       v1[2] * v2[0] - v1[0] * v2[2],
                       v1[0] * v2[1] - v1[1] * v2[0]);
+}
+
+/// @brief Calculate the 2D pseudo cross product of two vectors.
+///
+/// Also known as the "perp dot product", this returns the z-component of
+/// the cross product if the 2D vectors were extended to 3D. The result is
+/// a scalar whose sign indicates the winding order of v1 to v2.
+/// @param v1 First vector.
+/// @param v2 Second vector.
+/// @return The scalar cross product of v1 and v2.
+template <class T>
+inline T CrossProductHelper(const Vector<T, 2>& v1, const Vector<T, 2>& v2) {
+  return v1[0] * v2[1] - v1[1] * v2[0];
 }
 
 /// @brief Calculate the squared length of a vector.
@@ -929,21 +988,7 @@ inline Vector<T, Dims> NormalizedHelper(const Vector<T, Dims>& v) {
 template <class T, int Dims>
 inline Vector<T, Dims> LerpHelper(const Vector<T, Dims>& v1,
                                   const Vector<T, Dims>& v2, const T percent) {
-  const T one_minus_percent = T(1) - percent;
-  MATHFU_VECTOR_OPERATOR(one_minus_percent * v1[i] + percent * v2[i]);
-}
-
-/// @brief Generates a random vector.
-///
-/// The range of each component is bounded by min and max.
-/// @param min Minimum value of the vector.
-/// @param max Maximum value of the vector.
-template <class T, int Dims>
-inline Vector<T, Dims> RandomInRangeHelper(const Vector<T, Dims>& min,
-                                           const Vector<T, Dims>& max) {
-  Vector<T, Dims> result;
-  MATHFU_VECTOR_OPERATION(result[i] = RandomInRange<T>(min[i], max[i]));
-  return result;
+  MATHFU_VECTOR_OPERATOR(v1[i] + (v2[i] - v1[i]) * percent);
 }
 
 /// @brief Compare each component and returns max values.
@@ -974,6 +1019,7 @@ inline Vector<T, Dims> MinHelper(const Vector<T, Dims>& v1,
 
 /// @brief Returns the angle between 2 vectors in radians.
 ///
+/// @pre Both input vectors must be non-zero.
 /// @param v1 First vector.
 /// @param v2 Second vector.
 /// @return Angle between vectors v1 and v2.
@@ -982,9 +1028,7 @@ inline T AngleHelper(const Vector<T, Dims>& v1, const Vector<T, Dims>& v2) {
   // Applying law of cosines.
   // https://stackoverflow.com/questions/10507620/finding-the-angle-between-vectors
   const T divisor = v1.Length() * v2.Length();
-  if (divisor == T(0)) {
-    return T(0);
-  }
+  assert(divisor != T(0));
   const T cos_val = Vector<T, Dims>::DotProduct(v1, v2) / divisor;
   // Clamp to [-1, 1] to avoid NaN from acos due to floating point error.
   return std::acos(Clamp(cos_val, T(-1), T(1)));
@@ -1115,6 +1159,50 @@ static inline CompatibleT ToTypeHelper(const Vector<T, Dims>& v) {
   return compatible;
 }
 /// @endcond
+
+/// @}
+
+/// @addtogroup mathfu_vector
+/// @{
+
+/// @brief Calculate the dot product of two N-dimensional Vectors.
+///
+/// @param v1 Vector to multiply.
+/// @param v2 Vector to multiply.
+/// @return Scalar dot product result.
+template <class T, int d>
+inline T dot(const Vector<T, d>& v1, const Vector<T, d>& v2) {
+  return Vector<T, d>::DotProduct(v1, v2);
+}
+
+/// @brief Calculate the cross product of two 3-dimensional Vectors.
+///
+/// @param v1 Vector to multiply.
+/// @param v2 Vector to multiply.
+/// @return 3-dimensional vector that contains the result.
+template <class T>
+inline Vector<T, 3> cross(const Vector<T, 3>& v1, const Vector<T, 3>& v2) {
+  return Vector<T, 3>::CrossProduct(v1, v2);
+}
+
+/// @brief Calculate the 2D pseudo cross product of two 2-dimensional Vectors.
+///
+/// @param v1 First vector.
+/// @param v2 Second vector.
+/// @return Scalar cross product result.
+template <class T>
+inline T cross(const Vector<T, 2>& v1, const Vector<T, 2>& v2) {
+  return Vector<T, 2>::CrossProduct(v1, v2);
+}
+
+/// @brief Normalize an N-dimensional Vector.
+///
+/// @param v Vector to normalize.
+/// @return Normalized vector.
+template <class T, int d>
+inline Vector<T, d> normalize(const Vector<T, d>& v) {
+  return v.Normalized();
+}
 
 /// @}
 

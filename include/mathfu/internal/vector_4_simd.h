@@ -113,14 +113,6 @@ class Vector<float, 4> {
     return Vector<float, 4>(simd4f_sub(simd4f_zero(), simd4));
   }
 
-  inline Vector<float, 4> operator*(const Vector<float, 4>& v) const {
-    return Vector<float, 4>(simd4f_mul(simd4, v.simd4));
-  }
-
-  inline Vector<float, 4> operator/(const Vector<float, 4>& v) const {
-    return Vector<float, 4>(simd4f_div(simd4, v.simd4));
-  }
-
   inline Vector<float, 4> operator+(const Vector<float, 4>& v) const {
     return Vector<float, 4>(simd4f_add(simd4, v.simd4));
   }
@@ -143,16 +135,6 @@ class Vector<float, 4> {
 
   inline Vector<float, 4> operator-(const float& s) const {
     return Vector<float, 4>(simd4f_sub(simd4, simd4f_splat(s)));
-  }
-
-  inline Vector<float, 4>& operator*=(const Vector<float, 4>& v) {
-    simd4 = simd4f_mul(simd4, v.simd4);
-    return *this;
-  }
-
-  inline Vector<float, 4>& operator/=(const Vector<float, 4>& v) {
-    simd4 = simd4f_div(simd4, v.simd4);
-    return *this;
   }
 
   inline Vector<float, 4>& operator+=(const Vector<float, 4>& v) {
@@ -244,25 +226,17 @@ class Vector<float, 4> {
     return Vector<float, 4>(simd4f_mul(v1.simd4, v2.simd4));
   }
 
+  static inline Vector<float, 4> HadamardDivide(const Vector<float, 4>& v1,
+                                                const Vector<float, 4>& v2) {
+    return Vector<float, 4>(simd4f_div(v1.simd4, v2.simd4));
+  }
+
   static inline Vector<float, 4> Lerp(const Vector<float, 4>& v1,
                                       const Vector<float, 4>& v2,
                                       float percent) {
-    const Vector<float, 4> percentv(percent);
-    const Vector<float, 4> one(1.0f);
-    const Vector<float, 4> one_minus_percent = one - percentv;
-    return Vector<float, 4>(
-        simd4f_add(simd4f_mul(one_minus_percent.simd4, v1.simd4),
-                   simd4f_mul(percentv.simd4, v2.simd4)));
-  }
-
-  /// Generates a random vector, where the range for each component is
-  /// bounded by min and max.
-  static inline Vector<float, 4> RandomInRange(const Vector<float, 4>& min,
-                                               const Vector<float, 4>& max) {
-    return Vector<float, 4>(mathfu::RandomInRange<float>(min[0], max[0]),
-                            mathfu::RandomInRange<float>(min[1], max[1]),
-                            mathfu::RandomInRange<float>(min[2], max[2]),
-                            mathfu::RandomInRange<float>(min[3], max[3]));
+    const simd4f percentv = simd4f_splat(percent);
+    return Vector<float, 4>(simd4f_add(
+        v1.simd4, simd4f_mul(simd4f_sub(v2.simd4, v1.simd4), percentv)));
   }
 
   static inline bool InRange(const Vector<float, 4>& val,

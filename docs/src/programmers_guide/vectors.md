@@ -234,8 +234,6 @@ implements functions to perform the following:
 
    * [Lerp](@ref mathfu::Vector::Lerp) to linearly interpolate between two
      vectors.
-   * [RandomInRange](@ref mathfu::Vector::RandomInRange) to generate a vector
-     with random value for elements.
 
 # Packing    {#mathfu_guide_vectors_packing}
 

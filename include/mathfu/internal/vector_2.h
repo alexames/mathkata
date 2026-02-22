@@ -87,14 +87,14 @@ class Vector<T, 2> {
     return HadamardProductHelper(v1, v2);
   }
 
+  static inline Vector<T, 2> HadamardDivide(const Vector<T, 2>& v1,
+                                            const Vector<T, 2>& v2) {
+    return HadamardDivideHelper(v1, v2);
+  }
+
   static inline Vector<T, 2> Lerp(const Vector<T, 2>& v1,
                                   const Vector<T, 2>& v2, const T percent) {
     return LerpHelper(v1, v2, percent);
-  }
-
-  static inline Vector<T, 2> RandomInRange(const Vector<T, 2>& min,
-                                           const Vector<T, 2>& max) {
-    return RandomInRangeHelper(min, max);
   }
 
   static inline bool InRange(const Vector<T, 2>& val,
@@ -102,6 +102,7 @@ class Vector<T, 2> {
                              const Vector<T, 2>& range_end) {
     return InRangeHelper(val, range_start, range_end);
   }
+
 
   static inline Vector<T, 2> Max(const Vector<T, 2>& v1,
                                  const Vector<T, 2>& v2) {
@@ -120,6 +121,11 @@ class Vector<T, 2> {
   static inline T DistanceSquared(const Vector<T, 2>& v1,
                                   const Vector<T, 2>& v2) {
     return (v1 - v2).LengthSquared();
+  }
+
+  static inline T CrossProduct(const Vector<T, 2>& v1,
+                               const Vector<T, 2>& v2) {
+    return CrossProductHelper(v1, v2);
   }
 
   static inline T Angle(const Vector<T, 2>& v1, const Vector<T, 2>& v2) {

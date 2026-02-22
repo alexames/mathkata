@@ -97,6 +97,11 @@ class Vector<T, 3> {
     return HadamardProductHelper(v1, v2);
   }
 
+  static inline Vector<T, 3> HadamardDivide(const Vector<T, 3>& v1,
+                                            const Vector<T, 3>& v2) {
+    return HadamardDivideHelper(v1, v2);
+  }
+
   static inline Vector<T, 3> CrossProduct(const Vector<T, 3>& v1,
                                           const Vector<T, 3>& v2) {
     return CrossProductHelper(v1, v2);
@@ -107,16 +112,12 @@ class Vector<T, 3> {
     return LerpHelper(v1, v2, percent);
   }
 
-  static inline Vector<T, 3> RandomInRange(const Vector<T, 3>& min,
-                                           const Vector<T, 3>& max) {
-    return RandomInRangeHelper(min, max);
-  }
-
   static inline bool InRange(const Vector<T, 3>& val,
                              const Vector<T, 3>& range_start,
                              const Vector<T, 3>& range_end) {
     return InRangeHelper(val, range_start, range_end);
   }
+
 
   static inline Vector<T, 3> Max(const Vector<T, 3>& v1,
                                  const Vector<T, 3>& v2) {
