@@ -352,7 +352,8 @@ void Mul_Test(const T& precision) {
 
   mathfu::Vector<T, d> vector1(x1), vector2(x2);
 
-  mathfu::Vector<T, d> mul_vector(vector1 * vector2);
+  mathfu::Vector<T, d> mul_vector(
+      mathfu::Vector<T, d>::HadamardProduct(vector1, vector2));
   for (int i = 0; i < d; ++i) {
     EXPECT_NEAR(x1[i] * x2[i], mul_vector[i], precision);
   }
@@ -363,11 +364,6 @@ void Mul_Test(const T& precision) {
   mathfu::Vector<T, d> mul_scalar_vector(scalar * vector2);
   for (int i = 0; i < d; ++i) {
     EXPECT_NEAR(x2[i] * scalar, mul_scalar_vector[i], precision);
-  }
-  mathfu::Vector<T, d> mul_assign_vector_vector(vector1);
-  mul_assign_vector_vector *= vector2;
-  for (int i = 0; i < d; ++i) {
-    EXPECT_NEAR(x1[i] * x2[i], mul_assign_vector_vector[i], precision);
   }
   mathfu::Vector<T, d> mul_assign_vector_scalar(vector1);
   mul_assign_vector_scalar *= scalar;
@@ -390,7 +386,8 @@ void Div_Test(const T& precision) {
 
   mathfu::Vector<T, d> vector1(x1), vector2(x2);
 
-  mathfu::Vector<T, d> div_vector_vector(vector1 / vector2);
+  mathfu::Vector<T, d> div_vector_vector(
+      mathfu::Vector<T, d>::HadamardDivide(vector1, vector2));
   for (int i = 0; i < d; ++i) {
     EXPECT_NEAR(x1[i] / x2[i], div_vector_vector[i], precision);
   }
@@ -401,11 +398,6 @@ void Div_Test(const T& precision) {
   mathfu::Vector<T, d> div_scalar_vector(scalar / vector1);
   for (int i = 0; i < d; ++i) {
     EXPECT_NEAR(scalar / x1[i], div_scalar_vector[i], precision);
-  }
-  mathfu::Vector<T, d> div_assign_vector_vector(vector1);
-  div_assign_vector_vector /= vector2;
-  for (int i = 0; i < d; ++i) {
-    EXPECT_NEAR(x1[i] / x2[i], div_assign_vector_vector[i], precision);
   }
   mathfu::Vector<T, d> div_assign_vector_scalar(vector1);
   div_assign_vector_scalar /= scalar;
@@ -1337,11 +1329,13 @@ TEST_F(VectorTests, PaddingLaneZeroed_Arithmetic) {
   EXPECT_EQ(0.0f, diff.data_[3]);
 
   // Vector * Vector (Hadamard).
-  mathfu::Vector<float, 3> prod = a * b;
+  mathfu::Vector<float, 3> prod =
+      mathfu::Vector<float, 3>::HadamardProduct(a, b);
   EXPECT_EQ(0.0f, prod.data_[3]);
 
-  // Vector / Vector.
-  mathfu::Vector<float, 3> quot = a / b;
+  // Vector / Vector (Hadamard).
+  mathfu::Vector<float, 3> quot =
+      mathfu::Vector<float, 3>::HadamardDivide(a, b);
   EXPECT_EQ(0.0f, quot.data_[3]);
 
   // Vector + scalar.
@@ -1385,16 +1379,6 @@ TEST_F(VectorTests, PaddingLaneZeroed_CompoundAssignment) {
   mathfu::Vector<float, 3> v2(1.0f, 2.0f, 3.0f);
   v2 -= b;
   EXPECT_EQ(0.0f, v2.data_[3]);
-
-  // *=Vector
-  mathfu::Vector<float, 3> v3(1.0f, 2.0f, 3.0f);
-  v3 *= b;
-  EXPECT_EQ(0.0f, v3.data_[3]);
-
-  // /=Vector
-  mathfu::Vector<float, 3> v4(1.0f, 2.0f, 3.0f);
-  v4 /= b;
-  EXPECT_EQ(0.0f, v4.data_[3]);
 
   // +=scalar
   mathfu::Vector<float, 3> v5(1.0f, 2.0f, 3.0f);

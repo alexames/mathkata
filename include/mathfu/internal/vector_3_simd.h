@@ -152,16 +152,6 @@ class Vector<float, 3> {
         simd4f_sub(simd4f_zero(), MATHFU_VECTOR3_LOAD3(*this)));
   }
 
-  inline Vector<float, 3> operator*(const Vector<float, 3>& v) const {
-    return Vector<float, 3>(
-        simd4f_mul(MATHFU_VECTOR3_LOAD3(*this), MATHFU_VECTOR3_LOAD3(v)));
-  }
-
-  inline Vector<float, 3> operator/(const Vector<float, 3>& v) const {
-    return Vector<float, 3>(
-        simd4f_div(MATHFU_VECTOR3_LOAD3(*this), MATHFU_VECTOR3_LOAD3(v)));
-  }
-
   inline Vector<float, 3> operator+(const Vector<float, 3>& v) const {
     return Vector<float, 3>(
         simd4f_add(MATHFU_VECTOR3_LOAD3(*this), MATHFU_VECTOR3_LOAD3(v)));
@@ -208,18 +198,6 @@ class Vector<float, 3> {
                                            const Vector<float, 3>& v) {
     return Vector<float, 3>(
         simd4f_sub(simd4f_splat(s), MATHFU_VECTOR3_LOAD3(v)));
-  }
-
-  inline Vector<float, 3>& operator*=(const Vector<float, 3>& v) {
-    MATHFU_VECTOR3_STORE3(
-        simd4f_mul(MATHFU_VECTOR3_LOAD3(*this), MATHFU_VECTOR3_LOAD3(v)), *this)
-    return *this;
-  }
-
-  inline Vector<float, 3>& operator/=(const Vector<float, 3>& v) {
-    MATHFU_VECTOR3_STORE3(
-        simd4f_div(MATHFU_VECTOR3_LOAD3(*this), MATHFU_VECTOR3_LOAD3(v)), *this)
-    return *this;
   }
 
   inline Vector<float, 3>& operator+=(const Vector<float, 3>& v) {
@@ -328,6 +306,12 @@ class Vector<float, 3> {
                                                  const Vector<float, 3>& v2) {
     return Vector<float, 3>(
         simd4f_mul(MATHFU_VECTOR3_LOAD3(v1), MATHFU_VECTOR3_LOAD3(v2)));
+  }
+
+  static inline Vector<float, 3> HadamardDivide(const Vector<float, 3>& v1,
+                                                const Vector<float, 3>& v2) {
+    return Vector<float, 3>(
+        simd4f_div(MATHFU_VECTOR3_LOAD3(v1), MATHFU_VECTOR3_LOAD3(v2)));
   }
 
   static inline Vector<float, 3> Lerp(const Vector<float, 3>& v1,

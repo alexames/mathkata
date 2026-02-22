@@ -97,6 +97,11 @@ class Vector<T, 3> {
     return HadamardProductHelper(v1, v2);
   }
 
+  static inline Vector<T, 3> HadamardDivide(const Vector<T, 3>& v1,
+                                            const Vector<T, 3>& v2) {
+    return HadamardDivideHelper(v1, v2);
+  }
+
   static inline Vector<T, 3> CrossProduct(const Vector<T, 3>& v1,
                                           const Vector<T, 3>& v2) {
     return CrossProductHelper(v1, v2);
