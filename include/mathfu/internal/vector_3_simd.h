@@ -371,6 +371,17 @@ class Vector<float, 3> {
     return RejectHelper(v, from);
   }
 
+  static inline Vector<float, 3> Reflect(const Vector<float, 3>& incident,
+                                         const Vector<float, 3>& normal) {
+    return ReflectHelper(incident, normal);
+  }
+
+  static inline Vector<float, 3> Refract(const Vector<float, 3>& incident,
+                                         const Vector<float, 3>& normal,
+                                         float eta) {
+    return RefractHelper(incident, normal, eta);
+  }
+
   MATHFU_DEFINE_CLASS_SIMD_AWARE_NEW_DELETE
 
 #include "mathfu/internal/disable_warnings_begin.h"
