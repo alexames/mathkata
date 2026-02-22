@@ -329,6 +329,12 @@ class Vector<float, 3> {
         simd4f_add(v1s, simd4f_mul(simd4f_sub(v2s, v1s), percentv)));
   }
 
+  static inline bool InRange(const Vector<float, 3>& val,
+                             const Vector<float, 3>& range_start,
+                             const Vector<float, 3>& range_end) {
+    return InRangeHelper(val, range_start, range_end);
+  }
+
   static inline Vector<float, 3> Max(const Vector<float, 3>& v1,
                                      const Vector<float, 3>& v2) {
 #ifdef MATHFU_COMPILE_WITH_PADDING

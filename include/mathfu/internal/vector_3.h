@@ -112,6 +112,13 @@ class Vector<T, 3> {
     return LerpHelper(v1, v2, percent);
   }
 
+  static inline bool InRange(const Vector<T, 3>& val,
+                             const Vector<T, 3>& range_start,
+                             const Vector<T, 3>& range_end) {
+    return InRangeHelper(val, range_start, range_end);
+  }
+
+
   static inline Vector<T, 3> Max(const Vector<T, 3>& v1,
                                  const Vector<T, 3>& v2) {
     return MaxHelper(v1, v2);
