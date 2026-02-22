@@ -57,8 +57,8 @@ It is a modernized fork of Google's archived
 
 ```bash
 # Clone
-git clone https://github.com/alexames/mathfu2.git
-cd mathfu2
+git clone https://github.com/alexames/mathkata.git
+cd mathkata
 
 # Configure (Visual Studio - recommended on Windows)
 cmake -G "Visual Studio 17 2022" -A x64 -B Build

@@ -990,16 +990,16 @@ class Matrix {
 
 /// @cond MATHKATA_INTERNAL
 template <int index>
-struct MathfuMatrixUnroller {
+struct MathKataMatrixUnroller {
   template <class T, int Rows, int Cols>
   constexpr static bool NotEqual(const Matrix<T, Rows, Cols>& lhs,
                                  const Matrix<T, Rows, Cols>& rhs) {
     return (lhs[index] != rhs[index])
-           || MathfuMatrixUnroller<index - 1>::NotEqual(lhs, rhs);
+           || MathKataMatrixUnroller<index - 1>::NotEqual(lhs, rhs);
   }
 };
 template <>
-struct MathfuMatrixUnroller<0> {
+struct MathKataMatrixUnroller<0> {
   template <class T, int Rows, int Cols>
   constexpr static bool NotEqual(const Matrix<T, Rows, Cols>& lhs,
                                  const Matrix<T, Rows, Cols>& rhs) {
@@ -1016,7 +1016,7 @@ struct MathfuMatrixUnroller<0> {
 template <class T, int Rows, int Cols>
 constexpr bool operator!=(const Matrix<T, Rows, Cols>& lhs,
                           const Matrix<T, Rows, Cols>& rhs) {
-  return MathfuMatrixUnroller<Rows * Cols - 1>::NotEqual(lhs, rhs);
+  return MathKataMatrixUnroller<Rows * Cols - 1>::NotEqual(lhs, rhs);
 }
 
 /// @brief Compare 2 Matrices of the same size for equality.
