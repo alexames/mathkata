@@ -650,6 +650,30 @@ class Vector {
     return AngleHelper(v1, v2);
   }
 
+  /// @brief Reflect an incident vector off a surface with the given normal.
+  ///
+  /// @param incident The incoming direction vector.
+  /// @param normal The surface normal (must be normalized).
+  /// @return The reflected direction.
+  /// Matches GLSL reflect() semantics.
+  static inline Vector<T, Dims> Reflect(const Vector<T, Dims>& incident,
+                                        const Vector<T, Dims>& normal) {
+    return ReflectHelper(incident, normal);
+  }
+
+  /// @brief Compute the refracted direction using Snell's law.
+  ///
+  /// @param incident The incoming direction vector (must be normalized).
+  /// @param normal The surface normal (must be normalized).
+  /// @param eta The ratio of indices of refraction (n1/n2).
+  /// @return The refracted direction, or zero vector for total internal
+  ///         reflection.
+  /// Matches GLSL refract() semantics.
+  static inline Vector<T, Dims> Refract(const Vector<T, Dims>& incident,
+                                        const Vector<T, Dims>& normal, T eta) {
+    return RefractHelper(incident, normal, eta);
+  }
+
   MATHFU_DEFINE_CLASS_SIMD_AWARE_NEW_DELETE
 
   /// Elements of the vector.
@@ -682,6 +706,24 @@ inline bool operator==(const Vector<T, Dims>& lhs, const Vector<T, Dims>& rhs) {
 template <class T, int Dims>
 inline bool operator!=(const Vector<T, Dims>& lhs, const Vector<T, Dims>& rhs) {
   return !(lhs == rhs);
+}
+
+/// @brief Lexicographic less-than comparison for 2 Vectors of the same size.
+///
+/// Compares element by element from index 0 to Dims-1.  Returns true as soon
+/// as a component of @p lhs is less than the corresponding component of
+/// @p rhs, and false as soon as it is greater.  If all components are equal
+/// the result is false, providing a strict weak ordering suitable for use
+/// in sorted containers such as std::set and std::map.
+///
+/// @return true if @p lhs is lexicographically less than @p rhs.
+template <class T, int Dims>
+inline bool operator<(const Vector<T, Dims>& lhs, const Vector<T, Dims>& rhs) {
+  for (int i = 0; i < Dims; ++i) {
+    if (lhs[i] < rhs[i]) return true;
+    if (rhs[i] < lhs[i]) return false;
+  }
+  return false;
 }
 
 /// @brief Negate all elements of the Vector.
@@ -1019,6 +1061,36 @@ inline T AngleHelper(const Vector<T, Dims>& v1, const Vector<T, Dims>& v2) {
   const T cos_val = Vector<T, Dims>::DotProduct(v1, v2) / divisor;
   // Clamp to [-1, 1] to avoid NaN from acos due to floating point error.
   return std::acos(Clamp(cos_val, T(-1), T(1)));
+}
+
+/// @brief Reflect an incident vector off a surface with the given normal.
+///
+/// @param incident The incoming direction vector.
+/// @param normal The surface normal (must be normalized).
+/// @return The reflected direction.
+/// Matches GLSL reflect() semantics.
+template <class T, int Dims>
+inline Vector<T, Dims> ReflectHelper(const Vector<T, Dims>& incident,
+                                     const Vector<T, Dims>& normal) {
+  return incident
+         - normal * (T(2) * Vector<T, Dims>::DotProduct(incident, normal));
+}
+
+/// @brief Compute the refracted direction using Snell's law.
+///
+/// @param incident The incoming direction vector (must be normalized).
+/// @param normal The surface normal (must be normalized).
+/// @param eta The ratio of indices of refraction (n1/n2).
+/// @return The refracted direction, or zero vector for total internal
+///         reflection.
+/// Matches GLSL refract() semantics.
+template <class T, int Dims>
+inline Vector<T, Dims> RefractHelper(const Vector<T, Dims>& incident,
+                                     const Vector<T, Dims>& normal, T eta) {
+  T dot = Vector<T, Dims>::DotProduct(incident, normal);
+  T k = T(1) - eta * eta * (T(1) - dot * dot);
+  if (k < T(0)) return Vector<T, Dims>(T(0));
+  return incident * eta - normal * (eta * dot + std::sqrt(k));
 }
 
 /// @brief Check if val is within [range_start..range_end), denoting a

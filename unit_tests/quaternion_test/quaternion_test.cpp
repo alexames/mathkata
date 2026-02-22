@@ -412,7 +412,7 @@ void Mult_Test(const T& precision) {
   mathfu::Vector<T, 4> v4(3.5f, 6.4f, 7.0f, 0.0f);
   // This will verify that multiplying by a vector corresponds to applying
   // the rotation to that vector.
-  mathfu::Vector<T, 3> quatRotatedV(qaa1 * v);
+  mathfu::Vector<T, 3> quatRotatedV(qaa1.Rotate(v));
   mathfu::Vector<T, 3> matRotatedV(qaa1.ToMatrix() * v);
   mathfu::Vector<T, 4> mat4RotatedV(qaa1.ToMatrix4() * v4);
   EXPECT_NEAR(quatRotatedV[0], matRotatedV[0], 10 * precision);
@@ -638,18 +638,18 @@ void RotateFromTo_Test(const T& precision) {
   // By definition, rotateFromTo(v1, v2) * v2 should always equal v2.
   // if v1 and v2 are 90 degrees apart (as they are in the case of axes)
   // then applying the same rotation twice should invert the vector.
-  mathfu::Vector<T, 3> x_to_y_result = x_to_y * x_axis;
-  mathfu::Vector<T, 3> x_to_y_twice_result = x_to_y * x_to_y * x_axis;
+  mathfu::Vector<T, 3> x_to_y_result = x_to_y.Rotate(x_axis);
+  mathfu::Vector<T, 3> x_to_y_twice_result = (x_to_y * x_to_y).Rotate(x_axis);
   EXPECT_NEAR_VEC3(x_to_y_result, y_axis, precision);
   EXPECT_NEAR_VEC3(x_to_y_twice_result, -x_axis, precision);
 
-  mathfu::Vector<T, 3> y_to_z_result = y_to_z * y_axis;
-  mathfu::Vector<T, 3> y_to_z_twice_result = y_to_z * y_to_z * y_axis;
+  mathfu::Vector<T, 3> y_to_z_result = y_to_z.Rotate(y_axis);
+  mathfu::Vector<T, 3> y_to_z_twice_result = (y_to_z * y_to_z).Rotate(y_axis);
   EXPECT_NEAR_VEC3(y_to_z_result, z_axis, precision);
   EXPECT_NEAR_VEC3(y_to_z_twice_result, -y_axis, precision);
 
-  mathfu::Vector<T, 3> z_to_x_result = z_to_x * z_axis;
-  mathfu::Vector<T, 3> z_to_x_twice_result = z_to_x * z_to_x * z_axis;
+  mathfu::Vector<T, 3> z_to_x_result = z_to_x.Rotate(z_axis);
+  mathfu::Vector<T, 3> z_to_x_twice_result = (z_to_x * z_to_x).Rotate(z_axis);
   EXPECT_NEAR_VEC3(z_to_x_result, x_axis, precision);
   EXPECT_NEAR_VEC3(z_to_x_twice_result, -z_axis, precision);
 
@@ -662,7 +662,7 @@ void RotateFromTo_Test(const T& precision) {
   mathfu::Quaternion<T> arbitrary_to_arbitrary =
       mathfu::Quaternion<T>::RotateFromTo(arbitrary_1, arbitrary_2);
 
-  mathfu::Vector<T, 3> arbitrary_1_to_2 = arbitrary_to_arbitrary * arbitrary_1;
+  mathfu::Vector<T, 3> arbitrary_1_to_2 = arbitrary_to_arbitrary.Rotate(arbitrary_1);
   arbitrary_1_to_2.Normalize();
   mathfu::Vector<T, 3> arbitrary_2_normalized = arbitrary_2.Normalized();
 
@@ -672,7 +672,7 @@ void RotateFromTo_Test(const T& precision) {
   mathfu::Quaternion<T> identity =
       mathfu::Quaternion<T>::RotateFromTo(arbitrary_1, arbitrary_1);
 
-  mathfu::Vector<T, 3> arbitrary_2_identity = identity * arbitrary_2;
+  mathfu::Vector<T, 3> arbitrary_2_identity = identity.Rotate(arbitrary_2);
   EXPECT_NEAR_VEC3(arbitrary_2_identity, arbitrary_2, precision);
 
   // Using RotateFromTo on an inverted vector should give a 180 degree rotation:
@@ -681,7 +681,7 @@ void RotateFromTo_Test(const T& precision) {
 
   // Relaxing the precision slightly, because there are a lot of chained
   // float operations in here.
-  mathfu::Vector<T, 3> arbitrary_1_reversed = reverse * arbitrary_1;
+  mathfu::Vector<T, 3> arbitrary_1_reversed = reverse.Rotate(arbitrary_1);
   EXPECT_NEAR_VEC3(arbitrary_1_reversed, -arbitrary_1, precision * 2.0);
 }
 TEST_ALL_F(RotateFromTo)
@@ -817,7 +817,7 @@ void LookAt_Test(const T& precision) {
     const Vector3 rh_forward(zero, zero, neg_one);
     const Vector3 target(one, zero, zero);
     const Quaternion q = Quaternion::LookAt(target, up, one);
-    const Vector3 result = q * rh_forward;
+    const Vector3 result = q.Rotate(rh_forward);
     EXPECT_NEAR_VEC3(target, result, epsilon);
   }
 
@@ -826,7 +826,7 @@ void LookAt_Test(const T& precision) {
     const Vector3 lh_forward(zero, zero, one);
     const Vector3 target(one, zero, zero);
     const Quaternion q = Quaternion::LookAt(target, up, neg_one);
-    const Vector3 result = q * lh_forward;
+    const Vector3 result = q.Rotate(lh_forward);
     EXPECT_NEAR_VEC3(target, result, epsilon);
   }
 
