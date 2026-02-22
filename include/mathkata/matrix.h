@@ -1740,7 +1740,7 @@ static inline Matrix<T, Rows, Cols> FromTypeHelper(
   VectorPacked<T, Rows> packed[Cols];
   static_assert(sizeof(compatible) == sizeof(packed),
                 "Conversion size mismatch.");
-  std::memcpy(packed, &compatible, sizeof(packed));
+  std::memcpy(static_cast<void*>(packed), &compatible, sizeof(packed));
   return Matrix<T, Rows, Cols>(packed);
 }
 /// @endcond
@@ -1756,7 +1756,7 @@ static inline CompatibleT ToTypeHelper(const Matrix<T, Rows, Cols>& m) {
                 "Conversion size mismatch.");
   m.Pack(packed);
   CompatibleT compatible;
-  std::memcpy(&compatible, packed, sizeof(packed));
+  std::memcpy(&compatible, static_cast<const void*>(packed), sizeof(packed));
   return compatible;
 }
 /// @endcond
