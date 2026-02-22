@@ -398,7 +398,6 @@ class Matrix {
     MATHFU_MAT_OPERATION(GetColumn(i).Pack(&vector[i]));
   }
 
-  /// @cond MATHFU_INTERNAL
   /// @brief Access a column vector of the Matrix.
   ///
   /// @param i Index of the column to access.
@@ -412,7 +411,21 @@ class Matrix {
   inline const Vector<T, Rows>& GetColumn(const int i) const {
     return data_[i];
   }
-  /// @endcond
+
+  /// @brief Access a row vector of the Matrix.
+  ///
+  /// For a column-major matrix, this gathers one element from each column
+  /// to form the row vector.
+  ///
+  /// @param i Index of the row to access.
+  /// @return Vector containing the row elements.
+  inline Vector<T, Cols> GetRow(const int i) const {
+    Vector<T, Cols> result;
+    for (int j = 0; j < Cols; j++) {
+      result[j] = data_[j][i];
+    }
+    return result;
+  }
 
   /// @brief Negate this Matrix.
   ///
