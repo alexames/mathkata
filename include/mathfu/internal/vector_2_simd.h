@@ -226,14 +226,6 @@ class Vector<float, 2> {
                    simd2f_mul(percentv.simd2, v2.simd2)));
   }
 
-  /// Generates a random vector, where the range for each component is
-  /// bounded by min and max.
-  static inline Vector<float, 2> RandomInRange(const Vector<float, 2>& min,
-                                               const Vector<float, 2>& max) {
-    return Vector<float, 2>(mathfu::RandomInRange<float>(min[0], max[0]),
-                            mathfu::RandomInRange<float>(min[1], max[1]));
-  }
-
   static inline Vector<float, 2> Max(const Vector<float, 2>& v1,
                                      const Vector<float, 2>& v2) {
     return Vector<float, 2>(std::max(v1[0], v2[0]), std::max(v1[1], v2[1]));

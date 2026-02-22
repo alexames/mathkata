@@ -113,11 +113,6 @@ class Vector<T, 4> {
     return LerpHelper(v1, v2, percent);
   }
 
-  static inline Vector<T, 4> RandomInRange(const Vector<T, 4>& min,
-                                           const Vector<T, 4>& max) {
-    return RandomInRangeHelper(min, max);
-  }
-
   static inline Vector<T, 4> Max(const Vector<T, 4>& v1,
                                  const Vector<T, 4>& v2) {
     return MaxHelper(v1, v2);
