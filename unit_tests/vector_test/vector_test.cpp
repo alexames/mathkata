@@ -1185,9 +1185,9 @@ TEST_F(VectorTests, OutputStream_Test_float_1) {
 // Test that the kDims static member is present and correct for each
 // specialization.
 TEST_F(VectorTests, kDims) {
-  EXPECT_EQ(mathfu::Vector<float, 2>::kDims, 2);
-  EXPECT_EQ(mathfu::Vector<float, 3>::kDims, 3);
-  EXPECT_EQ(mathfu::Vector<float, 4>::kDims, 4);
+  EXPECT_EQ((mathfu::Vector<float, 2>::kDims), 2);
+  EXPECT_EQ((mathfu::Vector<float, 3>::kDims), 3);
+  EXPECT_EQ((mathfu::Vector<float, 4>::kDims), 4);
 }
 
 // Test that the SIMD padding lane (w / data_[3]) of Vector<float,3> is
@@ -1362,6 +1362,82 @@ TEST_F(VectorTests, PaddingLaneZeroed_VectorOps) {
   EXPECT_EQ(0.0f, min_v.data_[3]);
 }
 #endif  // defined(MATHFU_COMPILE_WITH_PADDING)
+
+// Test named member access x(), y(), z(), w() on the generic Vector template.
+// The generic template is used for dimensions >= 5 and for non-float types
+// when SIMD specializations are not active.
+TEST_F(VectorTests, NamedAccessors_Generic_5D) {
+  // A 5-dimensional vector always uses the generic (unspecialized) template.
+  mathfu::Vector<float, 5> v;
+  v[0] = 1.0f;
+  v[1] = 2.0f;
+  v[2] = 3.0f;
+  v[3] = 4.0f;
+  v[4] = 5.0f;
+
+  // Read access via named accessors.
+  EXPECT_EQ(1.0f, v.x());
+  EXPECT_EQ(2.0f, v.y());
+  EXPECT_EQ(3.0f, v.z());
+  EXPECT_EQ(4.0f, v.w());
+
+  // Write access via named accessors.
+  v.x() = 10.0f;
+  v.y() = 20.0f;
+  v.z() = 30.0f;
+  v.w() = 40.0f;
+  EXPECT_EQ(10.0f, v[0]);
+  EXPECT_EQ(20.0f, v[1]);
+  EXPECT_EQ(30.0f, v[2]);
+  EXPECT_EQ(40.0f, v[3]);
+  // The 5th element should be unaffected.
+  EXPECT_EQ(5.0f, v[4]);
+}
+
+// Test const correctness of named accessors on the generic template.
+TEST_F(VectorTests, NamedAccessors_Generic_Const) {
+  double values[] = {1.0, 2.0, 3.0, 4.0, 5.0};
+  const mathfu::Vector<double, 5> v(values);
+
+  // Const references should be returned.
+  EXPECT_EQ(1.0, v.x());
+  EXPECT_EQ(2.0, v.y());
+  EXPECT_EQ(3.0, v.z());
+  EXPECT_EQ(4.0, v.w());
+}
+
+// Test x() accessor on a 1D generic vector.
+TEST_F(VectorTests, NamedAccessors_Generic_1D) {
+  mathfu::Vector<int, 1> v(static_cast<int>(42));
+  EXPECT_EQ(42, v.x());
+  v.x() = 99;
+  EXPECT_EQ(99, v[0]);
+}
+
+// Test named accessors work with integer types on the generic template.
+TEST_F(VectorTests, NamedAccessors_Generic_Int) {
+  mathfu::Vector<int, 5> v;
+  v[0] = 10;
+  v[1] = 20;
+  v[2] = 30;
+  v[3] = 40;
+  v[4] = 50;
+
+  EXPECT_EQ(10, v.x());
+  EXPECT_EQ(20, v.y());
+  EXPECT_EQ(30, v.z());
+  EXPECT_EQ(40, v.w());
+
+  v.x() = 100;
+  v.y() = 200;
+  v.z() = 300;
+  v.w() = 400;
+  EXPECT_EQ(100, v[0]);
+  EXPECT_EQ(200, v[1]);
+  EXPECT_EQ(300, v[2]);
+  EXPECT_EQ(400, v[3]);
+  EXPECT_EQ(50, v[4]);
+}
 
 int main(int argc, char** argv) {
   ::testing::InitGoogleTest(&argc, argv);
