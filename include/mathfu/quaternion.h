@@ -24,6 +24,8 @@
 
 #include <math.h>
 
+#include <limits>
+
 #include "mathfu/matrix.h"
 #include "mathfu/vector.h"
 
@@ -286,7 +288,7 @@ class Quaternion {
   inline void ToAngleAxisFull(T* out_angle, Vector<T, 3>* out_axis) const {
     Vector<T, 3> axis = v_;
     const T axis_length = axis.Normalize();
-    if (axis_length == 0) {
+    if (axis_length < std::numeric_limits<T>::epsilon()) {
       // Normalize has left NaNs in axis.  This happens at angle = 0 and 360.
       // All axes are correct, so any will do.
       *out_axis = Vector<T, 3>(1, 0, 0);

@@ -559,6 +559,7 @@ class Vector {
 
   /// @brief Returns the angle between 2 vectors in radians.
   ///
+  /// @pre Both input vectors must be non-zero.
   /// @param v1 First vector.
   /// @param v2 Second vector.
   /// @return Angle between vectors v1 and v2.
@@ -962,6 +963,7 @@ inline Vector<T, Dims> MinHelper(const Vector<T, Dims>& v1,
 
 /// @brief Returns the angle between 2 vectors in radians.
 ///
+/// @pre Both input vectors must be non-zero.
 /// @param v1 First vector.
 /// @param v2 Second vector.
 /// @return Angle between vectors v1 and v2.
@@ -970,9 +972,7 @@ inline T AngleHelper(const Vector<T, Dims>& v1, const Vector<T, Dims>& v2) {
   // Applying law of cosines.
   // https://stackoverflow.com/questions/10507620/finding-the-angle-between-vectors
   const T divisor = v1.Length() * v2.Length();
-  if (divisor == T(0)) {
-    return T(0);
-  }
+  assert(divisor != T(0));
   const T cos_val = Vector<T, Dims>::DotProduct(v1, v2) / divisor;
   // Clamp to [-1, 1] to avoid NaN from acos due to floating point error.
   return std::acos(Clamp(cos_val, T(-1), T(1)));
