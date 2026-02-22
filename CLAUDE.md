@@ -4,7 +4,7 @@
 
 MathKata is a header-only C++ math library for games, forked from Google's
 archived [MathFu](https://github.com/google/mathfu). The repository is
-[alexames/mathfu2](https://github.com/alexames/mathfu2).
+[alexames/mathkata](https://github.com/alexames/mathkata).
 
 ### Key Types
 
