@@ -89,6 +89,15 @@ class Vector<float, 3> {
 #endif  // MATHKATA_COMPILE_WITH_PADDING
   }
 
+  inline Vector<float, 3>& operator=(const Vector<float, 3>& v) {
+#ifdef MATHKATA_COMPILE_WITH_PADDING
+    simd3 = v.simd3;
+#else
+    MATHKATA_VECTOR3_INIT3(*this, v[0], v[1], v[2])
+#endif  // MATHKATA_COMPILE_WITH_PADDING
+    return *this;
+  }
+
   explicit inline Vector(const Vector<int, 3>& v) {
     MATHKATA_VECTOR3_INIT3(*this, static_cast<float>(v[0]),
                            static_cast<float>(v[1]), static_cast<float>(v[2]))
