@@ -260,8 +260,7 @@ T Clamp(const T &x, const T &lower, const T &upper) {
 ///         (e.g float or double).
 template <class T, class T2>
 T Lerp(const T &range_start, const T &range_end, const T2 &percent) {
-  const T2 one_minus_percent = T2(1) - percent;
-  return range_start * one_minus_percent + range_end * percent;
+  return range_start + (range_end - range_start) * percent;
 }
 
 /// @brief Linearly interpolate between range_start and range_end, based on

@@ -1004,8 +1004,7 @@ inline Vector<T, Dims> NormalizedHelper(const Vector<T, Dims>& v) {
 template <class T, int Dims>
 inline Vector<T, Dims> LerpHelper(const Vector<T, Dims>& v1,
                                   const Vector<T, Dims>& v2, const T percent) {
-  const T one_minus_percent = T(1) - percent;
-  MATHFU_VECTOR_OPERATOR(one_minus_percent * v1[i] + percent * v2[i]);
+  MATHFU_VECTOR_OPERATOR(v1[i] + (v2[i] - v1[i]) * percent);
 }
 
 /// @brief Compare each component and returns max values.

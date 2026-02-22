@@ -827,6 +827,64 @@ TEST_F(VectorTests, Angle_AntiParallelDoesNotReturnNaN) {
   EXPECT_NEAR(angle, 0.0f, FLOAT_PRECISION);
 }
 
+// This will test that scalar Lerp returns exact endpoints.
+// The formula a + (b - a) * t guarantees Lerp(a, b, 0) == a exactly because
+// (b - a) * 0 == 0 for all finite values, and a + 0 == a.
+// Lerp(a, b, 1) == b holds exactly when a + (b - a) can recover b without
+// rounding error. We test with representative values to verify both endpoints.
+template <class T>
+void Numeric_Lerp_Exact_Endpoints_Test(const T& precision) {
+  (void)precision;
+
+  const T test_values[] = {static_cast<T>(0),     static_cast<T>(1),
+                           static_cast<T>(-1),    static_cast<T>(3.5),
+                           static_cast<T>(-7.25), static_cast<T>(100),
+                           static_cast<T>(1e5),   static_cast<T>(-1e5)};
+  const int num_values = sizeof(test_values) / sizeof(test_values[0]);
+
+  for (int ai = 0; ai < num_values; ++ai) {
+    for (int bi = 0; bi < num_values; ++bi) {
+      const T a = test_values[ai];
+      const T b = test_values[bi];
+      EXPECT_EQ(mathfu::Lerp(a, b, static_cast<T>(0)), a);
+      EXPECT_EQ(mathfu::Lerp(a, b, static_cast<T>(1)), b);
+    }
+  }
+}
+TEST_SCALAR_F(Numeric_Lerp_Exact_Endpoints)
+
+// This will test that vector Lerp returns exact endpoints.
+template <class T, int d>
+void LerpExactEndpoints_Test(const T& precision) {
+  (void)precision;
+
+  const T test_values[] = {static_cast<T>(0),     static_cast<T>(1),
+                           static_cast<T>(-1),    static_cast<T>(3.5),
+                           static_cast<T>(-7.25), static_cast<T>(100),
+                           static_cast<T>(1e5),   static_cast<T>(-1e5)};
+  const int num_values = sizeof(test_values) / sizeof(test_values[0]);
+
+  // Test a selection of value pairs to keep runtime manageable.
+  for (int vi = 0; vi < num_values; ++vi) {
+    mathfu::Vector<T, d> v1, v2;
+    for (int i = 0; i < d; ++i) {
+      v1[i] = test_values[(vi + i) % num_values];
+      v2[i] = test_values[(vi + i + 1) % num_values];
+    }
+
+    mathfu::Vector<T, d> lerp_at_0 =
+        mathfu::Vector<T, d>::Lerp(v1, v2, static_cast<T>(0));
+    mathfu::Vector<T, d> lerp_at_1 =
+        mathfu::Vector<T, d>::Lerp(v1, v2, static_cast<T>(1));
+
+    for (int i = 0; i < d; ++i) {
+      EXPECT_EQ(lerp_at_0[i], v1[i]);
+      EXPECT_EQ(lerp_at_1[i], v2[i]);
+    }
+  }
+}
+TEST_ALL_F(LerpExactEndpoints)
+
 // Tests scalar RoundUpToPowerOf2 for int32_t.
 TEST_F(VectorTests, RoundUpToPowerOf2_Int32) {
   // Zero returns zero.

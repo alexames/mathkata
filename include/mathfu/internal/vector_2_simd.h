@@ -218,12 +218,9 @@ class Vector<float, 2> {
   static inline Vector<float, 2> Lerp(const Vector<float, 2>& v1,
                                       const Vector<float, 2>& v2,
                                       float percent) {
-    const Vector<float, 2> percentv(percent);
-    const Vector<float, 2> one_minus_percent(
-        simd2f_sub(simd2f_splat(1.0f), percentv.simd2));
-    return Vector<float, 2>(
-        simd2f_add(simd2f_mul(one_minus_percent.simd2, v1.simd2),
-                   simd2f_mul(percentv.simd2, v2.simd2)));
+    const simd2f percentv = simd2f_splat(percent);
+    return Vector<float, 2>(simd2f_add(
+        v1.simd2, simd2f_mul(simd2f_sub(v2.simd2, v1.simd2), percentv)));
   }
 
   static inline Vector<float, 2> Max(const Vector<float, 2>& v1,
