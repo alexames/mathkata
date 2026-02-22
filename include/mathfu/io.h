@@ -35,12 +35,16 @@ inline std::ostream& operator<<(std::ostream& os, const Vector<T, d>& v) {
 }
 
 /// @brief Print the matrix contents to the output stream.
+///
+/// Each column is printed as a vector, and all columns are grouped together.
+/// For example, a 3x3 identity matrix is printed as:
+/// ((1, 0, 0), (0, 1, 0), (0, 0, 1))
 template <typename T, int rows, int columns>
 inline std::ostream& operator<<(std::ostream& os,
                                 const Matrix<T, rows, columns>& m) {
-  os << "(" << m[0];
-  for (int i = 1; i < rows * columns; ++i) {
-    os << ", " << m[i];
+  os << "(" << m.GetColumn(0);
+  for (int i = 1; i < columns; ++i) {
+    os << ", " << m.GetColumn(i);
   }
   return os << ")";
 }
