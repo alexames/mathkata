@@ -372,15 +372,15 @@ void Mult_Test(const T& precision) {
   // of the rotations.
   (qaa1 * qaa2).ToAngleAxis(&convertedAngle, &convertedAxis);
   EXPECT_NEAR(angle1 + angle2, convertedAngle, precision);
-  // This will verify that multiplying a quaternion with a scalar corresponds
-  // to scaling the rotation.
-  (qaa1 * 2).ToAngleAxis(&convertedAngle, &convertedAxis);
+  // This will verify that scaling a quaternion's angle corresponds to scaling
+  // the rotation.
+  qaa1.ScaleAngle(2).ToAngleAxis(&convertedAngle, &convertedAxis);
   EXPECT_NEAR(angle1 * 2, convertedAngle, precision);
   mathfu::Vector<T, 3> v(3.5f, 6.4f, 7.0f);
   mathfu::Vector<T, 4> v4(3.5f, 6.4f, 7.0f, 0.0f);
-  // This will verify that multiplying by a vector corresponds to applying
+  // This will verify that rotating a vector corresponds to applying
   // the rotation to that vector.
-  mathfu::Vector<T, 3> quatRotatedV(qaa1 * v);
+  mathfu::Vector<T, 3> quatRotatedV(qaa1.Rotate(v));
   mathfu::Vector<T, 3> matRotatedV(qaa1.ToMatrix() * v);
   mathfu::Vector<T, 4> mat4RotatedV(qaa1.ToMatrix4() * v4);
   EXPECT_NEAR(quatRotatedV[0], matRotatedV[0], 10 * precision);
@@ -404,12 +404,12 @@ void Mult_Test(const T& precision) {
 }
 TEST_ALL_F(Mult)
 
-// This tests that quat * float changes the direction of the quat to keep it
-// in the "small" hemisphere, before doing the multiplication.  This makes
+// This tests that ScaleAngle changes the direction of the quat to keep it
+// in the "small" hemisphere, before doing the scaling.  This makes
 // scalar factors < 1 act intuitively, at the cost of sometimes making
-// multiplication non-associative for scale factors > 1.
+// the operation non-associative for scale factors > 1.
 template <class T>
-void MultQuatFloatFlipsQuat_Test(const T& precision) {
+void ScaleAngleFlipsQuat_Test(const T& precision) {
   (void)precision;
   using Quaternion = mathfu::Quaternion<T>;
   using Vector3 = mathfu::Vector<T, 3>;
@@ -420,15 +420,16 @@ void MultQuatFloatFlipsQuat_Test(const T& precision) {
   const Quaternion bigQuat =
       Quaternion::FromAngleAxis(static_cast<T>(mathfu::kPi * 1.5), up);
   EXPECT_NEAR_QUAT(Quaternion(-bigQuat.scalar(), -bigQuat.vector()),
-                   bigQuat * 1, epsilon);
+                   bigQuat.ScaleAngle(1), epsilon);
 
   // Test the claim made in the documentation:
-  // "For example, you are not guaranteed that (q * 2) * .5 and q * (2 * .5)
-  //  are the same orientation, let alone the same quaternion."
+  // "For example, you are not guaranteed that
+  //  q.ScaleAngle(2).ScaleAngle(.5) and q.ScaleAngle(2 * .5) are the same
+  //  orientation, let alone the same quaternion."
   const Quaternion base =
       Quaternion::FromAngleAxis(static_cast<T>(mathfu::kPi * .75), up);
-  const Quaternion q1 = (base * 2) * .5f;
-  const Quaternion q2 = base * (2 * .5f);
+  const Quaternion q1 = base.ScaleAngle(2).ScaleAngle(.5f);
+  const Quaternion q2 = base.ScaleAngle(2 * .5f);
   EXPECT_NEAR_QUAT(
       q1, Quaternion::FromAngleAxis(static_cast<T>(mathfu::kPi * -.25), up),
       epsilon);
@@ -436,7 +437,7 @@ void MultQuatFloatFlipsQuat_Test(const T& precision) {
   EXPECT_FALSE(IsNearOrientation(q1, q2, epsilon));
   EXPECT_FALSE(IsNearQuat(q1, q2, epsilon));
 }
-TEST_ALL_F(MultQuatFloatFlipsQuat)
+TEST_ALL_F(ScaleAngleFlipsQuat)
 
 // This will test the dot product of quaternions.
 template <class T>
@@ -560,21 +561,21 @@ void RotateFromTo_Test(const T& precision) {
       mathfu::Quaternion<T>::RotateFromTo(z_axis, x_axis);
 
   // Check some axis rotations:
-  // By definition, rotateFromTo(v1, v2) * v2 should always equal v2.
+  // By definition, rotateFromTo(v1, v2).Rotate(v1) should always equal v2.
   // if v1 and v2 are 90 degrees apart (as they are in the case of axes)
   // then applying the same rotation twice should invert the vector.
-  mathfu::Vector<T, 3> x_to_y_result = x_to_y * x_axis;
-  mathfu::Vector<T, 3> x_to_y_twice_result = x_to_y * x_to_y * x_axis;
+  mathfu::Vector<T, 3> x_to_y_result = x_to_y.Rotate(x_axis);
+  mathfu::Vector<T, 3> x_to_y_twice_result = (x_to_y * x_to_y).Rotate(x_axis);
   EXPECT_NEAR_VEC3(x_to_y_result, y_axis, precision);
   EXPECT_NEAR_VEC3(x_to_y_twice_result, -x_axis, precision);
 
-  mathfu::Vector<T, 3> y_to_z_result = y_to_z * y_axis;
-  mathfu::Vector<T, 3> y_to_z_twice_result = y_to_z * y_to_z * y_axis;
+  mathfu::Vector<T, 3> y_to_z_result = y_to_z.Rotate(y_axis);
+  mathfu::Vector<T, 3> y_to_z_twice_result = (y_to_z * y_to_z).Rotate(y_axis);
   EXPECT_NEAR_VEC3(y_to_z_result, z_axis, precision);
   EXPECT_NEAR_VEC3(y_to_z_twice_result, -y_axis, precision);
 
-  mathfu::Vector<T, 3> z_to_x_result = z_to_x * z_axis;
-  mathfu::Vector<T, 3> z_to_x_twice_result = z_to_x * z_to_x * z_axis;
+  mathfu::Vector<T, 3> z_to_x_result = z_to_x.Rotate(z_axis);
+  mathfu::Vector<T, 3> z_to_x_twice_result = (z_to_x * z_to_x).Rotate(z_axis);
   EXPECT_NEAR_VEC3(z_to_x_result, x_axis, precision);
   EXPECT_NEAR_VEC3(z_to_x_twice_result, -z_axis, precision);
 
@@ -587,7 +588,8 @@ void RotateFromTo_Test(const T& precision) {
   mathfu::Quaternion<T> arbitrary_to_arbitrary =
       mathfu::Quaternion<T>::RotateFromTo(arbitrary_1, arbitrary_2);
 
-  mathfu::Vector<T, 3> arbitrary_1_to_2 = arbitrary_to_arbitrary * arbitrary_1;
+  mathfu::Vector<T, 3> arbitrary_1_to_2 =
+      arbitrary_to_arbitrary.Rotate(arbitrary_1);
   arbitrary_1_to_2.Normalize();
   mathfu::Vector<T, 3> arbitrary_2_normalized = arbitrary_2.Normalized();
 
@@ -597,7 +599,7 @@ void RotateFromTo_Test(const T& precision) {
   mathfu::Quaternion<T> identity =
       mathfu::Quaternion<T>::RotateFromTo(arbitrary_1, arbitrary_1);
 
-  mathfu::Vector<T, 3> arbitrary_2_identity = identity * arbitrary_2;
+  mathfu::Vector<T, 3> arbitrary_2_identity = identity.Rotate(arbitrary_2);
   EXPECT_NEAR_VEC3(arbitrary_2_identity, arbitrary_2, precision);
 
   // Using RotateFromTo on an inverted vector should give a 180 degree rotation:
@@ -606,7 +608,7 @@ void RotateFromTo_Test(const T& precision) {
 
   // Relaxing the precision slightly, because there are a lot of chained
   // float operations in here.
-  mathfu::Vector<T, 3> arbitrary_1_reversed = reverse * arbitrary_1;
+  mathfu::Vector<T, 3> arbitrary_1_reversed = reverse.Rotate(arbitrary_1);
   EXPECT_NEAR_VEC3(arbitrary_1_reversed, -arbitrary_1, precision * 2.0);
 }
 TEST_ALL_F(RotateFromTo)
@@ -736,7 +738,7 @@ void SlerpResultIsUnit_Test(const T& precision) {
     EXPECT_NEAR(1.0f, slerp_length, kLengthEpsilon) << " for angle " << angle;
 
     // Alternate spelling for Slerp
-    Quaternion mul_result = q2 * .5f;
+    Quaternion mul_result = q2.ScaleAngle(.5f);
     const T mul_length = mul_result.Normalize();
     EXPECT_NEAR(1.0f, mul_length, kLengthEpsilon) << " for angle " << angle;
   }
@@ -776,12 +778,12 @@ void CheckSlerp(float angle, float t, float expected_angle) {
   EXPECT_NEAR_ORIENTATION(expected, slerp_backwards_result, epsilon)
       << " for angle " << angle << " and t " << t;
 
-  Quaternion mul_result = original * t;
+  Quaternion mul_result = original.ScaleAngle(t);
   EXPECT_NEAR_ORIENTATION(expected, mul_result, epsilon)
       << " for angle " << angle << " and t " << t;
 }
 
-// This doubles as a test of both Slerp() and operator*(quat, float),
+// This doubles as a test of both Slerp() and ScaleAngle(),
 // since the two are pretty much the same operation with different spelling.
 template <class T>
 void Slerp_Test(const T& precision) {

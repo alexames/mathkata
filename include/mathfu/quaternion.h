@@ -167,7 +167,7 @@ class Quaternion {
         s_ * q.v_ + q.s_ * v_ + Vector<T, 3>::CrossProduct(v_, q.v_));
   }
 
-  /// @brief Multiply this Quaternion by a scalar.
+  /// @brief Scale the angle of rotation by a scalar factor.
   ///
   /// This conditions the Quaternion to be a rotation <= 180 degrees, then
   /// multiplies the angle of the rotation by a scalar factor.
@@ -178,16 +178,17 @@ class Quaternion {
   ///
   /// If the scalar factor is > 1, the resulting rotation will be on the longer
   /// of the two paths to the identity orientation, which can be unintuitive.
-  /// For example, you are not guaranteed that (q * 2) * .5 and q * (2 * .5)
-  /// are the same orientation, let alone the same quaternion.
+  /// For example, you are not guaranteed that
+  /// q.ScaleAngle(2).ScaleAngle(.5) and q.ScaleAngle(2 * .5) are the same
+  /// orientation, let alone the same quaternion.
   ///
-  /// @param s1 Scalar to multiply with.
+  /// @param factor Scalar factor to multiply the angle by.
   /// @return Quaternion containing the result.
-  inline Quaternion<T> operator*(T s1) const {
+  inline Quaternion<T> ScaleAngle(T factor) const {
     T angle;
     Vector<T, 3> axis;
     ToAngleAxis(&angle, &axis);
-    angle *= s1;
+    angle *= factor;
     // The axis coming from ToAngleAxis() is already normalized, but
     // ToAngleAxis may return slightly non-normal axes in unstable cases.
     // It should arguably handle that internally, allowing us to remove
@@ -197,14 +198,14 @@ class Quaternion {
         axis.Normalized() * static_cast<T>(sin(T(0.5) * angle)));
   }
 
-  /// @brief Multiply a Vector by this Quaternion.
+  /// @brief Rotate a Vector by this Quaternion.
   ///
   /// This will rotate the specified vector by the rotation specified by this
   /// Quaternion.
   ///
-  /// @param v1 Vector to multiply by this Quaternion.
+  /// @param v1 Vector to rotate.
   /// @return Rotated Vector.
-  inline Vector<T, 3> operator*(const Vector<T, 3>& v1) const {
+  inline Vector<T, 3> Rotate(const Vector<T, 3>& v1) const {
     T ss = s_ + s_;
     return ss * Vector<T, 3>::CrossProduct(v_, v1) + (ss * s_ - T(1)) * v1
            + T(2) * Vector<T, 3>::DotProduct(v_, v1) * v_;
@@ -454,7 +455,7 @@ class Quaternion {
                            q1.v_ * (T(1) - s1) + q2.v_ * s1)
           .Normalized();
     }
-    return q1 * ((q1.Conjugate() * q2) * s1);
+    return q1 * (q1.Conjugate() * q2).ScaleAngle(s1);
   }
 
   /// @brief Access an element of the quaternion.
@@ -649,22 +650,6 @@ template <typename T>
 Quaternion<T> Quaternion<T>::identity = Quaternion<T>(1, 0, 0, 0);
 /// @}
 
-/// @addtogroup mathfu_quaternion
-/// @{
-
-/// @brief Multiply a Quaternion by a scalar.
-///
-/// This multiplies the angle of the rotation of the specified Quaternion
-/// by a scalar factor.
-/// @param s Scalar to multiply with.
-/// @param q Quaternion to scale.
-/// @return Quaternion containing the result.
-///
-/// @related Quaternion
-template <class T>
-inline Quaternion<T> operator*(T s, const Quaternion<T>& q) {
-  return q * s;
-}
 /// @}
 
 }  // namespace mathfu
