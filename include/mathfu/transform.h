@@ -101,9 +101,8 @@ struct Transform {
   /// @param point The point to transform.
   /// @return The transformed point.
   inline Vector<T, 3> TransformPoint(const Vector<T, 3>& point) const {
-    return rotation
-               * Vector<T, 3>(point.x * scale.x, point.y * scale.y,
-                              point.z * scale.z)
+    return rotation.Rotate(Vector<T, 3>(point.x * scale.x, point.y * scale.y,
+                                        point.z * scale.z))
            + position;
   }
 
@@ -114,9 +113,9 @@ struct Transform {
   /// @param direction The direction vector to transform.
   /// @return The transformed direction.
   inline Vector<T, 3> TransformDirection(const Vector<T, 3>& direction) const {
-    return rotation
-           * Vector<T, 3>(direction.x * scale.x, direction.y * scale.y,
-                          direction.z * scale.z);
+    return rotation.Rotate(Vector<T, 3>(direction.x * scale.x,
+                                        direction.y * scale.y,
+                                        direction.z * scale.z));
   }
 
   /// @brief Compute the inverse of this transform.
@@ -143,7 +142,7 @@ struct Transform {
     Vector<T, 3> neg_p(-position.x, -position.y, -position.z);
     Vector<T, 3> scaled_neg_p(neg_p.x * inv_scale.x, neg_p.y * inv_scale.y,
                               neg_p.z * inv_scale.z);
-    Vector<T, 3> inv_position = inv_rotation * scaled_neg_p;
+    Vector<T, 3> inv_position = inv_rotation.Rotate(scaled_neg_p);
     return Transform<T>(inv_position, inv_rotation, inv_scale);
   }
 
@@ -165,7 +164,7 @@ struct Transform {
     Vector<T, 3> scaled_rhs_pos(rhs.position.x * scale.x,
                                 rhs.position.y * scale.y,
                                 rhs.position.z * scale.z);
-    Vector<T, 3> new_position = rotation * scaled_rhs_pos + position;
+    Vector<T, 3> new_position = rotation.Rotate(scaled_rhs_pos) + position;
     Quaternion<T> new_rotation = rotation * rhs.rotation;
     Vector<T, 3> new_scale(scale.x * rhs.scale.x, scale.y * rhs.scale.y,
                            scale.z * rhs.scale.z);
