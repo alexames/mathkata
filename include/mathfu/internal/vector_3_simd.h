@@ -351,6 +351,12 @@ class Vector<float, 3> {
                             mathfu::RandomInRange<float>(min[2], max[2]));
   }
 
+  static inline bool InRange(const Vector<float, 3>& val,
+                             const Vector<float, 3>& range_start,
+                             const Vector<float, 3>& range_end) {
+    return InRangeHelper(val, range_start, range_end);
+  }
+
   static inline Vector<float, 3> Max(const Vector<float, 3>& v1,
                                      const Vector<float, 3>& v2) {
 #ifdef MATHFU_COMPILE_WITH_PADDING

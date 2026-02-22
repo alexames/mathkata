@@ -118,6 +118,12 @@ class Vector<T, 4> {
     return RandomInRangeHelper(min, max);
   }
 
+  static inline bool InRange(const Vector<T, 4>& val,
+                             const Vector<T, 4>& range_start,
+                             const Vector<T, 4>& range_end) {
+    return InRangeHelper(val, range_start, range_end);
+  }
+
   static inline Vector<T, 4> Max(const Vector<T, 4>& v1,
                                  const Vector<T, 4>& v2) {
     return MaxHelper(v1, v2);

@@ -234,6 +234,12 @@ class Vector<float, 2> {
                             mathfu::RandomInRange<float>(min[1], max[1]));
   }
 
+  static inline bool InRange(const Vector<float, 2>& val,
+                             const Vector<float, 2>& range_start,
+                             const Vector<float, 2>& range_end) {
+    return InRangeHelper(val, range_start, range_end);
+  }
+
   static inline Vector<float, 2> Max(const Vector<float, 2>& v1,
                                      const Vector<float, 2>& v2) {
     return Vector<float, 2>(std::max(v1[0], v2[0]), std::max(v1[1], v2[1]));

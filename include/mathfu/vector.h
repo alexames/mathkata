@@ -536,6 +536,19 @@ class Vector {
     return MinHelper(v1, v2);
   }
 
+  /// @brief Check if val is within [range_start..range_end), checking all
+  /// components.
+  ///
+  /// @param val Vector to be tested.
+  /// @param range_start Starting point of the range (inclusive).
+  /// @param range_end Ending point of the range (non-inclusive).
+  /// @return Bool indicating val is in range for every component.
+  static inline bool InRange(const Vector<T, Dims>& val,
+                             const Vector<T, Dims>& range_start,
+                             const Vector<T, Dims>& range_end) {
+    return InRangeHelper(val, range_start, range_end);
+  }
+
   /// @brief Returns the distance between 2 vectors.
   ///
   /// @param v1 First vector.
@@ -977,8 +990,48 @@ inline T AngleHelper(const Vector<T, Dims>& v1, const Vector<T, Dims>& v2) {
   return std::acos(Clamp(cos_val, T(-1), T(1)));
 }
 
+/// @cond MATHFU_INTERNAL
+/// @brief Check if val is within [range_start..range_end), checking all
+/// components.
+///
+/// @param val Vector to be tested.
+/// @param range_start Starting point of the range (inclusive).
+/// @param range_end Ending point of the range (non-inclusive).
+/// @return Bool indicating val is in range for every component.
+///
+/// @tparam T Type of vector components to test.
+/// @tparam Dims Number of dimensions of the vector.
+template <class T, int Dims>
+bool InRangeHelper(const Vector<T, Dims>& val,
+                   const Vector<T, Dims>& range_start,
+                   const Vector<T, Dims>& range_end) {
+  for (int i = 0; i < Dims; ++i) {
+    if (!InRange(val[i], range_start[i], range_end[i])) return false;
+  }
+  return true;
+}
+/// @endcond
+
+/// @brief Check if val is within [range_start..range_end), checking all
+/// components.
+///
+/// @param val Vector to be tested.
+/// @param range_start Starting point of the range (inclusive).
+/// @param range_end Ending point of the range (non-inclusive).
+/// @return Bool indicating val is in range for every component.
+///
+/// @tparam T Type of vector components to test.
+/// @tparam Dims Number of dimensions of the vector.
+template <class T, int Dims>
+bool InRange(const Vector<T, Dims>& val, const Vector<T, Dims>& range_start,
+             const Vector<T, Dims>& range_end) {
+  return InRangeHelper(val, range_start, range_end);
+}
+
 /// @brief Check if val is within [range_start..range_end), denoting a
 /// rectangular area.
+///
+/// @deprecated Use InRange() instead, which works with any vector dimension.
 ///
 /// @param val 2D vector to be tested.
 /// @param range_start Starting point of the range (inclusive).
@@ -987,10 +1040,10 @@ inline T AngleHelper(const Vector<T, Dims>& v1, const Vector<T, Dims>& v2) {
 ///
 /// @tparam T Type of vector components to test.
 template <class T>
+[[deprecated("Use InRange() instead")]]
 bool InRange2D(const Vector<T, 2>& val, const Vector<T, 2>& range_start,
                const Vector<T, 2>& range_end) {
-  return InRange(val[0], range_start[0], range_end[0])
-         && InRange(val[1], range_start[1], range_end[1]);
+  return InRange(val, range_start, range_end);
 }
 
 /// @cond MATHFU_INTERNAL
