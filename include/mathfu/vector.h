@@ -650,6 +650,27 @@ class Vector {
     return AngleHelper(v1, v2);
   }
 
+  /// @brief Calculate the projection of a vector onto another vector.
+  ///
+  /// @param v The vector to project.
+  /// @param onto The vector to project onto. Must be non-zero.
+  /// @return The vector projection of v onto onto.
+  static inline Vector<T, Dims> Project(const Vector<T, Dims>& v,
+                                        const Vector<T, Dims>& onto) {
+    return ProjectHelper(v, onto);
+  }
+
+  /// @brief Calculate the rejection of a vector from another vector.
+  ///
+  /// The rejection is the component of v perpendicular to from.
+  /// @param v The vector to reject.
+  /// @param from The vector to reject from. Must be non-zero.
+  /// @return The vector rejection of v from from.
+  static inline Vector<T, Dims> Reject(const Vector<T, Dims>& v,
+                                       const Vector<T, Dims>& from) {
+    return RejectHelper(v, from);
+  }
+
   /// @brief Reflect an incident vector off a surface with the given normal.
   ///
   /// @param incident The incoming direction vector.
@@ -1063,6 +1084,29 @@ inline T AngleHelper(const Vector<T, Dims>& v1, const Vector<T, Dims>& v2) {
   return std::acos(Clamp(cos_val, T(-1), T(1)));
 }
 
+/// @brief Calculate the projection of a vector onto another vector.
+///
+/// @param v The vector to project.
+/// @param onto The vector to project onto. Must be non-zero.
+/// @return The vector projection of v onto onto.
+template <class T, int Dims>
+inline Vector<T, Dims> ProjectHelper(const Vector<T, Dims>& v,
+                                     const Vector<T, Dims>& onto) {
+  return onto * (DotProductHelper(v, onto) / DotProductHelper(onto, onto));
+}
+
+/// @brief Calculate the rejection of a vector from another vector.
+///
+/// The rejection is the component of v perpendicular to from.
+/// @param v The vector to reject.
+/// @param from The vector to reject from. Must be non-zero.
+/// @return The vector rejection of v from from.
+template <class T, int Dims>
+inline Vector<T, Dims> RejectHelper(const Vector<T, Dims>& v,
+                                    const Vector<T, Dims>& from) {
+  return v - ProjectHelper(v, from);
+}
+
 /// @brief Reflect an incident vector off a surface with the given normal.
 ///
 /// @param incident The incoming direction vector.
@@ -1242,6 +1286,29 @@ inline Vector<T, Dims> Clamp(const Vector<T, Dims>& x,
                              const Vector<T, Dims>& lower,
                              const Vector<T, Dims>& upper) {
   return Vector<T, Dims>::Max(lower, Vector<T, Dims>::Min(x, upper));
+}
+
+/// @brief Calculate the projection of a vector onto another vector.
+///
+/// @param v The vector to project.
+/// @param onto The vector to project onto. Must be non-zero.
+/// @return The vector projection of v onto onto.
+template <class T, int Dims>
+inline Vector<T, Dims> Project(const Vector<T, Dims>& v,
+                               const Vector<T, Dims>& onto) {
+  return Vector<T, Dims>::Project(v, onto);
+}
+
+/// @brief Calculate the rejection of a vector from another vector.
+///
+/// The rejection is the component of v perpendicular to from.
+/// @param v The vector to reject.
+/// @param from The vector to reject from. Must be non-zero.
+/// @return The vector rejection of v from from.
+template <class T, int Dims>
+inline Vector<T, Dims> Reject(const Vector<T, Dims>& v,
+                              const Vector<T, Dims>& from) {
+  return Vector<T, Dims>::Reject(v, from);
 }
 /// @}
 

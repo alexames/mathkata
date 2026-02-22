@@ -835,6 +835,93 @@ TEST_F(VectorTests, Angle_AntiParallelDoesNotReturnNaN) {
   EXPECT_NEAR(angle, 0.0f, FLOAT_PRECISION);
 }
 
+// Test projection onto an axis-aligned vector.
+TEST_F(VectorTests, Project_OntoAxis) {
+  using Vec3 = mathfu::Vector<float, 3>;
+  Vec3 v(3.0f, 4.0f, 0.0f);
+  Vec3 x_axis(1.0f, 0.0f, 0.0f);
+
+  Vec3 proj = Vec3::Project(v, x_axis);
+  EXPECT_NEAR(proj[0], 3.0f, FLOAT_PRECISION);
+  EXPECT_NEAR(proj[1], 0.0f, FLOAT_PRECISION);
+  EXPECT_NEAR(proj[2], 0.0f, FLOAT_PRECISION);
+}
+
+// Test projection of parallel vectors returns the original vector.
+TEST_F(VectorTests, Project_Parallel) {
+  using Vec3 = mathfu::Vector<float, 3>;
+  Vec3 v(2.0f, 4.0f, 6.0f);
+  Vec3 onto(1.0f, 2.0f, 3.0f);
+
+  Vec3 proj = Vec3::Project(v, onto);
+  EXPECT_NEAR(proj[0], 2.0f, FLOAT_PRECISION);
+  EXPECT_NEAR(proj[1], 4.0f, FLOAT_PRECISION);
+  EXPECT_NEAR(proj[2], 6.0f, FLOAT_PRECISION);
+}
+
+// Test projection of perpendicular vectors returns zero.
+TEST_F(VectorTests, Project_Perpendicular) {
+  using Vec3 = mathfu::Vector<float, 3>;
+  Vec3 v(0.0f, 1.0f, 0.0f);
+  Vec3 onto(1.0f, 0.0f, 0.0f);
+
+  Vec3 proj = Vec3::Project(v, onto);
+  EXPECT_NEAR(proj[0], 0.0f, FLOAT_PRECISION);
+  EXPECT_NEAR(proj[1], 0.0f, FLOAT_PRECISION);
+  EXPECT_NEAR(proj[2], 0.0f, FLOAT_PRECISION);
+}
+
+// Test rejection is perpendicular to the 'from' vector.
+TEST_F(VectorTests, Reject_PerpendicularToFrom) {
+  using Vec3 = mathfu::Vector<float, 3>;
+  Vec3 v(3.0f, 4.0f, 5.0f);
+  Vec3 from(1.0f, 2.0f, 0.0f);
+
+  Vec3 rej = Vec3::Reject(v, from);
+  float dot = Vec3::DotProduct(rej, from);
+  EXPECT_NEAR(dot, 0.0f, FLOAT_PRECISION * 10);
+}
+
+// Test that Project + Reject reconstructs the original vector.
+template <class T, int d>
+void ProjectRejectSum_Test(const T& precision) {
+  mathfu::Vector<T, d> v(RandomVector<T, d>());
+  mathfu::Vector<T, d> onto(RandomVector<T, d>());
+
+  // Ensure onto is non-zero by adding 1 to the first component.
+  onto[0] += static_cast<T>(1);
+
+  mathfu::Vector<T, d> proj = mathfu::Vector<T, d>::Project(v, onto);
+  mathfu::Vector<T, d> rej = mathfu::Vector<T, d>::Reject(v, onto);
+  mathfu::Vector<T, d> sum = proj + rej;
+
+  for (int i = 0; i < d; ++i) {
+    EXPECT_NEAR(v[i], sum[i], precision * 10);
+  }
+}
+TEST_ALL_F(ProjectRejectSum)
+
+// Test the free function versions of Project and Reject.
+TEST_F(VectorTests, Project_FreeFunction) {
+  using Vec2 = mathfu::Vector<float, 2>;
+  Vec2 v(3.0f, 4.0f);
+  Vec2 onto(1.0f, 0.0f);
+
+  Vec2 proj = mathfu::Project(v, onto);
+  EXPECT_NEAR(proj[0], 3.0f, FLOAT_PRECISION);
+  EXPECT_NEAR(proj[1], 0.0f, FLOAT_PRECISION);
+}
+
+TEST_F(VectorTests, Reject_FreeFunction) {
+  using Vec2 = mathfu::Vector<float, 2>;
+  Vec2 v(3.0f, 4.0f);
+  Vec2 from(1.0f, 0.0f);
+
+  Vec2 rej = mathfu::Reject(v, from);
+  EXPECT_NEAR(rej[0], 0.0f, FLOAT_PRECISION);
+  EXPECT_NEAR(rej[1], 4.0f, FLOAT_PRECISION);
+}
+
 // This will test that scalar Lerp returns exact endpoints.
 // The formula a + (b - a) * t guarantees Lerp(a, b, 0) == a exactly because
 // (b - a) * 0 == 0 for all finite values, and a + 0 == a.
@@ -892,6 +979,7 @@ void LerpExactEndpoints_Test(const T& precision) {
   }
 }
 TEST_ALL_F(LerpExactEndpoints)
+
 
 // Tests scalar RoundUpToPowerOf2 for int32_t.
 TEST_F(VectorTests, RoundUpToPowerOf2_Int32) {
@@ -1400,6 +1488,7 @@ TEST_F(VectorTests, kDims) {
   EXPECT_EQ((mathfu::Vector<float, 2>::kDims), 2);
   EXPECT_EQ((mathfu::Vector<float, 3>::kDims), 3);
   EXPECT_EQ((mathfu::Vector<float, 4>::kDims), 4);
+
 }
 
 // Test that the SIMD padding lane (w / data_[3]) of Vector<float,3> is

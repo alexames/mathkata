@@ -240,6 +240,16 @@ class Vector<float, 2> {
     return AngleHelper(v1, v2);
   }
 
+  static inline Vector<float, 2> Project(const Vector<float, 2>& v,
+                                         const Vector<float, 2>& onto) {
+    return ProjectHelper(v, onto);
+  }
+
+  static inline Vector<float, 2> Reject(const Vector<float, 2>& v,
+                                        const Vector<float, 2>& from) {
+    return RejectHelper(v, from);
+  }
+
   static inline Vector<float, 2> Reflect(const Vector<float, 2>& incident,
                                          const Vector<float, 2>& normal) {
     return ReflectHelper(incident, normal);
