@@ -18,6 +18,7 @@
 
 #include <ostream>
 
+#include "mathkata/color.h"
 #include "mathkata/matrix.h"
 #include "mathkata/quaternion.h"
 #include "mathkata/vector.h"
@@ -53,6 +54,13 @@ inline std::ostream& operator<<(std::ostream& os,
 template <typename T>
 inline std::ostream& operator<<(std::ostream& os, const Quaternion<T>& q) {
   return os << "(" << q[0] << ", " << q[1] << ", " << q[2] << ", " << q[3]
+            << ")";
+}
+
+/// @brief Print the color contents to the output stream.
+inline std::ostream& operator<<(std::ostream& os, const Color& c) {
+  return os << "(" << static_cast<int>(c.r) << ", " << static_cast<int>(c.g)
+            << ", " << static_cast<int>(c.b) << ", " << static_cast<int>(c.a)
             << ")";
 }
 
