@@ -1249,9 +1249,9 @@ TEST_F(VectorTests, OutputStream_Test_float_1) {
 // Test that the kDims static member is present and correct for each
 // specialization.
 TEST_F(VectorTests, kDims) {
-  EXPECT_EQ(mathfu::Vector<float, 2>::kDims, 2);
-  EXPECT_EQ(mathfu::Vector<float, 3>::kDims, 3);
-  EXPECT_EQ(mathfu::Vector<float, 4>::kDims, 4);
+  EXPECT_EQ((mathfu::Vector<float, 2>::kDims), 2);
+  EXPECT_EQ((mathfu::Vector<float, 3>::kDims), 3);
+  EXPECT_EQ((mathfu::Vector<float, 4>::kDims), 4);
 }
 
 // Test that the SIMD padding lane (w / data_[3]) of Vector<float,3> is

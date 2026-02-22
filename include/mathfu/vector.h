@@ -31,6 +31,7 @@
 #if defined(_MSC_VER)
 #pragma warning(push)
 #pragma warning(disable : 4127)  // conditional expression is constant
+#pragma warning(disable : 4100)  // unreferenced formal parameter
 #if _MSC_VER >= 1900             // MSVC 2015
 #pragma warning(disable : 4456)  // allow shadowing in unrolled loops
 #endif                           // _MSC_VER >= 1900
@@ -238,7 +239,7 @@ class Vector {
   /// @param s1 Scalar value for the first element of the vector.
   /// @param s2 Scalar value for the second element of the vector.
   inline Vector(T s1, T s2) {
-    MATHFU_STATIC_ASSERT(Dims == 2);
+    static_assert(Dims == 2, "Dims must be 2");
     data_[0] = s1;
     data_[1] = s2;
   }
@@ -251,7 +252,7 @@ class Vector {
   /// @param s2 Scalar value for the second element of the vector.
   /// @param s3 Scalar value for the third element of the vector.
   inline Vector(T s1, T s2, T s3) {
-    MATHFU_STATIC_ASSERT(Dims == 3);
+    static_assert(Dims == 3, "Dims must be 3");
     data_[0] = s1;
     data_[1] = s2;
     data_[2] = s3;
@@ -264,7 +265,7 @@ class Vector {
   /// @param v12 Vector containing the first 2 values.
   /// @param s3 Scalar value for the third element of the vector.
   inline Vector(const Vector<T, 2>& v12, T s3) {
-    MATHFU_STATIC_ASSERT(Dims == 3);
+    static_assert(Dims == 3, "Dims must be 3");
     data_[0] = v12[0];
     data_[1] = v12[1];
     data_[2] = s3;
@@ -279,7 +280,7 @@ class Vector {
   /// @param s3 Scalar value for the third element of the vector.
   /// @param s4 Scalar value for the forth element of the vector.
   inline Vector(T s1, T s2, T s3, T s4) {
-    MATHFU_STATIC_ASSERT(Dims == 4);
+    static_assert(Dims == 4, "Dims must be 4");
     data_[0] = s1;
     data_[1] = s2;
     data_[2] = s3;
@@ -294,7 +295,7 @@ class Vector {
   /// @param vector3 Vector used to initialize the first 3 elements.
   /// @param value Value used to set the last element of the vector.
   inline Vector(const Vector<T, 3>& vector123, T s4) {
-    MATHFU_STATIC_ASSERT(Dims == 4);
+    static_assert(Dims == 4, "Dims must be 4");
     data_[0] = vector123[0];
     data_[1] = vector123[1];
     data_[2] = vector123[2];
@@ -308,7 +309,7 @@ class Vector {
   /// @param v12 Vector containing the first 2 values.
   /// @param v34 Vector containing the last 2 values.
   inline Vector(const Vector<T, 2>& v12, const Vector<T, 2>& v34) {
-    MATHFU_STATIC_ASSERT(Dims == 4);
+    static_assert(Dims == 4, "Dims must be 4");
     data_[0] = v12[0];
     data_[1] = v12[1];
     data_[2] = v34[0];
@@ -354,7 +355,7 @@ class Vector {
   /// @returns A 3-dimensional Vector containing the first 3 elements of
   // this Vector.
   inline Vector<T, 3> xyz() {
-    MATHFU_STATIC_ASSERT(Dims > 3);
+    static_assert(Dims > 3, "Dims must be greater than 3");
     return Vector<T, 3>(data_[0], data_[1], data_[2]);
   }
 
@@ -364,7 +365,7 @@ class Vector {
   /// @returns A 3-dimensional Vector containing the first 3 elements of
   // this Vector.
   inline const Vector<T, 3> xyz() const {
-    MATHFU_STATIC_ASSERT(Dims > 3);
+    static_assert(Dims > 3, "Dims must be greater than 3");
     return Vector<T, 3>(data_[0], data_[1], data_[2]);
   }
 
@@ -373,7 +374,7 @@ class Vector {
   /// This only works with vectors that contain more than 2 elements.
   /// @returns A 2-dimensional Vector with the first 2 elements of this Vector.
   inline Vector<T, 2> xy() {
-    MATHFU_STATIC_ASSERT(Dims > 2);
+    static_assert(Dims > 2, "Dims must be greater than 2");
     return Vector<T, 2>(data_[0], data_[1]);
   }
 
@@ -382,7 +383,7 @@ class Vector {
   /// This only works with vectors that contain more than 2 elements.
   /// @returns A 2-dimensional Vector with the first 2 elements of this Vector.
   inline const Vector<T, 2> xy() const {
-    MATHFU_STATIC_ASSERT(Dims > 2);
+    static_assert(Dims > 2, "Dims must be greater than 2");
     return Vector<T, 2>(data_[0], data_[1]);
   }
 
@@ -391,7 +392,7 @@ class Vector {
   /// This only works with vectors that contain 4 elements.
   /// @returns A 2-dimensional Vector with the last 2 elements of this Vector.
   inline Vector<T, 2> zw() {
-    MATHFU_STATIC_ASSERT(Dims == 4);
+    static_assert(Dims == 4, "Dims must be 4");
     return Vector<T, 2>(data_[2], data_[3]);
   }
 
@@ -400,7 +401,7 @@ class Vector {
   /// This only works with vectors that contain 4 elements.
   /// @returns A 2-dimensional Vector with the last 2 elements of this Vector.
   inline const Vector<T, 2> zw() const {
-    MATHFU_STATIC_ASSERT(Dims == 4);
+    static_assert(Dims == 4, "Dims must be 4");
     return Vector<T, 2>(data_[2], data_[3]);
   }
 
@@ -569,6 +570,7 @@ class Vector {
 
   /// @brief Returns the angle between 2 vectors in radians.
   ///
+  /// @pre Both input vectors must be non-zero.
   /// @param v1 First vector.
   /// @param v2 Second vector.
   /// @return Angle between vectors v1 and v2.
@@ -985,6 +987,7 @@ inline Vector<T, Dims> MinHelper(const Vector<T, Dims>& v1,
 
 /// @brief Returns the angle between 2 vectors in radians.
 ///
+/// @pre Both input vectors must be non-zero.
 /// @param v1 First vector.
 /// @param v2 Second vector.
 /// @return Angle between vectors v1 and v2.
@@ -993,9 +996,7 @@ inline T AngleHelper(const Vector<T, Dims>& v1, const Vector<T, Dims>& v2) {
   // Applying law of cosines.
   // https://stackoverflow.com/questions/10507620/finding-the-angle-between-vectors
   const T divisor = v1.Length() * v2.Length();
-  if (divisor == T(0)) {
-    return T(0);
-  }
+  assert(divisor != T(0));
   const T cos_val = Vector<T, Dims>::DotProduct(v1, v2) / divisor;
   // Clamp to [-1, 1] to avoid NaN from acos due to floating point error.
   return std::acos(Clamp(cos_val, T(-1), T(1)));
@@ -1086,6 +1087,50 @@ static inline CompatibleT ToTypeHelper(const Vector<T, Dims>& v) {
   return compatible;
 }
 /// @endcond
+
+/// @}
+
+/// @addtogroup mathfu_vector
+/// @{
+
+/// @brief Calculate the dot product of two N-dimensional Vectors.
+///
+/// @param v1 Vector to multiply.
+/// @param v2 Vector to multiply.
+/// @return Scalar dot product result.
+template <class T, int d>
+inline T dot(const Vector<T, d>& v1, const Vector<T, d>& v2) {
+  return Vector<T, d>::DotProduct(v1, v2);
+}
+
+/// @brief Calculate the cross product of two 3-dimensional Vectors.
+///
+/// @param v1 Vector to multiply.
+/// @param v2 Vector to multiply.
+/// @return 3-dimensional vector that contains the result.
+template <class T>
+inline Vector<T, 3> cross(const Vector<T, 3>& v1, const Vector<T, 3>& v2) {
+  return Vector<T, 3>::CrossProduct(v1, v2);
+}
+
+/// @brief Calculate the 2D pseudo cross product of two 2-dimensional Vectors.
+///
+/// @param v1 First vector.
+/// @param v2 Second vector.
+/// @return Scalar cross product result.
+template <class T>
+inline T cross(const Vector<T, 2>& v1, const Vector<T, 2>& v2) {
+  return Vector<T, 2>::CrossProduct(v1, v2);
+}
+
+/// @brief Normalize an N-dimensional Vector.
+///
+/// @param v Vector to normalize.
+/// @return Normalized vector.
+template <class T, int d>
+inline Vector<T, d> normalize(const Vector<T, d>& v) {
+  return v.Normalized();
+}
 
 /// @}
 
