@@ -83,35 +83,6 @@ typedef Rect<double> rectd;
 /// Rect composed of type <code>int</code>.
 typedef Rect<int> recti;
 
-/// @brief Calculate the cross product of two 3-dimensional Vectors.
-///
-/// @param v1 Vector to multiply
-/// @param v2 Vector to multiply
-/// @return 3-dimensional vector that contains the result.
-template <class T>
-inline Vector<T, 3> cross(const Vector<T, 3>& v1, const Vector<T, 3>& v2) {
-  return Vector<T, 3>::CrossProduct(v1, v2);
-}
-
-/// @brief Calculate the dot product of two N-dimensional Vectors of any type.
-///
-/// @param v1 Vector to multiply
-/// @param v2 Vector to multiply
-/// @return Scalar dot product result.
-template <class TV>
-inline typename TV::Scalar dot(const TV& v1, const TV& v2) {
-  return TV::DotProduct(v1, v2);
-}
-
-/// @brief Normalize an N-dimensional Vector of an arbitrary type.
-///
-/// @param v1 Vector to normalize.
-/// @return Normalized vector.
-template <class TV>
-inline TV normalize(const TV& v1) {
-  return v1.Normalized();
-}
-
 /// @brief Reflect incident vector off a surface with the given normal.
 ///
 /// @param incident The incoming direction vector.

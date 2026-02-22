@@ -18,6 +18,7 @@
 #include <climits>
 #include <cmath>
 #include <cstdint>
+#include <random>
 #include <sstream>
 #include <string>
 
@@ -26,6 +27,19 @@
 #include "mathfu/io.h"
 #include "mathfu/utilities.h"
 #include "precision.h"
+
+// Thread-local random engine seeded deterministically for reproducible tests.
+static std::mt19937& TestRng() {
+  static std::mt19937 rng(42);
+  return rng;
+}
+
+// Generate a random value in [0, 1) for floating point types.
+template <class T>
+T TestRandom01() {
+  std::uniform_real_distribution<T> dist(static_cast<T>(0), static_cast<T>(1));
+  return dist(TestRng());
+}
 
 class VectorTests : public ::testing::Test {
  protected:
@@ -155,7 +169,7 @@ void Initialization_Test(const T& precision) {
   }
   T x[d];
   for (int i = 0; i < d; ++i) {
-    x[i] = rand() / static_cast<T>(RAND_MAX) * 100.f;
+    x[i] = TestRandom01<T>() * static_cast<T>(100);
   }
   // This will test initialization of the vector using a c style array of
   // values.
@@ -250,7 +264,7 @@ template <class T, int d>
 void Negate_Test(const T& precision) {
   T x[d];
   for (int i = 0; i < d; ++i) {
-    x[i] = rand() / static_cast<T>(RAND_MAX) * 100.f;
+    x[i] = TestRandom01<T>() * static_cast<T>(100);
   }
 
   mathfu::Vector<T, d> vector(x);
@@ -266,12 +280,12 @@ TEST_ALL_F(Negate)
 template <class T, int d>
 void Add_Test(const T& precision) {
   T x1[d], x2[d];
-  T scalar = rand() / static_cast<T>(RAND_MAX) * 100.f;
+  T scalar = TestRandom01<T>() * static_cast<T>(100);
   for (int i = 0; i < d; ++i) {
-    x1[i] = rand() / static_cast<T>(RAND_MAX) * 100.f;
+    x1[i] = TestRandom01<T>() * static_cast<T>(100);
   }
   for (int i = 0; i < d; ++i) {
-    x2[i] = rand() / static_cast<T>(RAND_MAX) * 100.f;
+    x2[i] = TestRandom01<T>() * static_cast<T>(100);
   }
 
   mathfu::Vector<T, d> vector1(x1), vector2(x2);
@@ -304,12 +318,12 @@ TEST_ALL_F(Add)
 template <class T, int d>
 void Sub_Test(const T& precision) {
   T x1[d], x2[d];
-  T scalar = rand() / static_cast<T>(RAND_MAX) * 100.f;
+  T scalar = TestRandom01<T>() * static_cast<T>(100);
   for (int i = 0; i < d; ++i) {
-    x1[i] = rand() / static_cast<T>(RAND_MAX) * 100.f;
+    x1[i] = TestRandom01<T>() * static_cast<T>(100);
   }
   for (int i = 0; i < d; ++i) {
-    x2[i] = rand() / static_cast<T>(RAND_MAX) * 100.f;
+    x2[i] = TestRandom01<T>() * static_cast<T>(100);
   }
 
   mathfu::Vector<T, d> vector1(x1), vector2(x2);
@@ -344,15 +358,16 @@ void Mul_Test(const T& precision) {
   T x1[d], x2[d];
   T scalar(static_cast<T>(1.4));
   for (int i = 0; i < d; ++i) {
-    x1[i] = rand() / static_cast<T>(RAND_MAX);
+    x1[i] = TestRandom01<T>();
   }
   for (int i = 0; i < d; ++i) {
-    x2[i] = rand() / static_cast<T>(RAND_MAX);
+    x2[i] = TestRandom01<T>();
   }
 
   mathfu::Vector<T, d> vector1(x1), vector2(x2);
 
-  mathfu::Vector<T, d> mul_vector(vector1 * vector2);
+  mathfu::Vector<T, d> mul_vector(
+      mathfu::Vector<T, d>::HadamardProduct(vector1, vector2));
   for (int i = 0; i < d; ++i) {
     EXPECT_NEAR(x1[i] * x2[i], mul_vector[i], precision);
   }
@@ -363,11 +378,6 @@ void Mul_Test(const T& precision) {
   mathfu::Vector<T, d> mul_scalar_vector(scalar * vector2);
   for (int i = 0; i < d; ++i) {
     EXPECT_NEAR(x2[i] * scalar, mul_scalar_vector[i], precision);
-  }
-  mathfu::Vector<T, d> mul_assign_vector_vector(vector1);
-  mul_assign_vector_vector *= vector2;
-  for (int i = 0; i < d; ++i) {
-    EXPECT_NEAR(x1[i] * x2[i], mul_assign_vector_vector[i], precision);
   }
   mathfu::Vector<T, d> mul_assign_vector_scalar(vector1);
   mul_assign_vector_scalar *= scalar;
@@ -380,17 +390,18 @@ TEST_ALL_F(Mul)
 template <class T, int d>
 void Div_Test(const T& precision) {
   T x1[d], x2[d];
-  T scalar = (rand() / static_cast<T>(RAND_MAX)) + 1;
+  T scalar = TestRandom01<T>() + static_cast<T>(1);
   for (int i = 0; i < d; ++i) {
-    x1[i] = (rand() / static_cast<T>(RAND_MAX)) + 1;
+    x1[i] = TestRandom01<T>() + static_cast<T>(1);
   }
   for (int i = 0; i < d; ++i) {
-    x2[i] = (rand() / static_cast<T>(RAND_MAX)) + 1;
+    x2[i] = TestRandom01<T>() + static_cast<T>(1);
   }
 
   mathfu::Vector<T, d> vector1(x1), vector2(x2);
 
-  mathfu::Vector<T, d> div_vector_vector(vector1 / vector2);
+  mathfu::Vector<T, d> div_vector_vector(
+      mathfu::Vector<T, d>::HadamardDivide(vector1, vector2));
   for (int i = 0; i < d; ++i) {
     EXPECT_NEAR(x1[i] / x2[i], div_vector_vector[i], precision);
   }
@@ -401,11 +412,6 @@ void Div_Test(const T& precision) {
   mathfu::Vector<T, d> div_scalar_vector(scalar / vector1);
   for (int i = 0; i < d; ++i) {
     EXPECT_NEAR(scalar / x1[i], div_scalar_vector[i], precision);
-  }
-  mathfu::Vector<T, d> div_assign_vector_vector(vector1);
-  div_assign_vector_vector /= vector2;
-  for (int i = 0; i < d; ++i) {
-    EXPECT_NEAR(x1[i] / x2[i], div_assign_vector_vector[i], precision);
   }
   mathfu::Vector<T, d> div_assign_vector_scalar(vector1);
   div_assign_vector_scalar /= scalar;
@@ -421,7 +427,7 @@ template <class T, int d>
 void Norm_Test(const T& precision) {
   T x[d];
   for (int i = 0; i < d; ++i) {
-    x[i] = rand() / static_cast<T>(RAND_MAX);
+    x[i] = TestRandom01<T>();
   }
 
   mathfu::Vector<T, d> vector(x);
@@ -438,10 +444,10 @@ template <class T, int d>
 void Dot_Test(const T& precision) {
   T x1[d], x2[d];
   for (int i = 0; i < d; ++i) {
-    x1[i] = rand() / static_cast<T>(RAND_MAX);
+    x1[i] = TestRandom01<T>();
   }
   for (int i = 0; i < d; ++i) {
-    x2[i] = rand() / static_cast<T>(RAND_MAX);
+    x2[i] = TestRandom01<T>();
   }
 
   mathfu::Vector<T, d> vector1(x1), vector2(x2);
@@ -477,12 +483,76 @@ void Cross_Test(const T& precision) {
 }
 TEST_SCALAR_F(Cross)
 
+// This will test that the 2D cross product of perpendicular vectors gives the
+// area of the rectangle they span.
+template <class T>
+void CrossProduct2D_Perpendicular_Test(const T& precision) {
+  mathfu::Vector<T, 2> v1(static_cast<T>(3), static_cast<T>(0));
+  mathfu::Vector<T, 2> v2(static_cast<T>(0), static_cast<T>(5));
+  T result = mathfu::Vector<T, 2>::CrossProduct(v1, v2);
+  EXPECT_NEAR(static_cast<T>(15), result, precision);
+}
+TEST_SCALAR_F(CrossProduct2D_Perpendicular)
+
+// This will test that the 2D cross product of parallel vectors is 0.
+template <class T>
+void CrossProduct2D_Parallel_Test(const T& precision) {
+  mathfu::Vector<T, 2> v1(static_cast<T>(2), static_cast<T>(3));
+  mathfu::Vector<T, 2> v2(static_cast<T>(4), static_cast<T>(6));
+  T result = mathfu::Vector<T, 2>::CrossProduct(v1, v2);
+  EXPECT_NEAR(static_cast<T>(0), result, precision);
+}
+TEST_SCALAR_F(CrossProduct2D_Parallel)
+
+// This will test that the 2D cross product of anti-parallel vectors is 0.
+template <class T>
+void CrossProduct2D_AntiParallel_Test(const T& precision) {
+  mathfu::Vector<T, 2> v1(static_cast<T>(2), static_cast<T>(3));
+  mathfu::Vector<T, 2> v2(static_cast<T>(-4), static_cast<T>(-6));
+  T result = mathfu::Vector<T, 2>::CrossProduct(v1, v2);
+  EXPECT_NEAR(static_cast<T>(0), result, precision);
+}
+TEST_SCALAR_F(CrossProduct2D_AntiParallel)
+
+// This will test that counter-clockwise winding gives a positive result.
+template <class T>
+void CrossProduct2D_CounterClockwise_Test(const T& precision) {
+  // v1 along +x, v2 along +y is counter-clockwise.
+  mathfu::Vector<T, 2> v1(static_cast<T>(1), static_cast<T>(0));
+  mathfu::Vector<T, 2> v2(static_cast<T>(0), static_cast<T>(1));
+  T result = mathfu::Vector<T, 2>::CrossProduct(v1, v2);
+  EXPECT_GT(result, static_cast<T>(0));
+  (void)precision;
+}
+TEST_SCALAR_F(CrossProduct2D_CounterClockwise)
+
+// This will test that clockwise winding gives a negative result.
+template <class T>
+void CrossProduct2D_Clockwise_Test(const T& precision) {
+  // v1 along +y, v2 along +x is clockwise.
+  mathfu::Vector<T, 2> v1(static_cast<T>(0), static_cast<T>(1));
+  mathfu::Vector<T, 2> v2(static_cast<T>(1), static_cast<T>(0));
+  T result = mathfu::Vector<T, 2>::CrossProduct(v1, v2);
+  EXPECT_LT(result, static_cast<T>(0));
+  (void)precision;
+}
+TEST_SCALAR_F(CrossProduct2D_Clockwise)
+
+// This will test that the cross product of a vector with itself is 0.
+template <class T>
+void CrossProduct2D_Self_Test(const T& precision) {
+  mathfu::Vector<T, 2> v(static_cast<T>(7), static_cast<T>(11));
+  T result = mathfu::Vector<T, 2>::CrossProduct(v, v);
+  EXPECT_NEAR(static_cast<T>(0), result, precision);
+}
+TEST_SCALAR_F(CrossProduct2D_Self)
+
 // Create a vector with random values between 0~1.
 template <class T, int d>
 mathfu::Vector<T, d> RandomVector() {
   T x[d];
   for (int i = 0; i < d; ++i) {
-    x[i] = rand() / static_cast<T>(RAND_MAX);
+    x[i] = TestRandom01<T>();
   }
   return mathfu::Vector<T, d>(x);
 }
@@ -584,52 +654,6 @@ void Numeric_Lerp_Test(const T& precision) {
 }
 TEST_SCALAR_F(Numeric_Lerp)
 
-// Tests the random-in-range function for vectors.
-// Given a pair of vectors, it should return a third vector whose elements
-// are bounded by the corresponding elements in the argument vectors.
-template <class T, int d>
-void Vector_RandomInRange_Test(const T& precision) {
-  (void)precision;
-  mathfu::Vector<T, d> min, max, result1, result2;
-
-  for (int count = 0; count < 100; count++) {
-    for (int i = 0; i < d; i++) {
-      min[i] = -i - 10;
-      max[i] = i * 2 + 2;
-    }
-    result1 = mathfu::Vector<T, d>::RandomInRange(min, max);
-    result2 = mathfu::Vector<T, d>::RandomInRange(max, min);
-    for (int i = 0; i < d; i++) {
-      EXPECT_GE(result1[i], min[i]);
-      EXPECT_LE(result1[i], max[i]);
-
-      EXPECT_GE(result2[i], min[i]);
-      EXPECT_LE(result2[i], max[i]);
-    }
-  }
-}
-TEST_ALL_INTS_F(Vector_RandomInRange)
-
-// Tests the generic Random in Range function in Mathfu.
-template <class T>
-void RandomInRange_Test(const T& precision) {
-  (void)precision;
-  for (int count = 0; count < 100; count++) {
-    T result = mathfu::RandomInRange(static_cast<T>(0), static_cast<T>(100));
-    EXPECT_GE(result, 0);
-    EXPECT_LT(result, 100);
-  }
-  for (int count = 0; count < 100; count++) {
-    T result = mathfu::RandomInRange(static_cast<T>(-100), static_cast<T>(0));
-    EXPECT_GE(result, -100);
-    EXPECT_LE(result, 0);
-  }
-  EXPECT_EQ(0, mathfu::RandomInRange(0, 0));
-  EXPECT_EQ(-5, mathfu::RandomInRange(-5, -5));
-  EXPECT_EQ(23, mathfu::RandomInRange(23, 23));
-}
-TEST_SCALAR_AND_INT_F(RandomInRange)
-
 // This will test initialization by passing in values. The template parameter d
 // corresponds to the size of the vector.
 template <class T, int d>
@@ -637,7 +661,7 @@ void Accessor_Test(const T& precision) {
   (void)precision;
   T x[d];
   for (int i = 0; i < d; ++i) {
-    x[i] = rand() / static_cast<T>(RAND_MAX) * 100.f;
+    x[i] = TestRandom01<T>() * static_cast<T>(100);
   }
 
   mathfu::Vector<T, d> vector(x);
@@ -808,6 +832,64 @@ TEST_F(VectorTests, Angle_AntiParallelDoesNotReturnNaN) {
   EXPECT_FALSE(std::isnan(angle));
   EXPECT_NEAR(angle, 0.0f, FLOAT_PRECISION);
 }
+
+// This will test that scalar Lerp returns exact endpoints.
+// The formula a + (b - a) * t guarantees Lerp(a, b, 0) == a exactly because
+// (b - a) * 0 == 0 for all finite values, and a + 0 == a.
+// Lerp(a, b, 1) == b holds exactly when a + (b - a) can recover b without
+// rounding error. We test with representative values to verify both endpoints.
+template <class T>
+void Numeric_Lerp_Exact_Endpoints_Test(const T& precision) {
+  (void)precision;
+
+  const T test_values[] = {static_cast<T>(0),     static_cast<T>(1),
+                           static_cast<T>(-1),    static_cast<T>(3.5),
+                           static_cast<T>(-7.25), static_cast<T>(100),
+                           static_cast<T>(1e5),   static_cast<T>(-1e5)};
+  const int num_values = sizeof(test_values) / sizeof(test_values[0]);
+
+  for (int ai = 0; ai < num_values; ++ai) {
+    for (int bi = 0; bi < num_values; ++bi) {
+      const T a = test_values[ai];
+      const T b = test_values[bi];
+      EXPECT_EQ(mathfu::Lerp(a, b, static_cast<T>(0)), a);
+      EXPECT_EQ(mathfu::Lerp(a, b, static_cast<T>(1)), b);
+    }
+  }
+}
+TEST_SCALAR_F(Numeric_Lerp_Exact_Endpoints)
+
+// This will test that vector Lerp returns exact endpoints.
+template <class T, int d>
+void LerpExactEndpoints_Test(const T& precision) {
+  (void)precision;
+
+  const T test_values[] = {static_cast<T>(0),     static_cast<T>(1),
+                           static_cast<T>(-1),    static_cast<T>(3.5),
+                           static_cast<T>(-7.25), static_cast<T>(100),
+                           static_cast<T>(1e5),   static_cast<T>(-1e5)};
+  const int num_values = sizeof(test_values) / sizeof(test_values[0]);
+
+  // Test a selection of value pairs to keep runtime manageable.
+  for (int vi = 0; vi < num_values; ++vi) {
+    mathfu::Vector<T, d> v1, v2;
+    for (int i = 0; i < d; ++i) {
+      v1[i] = test_values[(vi + i) % num_values];
+      v2[i] = test_values[(vi + i + 1) % num_values];
+    }
+
+    mathfu::Vector<T, d> lerp_at_0 =
+        mathfu::Vector<T, d>::Lerp(v1, v2, static_cast<T>(0));
+    mathfu::Vector<T, d> lerp_at_1 =
+        mathfu::Vector<T, d>::Lerp(v1, v2, static_cast<T>(1));
+
+    for (int i = 0; i < d; ++i) {
+      EXPECT_EQ(lerp_at_0[i], v1[i]);
+      EXPECT_EQ(lerp_at_1[i], v2[i]);
+    }
+  }
+}
+TEST_ALL_F(LerpExactEndpoints)
 
 // Tests scalar RoundUpToPowerOf2 for int32_t.
 TEST_F(VectorTests, RoundUpToPowerOf2_Int32) {
@@ -1261,11 +1343,13 @@ TEST_F(VectorTests, PaddingLaneZeroed_Arithmetic) {
   EXPECT_EQ(0.0f, diff.data_[3]);
 
   // Vector * Vector (Hadamard).
-  mathfu::Vector<float, 3> prod = a * b;
+  mathfu::Vector<float, 3> prod =
+      mathfu::Vector<float, 3>::HadamardProduct(a, b);
   EXPECT_EQ(0.0f, prod.data_[3]);
 
-  // Vector / Vector.
-  mathfu::Vector<float, 3> quot = a / b;
+  // Vector / Vector (Hadamard).
+  mathfu::Vector<float, 3> quot =
+      mathfu::Vector<float, 3>::HadamardDivide(a, b);
   EXPECT_EQ(0.0f, quot.data_[3]);
 
   // Vector + scalar.
@@ -1309,16 +1393,6 @@ TEST_F(VectorTests, PaddingLaneZeroed_CompoundAssignment) {
   mathfu::Vector<float, 3> v2(1.0f, 2.0f, 3.0f);
   v2 -= b;
   EXPECT_EQ(0.0f, v2.data_[3]);
-
-  // *=Vector
-  mathfu::Vector<float, 3> v3(1.0f, 2.0f, 3.0f);
-  v3 *= b;
-  EXPECT_EQ(0.0f, v3.data_[3]);
-
-  // /=Vector
-  mathfu::Vector<float, 3> v4(1.0f, 2.0f, 3.0f);
-  v4 /= b;
-  EXPECT_EQ(0.0f, v4.data_[3]);
 
   // +=scalar
   mathfu::Vector<float, 3> v5(1.0f, 2.0f, 3.0f);
@@ -1492,6 +1566,82 @@ TEST_F(VectorTests, Refract_2D) {
   // Perpendicular incidence with any eta should pass straight through.
   Vec2 refracted = Vec2::Refract(incident, normal, 0.5f);
   EXPECT_PRED_FORMAT3(AssertVectorNear, refracted, incident, FLOAT_PRECISION);
+
+// Test named member access x(), y(), z(), w() on the generic Vector template.
+// The generic template is used for dimensions >= 5 and for non-float types
+// when SIMD specializations are not active.
+TEST_F(VectorTests, NamedAccessors_Generic_5D) {
+  // A 5-dimensional vector always uses the generic (unspecialized) template.
+  mathfu::Vector<float, 5> v;
+  v[0] = 1.0f;
+  v[1] = 2.0f;
+  v[2] = 3.0f;
+  v[3] = 4.0f;
+  v[4] = 5.0f;
+
+  // Read access via named accessors.
+  EXPECT_EQ(1.0f, v.x());
+  EXPECT_EQ(2.0f, v.y());
+  EXPECT_EQ(3.0f, v.z());
+  EXPECT_EQ(4.0f, v.w());
+
+  // Write access via named accessors.
+  v.x() = 10.0f;
+  v.y() = 20.0f;
+  v.z() = 30.0f;
+  v.w() = 40.0f;
+  EXPECT_EQ(10.0f, v[0]);
+  EXPECT_EQ(20.0f, v[1]);
+  EXPECT_EQ(30.0f, v[2]);
+  EXPECT_EQ(40.0f, v[3]);
+  // The 5th element should be unaffected.
+  EXPECT_EQ(5.0f, v[4]);
+}
+
+// Test const correctness of named accessors on the generic template.
+TEST_F(VectorTests, NamedAccessors_Generic_Const) {
+  double values[] = {1.0, 2.0, 3.0, 4.0, 5.0};
+  const mathfu::Vector<double, 5> v(values);
+
+  // Const references should be returned.
+  EXPECT_EQ(1.0, v.x());
+  EXPECT_EQ(2.0, v.y());
+  EXPECT_EQ(3.0, v.z());
+  EXPECT_EQ(4.0, v.w());
+}
+
+// Test x() accessor on a 1D generic vector.
+TEST_F(VectorTests, NamedAccessors_Generic_1D) {
+  mathfu::Vector<int, 1> v(static_cast<int>(42));
+  EXPECT_EQ(42, v.x());
+  v.x() = 99;
+  EXPECT_EQ(99, v[0]);
+}
+
+// Test named accessors work with integer types on the generic template.
+TEST_F(VectorTests, NamedAccessors_Generic_Int) {
+  mathfu::Vector<int, 5> v;
+  v[0] = 10;
+  v[1] = 20;
+  v[2] = 30;
+  v[3] = 40;
+  v[4] = 50;
+
+  EXPECT_EQ(10, v.x());
+  EXPECT_EQ(20, v.y());
+  EXPECT_EQ(30, v.z());
+  EXPECT_EQ(40, v.w());
+
+  v.x() = 100;
+  v.y() = 200;
+  v.z() = 300;
+  v.w() = 400;
+  EXPECT_EQ(100, v[0]);
+  EXPECT_EQ(200, v[1]);
+  EXPECT_EQ(300, v[2]);
+  EXPECT_EQ(400, v[3]);
+  EXPECT_EQ(50, v[4]);
+
 }
 
 int main(int argc, char** argv) {

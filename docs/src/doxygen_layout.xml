@@ -54,17 +54,11 @@
                  url="@ref mathfu_guide_building_android_building_ndk_build"
                  title="Building with ndk-build"/>
             <tab type="user"
-                 url="@ref mathfu_guide_building_android_building_fplutil"
-                 title="Building with fplutil"/>
-            <tab type="user"
                  url="@ref mathfu_guide_building_android_running"
                  title="Installing and Running Applications"/>
             <tab type="user"
                  url="@ref mathfu_guide_building_android_eclipse"
                  title="Using Eclipse"/>
-            <tab type="user"
-                 url="@ref mathfu_guide_building_android_fplutil"
-                 title="Using fplutil"/>
             <tab type="user"
                  url="@ref mathfu_guide_building_android_code_generation"
                  title="Code Generation"/>
@@ -172,11 +166,8 @@
            title="Utilities">
         <tab type="user" url="@ref mathfu_guide_utilities_allocation"
              title="Memory Allocation"/>
-        <tab type="usergroup" url="@ref mathfu_guide_utilities_misc"
-             title="Miscellaneous Functions">
-          <tab type="user" url="@ref mathfu_guide_utilities_random"
-               title="Random Number Generation"/>
-        </tab>
+        <tab type="user" url="@ref mathfu_guide_utilities_misc"
+             title="Miscellaneous Functions"/>
       </tab>
     </tab>
     <tab type="usergroup" url="@ref mathfu_api_reference"
