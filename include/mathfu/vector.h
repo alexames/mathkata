@@ -1066,6 +1066,40 @@ static inline CompatibleT ToTypeHelper(const Vector<T, Dims>& v) {
 
 /// @}
 
+/// @addtogroup mathfu_vector
+/// @{
+
+/// @brief Calculate the dot product of two N-dimensional Vectors.
+///
+/// @param v1 Vector to multiply.
+/// @param v2 Vector to multiply.
+/// @return Scalar dot product result.
+template <class T, int d>
+inline T dot(const Vector<T, d>& v1, const Vector<T, d>& v2) {
+  return Vector<T, d>::DotProduct(v1, v2);
+}
+
+/// @brief Calculate the cross product of two 3-dimensional Vectors.
+///
+/// @param v1 Vector to multiply.
+/// @param v2 Vector to multiply.
+/// @return 3-dimensional vector that contains the result.
+template <class T>
+inline Vector<T, 3> cross(const Vector<T, 3>& v1, const Vector<T, 3>& v2) {
+  return Vector<T, 3>::CrossProduct(v1, v2);
+}
+
+/// @brief Normalize an N-dimensional Vector.
+///
+/// @param v Vector to normalize.
+/// @return Normalized vector.
+template <class T, int d>
+inline Vector<T, d> normalize(const Vector<T, d>& v) {
+  return v.Normalized();
+}
+
+/// @}
+
 /// @addtogroup mathfu_utilities
 /// @{
 
