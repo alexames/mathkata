@@ -13,10 +13,8 @@
 # limitations under the License.
 cmake_minimum_required(VERSION 3.14)
 
-# Add googletest.
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/../dependencies/googletest
-                 ${CMAKE_CURRENT_BINARY_DIR}/googletest EXCLUDE_FROM_ALL)
+# Find googletest via vcpkg.
+find_package(GTest REQUIRED)
 
 include(GoogleTest)
 
