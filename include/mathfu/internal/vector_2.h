@@ -87,6 +87,11 @@ class Vector<T, 2> {
     return HadamardProductHelper(v1, v2);
   }
 
+  static inline Vector<T, 2> HadamardDivide(const Vector<T, 2>& v1,
+                                            const Vector<T, 2>& v2) {
+    return HadamardDivideHelper(v1, v2);
+  }
+
   static inline Vector<T, 2> Lerp(const Vector<T, 2>& v1,
                                   const Vector<T, 2>& v2, const T percent) {
     return LerpHelper(v1, v2, percent);

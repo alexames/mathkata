@@ -84,14 +84,6 @@ class Vector<float, 2> {
     return Vector<float, 2>(simd2f_sub(simd2f_zero(), simd2));
   }
 
-  inline Vector<float, 2> operator*(const Vector<float, 2>& v) const {
-    return Vector<float, 2>(simd2f_mul(simd2, v.simd2));
-  }
-
-  inline Vector<float, 2> operator/(const Vector<float, 2>& v) const {
-    return Vector<float, 2>(simd2f_div(simd2, v.simd2));
-  }
-
   inline Vector<float, 2> operator+(const Vector<float, 2>& v) const {
     return Vector<float, 2>(simd2f_add(simd2, v.simd2));
   }
@@ -114,16 +106,6 @@ class Vector<float, 2> {
 
   inline Vector<float, 2> operator-(const float& s) const {
     return Vector<float, 2>(simd2f_sub(simd2, simd2f_splat(s)));
-  }
-
-  inline Vector<float, 2>& operator*=(const Vector<float, 2>& v) {
-    simd2 = simd2f_mul(simd2, v.simd2);
-    return *this;
-  }
-
-  inline Vector<float, 2>& operator/=(const Vector<float, 2>& v) {
-    simd2 = simd2f_div(simd2, v.simd2);
-    return *this;
   }
 
   inline Vector<float, 2>& operator+=(const Vector<float, 2>& v) {
@@ -213,6 +195,11 @@ class Vector<float, 2> {
   static inline Vector<float, 2> HadamardProduct(const Vector<float, 2>& v1,
                                                  const Vector<float, 2>& v2) {
     return Vector<float, 2>(simd2f_mul(v1.simd2, v2.simd2));
+  }
+
+  static inline Vector<float, 2> HadamardDivide(const Vector<float, 2>& v1,
+                                                const Vector<float, 2>& v2) {
+    return Vector<float, 2>(simd2f_div(v1.simd2, v2.simd2));
   }
 
   static inline Vector<float, 2> Lerp(const Vector<float, 2>& v1,

@@ -483,6 +483,16 @@ class Vector {
     return HadamardProductHelper(v1, v2);
   }
 
+  /// @brief Calculate the componentwise division of two vectors.
+  ///
+  /// @param v1 First vector (numerator).
+  /// @param v2 Second vector (denominator).
+  /// @return The componentwise quotient of v1 and v2.
+  static inline Vector<T, Dims> HadamardDivide(const Vector<T, Dims>& v1,
+                                               const Vector<T, Dims>& v2) {
+    return HadamardDivideHelper(v1, v2);
+  }
+
   /// @brief Calculate the cross product of two vectors.
   ///
   /// Note that this function is only defined for 3-dimensional Vectors.
@@ -668,30 +678,6 @@ inline Vector<T, Dims> operator-(T s, const Vector<T, Dims>& v) {
   MATHFU_VECTOR_OPERATOR(s - v.data_[i]);
 }
 
-/// @brief Multiply a vector by another Vector.
-///
-/// In line with GLSL, this performs component-wise multiplication.
-/// @param lhs First vector to use as a starting point.
-/// @param rhs Second vector to multiply by.
-/// @return A new Vector containing the result.
-template <class T, int Dims>
-inline Vector<T, Dims> operator*(const Vector<T, Dims>& lhs,
-                                 const Vector<T, Dims>& rhs) {
-  return HadamardProductHelper(lhs, rhs);
-}
-
-/// @brief Divide a vector by another Vector.
-///
-/// In line with GLSL, this performs component-wise division.
-/// @param lhs First vector to use as a starting point.
-/// @param rhs Second vector to divide by.
-/// @return A new Vector containing the result.
-template <class T, int Dims>
-inline Vector<T, Dims> operator/(const Vector<T, Dims>& lhs,
-                                 const Vector<T, Dims>& rhs) {
-  MATHFU_VECTOR_OPERATOR(lhs.data_[i] / rhs[i]);
-}
-
 /// @brief Add a vector with another Vector.
 ///
 /// @param lhs First vector to use as a starting point.
@@ -742,32 +728,6 @@ inline Vector<T, Dims> operator+(const Vector<T, Dims>& v, T s) {
 template <class T, int Dims>
 inline Vector<T, Dims> operator-(const Vector<T, Dims>& v, T s) {
   MATHFU_VECTOR_OPERATOR(v.data_[i] - s);
-}
-
-/// @brief Multiply (in-place) a vector with another Vector.
-///
-/// In line with GLSL, this performs component-wise multiplication.
-/// @param lhs First vector to use as a starting point.
-/// @param rhs Second vector to multiply by.
-/// @return A reference to the input <b>v</b> vector.
-template <class T, int Dims>
-inline Vector<T, Dims>& operator*=(Vector<T, Dims>& lhs,
-                                   const Vector<T, Dims>& rhs) {
-  MATHFU_VECTOR_OPERATION(lhs.data_[i] *= rhs[i]);
-  return lhs;
-}
-
-/// @brief Divide (in-place) a vector by another Vector.
-///
-/// In line with GLSL, this performs component-wise division.
-/// @param lhs First vector to use as a starting point.
-/// @param rhs Second vector to divide by.
-/// @return A reference to the input <b>v</b> vector.
-template <class T, int Dims>
-inline Vector<T, Dims>& operator/=(Vector<T, Dims>& lhs,
-                                   const Vector<T, Dims>& rhs) {
-  MATHFU_VECTOR_OPERATION(lhs.data_[i] /= rhs[i]);
-  return lhs;
 }
 
 /// @brief Add (in-place) a vector with another Vector.
@@ -847,6 +807,17 @@ template <class T, int Dims>
 inline Vector<T, Dims> HadamardProductHelper(const Vector<T, Dims>& v1,
                                              const Vector<T, Dims>& v2) {
   MATHFU_VECTOR_OPERATOR(v1[i] * v2[i]);
+}
+
+/// @brief Calculate the componentwise division of two vectors.
+///
+/// @param v1 First vector (numerator).
+/// @param v2 Second vector (denominator).
+/// @return The componentwise quotient of v1 and v2.
+template <class T, int Dims>
+inline Vector<T, Dims> HadamardDivideHelper(const Vector<T, Dims>& v1,
+                                            const Vector<T, Dims>& v2) {
+  MATHFU_VECTOR_OPERATOR(v1[i] / v2[i]);
 }
 
 /// @brief Calculate the cross product of two vectors.
