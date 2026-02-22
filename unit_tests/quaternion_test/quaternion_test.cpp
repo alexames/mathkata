@@ -372,9 +372,9 @@ void Mult_Test(const T& precision) {
   // of the rotations.
   (qaa1 * qaa2).ToAngleAxis(&convertedAngle, &convertedAxis);
   EXPECT_NEAR(angle1 + angle2, convertedAngle, precision);
-  // This will verify that multiplying a quaternion with a scalar corresponds
+  // This will verify that ScaleAngle on a quaternion corresponds
   // to scaling the rotation.
-  (qaa1 * 2).ToAngleAxis(&convertedAngle, &convertedAxis);
+  qaa1.ScaleAngle(2).ToAngleAxis(&convertedAngle, &convertedAxis);
   EXPECT_NEAR(angle1 * 2, convertedAngle, precision);
   mathfu::Vector<T, 3> v(3.5f, 6.4f, 7.0f);
   mathfu::Vector<T, 4> v4(3.5f, 6.4f, 7.0f, 0.0f);
@@ -404,39 +404,82 @@ void Mult_Test(const T& precision) {
 }
 TEST_ALL_F(Mult)
 
-// This tests that quat * float changes the direction of the quat to keep it
-// in the "small" hemisphere, before doing the multiplication.  This makes
-// scalar factors < 1 act intuitively, at the cost of sometimes making
-// multiplication non-associative for scale factors > 1.
+// This tests that quat * scalar performs component-wise scaling, and is
+// therefore associative and commutative with respect to real-number
+// multiplication.
 template <class T>
-void MultQuatFloatFlipsQuat_Test(const T& precision) {
+void MultQuatScalarComponentWise_Test(const T& precision) {
+  (void)precision;
+  using Quaternion = mathfu::Quaternion<T>;
+  const double epsilon = 1e-5;
+
+  const Quaternion q(static_cast<T>(1), static_cast<T>(2), static_cast<T>(3),
+                     static_cast<T>(4));
+
+  // Component-wise scaling.
+  const Quaternion expected(static_cast<T>(3), static_cast<T>(6),
+                            static_cast<T>(9), static_cast<T>(12));
+  EXPECT_NEAR_QUAT(expected, q * static_cast<T>(3), epsilon);
+
+  // Commutativity: q * s == s * q.
+  EXPECT_NEAR_QUAT(q * static_cast<T>(3), static_cast<T>(3) * q, epsilon);
+
+  // Associativity: (q * a) * b == q * (a * b).
+  EXPECT_NEAR_QUAT((q * static_cast<T>(2)) * static_cast<T>(3),
+                   q * static_cast<T>(6), epsilon);
+
+  // operator*= consistency.
+  Quaternion q_mut = q;
+  q_mut *= static_cast<T>(3);
+  EXPECT_NEAR_QUAT(expected, q_mut, epsilon);
+}
+TEST_ALL_F(MultQuatScalarComponentWise)
+
+// This tests that ScaleAngle preserves the old angle-scaling behavior.
+template <class T>
+void ScaleAngle_Test(const T& precision) {
   (void)precision;
   using Quaternion = mathfu::Quaternion<T>;
   using Vector3 = mathfu::Vector<T, 3>;
-  const Vector3 up(0, 1, 0);
   const double epsilon = 1e-5;
+  const Vector3 up(0, 1, 0);
 
-  // Test the flipping behavior directly.
+  // ScaleAngle(1) on a big quaternion should condition it to the short path.
   const Quaternion bigQuat =
       Quaternion::FromAngleAxis(static_cast<T>(mathfu::kPi * 1.5), up);
   EXPECT_NEAR_QUAT(Quaternion(-bigQuat.scalar(), -bigQuat.vector()),
-                   bigQuat * 1, epsilon);
+                   bigQuat.ScaleAngle(1), epsilon);
 
-  // Test the claim made in the documentation:
-  // "For example, you are not guaranteed that (q * 2) * .5 and q * (2 * .5)
-  //  are the same orientation, let alone the same quaternion."
+  // ScaleAngle is not associative for factors > 1.
   const Quaternion base =
       Quaternion::FromAngleAxis(static_cast<T>(mathfu::kPi * .75), up);
-  const Quaternion q1 = (base * 2) * .5f;
-  const Quaternion q2 = base * (2 * .5f);
-  EXPECT_NEAR_QUAT(
-      q1, Quaternion::FromAngleAxis(static_cast<T>(mathfu::kPi * -.25), up),
-      epsilon);
-  EXPECT_NEAR_QUAT(q2, base, epsilon);
+  const Quaternion q1 = base.ScaleAngle(2).ScaleAngle(static_cast<T>(.5));
+  const Quaternion q2 = base.ScaleAngle(static_cast<T>(2 * .5));
   EXPECT_FALSE(IsNearOrientation(q1, q2, epsilon));
-  EXPECT_FALSE(IsNearQuat(q1, q2, epsilon));
+
+  // ScaleAngle(0) should give identity.
+  const Quaternion rot = Quaternion::FromAngleAxis(static_cast<T>(1.2), up);
+  EXPECT_NEAR_QUAT(Quaternion::identity, rot.ScaleAngle(0), epsilon);
 }
-TEST_ALL_F(MultQuatFloatFlipsQuat)
+TEST_ALL_F(ScaleAngle)
+
+// This tests that scalar multiplication distributes over quaternion addition.
+template <class T>
+void ScalarMultDistributesOverAdd_Test(const T& precision) {
+  (void)precision;
+  using Quaternion = mathfu::Quaternion<T>;
+  const double epsilon = 1e-5;
+
+  const Quaternion q1(static_cast<T>(1), static_cast<T>(2), static_cast<T>(3),
+                      static_cast<T>(4));
+  const Quaternion q2(static_cast<T>(5), static_cast<T>(6), static_cast<T>(7),
+                      static_cast<T>(8));
+  const T s = static_cast<T>(2.5);
+
+  // s * (q1 + q2) == s * q1 + s * q2
+  EXPECT_NEAR_QUAT((q1 + q2) * s, q1 * s + q2 * s, epsilon);
+}
+TEST_ALL_F(ScalarMultDistributesOverAdd)
 
 // This will test the dot product of quaternions.
 template <class T>
@@ -736,9 +779,9 @@ void SlerpResultIsUnit_Test(const T& precision) {
     EXPECT_NEAR(1.0f, slerp_length, kLengthEpsilon) << " for angle " << angle;
 
     // Alternate spelling for Slerp
-    Quaternion mul_result = q2 * .5f;
-    const T mul_length = mul_result.Normalize();
-    EXPECT_NEAR(1.0f, mul_length, kLengthEpsilon) << " for angle " << angle;
+    Quaternion scale_result = q2.ScaleAngle(static_cast<T>(.5));
+    const T scale_length = scale_result.Normalize();
+    EXPECT_NEAR(1.0f, scale_length, kLengthEpsilon) << " for angle " << angle;
   }
 }
 TEST_ALL_F(SlerpResultIsUnit)
@@ -776,8 +819,8 @@ void CheckSlerp(float angle, float t, float expected_angle) {
   EXPECT_NEAR_ORIENTATION(expected, slerp_backwards_result, epsilon)
       << " for angle " << angle << " and t " << t;
 
-  Quaternion mul_result = original * t;
-  EXPECT_NEAR_ORIENTATION(expected, mul_result, epsilon)
+  Quaternion scale_result = original.ScaleAngle(t);
+  EXPECT_NEAR_ORIENTATION(expected, scale_result, epsilon)
       << " for angle " << angle << " and t " << t;
 }
 
