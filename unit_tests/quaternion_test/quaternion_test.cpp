@@ -33,6 +33,11 @@ class QuaternionTests : public ::testing::Test {
   virtual void TearDown() {}
 };
 
+// Verify that Quaternion<float> is 16 bytes (4 floats) and
+// Quaternion<double> is 32 bytes (4 doubles), not inflated by SIMD padding.
+static_assert(sizeof(mathfu::Quaternion<float>) == 4 * sizeof(float));
+static_assert(sizeof(mathfu::Quaternion<double>) == 4 * sizeof(double));
+
 // This will automatically generate tests for each template parameter.
 #define TEST_ALL_F(MY_TEST)                   \
   TEST_F(QuaternionTests, MY_TEST) {          \
