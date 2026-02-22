@@ -484,8 +484,16 @@ class Quaternion {
   /// @brief Access an element of the quaternion.
   ///
   /// @param i Index of the element to access.
-  /// @return A const reference to the accessed.
-  inline T operator[](const int i) const { return i == 0 ? s_ : v_[i - 1]; }
+  /// @return A reference to the accessed element.
+  inline T& operator[](const int i) { return i == 0 ? s_ : v_[i - 1]; }
+
+  /// @brief Access an element of the quaternion.
+  ///
+  /// @param i Index of the element to access.
+  /// @return A const reference to the accessed element.
+  inline const T& operator[](const int i) const {
+    return i == 0 ? s_ : v_[i - 1];
+  }
 
   /// @brief Returns a vector that is perpendicular to the supplied vector.
   ///
