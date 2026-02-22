@@ -17,6 +17,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <cstdio>
 
 #include "gtest/gtest.h"
 
@@ -110,4 +111,10 @@ TEST_F(UtilitiesTests, RoundUpToTypeBoundary_VariousTypes) {
     EXPECT_EQ(2u, mathfu::RoundUpToTypeBoundary<int16_t>(2));
     EXPECT_EQ(4u, mathfu::RoundUpToTypeBoundary<int16_t>(3));
   }
+}
+
+int main(int argc, char** argv) {
+  ::testing::InitGoogleTest(&argc, argv);
+  printf("%s (%s)\n", argv[0], MATHFU_BUILD_OPTIONS_STRING);
+  return RUN_ALL_TESTS();
 }
