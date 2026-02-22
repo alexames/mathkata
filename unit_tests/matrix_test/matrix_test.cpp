@@ -1057,6 +1057,83 @@ void Transpose_Test(const T& precision) {
 
 TEST_ALL_F(Transpose, FLOAT_PRECISION, DOUBLE_PRECISION)
 
+// Test GetColumn returns the correct column vector from the matrix.
+template <class T, int d>
+void GetColumn_Test(const T& precision) {
+  (void)precision;
+  mathfu::Matrix<T, d> matrix;
+  for (int i = 0; i < d * d; ++i) {
+    matrix[i] = static_cast<T>(i);
+  }
+  for (int col = 0; col < d; ++col) {
+    mathfu::Vector<T, d> column = matrix.GetColumn(col);
+    for (int row = 0; row < d; ++row) {
+      EXPECT_EQ(matrix(row, col), column[row])
+          << "col=" << col << " row=" << row;
+    }
+  }
+}
+TEST_ALL_F(GetColumn, FLOAT_PRECISION, DOUBLE_PRECISION)
+
+// Test that GetColumn returns a mutable reference that can modify the matrix.
+template <class T, int d>
+void GetColumnMutable_Test(const T& precision) {
+  (void)precision;
+  mathfu::Matrix<T, d> matrix(static_cast<T>(0));
+  for (int col = 0; col < d; ++col) {
+    mathfu::Vector<T, d> new_col;
+    for (int row = 0; row < d; ++row) {
+      new_col[row] = static_cast<T>(col * d + row + 1);
+    }
+    matrix.GetColumn(col) = new_col;
+  }
+  for (int col = 0; col < d; ++col) {
+    for (int row = 0; row < d; ++row) {
+      EXPECT_EQ(matrix(row, col), static_cast<T>(col * d + row + 1))
+          << "col=" << col << " row=" << row;
+    }
+  }
+}
+TEST_ALL_F(GetColumnMutable, FLOAT_PRECISION, DOUBLE_PRECISION)
+
+// Test GetRow returns the correct row vector from the matrix.
+template <class T, int d>
+void GetRow_Test(const T& precision) {
+  (void)precision;
+  mathfu::Matrix<T, d> matrix;
+  for (int i = 0; i < d * d; ++i) {
+    matrix[i] = static_cast<T>(i);
+  }
+  for (int row = 0; row < d; ++row) {
+    mathfu::Vector<T, d> r = matrix.GetRow(row);
+    for (int col = 0; col < d; ++col) {
+      EXPECT_EQ(matrix(row, col), r[col]) << "row=" << row << " col=" << col;
+    }
+  }
+}
+TEST_ALL_F(GetRow, FLOAT_PRECISION, DOUBLE_PRECISION)
+
+// Test that GetRow and GetColumn are consistent with each other and with
+// element access. The i-th element of GetRow(r) should equal the r-th
+// element of GetColumn(i).
+template <class T, int d>
+void GetRowColumnConsistency_Test(const T& precision) {
+  (void)precision;
+  mathfu::Matrix<T, d> matrix;
+  for (int i = 0; i < d * d; ++i) {
+    matrix[i] = static_cast<T>(i * 3 + 1);
+  }
+  for (int row = 0; row < d; ++row) {
+    mathfu::Vector<T, d> r = matrix.GetRow(row);
+    for (int col = 0; col < d; ++col) {
+      mathfu::Vector<T, d> c = matrix.GetColumn(col);
+      EXPECT_EQ(r[col], c[row]) << "row=" << row << " col=" << col;
+      EXPECT_EQ(r[col], matrix(row, col)) << "row=" << row << " col=" << col;
+    }
+  }
+}
+TEST_ALL_F(GetRowColumnConsistency, FLOAT_PRECISION, DOUBLE_PRECISION)
+
 // Return one of the numbers:
 //   offset, offset + width/d, offset + 2*width/d, ... , offset + (d-1)*width/d
 // For each i=0..d-1, the number returned is different.

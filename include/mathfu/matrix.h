@@ -398,7 +398,6 @@ class Matrix {
     MATHFU_MAT_OPERATION(GetColumn(i).Pack(&vector[i]));
   }
 
-  /// @cond MATHFU_INTERNAL
   /// @brief Access a column vector of the Matrix.
   ///
   /// @param i Index of the column to access.
@@ -412,7 +411,21 @@ class Matrix {
   inline const Vector<T, Rows>& GetColumn(const int i) const {
     return data_[i];
   }
-  /// @endcond
+
+  /// @brief Access a row vector of the Matrix.
+  ///
+  /// For a column-major matrix, this gathers one element from each column
+  /// to form the row vector.
+  ///
+  /// @param i Index of the row to access.
+  /// @return Vector containing the row elements.
+  inline Vector<T, Cols> GetRow(const int i) const {
+    Vector<T, Cols> result;
+    for (int j = 0; j < Cols; j++) {
+      result[j] = data_[j][i];
+    }
+    return result;
+  }
 
   /// @brief Negate this Matrix.
   ///
@@ -461,9 +474,9 @@ class Matrix {
     MATHFU_MAT_OPERATOR(data_[i] * s);
   }
 
-  /// @brief Divide each element of this Matrix with a scalar.
+  /// @brief Divide each element of this Matrix by a scalar.
   ///
-  /// @param s Scalar to divide this Matrix with.
+  /// @param s Scalar to divide this Matrix by. Must be non-zero.
   /// @return Matrix containing the result.
   inline Matrix<T, Rows, Cols> operator/(T s) const {
     return (*this) * (T(1) / s);
@@ -521,7 +534,7 @@ class Matrix {
 
   /// @brief Divide each element of this Matrix by a scalar (in-place).
   ///
-  /// @param s Scalar to divide this Matrix by.
+  /// @param s Scalar to divide this Matrix by. Must be non-zero.
   /// @return Reference to this class.
   inline Matrix<T, Rows, Cols>& operator/=(T s) {
     return (*this) *= (T(1) / s);
@@ -1046,21 +1059,60 @@ inline Vector<T, 4> operator*(const Matrix<T, 4, 4>& m, const Vector<T, 4>& v) {
 }
 /// @endcond
 
-/// @brief Multiply a 4x4 Matrix by a 3-dimensional Vector.
+/// @brief Multiply a 4x4 Matrix by a 3-dimensional Vector, with perspective
+/// division.
 ///
-/// This is provided as a convenience and assumes the vector has a fourth
-/// component equal to 1.
+/// This extends the 3D vector to homogeneous coordinates (w=1), multiplies by
+/// the matrix, then performs perspective division by dividing xyz by the
+/// resulting w component.
+///
+/// @warning The resulting w component must be non-zero. If the matrix is a
+/// projective transform that maps the input point to w=0 (i.e. onto the plane
+/// at infinity), this operation will produce Inf or NaN. Use the 4D overload
+/// (Matrix * Vector<T,4>) if you need to handle this case yourself.
+///
+/// @note For affine transforms (where the bottom row of the matrix is
+/// [0, 0, 0, 1]), the resulting w is always 1 and the perspective division is
+/// a no-op. If you know your matrix is affine, you can avoid the division by
+/// using @ref operator*(const Matrix<T,4,4>&, const Vector<T,4>&) directly
+/// with a 4D vector, or by using TransformPoint3D().
 ///
 /// @param m 4x4 Matrix.
 /// @param v 3-dimensional Vector.
-/// @return 3-dimensional Vector result.
+/// @return 3-dimensional Vector result after perspective division.
 ///
 /// @related mathfu::Matrix
 template <class T>
 inline Vector<T, 3> operator*(const Matrix<T, 4, 4>& m, const Vector<T, 3>& v) {
   Vector<T, 4> v4(v[0], v[1], v[2], T(1));
   v4 = m * v4;
+  assert(v4[3] != 0);
   return Vector<T, 3>(v4[0] / v4[3], v4[1] / v4[3], v4[2] / v4[3]);
+}
+
+/// @brief Transform a 3D point by a 4x4 affine matrix, without perspective
+/// division.
+///
+/// This extends the 3D vector to homogeneous coordinates (w=1), multiplies by
+/// the matrix, and returns the xyz components of the result without dividing
+/// by w. This is correct and more efficient for affine transforms (where the
+/// bottom row of the matrix is [0, 0, 0, 1]).
+///
+/// @note If the matrix is a projective (non-affine) transform, use
+/// @ref operator*(const Matrix<T,4,4>&, const Vector<T,3>&) instead, which
+/// performs the perspective division needed to produce correct results.
+///
+/// @param m 4x4 Matrix (assumed to be affine).
+/// @param v 3-dimensional Vector representing a point.
+/// @return 3-dimensional Vector result (no perspective division).
+///
+/// @related mathfu::Matrix
+template <class T>
+inline Vector<T, 3> TransformPoint3D(const Matrix<T, 4, 4>& m,
+                                     const Vector<T, 3>& v) {
+  Vector<T, 4> v4(v[0], v[1], v[2], 1);
+  v4 = m * v4;
+  return Vector<T, 3>(v4[0], v4[1], v4[2]);
 }
 
 /// @cond MATHFU_INTERNAL
@@ -1271,10 +1323,12 @@ static inline Matrix<T, 4, 4> OuterProductHelper(const Vector<T, 4>& v1,
 template <bool check_invertible, class T, int Rows, int Cols>
 inline bool InverseHelper(const Matrix<T, Rows, Cols>& m,
                           Matrix<T, Rows, Cols>* const inverse, T det_thresh) {
-  assert(false);
+  static_assert(sizeof(T) == 0,
+                "Matrix::Inverse() is only implemented for "
+                "2x2, 3x3, and 4x4 matrices");
   (void)m;
+  (void)inverse;
   (void)det_thresh;
-  *inverse = T::Identity();
   return false;
 }
 /// @endcond
