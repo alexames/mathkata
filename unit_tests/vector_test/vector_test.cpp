@@ -17,12 +17,14 @@
 
 #include <climits>
 #include <cstdint>
+#include <set>
 #include <sstream>
 #include <string>
 
 #include "gtest/gtest.h"
 #include "mathfu/constants.h"
 #include "mathfu/io.h"
+#include "mathfu/rect.h"
 #include "mathfu/utilities.h"
 #include "precision.h"
 
@@ -1076,6 +1078,120 @@ void PackedNotEqual_Test(const T& precision) {
 TEST_ALL_F(PackedNotEqual)
 TEST_ALL_INTS_F(PackedNotEqual)
 
+// This will test lexicographic operator< for vectors.
+template <class T, int d>
+void LessThan_Test(const T& precision) {
+  (void)precision;
+
+  // Equal vectors should not compare as less-than.
+  mathfu::Vector<T, d> a;
+  for (int i = 0; i < d; ++i) {
+    a[i] = static_cast<T>(i + 1);
+  }
+  mathfu::Vector<T, d> b(a);
+  EXPECT_FALSE(a < b);
+  EXPECT_FALSE(b < a);
+
+  // Vectors that differ in the first element.
+  mathfu::Vector<T, d> smaller(a);
+  smaller[0] = static_cast<T>(0);
+  EXPECT_TRUE(smaller < a);
+  EXPECT_FALSE(a < smaller);
+
+  // Vectors that differ only in the last element.
+  mathfu::Vector<T, d> smaller_last(a);
+  smaller_last[d - 1] = static_cast<T>(0);
+  EXPECT_TRUE(smaller_last < a);
+  EXPECT_FALSE(a < smaller_last);
+
+  // First element larger but last element smaller -- first element dominates.
+  mathfu::Vector<T, d> first_larger(a);
+  first_larger[0] = static_cast<T>(a[0] + 10);
+  if (d > 1) {
+    first_larger[d - 1] = static_cast<T>(0);
+  }
+  EXPECT_FALSE(first_larger < a);
+  EXPECT_TRUE(a < first_larger);
+}
+TEST_ALL_F(LessThan)
+TEST_ALL_INTS_F(LessThan)
+
+// Test operator< specifically for 2D vectors with concrete values.
+TEST_F(VectorTests, LessThan_Vector2_Concrete) {
+  using Vec2 = mathfu::Vector<float, 2>;
+  EXPECT_TRUE(Vec2(1.0f, 2.0f) < Vec2(2.0f, 0.0f));
+  EXPECT_TRUE(Vec2(1.0f, 2.0f) < Vec2(1.0f, 3.0f));
+  EXPECT_FALSE(Vec2(1.0f, 2.0f) < Vec2(1.0f, 2.0f));
+  EXPECT_FALSE(Vec2(2.0f, 0.0f) < Vec2(1.0f, 99.0f));
+}
+
+// Test operator< specifically for 3D vectors with concrete values.
+TEST_F(VectorTests, LessThan_Vector3_Concrete) {
+  using Vec3 = mathfu::Vector<float, 3>;
+  EXPECT_TRUE(Vec3(1.0f, 2.0f, 3.0f) < Vec3(1.0f, 2.0f, 4.0f));
+  EXPECT_TRUE(Vec3(1.0f, 2.0f, 3.0f) < Vec3(1.0f, 3.0f, 0.0f));
+  EXPECT_TRUE(Vec3(1.0f, 2.0f, 3.0f) < Vec3(2.0f, 0.0f, 0.0f));
+  EXPECT_FALSE(Vec3(1.0f, 2.0f, 3.0f) < Vec3(1.0f, 2.0f, 3.0f));
+  EXPECT_FALSE(Vec3(1.0f, 2.0f, 4.0f) < Vec3(1.0f, 2.0f, 3.0f));
+}
+
+// Test operator< specifically for 4D vectors with concrete values.
+TEST_F(VectorTests, LessThan_Vector4_Concrete) {
+  using Vec4 = mathfu::Vector<float, 4>;
+  EXPECT_TRUE(Vec4(1.0f, 2.0f, 3.0f, 4.0f) < Vec4(1.0f, 2.0f, 3.0f, 5.0f));
+  EXPECT_TRUE(Vec4(1.0f, 2.0f, 3.0f, 4.0f) < Vec4(1.0f, 2.0f, 4.0f, 0.0f));
+  EXPECT_FALSE(Vec4(1.0f, 2.0f, 3.0f, 4.0f) < Vec4(1.0f, 2.0f, 3.0f, 4.0f));
+  EXPECT_FALSE(Vec4(2.0f, 0.0f, 0.0f, 0.0f) < Vec4(1.0f, 9.0f, 9.0f, 9.0f));
+}
+
+// Test that Vector can be used in std::set (requires operator<).
+TEST_F(VectorTests, LessThan_StdSet) {
+  using Vec3 = mathfu::Vector<float, 3>;
+  std::set<Vec3> s;
+  s.insert(Vec3(1.0f, 2.0f, 3.0f));
+  s.insert(Vec3(1.0f, 2.0f, 3.0f));  // duplicate
+  s.insert(Vec3(4.0f, 5.0f, 6.0f));
+  s.insert(Vec3(0.0f, 0.0f, 0.0f));
+  EXPECT_EQ(s.size(), 3u);
+  EXPECT_NE(s.find(Vec3(1.0f, 2.0f, 3.0f)), s.end());
+  EXPECT_NE(s.find(Vec3(4.0f, 5.0f, 6.0f)), s.end());
+  EXPECT_NE(s.find(Vec3(0.0f, 0.0f, 0.0f)), s.end());
+  EXPECT_EQ(s.find(Vec3(9.0f, 9.0f, 9.0f)), s.end());
+}
+
+// Test operator< for Rect.
+TEST_F(VectorTests, LessThan_Rect) {
+  using Rect = mathfu::Rect<float>;
+  using Vec2 = mathfu::Vector<float, 2>;
+
+  // Different positions -- position determines ordering.
+  EXPECT_TRUE(Rect(Vec2(0.0f, 0.0f), Vec2(10.0f, 10.0f))
+              < Rect(Vec2(1.0f, 0.0f), Vec2(10.0f, 10.0f)));
+
+  // Same position, different sizes -- size breaks the tie.
+  EXPECT_TRUE(Rect(Vec2(1.0f, 1.0f), Vec2(2.0f, 2.0f))
+              < Rect(Vec2(1.0f, 1.0f), Vec2(3.0f, 2.0f)));
+
+  // Equal rects are not less-than.
+  EXPECT_FALSE(Rect(Vec2(1.0f, 1.0f), Vec2(2.0f, 2.0f))
+               < Rect(Vec2(1.0f, 1.0f), Vec2(2.0f, 2.0f)));
+
+  // Position with smaller x but larger y -- x dominates (lexicographic).
+  EXPECT_TRUE(Rect(Vec2(0.0f, 99.0f), Vec2(1.0f, 1.0f))
+              < Rect(Vec2(1.0f, 0.0f), Vec2(1.0f, 1.0f)));
+}
+
+// Test that Rect can be used in std::set (requires operator<).
+TEST_F(VectorTests, LessThan_Rect_StdSet) {
+  using Rect = mathfu::Rect<float>;
+  using Vec2 = mathfu::Vector<float, 2>;
+  std::set<Rect> s;
+  s.insert(Rect(Vec2(0.0f, 0.0f), Vec2(1.0f, 1.0f)));
+  s.insert(Rect(Vec2(0.0f, 0.0f), Vec2(1.0f, 1.0f)));  // duplicate
+  s.insert(Rect(Vec2(2.0f, 3.0f), Vec2(4.0f, 5.0f)));
+  EXPECT_EQ(s.size(), 2u);
+}
+
 // Simple class that represents a possible compatible type for a vector.
 // That is, it's just an array of T of length d, so can be loaded and
 // stored from mathfu::Vector<T,d> using ToType() and FromType().
@@ -1185,9 +1301,9 @@ TEST_F(VectorTests, OutputStream_Test_float_1) {
 // Test that the kDims static member is present and correct for each
 // specialization.
 TEST_F(VectorTests, kDims) {
-  EXPECT_EQ(mathfu::Vector<float, 2>::kDims, 2);
-  EXPECT_EQ(mathfu::Vector<float, 3>::kDims, 3);
-  EXPECT_EQ(mathfu::Vector<float, 4>::kDims, 4);
+  EXPECT_EQ((mathfu::Vector<float, 2>::kDims), 2);
+  EXPECT_EQ((mathfu::Vector<float, 3>::kDims), 3);
+  EXPECT_EQ((mathfu::Vector<float, 4>::kDims), 4);
 }
 
 // Test that the SIMD padding lane (w / data_[3]) of Vector<float,3> is
