@@ -31,6 +31,8 @@ class Vector<T, 3> {
 
   constexpr Vector(const Vector<T, 3>& v) : x(v.x), y(v.y), z(v.z) {}
 
+  constexpr Vector<T, 3>& operator=(const Vector<T, 3>& v) = default;
+
   explicit constexpr Vector(const VectorPacked<T, 3>& v)
       : x(v.x), y(v.y), z(v.z) {}
 

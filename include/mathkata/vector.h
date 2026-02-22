@@ -203,6 +203,8 @@ class Vector {
     MATHKATA_VECTOR_OPERATION(data_[i] = v.data_[i]);
   }
 
+  constexpr Vector<T, Dims>& operator=(const Vector<T, Dims>& v) = default;
+
   /// @brief Create a vector from another vector of a different type.
   ///
   /// This copies each element of a Vector which makes it possible to between

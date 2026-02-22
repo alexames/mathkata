@@ -215,10 +215,8 @@ class Matrix {
     MATHKATA_MAT_OPERATION(data_[i] = m.data_[i]);
   }
 
-  constexpr Matrix<T, Rows, Cols>& operator=(const Matrix<T, Rows, Cols>& m) {
-    MATHKATA_MAT_OPERATION(data_[i] = m.data_[i]);
-    return *this;
-  }
+  constexpr Matrix<T, Rows, Cols>& operator=(const Matrix<T, Rows, Cols>& m) =
+      default;
 
   /// @brief Construct a Matrix from a single float.
   ///

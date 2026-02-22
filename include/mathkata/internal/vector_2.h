@@ -31,6 +31,8 @@ class Vector<T, 2> {
 
   constexpr Vector(const Vector<T, 2>& v) : x(v.x), y(v.y) {}
 
+  constexpr Vector<T, 2>& operator=(const Vector<T, 2>& v) = default;
+
   explicit constexpr Vector(const VectorPacked<T, 2>& v) : x(v.x), y(v.y) {}
 
   explicit constexpr Vector(const T* a) : x(a[0]), y(a[1]) {}
