@@ -349,6 +349,78 @@ class Vector {
   /// @return A const reference to the accessed.
   inline const T& operator[](const int i) const { return data_[i]; }
 
+  /// @brief Access the first element of the vector.
+  ///
+  /// @note This method only works with vectors of 1 or more dimensions.
+  /// @return A reference to the first element.
+  inline T& x() {
+    static_assert(Dims >= 1, "x() requires >= 1D");
+    return data_[0];
+  }
+
+  /// @brief Access the first element of the vector.
+  ///
+  /// @note This method only works with vectors of 1 or more dimensions.
+  /// @return A const reference to the first element.
+  inline const T& x() const {
+    static_assert(Dims >= 1, "x() requires >= 1D");
+    return data_[0];
+  }
+
+  /// @brief Access the second element of the vector.
+  ///
+  /// @note This method only works with vectors of 2 or more dimensions.
+  /// @return A reference to the second element.
+  inline T& y() {
+    static_assert(Dims >= 2, "y() requires >= 2D");
+    return data_[1];
+  }
+
+  /// @brief Access the second element of the vector.
+  ///
+  /// @note This method only works with vectors of 2 or more dimensions.
+  /// @return A const reference to the second element.
+  inline const T& y() const {
+    static_assert(Dims >= 2, "y() requires >= 2D");
+    return data_[1];
+  }
+
+  /// @brief Access the third element of the vector.
+  ///
+  /// @note This method only works with vectors of 3 or more dimensions.
+  /// @return A reference to the third element.
+  inline T& z() {
+    static_assert(Dims >= 3, "z() requires >= 3D");
+    return data_[2];
+  }
+
+  /// @brief Access the third element of the vector.
+  ///
+  /// @note This method only works with vectors of 3 or more dimensions.
+  /// @return A const reference to the third element.
+  inline const T& z() const {
+    static_assert(Dims >= 3, "z() requires >= 3D");
+    return data_[2];
+  }
+
+  /// @brief Access the fourth element of the vector.
+  ///
+  /// @note This method only works with vectors of 4 or more dimensions.
+  /// @return A reference to the fourth element.
+  inline T& w() {
+    static_assert(Dims >= 4, "w() requires >= 4D");
+    return data_[3];
+  }
+
+  /// @brief Access the fourth element of the vector.
+  ///
+  /// @note This method only works with vectors of 4 or more dimensions.
+  /// @return A const reference to the fourth element.
+  inline const T& w() const {
+    static_assert(Dims >= 4, "w() requires >= 4D");
+    return data_[3];
+  }
+
   /// @brief GLSL style 3 element accessor.
   ///
   /// This only works with vectors that contain more than 3 elements.
