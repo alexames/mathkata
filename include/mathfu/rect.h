@@ -1,18 +1,18 @@
 /*
-* Copyright 2016 Google Inc. All rights reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright 2016 Google Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 #ifndef MATHFU_RECT_H_
 #define MATHFU_RECT_H_
 
@@ -37,8 +37,7 @@ struct Rect {
   /// @brief Create a rect from a vector4 of the same type.
   ///
   /// @param v Vector that the data will be copied from.
-  explicit Rect(const Vector<T, 4>& v)
-      : pos(v.x, v.y), size(v.z, v.w) {}
+  explicit Rect(const Vector<T, 4>& v) : pos(v.x, v.y), size(v.z, v.w) {}
 
   /// @brief Create a rect from x, y, width and height values.
   ///
@@ -75,6 +74,21 @@ bool operator==(const Rect<T>& r1, const Rect<T>& r2) {
 template <class T>
 bool operator!=(const Rect<T>& r1, const Rect<T>& r2) {
   return !(r1 == r2);
+}
+
+/// @brief Lexicographic less-than comparison for two Rects.
+///
+/// Compares by position first, then by size.  This provides a strict weak
+/// ordering suitable for use in sorted containers such as std::set and
+/// std::map.
+///
+/// @param r1 Rect to be tested.
+/// @param r2 Other rect to be tested.
+/// @return true if @p r1 is lexicographically less than @p r2.
+template <class T>
+bool operator<(const Rect<T>& r1, const Rect<T>& r2) {
+  if (r1.pos != r2.pos) return r1.pos < r2.pos;
+  return r1.size < r2.size;
 }
 
 }  // namespace mathfu

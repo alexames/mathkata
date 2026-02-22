@@ -599,6 +599,24 @@ inline bool operator!=(const Vector<T, Dims>& lhs, const Vector<T, Dims>& rhs) {
   return !(lhs == rhs);
 }
 
+/// @brief Lexicographic less-than comparison for 2 Vectors of the same size.
+///
+/// Compares element by element from index 0 to Dims-1.  Returns true as soon
+/// as a component of @p lhs is less than the corresponding component of
+/// @p rhs, and false as soon as it is greater.  If all components are equal
+/// the result is false, providing a strict weak ordering suitable for use
+/// in sorted containers such as std::set and std::map.
+///
+/// @return true if @p lhs is lexicographically less than @p rhs.
+template <class T, int Dims>
+inline bool operator<(const Vector<T, Dims>& lhs, const Vector<T, Dims>& rhs) {
+  for (int i = 0; i < Dims; ++i) {
+    if (lhs[i] < rhs[i]) return true;
+    if (rhs[i] < lhs[i]) return false;
+  }
+  return false;
+}
+
 /// @brief Negate all elements of the Vector.
 ///
 /// @return A new Vector containing the result.
