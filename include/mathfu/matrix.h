@@ -1750,4 +1750,8 @@ typedef Matrix<float, 4, 3> AffineTransform;
 #pragma warning(pop)
 #endif
 
+// Include SIMD-optimized 4x4 matrix operations when SIMD is enabled.
+// These replace the scalar TimesHelper and operator* specializations above.
+#include "mathfu/internal/matrix_4x4_simd.h"
+
 #endif  // MATHFU_MATRIX_H_
