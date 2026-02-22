@@ -42,6 +42,7 @@
 // MSVC decides that "Cols" *is* constant when unrolling the operation
 // loop.
 #pragma warning(disable : 4127)  // conditional expression is constant
+#pragma warning(disable : 4100)  // unreferenced formal parameter
 #pragma warning(disable : 4789)  // buffer overrun
 #if _MSC_VER >= 1900             // MSVC 2015
 #pragma warning(disable : 4456)  // allow shadowing in unrolled loops
@@ -134,8 +135,7 @@ template <class T>
 static inline bool UnProjectHelper(const Vector<T, 3>& window_coord,
                                    const Matrix<T, 4, 4>& model_view,
                                    const Matrix<T, 4, 4>& projection,
-                                   const float window_width,
-                                   const float window_height,
+                                   const T window_width, const T window_height,
                                    Vector<T, 3>& result);
 
 template <typename T, int Rows, int Cols, typename CompatibleT>
@@ -225,7 +225,7 @@ class Matrix {
   /// @param s01 Value of the first row, second column.
   /// @param s11 Value of the second row and column.
   inline Matrix(T s00, T s10, T s01, T s11) {
-    MATHFU_STATIC_ASSERT(Rows == 2 && Cols == 2);
+    static_assert(Rows == 2 && Cols == 2, "Rows and Cols must be 2");
     data_[0] = Vector<T, Rows>(s00, s10);
     data_[1] = Vector<T, Rows>(s01, s11);
   }
@@ -244,7 +244,7 @@ class Matrix {
   /// @param s12 Value of the second row, third column.
   /// @param s22 Value of the third row and column.
   inline Matrix(T s00, T s10, T s20, T s01, T s11, T s21, T s02, T s12, T s22) {
-    MATHFU_STATIC_ASSERT(Rows == 3 && Cols == 3);
+    static_assert(Rows == 3 && Cols == 3, "Rows and Cols must be 3");
     data_[0] = Vector<T, Rows>(s00, s10, s20);
     data_[1] = Vector<T, Rows>(s01, s11, s21);
     data_[2] = Vector<T, Rows>(s02, s12, s22);
@@ -269,7 +269,7 @@ class Matrix {
   /// @param s32 Value of the fourth row, third column.
   inline Matrix(T s00, T s10, T s20, T s30, T s01, T s11, T s21, T s31, T s02,
                 T s12, T s22, T s32) {
-    MATHFU_STATIC_ASSERT(Rows == 4 && Cols == 3);
+    static_assert(Rows == 4 && Cols == 3, "Rows must be 4 and Cols must be 3");
     data_[0] = Vector<T, Rows>(s00, s10, s20, s30);
     data_[1] = Vector<T, Rows>(s01, s11, s21, s31);
     data_[2] = Vector<T, Rows>(s02, s12, s22, s32);
@@ -297,7 +297,7 @@ class Matrix {
   /// @param s33 Value of the fourth row and column.
   inline Matrix(T s00, T s10, T s20, T s30, T s01, T s11, T s21, T s31, T s02,
                 T s12, T s22, T s32, T s03, T s13, T s23, T s33) {
-    MATHFU_STATIC_ASSERT(Rows == 4 && Cols == 4);
+    static_assert(Rows == 4 && Cols == 4, "Rows and Cols must be 4");
     data_[0] = Vector<T, Rows>(s00, s10, s20, s30);
     data_[1] = Vector<T, Rows>(s01, s11, s21, s31);
     data_[2] = Vector<T, Rows>(s02, s12, s22, s32);
@@ -314,7 +314,7 @@ class Matrix {
   /// @param column3 Vector used for the fourth column.
   inline Matrix(const Vector<T, 4>& column0, const Vector<T, 4>& column1,
                 const Vector<T, 4>& column2, const Vector<T, 4>& column3) {
-    MATHFU_STATIC_ASSERT(Rows == 4 && Cols == 4);
+    static_assert(Rows == 4 && Cols == 4, "Rows and Cols must be 4");
     data_[0] = column0;
     data_[1] = column1;
     data_[2] = column2;
@@ -398,7 +398,6 @@ class Matrix {
     MATHFU_MAT_OPERATION(GetColumn(i).Pack(&vector[i]));
   }
 
-  /// @cond MATHFU_INTERNAL
   /// @brief Access a column vector of the Matrix.
   ///
   /// @param i Index of the column to access.
@@ -412,7 +411,21 @@ class Matrix {
   inline const Vector<T, Rows>& GetColumn(const int i) const {
     return data_[i];
   }
-  /// @endcond
+
+  /// @brief Access a row vector of the Matrix.
+  ///
+  /// For a column-major matrix, this gathers one element from each column
+  /// to form the row vector.
+  ///
+  /// @param i Index of the row to access.
+  /// @return Vector containing the row elements.
+  inline Vector<T, Cols> GetRow(const int i) const {
+    Vector<T, Cols> result;
+    for (int j = 0; j < Cols; j++) {
+      result[j] = data_[j][i];
+    }
+    return result;
+  }
 
   /// @brief Negate this Matrix.
   ///
@@ -461,9 +474,9 @@ class Matrix {
     MATHFU_MAT_OPERATOR(data_[i] * s);
   }
 
-  /// @brief Divide each element of this Matrix with a scalar.
+  /// @brief Divide each element of this Matrix by a scalar.
   ///
-  /// @param s Scalar to divide this Matrix with.
+  /// @param s Scalar to divide this Matrix by. Must be non-zero.
   /// @return Matrix containing the result.
   inline Matrix<T, Rows, Cols> operator/(T s) const {
     return (*this) * (T(1) / s);
@@ -471,9 +484,16 @@ class Matrix {
 
   /// @brief Multiply this Matrix with another Matrix.
   ///
+  /// @note This operator requires square matrices (Rows == Cols).
+  /// For non-square matrix multiplication, use the free function
+  /// mathfu::Multiply() instead.
+  ///
   /// @param m Matrix to multiply with this Matrix.
   /// @return Matrix containing the result.
   inline Matrix<T, Rows, Cols> operator*(const Matrix<T, Rows, Cols>& m) const {
+    static_assert(Rows == Cols,
+                  "operator* requires square matrices; use Multiply() for "
+                  "non-square matrix multiplication");
     Matrix<T, Rows, Cols> result;
     TimesHelper(*this, m, &result);
     return result;
@@ -521,7 +541,7 @@ class Matrix {
 
   /// @brief Divide each element of this Matrix by a scalar (in-place).
   ///
-  /// @param s Scalar to divide this Matrix by.
+  /// @param s Scalar to divide this Matrix by. Must be non-zero.
   /// @return Reference to this class.
   inline Matrix<T, Rows, Cols>& operator/=(T s) {
     return (*this) *= (T(1) / s);
@@ -529,9 +549,16 @@ class Matrix {
 
   /// @brief Multiply this Matrix with another Matrix (in-place).
   ///
+  /// @note This operator requires square matrices (Rows == Cols).
+  /// For non-square matrix multiplication, use the free function
+  /// mathfu::Multiply() instead.
+  ///
   /// @param m Matrix to multiply with this Matrix.
   /// @return Reference to this class.
   inline Matrix<T, Rows, Cols>& operator*=(const Matrix<T, Rows, Cols>& m) {
+    static_assert(Rows == Cols,
+                  "operator*= requires square matrices; use Multiply() for "
+                  "non-square matrix multiplication");
     const Matrix<T, Rows, Cols> copy_of_this(*this);
     TimesHelper(copy_of_this, m, this);
     return *this;
@@ -541,10 +568,16 @@ class Matrix {
   ///
   /// This calculates the inverse Matrix such that
   /// <code>m * m.Inverse()</code> is the identity.
+  /// @pre The matrix must be invertible (non-zero determinant). In debug
+  ///      builds, an assertion failure is triggered for singular matrices.
+  ///      Use InverseWithDeterminantCheck() when invertibility is uncertain.
   /// @return Matrix containing the result.
   inline Matrix<T, Rows, Cols> Inverse() const {
     Matrix<T, Rows, Cols> inverse;
-    InverseHelper<false>(*this, &inverse, static_cast<T>(0));
+    bool invertible = InverseHelper<true>(
+        *this, &inverse, Constants<T>::GetDeterminantThreshold());
+    assert(invertible);
+    (void)invertible;
     return inverse;
   }
 
@@ -587,7 +620,7 @@ class Matrix {
   /// @note 2-dimensional affine transforms are represented by 3x3 matrices.
   /// @return Vector with the first two components of column 2 of this Matrix.
   inline Vector<T, 2> TranslationVector2D() const {
-    MATHFU_STATIC_ASSERT(Rows == 3 && Cols == 3);
+    static_assert(Rows == 3 && Cols == 3, "Rows and Cols must be 3");
     return Vector<T, 2>(data_[2][0], data_[2][1]);
   }
 
@@ -597,7 +630,7 @@ class Matrix {
   /// @note 3-dimensional affine transforms are represented by 4x4 matrices.
   /// @return Vector with the first three components of column 3.
   inline Vector<T, 3> TranslationVector3D() const {
-    MATHFU_STATIC_ASSERT(Rows == 4 && Cols == 4);
+    static_assert(Rows == 4 && Cols == 4, "Rows and Cols must be 4");
     return Vector<T, 3>(data_[3][0], data_[3][1], data_[3][2]);
   }
 
@@ -605,7 +638,7 @@ class Matrix {
   ///
   /// @return Vector with the scale along each local axis.
   inline Vector<T, 3> ScaleVector3D() const {
-    MATHFU_STATIC_ASSERT(Rows >= 3 && Cols >= 3);
+    static_assert(Rows >= 3 && Cols >= 3, "Rows and Cols must be at least 3");
     return Vector<T, 3>(data_[0].xyz().Length(), data_[1].xyz().Length(),
                         data_[2].xyz().Length());
   }
@@ -663,7 +696,7 @@ class Matrix {
   /// @return Matrix containing the result.
   static inline Matrix<T, Rows, Cols> HadamardProduct(
       const Matrix<T, Rows, Cols>& m1, const Matrix<T, Rows, Cols>& m2) {
-    MATHFU_MAT_OPERATOR(m1.data_[i] * m2.data_[i]);
+    MATHFU_MAT_OPERATOR(HadamardProductHelper(m1.data_[i], m2.data_[i]));
   }
 
   /// @brief Calculate the identity Matrix.
@@ -892,8 +925,7 @@ class Matrix {
   static inline bool UnProject(const Vector<T, 3>& window_coord,
                                const Matrix<T, 4, 4>& model_view,
                                const Matrix<T, 4, 4>& projection,
-                               const float window_width,
-                               const float window_height,
+                               const T window_width, const T window_height,
                                Vector<T, 3>* result) {
     return UnProjectHelper(window_coord, model_view, projection, window_width,
                            window_height, *result);
@@ -918,8 +950,19 @@ class Matrix {
   /// Total number of elements in the matrix.
   static const int kElements = Rows * Cols;
 
+  /// @brief Access the underlying column data array.
+  ///
+  /// @return Pointer to the first column vector.
+  inline const Vector<T, Rows>* data() const { return data_; }
+
+  /// @brief Access the underlying column data array.
+  ///
+  /// @return Pointer to the first column vector.
+  inline Vector<T, Rows>* data() { return data_; }
+
   MATHFU_DEFINE_CLASS_SIMD_AWARE_NEW_DELETE
 
+ private:
   Vector<T, Rows> data_[Cols];
 };
 /// @}
@@ -1017,9 +1060,9 @@ inline Vector<T, 2> operator*(const Matrix<T, 2, 2>& m, const Vector<T, 2>& v) {
 /// @cond MATHFU_INTERNAL
 template <class T>
 inline Vector<T, 3> operator*(const Matrix<T, 3, 3>& m, const Vector<T, 3>& v) {
-  return Vector<T, 3>(MATHFU_MATRIX_3X3_DOT(&m.data_[0].data_[0], v, 0, 3),
-                      MATHFU_MATRIX_3X3_DOT(&m.data_[0].data_[0], v, 1, 3),
-                      MATHFU_MATRIX_3X3_DOT(&m.data_[0].data_[0], v, 2, 3));
+  return Vector<T, 3>(MATHFU_MATRIX_3X3_DOT(&m.GetColumn(0).data_[0], v, 0, 3),
+                      MATHFU_MATRIX_3X3_DOT(&m.GetColumn(0).data_[0], v, 1, 3),
+                      MATHFU_MATRIX_3X3_DOT(&m.GetColumn(0).data_[0], v, 2, 3));
 }
 /// @endcond
 
@@ -1028,11 +1071,11 @@ template <>
 inline Vector<float, 3> operator*(const Matrix<float, 3, 3>& m,
                                   const Vector<float, 3>& v) {
   return Vector<float, 3>(
-      MATHFU_MATRIX_3X3_DOT(&m.data_[0].data_[0], v, 0,
+      MATHFU_MATRIX_3X3_DOT(&m.GetColumn(0).data_[0], v, 0,
                             MATHFU_VECTOR_STRIDE_FLOATS(v)),
-      MATHFU_MATRIX_3X3_DOT(&m.data_[0].data_[0], v, 1,
+      MATHFU_MATRIX_3X3_DOT(&m.GetColumn(0).data_[0], v, 1,
                             MATHFU_VECTOR_STRIDE_FLOATS(v)),
-      MATHFU_MATRIX_3X3_DOT(&m.data_[0].data_[0], v, 2,
+      MATHFU_MATRIX_3X3_DOT(&m.GetColumn(0).data_[0], v, 2,
                             MATHFU_VECTOR_STRIDE_FLOATS(v)));
 }
 /// @endcond
@@ -1040,28 +1083,67 @@ inline Vector<float, 3> operator*(const Matrix<float, 3, 3>& m,
 /// @cond MATHFU_INTERNAL
 template <class T>
 inline Vector<T, 4> operator*(const Matrix<T, 4, 4>& m, const Vector<T, 4>& v) {
-  return Vector<T, 4>(MATHFU_MATRIX_4X4_DOT(&m.data_[0].data_[0], v, 0),
-                      MATHFU_MATRIX_4X4_DOT(&m.data_[0].data_[0], v, 1),
-                      MATHFU_MATRIX_4X4_DOT(&m.data_[0].data_[0], v, 2),
-                      MATHFU_MATRIX_4X4_DOT(&m.data_[0].data_[0], v, 3));
+  return Vector<T, 4>(MATHFU_MATRIX_4X4_DOT(&m.GetColumn(0).data_[0], v, 0),
+                      MATHFU_MATRIX_4X4_DOT(&m.GetColumn(0).data_[0], v, 1),
+                      MATHFU_MATRIX_4X4_DOT(&m.GetColumn(0).data_[0], v, 2),
+                      MATHFU_MATRIX_4X4_DOT(&m.GetColumn(0).data_[0], v, 3));
 }
 /// @endcond
 
-/// @brief Multiply a 4x4 Matrix by a 3-dimensional Vector.
+/// @brief Multiply a 4x4 Matrix by a 3-dimensional Vector, with perspective
+/// division.
 ///
-/// This is provided as a convenience and assumes the vector has a fourth
-/// component equal to 1.
+/// This extends the 3D vector to homogeneous coordinates (w=1), multiplies by
+/// the matrix, then performs perspective division by dividing xyz by the
+/// resulting w component.
+///
+/// @warning The resulting w component must be non-zero. If the matrix is a
+/// projective transform that maps the input point to w=0 (i.e. onto the plane
+/// at infinity), this operation will produce Inf or NaN. Use the 4D overload
+/// (Matrix * Vector<T,4>) if you need to handle this case yourself.
+///
+/// @note For affine transforms (where the bottom row of the matrix is
+/// [0, 0, 0, 1]), the resulting w is always 1 and the perspective division is
+/// a no-op. If you know your matrix is affine, you can avoid the division by
+/// using @ref operator*(const Matrix<T,4,4>&, const Vector<T,4>&) directly
+/// with a 4D vector, or by using TransformPoint3D().
 ///
 /// @param m 4x4 Matrix.
 /// @param v 3-dimensional Vector.
-/// @return 3-dimensional Vector result.
+/// @return 3-dimensional Vector result after perspective division.
 ///
 /// @related mathfu::Matrix
 template <class T>
 inline Vector<T, 3> operator*(const Matrix<T, 4, 4>& m, const Vector<T, 3>& v) {
   Vector<T, 4> v4(v[0], v[1], v[2], T(1));
   v4 = m * v4;
+  assert(v4[3] != 0);
   return Vector<T, 3>(v4[0] / v4[3], v4[1] / v4[3], v4[2] / v4[3]);
+}
+
+/// @brief Transform a 3D point by a 4x4 affine matrix, without perspective
+/// division.
+///
+/// This extends the 3D vector to homogeneous coordinates (w=1), multiplies by
+/// the matrix, and returns the xyz components of the result without dividing
+/// by w. This is correct and more efficient for affine transforms (where the
+/// bottom row of the matrix is [0, 0, 0, 1]).
+///
+/// @note If the matrix is a projective (non-affine) transform, use
+/// @ref operator*(const Matrix<T,4,4>&, const Vector<T,3>&) instead, which
+/// performs the perspective division needed to produce correct results.
+///
+/// @param m 4x4 Matrix (assumed to be affine).
+/// @param v 3-dimensional Vector representing a point.
+/// @return 3-dimensional Vector result (no perspective division).
+///
+/// @related mathfu::Matrix
+template <class T>
+inline Vector<T, 3> TransformPoint3D(const Matrix<T, 4, 4>& m,
+                                     const Vector<T, 3>& v) {
+  Vector<T, 4> v4(v[0], v[1], v[2], 1);
+  v4 = m * v4;
+  return Vector<T, 3>(v4[0], v4[1], v4[2]);
 }
 
 /// @cond MATHFU_INTERNAL
@@ -1169,6 +1251,39 @@ inline void TimesHelper(const Matrix<T, 4, 4>& m1, const Matrix<T, 4, 4>& m2,
 }
 /// @endcond
 
+/// @brief Multiply two matrices of arbitrary compatible dimensions.
+///
+/// Computes the matrix product m1 * m2 where m1 is an R1 x C1 matrix and m2
+/// is a C1 x C2 matrix, producing an R1 x C2 result.  This function works
+/// for both square and non-square matrices, unlike operator* which requires
+/// square matrices.
+///
+/// @param m1 Matrix with R1 rows and C1 columns.
+/// @param m2 Matrix with C1 rows and C2 columns.
+/// @return Matrix with R1 rows and C2 columns containing the result.
+///
+/// @tparam T Type of each element in the matrices.
+/// @tparam R1 Number of rows in m1 and the result.
+/// @tparam C1 Number of columns in m1 / rows in m2.
+/// @tparam C2 Number of columns in m2 and the result.
+///
+/// @related mathfu::Matrix
+template <class T, int R1, int C1, int C2>
+inline Matrix<T, R1, C2> Multiply(const Matrix<T, R1, C1>& m1,
+                                  const Matrix<T, C1, C2>& m2) {
+  Matrix<T, R1, C2> result;
+  for (int c = 0; c < C2; ++c) {
+    for (int r = 0; r < R1; ++r) {
+      T sum = T(0);
+      for (int k = 0; k < C1; ++k) {
+        sum += m1(r, k) * m2(k, c);
+      }
+      result(r, c) = sum;
+    }
+  }
+  return result;
+}
+
 /// @cond MATHFU_INTERNAL
 /// @brief Compute the identity matrix.
 ///
@@ -1272,9 +1387,12 @@ static inline Matrix<T, 4, 4> OuterProductHelper(const Vector<T, 4>& v1,
 template <bool check_invertible, class T, int Rows, int Cols>
 inline bool InverseHelper(const Matrix<T, Rows, Cols>& m,
                           Matrix<T, Rows, Cols>* const inverse, T det_thresh) {
-  assert(false);
+  static_assert(sizeof(T) == 0,
+                "Matrix::Inverse() is only implemented for "
+                "2x2, 3x3, and 4x4 matrices");
   (void)m;
-  *inverse = T::Identity();
+  (void)inverse;
+  (void)det_thresh;
   return false;
 }
 /// @endcond
@@ -1556,8 +1674,7 @@ template <class T>
 static inline bool UnProjectHelper(const Vector<T, 3>& window_coord,
                                    const Matrix<T, 4, 4>& model_view,
                                    const Matrix<T, 4, 4>& projection,
-                                   const float window_width,
-                                   const float window_height,
+                                   const T window_width, const T window_height,
                                    Vector<T, 3>& result) {
   if (window_coord.z < static_cast<T>(0)
       || window_coord.z > static_cast<T>(1)) {
@@ -1632,5 +1749,9 @@ typedef Matrix<float, 4, 3> AffineTransform;
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
+
+// Include SIMD-optimized 4x4 matrix operations when SIMD is enabled.
+// These replace the scalar TimesHelper and operator* specializations above.
+#include "mathfu/internal/matrix_4x4_simd.h"
 
 #endif  // MATHFU_MATRIX_H_
