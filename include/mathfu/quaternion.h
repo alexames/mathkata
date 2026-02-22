@@ -52,10 +52,7 @@ class Quaternion {
 
   /// @brief Construct a Quaternion from a copy.
   /// @param q Quaternion to copy.
-  inline Quaternion(const Quaternion<T>& q) {
-    s_ = q.s_;
-    v_ = q.v_;
-  }
+  inline Quaternion(const Quaternion<T>& q) : data_(q.data_) {}
 
   /// @brief Construct a Quaternion using scalar values to initialize each
   /// element.
@@ -64,39 +61,40 @@ class Quaternion {
   /// @param qs1 First element of the Vector component.
   /// @param qs2 Second element of the Vector component.
   /// @param qs3 Third element of the Vector component.
-  inline Quaternion(T s1, T qs1, T qs2, T qs3) {
-    s_ = s1;
-    v_ = Vector<T, 3>(qs1, qs2, qs3);
-  }
+  inline Quaternion(T s1, T qs1, T qs2, T qs3) : data_(s1, qs1, qs2, qs3) {}
 
   /// @brief Construct a quaternion from a scalar and 3-dimensional Vector.
   ///
   /// @param s1 Scalar component.
   /// @param v1 Vector component.
-  inline Quaternion(T s1, const Vector<T, 3>& v1) {
-    s_ = s1;
-    v_ = v1;
-  }
+  inline Quaternion(T s1, const Vector<T, 3>& v1)
+      : data_(s1, v1[0], v1[1], v1[2]) {}
 
   /// @brief Return the scalar component of the quaternion.
   ///
   /// @return The scalar component
-  inline const T& scalar() const { return s_; }
+  inline T scalar() const { return data_[0]; }
 
   /// @brief Set the scalar component of the quaternion.
   ///
   /// @param s Scalar component.
-  inline void set_scalar(T s) { s_ = s; }
+  inline void set_scalar(T s) { data_[0] = s; }
 
   /// @brief Return the vector component of the quaternion.
   ///
   /// @return The vector component
-  inline const Vector<T, 3>& vector() const { return v_; }
+  inline Vector<T, 3> vector() const {
+    return Vector<T, 3>(data_[1], data_[2], data_[3]);
+  }
 
   /// @brief Set the vector component of the quaternion.
   ///
   /// @param v Vector component.
-  inline void set_vector(const Vector<T, 3>& v) { v_ = v; }
+  inline void set_vector(const Vector<T, 3>& v) {
+    data_[1] = v[0];
+    data_[2] = v[1];
+    data_[3] = v[2];
+  }
 
   /// @brief Calculate the conjugate of this Quaternion.
   ///
@@ -104,7 +102,9 @@ class Quaternion {
   /// For unit quaternions, the conjugate is equal to the inverse.
   ///
   /// @return Quaternion containing the result.
-  inline Quaternion<T> Conjugate() const { return Quaternion<T>(s_, -v_); }
+  inline Quaternion<T> Conjugate() const {
+    return Quaternion<T>(data_[0], -data_[1], -data_[2], -data_[3]);
+  }
 
   /// @brief Calculate the inverse Quaternion.
   ///
@@ -114,9 +114,10 @@ class Quaternion {
   ///
   /// @return Quaternion containing the result.
   inline Quaternion<T> Inverse() const {
-    T norm_sq = s_ * s_ + Vector<T, 3>::DotProduct(v_, v_);
+    T norm_sq = Vector<T, 4>::DotProduct(data_, data_);
     T inv_norm_sq = T(1) / norm_sq;
-    return Quaternion<T>(s_ * inv_norm_sq, -v_ * inv_norm_sq);
+    return Quaternion<T>(data_[0] * inv_norm_sq, -data_[1] * inv_norm_sq,
+                         -data_[2] * inv_norm_sq, -data_[3] * inv_norm_sq);
   }
 
   /// @brief Add this Quaternion to another Quaternion.
@@ -124,7 +125,7 @@ class Quaternion {
   /// @param q Quaternion to add.
   /// @return Quaternion containing the result.
   inline Quaternion<T> operator+(const Quaternion<T>& q) const {
-    return Quaternion<T>(s_ + q.s_, v_ + q.v_);
+    return Quaternion<T>(data_ + q.data_);
   }
 
   /// @brief Add another Quaternion to this, and store the result.
@@ -132,8 +133,7 @@ class Quaternion {
   /// @param q Quaternion to add.
   /// @return Quaternion containing the result.
   inline Quaternion<T>& operator+=(const Quaternion<T>& q) {
-    s_ += q.s_;
-    v_ += q.v_;
+    data_ += q.data_;
     return *this;
   }
 
@@ -142,7 +142,7 @@ class Quaternion {
   /// @param q Quaternion to compare against.
   /// @return true if the scalar and vector components are equal.
   inline bool operator==(const Quaternion<T>& q) const {
-    return s_ == q.s_ && v_ == q.v_;
+    return data_ == q.data_;
   }
 
   /// @brief Compare two Quaternions for inequality.
@@ -158,9 +158,11 @@ class Quaternion {
   /// @param q Quaternion to multiply with.
   /// @return Quaternion containing the result.
   inline Quaternion<T> operator*(const Quaternion<T>& q) const {
+    const Vector<T, 3> v1 = vector();
+    const Vector<T, 3> v2 = q.vector();
     return Quaternion<T>(
-        s_ * q.s_ - Vector<T, 3>::DotProduct(v_, q.v_),
-        s_ * q.v_ + q.s_ * v_ + Vector<T, 3>::CrossProduct(v_, q.v_));
+        data_[0] * q.data_[0] - Vector<T, 3>::DotProduct(v1, v2),
+        data_[0] * v2 + q.data_[0] * v1 + Vector<T, 3>::CrossProduct(v1, v2));
   }
 
   /// @brief Multiply this Quaternion by a scalar (component-wise).
@@ -175,7 +177,7 @@ class Quaternion {
   /// @param s1 Scalar to multiply with.
   /// @return Quaternion containing the result.
   inline Quaternion<T> operator*(T s1) const {
-    return Quaternion<T>(s_ * s1, v_ * s1);
+    return Quaternion<T>(data_ * s1);
   }
 
   /// @brief Multiply this Quaternion by a scalar (component-wise), in-place.
@@ -186,8 +188,7 @@ class Quaternion {
   /// @param s1 Scalar to multiply with.
   /// @return Reference to this Quaternion.
   inline Quaternion<T>& operator*=(T s1) {
-    s_ *= s1;
-    v_ *= s1;
+    data_ *= s1;
     return *this;
   }
 
@@ -225,9 +226,10 @@ class Quaternion {
   /// @param v1 Vector to rotate.
   /// @return Rotated Vector.
   inline Vector<T, 3> Rotate(const Vector<T, 3>& v1) const {
-    T ss = s_ + s_;
-    return ss * Vector<T, 3>::CrossProduct(v_, v1) + (ss * s_ - T(1)) * v1
-           + T(2) * Vector<T, 3>::DotProduct(v_, v1) * v_;
+    const Vector<T, 3> v = vector();
+    T ss = data_[0] + data_[0];
+    return ss * Vector<T, 3>::CrossProduct(v, v1) + (ss * data_[0] - T(1)) * v1
+           + T(2) * Vector<T, 3>::DotProduct(v, v1) * v;
   }
 
   /// @brief Normalize this quaternion (in-place).
@@ -237,10 +239,9 @@ class Quaternion {
   ///
   /// @return Length of the quaternion.
   inline T Normalize() {
-    T length = sqrt(s_ * s_ + Vector<T, 3>::DotProduct(v_, v_));
+    T length = sqrt(Vector<T, 4>::DotProduct(data_, data_));
     T scale = (T(1) / length);
-    s_ *= scale;
-    v_ *= scale;
+    data_ *= scale;
     return length;
   }
 
@@ -268,7 +269,10 @@ class Quaternion {
   /// @param angle Receives the angle, in the range [0, pi].
   /// @param axis Receives the normalized axis.
   inline void ToAngleAxis(T* out_angle, Vector<T, 3>* out_axis) const {
-    const Quaternion<T> q = (s_ > 0) ? *this : Quaternion<T>(-s_, -v_);
+    const Quaternion<T> q =
+        (data_[0] > 0)
+            ? *this
+            : Quaternion<T>(-data_[0], -data_[1], -data_[2], -data_[3]);
     q.ToAngleAxisFull(out_angle, out_axis);
   }
 
@@ -280,7 +284,7 @@ class Quaternion {
   /// @param angle Receives the angle, in the range [0, 2pi).
   /// @param axis Receives the normalized axis.
   inline void ToAngleAxisFull(T* out_angle, Vector<T, 3>* out_axis) const {
-    Vector<T, 3> axis = v_;
+    Vector<T, 3> axis = vector();
     const T axis_length = axis.Normalize();
     if (axis_length < std::numeric_limits<T>::epsilon()) {
       // Normalize has left NaNs in axis.  This happens at angle = 0 and 360.
@@ -289,7 +293,7 @@ class Quaternion {
     } else {
       *out_axis = axis;
     }
-    *out_angle = T(2) * atan2(axis_length, s_);
+    *out_angle = T(2) * atan2(axis_length, data_[0]);
   }
 
   /// @brief Convert this Quaternion to 3 Euler Angles.
@@ -316,9 +320,12 @@ class Quaternion {
   ///
   /// @return 3x3 rotation Matrix.
   inline Matrix<T, 3> ToMatrix() const {
-    const T x2 = v_[0] * v_[0], y2 = v_[1] * v_[1], z2 = v_[2] * v_[2];
-    const T sx = s_ * v_[0], sy = s_ * v_[1], sz = s_ * v_[2];
-    const T xz = v_[0] * v_[2], yz = v_[1] * v_[2], xy = v_[0] * v_[1];
+    const T x2 = data_[1] * data_[1], y2 = data_[2] * data_[2],
+            z2 = data_[3] * data_[3];
+    const T sx = data_[0] * data_[1], sy = data_[0] * data_[2],
+            sz = data_[0] * data_[3];
+    const T xz = data_[1] * data_[3], yz = data_[2] * data_[3],
+            xy = data_[1] * data_[2];
     return Matrix<T, 3>(
         T(1) - T(2) * (y2 + z2), T(2) * (xy + sz), T(2) * (xz - sy),
         T(2) * (xy - sz), T(1) - T(2) * (x2 + z2), T(2) * (sx + yz),
@@ -329,9 +336,12 @@ class Quaternion {
   ///
   /// @return 4x4 transform Matrix.
   inline Matrix<T, 4> ToMatrix4() const {
-    const T x2 = v_[0] * v_[0], y2 = v_[1] * v_[1], z2 = v_[2] * v_[2];
-    const T sx = s_ * v_[0], sy = s_ * v_[1], sz = s_ * v_[2];
-    const T xz = v_[0] * v_[2], yz = v_[1] * v_[2], xy = v_[0] * v_[1];
+    const T x2 = data_[1] * data_[1], y2 = data_[2] * data_[2],
+            z2 = data_[3] * data_[3];
+    const T sx = data_[0] * data_[1], sy = data_[0] * data_[2],
+            sz = data_[0] * data_[3];
+    const T xz = data_[1] * data_[3], yz = data_[2] * data_[3],
+            xy = data_[1] * data_[2];
     return Matrix<T, 4>(T(1) - T(2) * (y2 + z2), T(2) * (xy + sz),
                         T(2) * (xz - sy), T(0), T(2) * (xy - sz),
                         T(1) - T(2) * (x2 + z2), T(2) * (sx + yz), T(0),
@@ -448,7 +458,7 @@ class Quaternion {
   /// @param q2 Second quaternion
   /// @return The scalar dot product of both Quaternions.
   static inline T DotProduct(const Quaternion<T>& q1, const Quaternion<T>& q2) {
-    return q1.s_ * q2.s_ + Vector<T, 3>::DotProduct(q1.v_, q2.v_);
+    return Vector<T, 4>::DotProduct(q1.data_, q2.data_);
   }
 
   /// @brief Calculate the shortest-path spherical linear interpolation between
@@ -469,11 +479,8 @@ class Quaternion {
   /// @result Quaternion containing the result.
   static inline Quaternion<T> Slerp(const Quaternion<T>& q1,
                                     const Quaternion<T>& q2, T s1) {
-    if (q1.s_ * q2.s_ + Vector<T, 3>::DotProduct(q1.v_, q2.v_)
-        > static_cast<T>(0.9999)) {
-      return Quaternion<T>(q1.s_ * (T(1) - s1) + q2.s_ * s1,
-                           q1.v_ * (T(1) - s1) + q2.v_ * s1)
-          .Normalized();
+    if (Vector<T, 4>::DotProduct(q1.data_, q2.data_) > static_cast<T>(0.9999)) {
+      return Quaternion<T>(q1.data_ * (T(1) - s1) + q2.data_ * s1).Normalized();
     }
     return q1 * (q1.Conjugate() * q2).ScaleAngle(s1);
   }
@@ -482,15 +489,13 @@ class Quaternion {
   ///
   /// @param i Index of the element to access.
   /// @return A reference to the accessed element.
-  inline T& operator[](const int i) { return i == 0 ? s_ : v_[i - 1]; }
+  inline T& operator[](const int i) { return data_[i]; }
 
   /// @brief Access an element of the quaternion.
   ///
   /// @param i Index of the element to access.
   /// @return A const reference to the accessed element.
-  inline const T& operator[](const int i) const {
-    return i == 0 ? s_ : v_[i - 1];
-  }
+  inline const T& operator[](const int i) const { return data_[i]; }
 
   /// @brief Returns a vector that is perpendicular to the supplied vector.
   ///
@@ -638,6 +643,11 @@ class Quaternion {
   MATHFU_DEFINE_CLASS_SIMD_AWARE_NEW_DELETE
 
  private:
+  /// @brief Construct a Quaternion directly from a Vector<T, 4>.
+  ///
+  /// The layout is [scalar, x, y, z].
+  explicit Quaternion(const Vector<T, 4>& data) : data_(data) {}
+
   /// @brief Shared implementation for RotateFromTo variants.
   ///
   /// @param start Normalized starting direction.
@@ -666,8 +676,7 @@ class Quaternion {
     return Quaternion<T>(T(1) + dot_product, cross_product).Normalized();
   }
 
-  Vector<T, 3> v_;
-  T s_;
+  Vector<T, 4> data_;
 };
 
 template <typename T>
