@@ -16,6 +16,7 @@
 #include "mathfu/matrix.h"
 
 #include <cmath>
+#include <random>
 #include <sstream>
 #include <string>
 
@@ -25,6 +26,25 @@
 #include "mathfu/utilities.h"
 #include "mathfu/vector.h"
 #include "precision.h"
+
+// Thread-local random engine seeded deterministically for reproducible tests.
+static std::mt19937& TestRng() {
+  static std::mt19937 rng(42);
+  return rng;
+}
+
+// Generate a random value in [0, 1) for floating point types.
+template <class T>
+T TestRandom01() {
+  std::uniform_real_distribution<T> dist(static_cast<T>(0), static_cast<T>(1));
+  return dist(TestRng());
+}
+
+// Generate a random value in [-range, +range] for floating point types.
+template <class T>
+T TestRandomRange(T range) {
+  return (TestRandom01<T>() * range * static_cast<T>(2)) - range;
+}
 static const float kUnProjectFloatPrecision = 0.0012f;
 static const double kLookAtDoublePrecision = 1e-8;
 class MatrixTests : public ::testing::Test {
@@ -91,7 +111,7 @@ void Initialize_Test(const T& precision) {
   // values.
   T x[d * d];
   for (int i = 0; i < d * d; ++i) {
-    x[i] = rand() / static_cast<T>(RAND_MAX) * 100.f;
+    x[i] = TestRandom01<T>() * static_cast<T>(100);
   }
   mathfu::Matrix<T, d> matrix_arr(x);
   for (int i = 0; i < d; ++i) {
@@ -210,10 +230,10 @@ template <class T, int d>
 void AddSub_Test(const T& precision) {
   T x1[d * d], x2[d * d];
   for (int i = 0; i < d * d; ++i) {
-    x1[i] = rand() / static_cast<T>(RAND_MAX) * 100.f;
+    x1[i] = TestRandom01<T>() * static_cast<T>(100);
   }
   for (int i = 0; i < d * d; ++i) {
-    x2[i] = rand() / static_cast<T>(RAND_MAX) * 100.f;
+    x2[i] = TestRandom01<T>() * static_cast<T>(100);
   }
   mathfu::Matrix<T, d> matrix1(x1), matrix2(x2);
   // This will test the negation of a matrix and verify that each element
@@ -249,8 +269,8 @@ TEST_ALL_F(AddSub, FLOAT_PRECISION, DOUBLE_PRECISION)
 template <class T, int d>
 void Mult_Test(const T& precision) {
   T x1[d * d], x2[d * d];
-  for (int i = 0; i < d * d; ++i) x1[i] = rand() / static_cast<T>(RAND_MAX);
-  for (int i = 0; i < d * d; ++i) x2[i] = rand() / static_cast<T>(RAND_MAX);
+  for (int i = 0; i < d * d; ++i) x1[i] = TestRandom01<T>();
+  for (int i = 0; i < d * d; ++i) x2[i] = TestRandom01<T>();
   mathfu::Matrix<T, d> matrix1(x1), matrix2(x2);
   // This will test scalar matrix multiplication and verify that each element
   // is equal to multiplication by the scalar.
@@ -261,7 +281,7 @@ void Mult_Test(const T& precision) {
     }
   }
   T v[d];
-  for (int i = 0; i < d; ++i) v[i] = rand() / static_cast<T>(RAND_MAX);
+  for (int i = 0; i < d; ++i) v[i] = TestRandom01<T>();
   mathfu::Vector<T, d> vector(v);
   // This will test matrix vector multiplication and verify that the resulting
   // vector is mathematically correct.
@@ -296,8 +316,8 @@ TEST_F(MatrixTests, Mult_double_5) { Mult_Test<double, 5>(DOUBLE_PRECISION); }
 template <class T, int d>
 void OuterProduct_Test(const T& precision) {
   T x1[d], x2[d];
-  for (int i = 0; i < d; ++i) x1[i] = rand() / static_cast<T>(RAND_MAX);
-  for (int i = 0; i < d; ++i) x2[i] = rand() / static_cast<T>(RAND_MAX);
+  for (int i = 0; i < d; ++i) x1[i] = TestRandom01<T>();
+  for (int i = 0; i < d; ++i) x2[i] = TestRandom01<T>();
   mathfu::Vector<T, d> vector1(x1), vector2(x2);
   mathfu::Matrix<T, d> matrix(
       mathfu::Matrix<T, d>::OuterProduct(vector1, vector2));
@@ -445,7 +465,7 @@ void Inverse_Test(const T& precision) {
     // noninvertible.  This does mean that this test can be flakey by
     // occasionally generating noninvertible matrices.
     for (int i = 0; i < mathfu::Matrix<T, d>::kElements; ++i) {
-      x[i] = mathfu::RandomRange<T>(1);
+      x[i] = TestRandomRange<T>(1);
     }
     mathfu::Matrix<T, d> matrix(x);
     std::string error_string = MatrixToString(matrix);
@@ -1057,6 +1077,83 @@ void Transpose_Test(const T& precision) {
 
 TEST_ALL_F(Transpose, FLOAT_PRECISION, DOUBLE_PRECISION)
 
+// Test GetColumn returns the correct column vector from the matrix.
+template <class T, int d>
+void GetColumn_Test(const T& precision) {
+  (void)precision;
+  mathfu::Matrix<T, d> matrix;
+  for (int i = 0; i < d * d; ++i) {
+    matrix[i] = static_cast<T>(i);
+  }
+  for (int col = 0; col < d; ++col) {
+    mathfu::Vector<T, d> column = matrix.GetColumn(col);
+    for (int row = 0; row < d; ++row) {
+      EXPECT_EQ(matrix(row, col), column[row])
+          << "col=" << col << " row=" << row;
+    }
+  }
+}
+TEST_ALL_F(GetColumn, FLOAT_PRECISION, DOUBLE_PRECISION)
+
+// Test that GetColumn returns a mutable reference that can modify the matrix.
+template <class T, int d>
+void GetColumnMutable_Test(const T& precision) {
+  (void)precision;
+  mathfu::Matrix<T, d> matrix(static_cast<T>(0));
+  for (int col = 0; col < d; ++col) {
+    mathfu::Vector<T, d> new_col;
+    for (int row = 0; row < d; ++row) {
+      new_col[row] = static_cast<T>(col * d + row + 1);
+    }
+    matrix.GetColumn(col) = new_col;
+  }
+  for (int col = 0; col < d; ++col) {
+    for (int row = 0; row < d; ++row) {
+      EXPECT_EQ(matrix(row, col), static_cast<T>(col * d + row + 1))
+          << "col=" << col << " row=" << row;
+    }
+  }
+}
+TEST_ALL_F(GetColumnMutable, FLOAT_PRECISION, DOUBLE_PRECISION)
+
+// Test GetRow returns the correct row vector from the matrix.
+template <class T, int d>
+void GetRow_Test(const T& precision) {
+  (void)precision;
+  mathfu::Matrix<T, d> matrix;
+  for (int i = 0; i < d * d; ++i) {
+    matrix[i] = static_cast<T>(i);
+  }
+  for (int row = 0; row < d; ++row) {
+    mathfu::Vector<T, d> r = matrix.GetRow(row);
+    for (int col = 0; col < d; ++col) {
+      EXPECT_EQ(matrix(row, col), r[col]) << "row=" << row << " col=" << col;
+    }
+  }
+}
+TEST_ALL_F(GetRow, FLOAT_PRECISION, DOUBLE_PRECISION)
+
+// Test that GetRow and GetColumn are consistent with each other and with
+// element access. The i-th element of GetRow(r) should equal the r-th
+// element of GetColumn(i).
+template <class T, int d>
+void GetRowColumnConsistency_Test(const T& precision) {
+  (void)precision;
+  mathfu::Matrix<T, d> matrix;
+  for (int i = 0; i < d * d; ++i) {
+    matrix[i] = static_cast<T>(i * 3 + 1);
+  }
+  for (int row = 0; row < d; ++row) {
+    mathfu::Vector<T, d> r = matrix.GetRow(row);
+    for (int col = 0; col < d; ++col) {
+      mathfu::Vector<T, d> c = matrix.GetColumn(col);
+      EXPECT_EQ(r[col], c[row]) << "row=" << row << " col=" << col;
+      EXPECT_EQ(r[col], matrix(row, col)) << "row=" << row << " col=" << col;
+    }
+  }
+}
+TEST_ALL_F(GetRowColumnConsistency, FLOAT_PRECISION, DOUBLE_PRECISION)
+
 // Return one of the numbers:
 //   offset, offset + width/d, offset + 2*width/d, ... , offset + (d-1)*width/d
 // For each i=0..d-1, the number returned is different.
@@ -1581,23 +1678,152 @@ void OutputStream_Test(const T&) {
 
   switch (d) {
     case 1:
-      EXPECT_EQ("(0)", ss.str());
+      EXPECT_EQ("((0))", ss.str());
       break;
     case 2:
-      EXPECT_EQ("(0, 1, 2, 3)", ss.str());
+      EXPECT_EQ("((0, 1), (2, 3))", ss.str());
       break;
     case 3:
-      EXPECT_EQ("(0, 1, 2, 3, 4, 5, 6, 7, 8)", ss.str());
+      EXPECT_EQ("((0, 1, 2), (3, 4, 5), (6, 7, 8))", ss.str());
       break;
     case 4:
-      EXPECT_EQ("(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)",
-                ss.str());
+      EXPECT_EQ(
+          "((0, 1, 2, 3), (4, 5, 6, 7), (8, 9, 10, 11), (12, 13, 14, 15))",
+          ss.str());
       break;
   }
 }
 TEST_ALL_F(OutputStream, 0.0f, 0.0)
 TEST_F(MatrixTests, OutputStream_Test_float_1) {
   OutputStream_Test<float, 1>(0.0f);
+}
+
+// Test non-square matrix multiplication via mathfu::Multiply().
+// Multiplies a 2x3 matrix by a 3x4 matrix and verifies the 2x4 result.
+template <class T>
+void MultiplyNonSquare_2x3_times_3x4_Test(const T& precision) {
+  // m1 is 2 rows x 3 cols (column-major storage: col0={1,4}, col1={2,5},
+  // col2={3,6}).
+  //   | 1  2  3 |
+  //   | 4  5  6 |
+  const T data1[] = {T(1), T(4), T(2), T(5), T(3), T(6)};
+  mathfu::Matrix<T, 2, 3> m1(data1);
+
+  // m2 is 3 rows x 4 cols (column-major storage).
+  //   | 7  8  9  10 |
+  //   | 11 12 13 14 |
+  //   | 15 16 17 18 |
+  const T data2[] = {T(7), T(11), T(15), T(8),  T(12), T(16),
+                     T(9), T(13), T(17), T(10), T(14), T(18)};
+  mathfu::Matrix<T, 3, 4> m2(data2);
+
+  mathfu::Matrix<T, 2, 4> result = mathfu::Multiply(m1, m2);
+
+  // Expected result (2x4):
+  //   row0: 1*7+2*11+3*15=74   1*8+2*12+3*16=80   1*9+2*13+3*17=86
+  //   1*10+2*14+3*18=92 row1: 4*7+5*11+6*15=173  4*8+5*12+6*16=188
+  //   4*9+5*13+6*17=203  4*10+5*14+6*18=218
+  EXPECT_NEAR(result(0, 0), T(74), precision);
+  EXPECT_NEAR(result(1, 0), T(173), precision);
+  EXPECT_NEAR(result(0, 1), T(80), precision);
+  EXPECT_NEAR(result(1, 1), T(188), precision);
+  EXPECT_NEAR(result(0, 2), T(86), precision);
+  EXPECT_NEAR(result(1, 2), T(203), precision);
+  EXPECT_NEAR(result(0, 3), T(92), precision);
+  EXPECT_NEAR(result(1, 3), T(218), precision);
+}
+
+TEST_F(MatrixTests, MultiplyNonSquare_2x3_times_3x4_float) {
+  MultiplyNonSquare_2x3_times_3x4_Test<float>(FLOAT_PRECISION);
+}
+TEST_F(MatrixTests, MultiplyNonSquare_2x3_times_3x4_double) {
+  MultiplyNonSquare_2x3_times_3x4_Test<double>(DOUBLE_PRECISION);
+}
+
+// Test that Multiply() also works correctly for square matrices and matches
+// operator*.
+template <class T, int d>
+void MultiplySquareMatchesOperator_Test(const T& precision) {
+  T x1[d * d], x2[d * d];
+  for (int i = 0; i < d * d; ++i) x1[i] = rand() / static_cast<T>(RAND_MAX);
+  for (int i = 0; i < d * d; ++i) x2[i] = rand() / static_cast<T>(RAND_MAX);
+  mathfu::Matrix<T, d> m1(x1), m2(x2);
+
+  mathfu::Matrix<T, d> via_operator = m1 * m2;
+  mathfu::Matrix<T, d> via_multiply = mathfu::Multiply(m1, m2);
+
+  for (int i = 0; i < d; ++i) {
+    for (int j = 0; j < d; ++j) {
+      EXPECT_NEAR(via_operator(i, j), via_multiply(i, j), precision);
+    }
+  }
+}
+TEST_ALL_F(MultiplySquareMatchesOperator, FLOAT_PRECISION, DOUBLE_PRECISION)
+
+// Test Multiply() with a 4x3 times 3x2 producing a 4x2 result.
+template <class T>
+void MultiplyNonSquare_4x3_times_3x2_Test(const T& precision) {
+  // m1 is 4 rows x 3 cols.
+  //   | 1  2  3 |
+  //   | 4  5  6 |
+  //   | 7  8  9 |
+  //   | 10 11 12|
+  const T data1[] = {T(1), T(4),  T(7), T(10), T(2), T(5),
+                     T(8), T(11), T(3), T(6),  T(9), T(12)};
+  mathfu::Matrix<T, 4, 3> m1(data1);
+
+  // m2 is 3 rows x 2 cols.
+  //   | 2  1 |
+  //   | 0  3 |
+  //   | 4  2 |
+  const T data2[] = {T(2), T(0), T(4), T(1), T(3), T(2)};
+  mathfu::Matrix<T, 3, 2> m2(data2);
+
+  mathfu::Matrix<T, 4, 2> result = mathfu::Multiply(m1, m2);
+
+  // Expected result (4x2):
+  //   row0: 1*2+2*0+3*4=14   1*1+2*3+3*2=13
+  //   row1: 4*2+5*0+6*4=32   4*1+5*3+6*2=31
+  //   row2: 7*2+8*0+9*4=50   7*1+8*3+9*2=49
+  //   row3: 10*2+11*0+12*4=68  10*1+11*3+12*2=67
+  EXPECT_NEAR(result(0, 0), T(14), precision);
+  EXPECT_NEAR(result(1, 0), T(32), precision);
+  EXPECT_NEAR(result(2, 0), T(50), precision);
+  EXPECT_NEAR(result(3, 0), T(68), precision);
+  EXPECT_NEAR(result(0, 1), T(13), precision);
+  EXPECT_NEAR(result(1, 1), T(31), precision);
+  EXPECT_NEAR(result(2, 1), T(49), precision);
+  EXPECT_NEAR(result(3, 1), T(67), precision);
+}
+
+TEST_F(MatrixTests, MultiplyNonSquare_4x3_times_3x2_float) {
+  MultiplyNonSquare_4x3_times_3x2_Test<float>(FLOAT_PRECISION);
+}
+TEST_F(MatrixTests, MultiplyNonSquare_4x3_times_3x2_double) {
+  MultiplyNonSquare_4x3_times_3x2_Test<double>(DOUBLE_PRECISION);
+}
+
+// Test Multiply() with a 1x3 row vector times a 3x1 column vector (dot
+// product).
+template <class T>
+void MultiplyNonSquare_1x3_times_3x1_Test(const T& precision) {
+  const T data1[] = {T(2), T(3), T(4)};
+  mathfu::Matrix<T, 1, 3> m1(data1);
+
+  const T data2[] = {T(5), T(6), T(7)};
+  mathfu::Matrix<T, 3, 1> m2(data2);
+
+  mathfu::Matrix<T, 1, 1> result = mathfu::Multiply(m1, m2);
+
+  // Expected: 2*5 + 3*6 + 4*7 = 10 + 18 + 28 = 56
+  EXPECT_NEAR(result(0, 0), T(56), precision);
+}
+
+TEST_F(MatrixTests, MultiplyNonSquare_1x3_times_3x1_float) {
+  MultiplyNonSquare_1x3_times_3x1_Test<float>(FLOAT_PRECISION);
+}
+TEST_F(MatrixTests, MultiplyNonSquare_1x3_times_3x1_double) {
+  MultiplyNonSquare_1x3_times_3x1_Test<double>(DOUBLE_PRECISION);
 }
 
 int main(int argc, char** argv) {
