@@ -74,40 +74,10 @@ specified by a [Vector][] could be moved over a range as time elapses:
     }
 ~~~
 
-## Random Number Generation    {#mathfu_guide_utilities_random}
-
-[Random()][] generates pseudo random floating point numbers using `rand()`
-from the C standard library.  For example, the following generates 3 random
-numbers:
-
-~~~{.cpp}
-    float value1, value2, value2;
-    value1 = mathfu::Random<float>();
-    value2 = mathfu::Random<float>();
-    value3 = mathfu::Random<float>();
-~~~
-
-[Random()][] is used by [RandomRange()](@ref mathfu_RandomRange) to generate
-a random number within a symmetric range.  For example, to generate a random
-value between -10.0f..10.0f:
-
-~~~{.cpp}
-    float random_value = mathfu::RandomRange(10.0f);
-~~~
-
-Finally, [RandomInRange](@ref mathfu_RandomInRange) can be used to generate
-a random number within an arbitrary range.  For example, to generate a random
-value between 5.0f..7.0f:
-
-~~~{.cpp}
-    float random_value = mathfu::RandomInRange(5.0f, 7.0f);
-~~~
-
 <br>
 
   [AllocateAligned()]: @ref mathfu_AllocateAligned
   [FreeAligned()]: @ref mathfu_FreeAligned
   [MathFu]: @ref mathfu_overview
-  [Random()]: @ref mathfu_Random
   [SIMD]: http://en.wikipedia.org/wiki/SIMD
   [Vector]: @ref mathfu::Vector
