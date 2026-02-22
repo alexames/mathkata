@@ -17,20 +17,15 @@ jobs:
 
     runs-on: ${{ matrix.os }}
 
-    env:
-      VCPKG_DEFAULT_TRIPLET: ${{ matrix.os == 'windows-latest' && 'x64-windows' || 'x64-linux' }}
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           submodules: false
 
-      - name: Setup vcpkg
-        uses: lukka/run-vcpkg@v11
-
       - name: Configure CMake
-        run: cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
+        run: cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE="${VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake"
+        shell: bash
 
       - name: Build
         run: cmake --build build --config Release
