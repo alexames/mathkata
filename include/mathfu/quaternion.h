@@ -650,9 +650,10 @@ class Quaternion {
 
   /// @brief Returns a quaternion looking at forward vector with an up vector.
   ///
+  /// @tparam H Coordinate system handedness
+  ///           (Handedness::kRightHanded or Handedness::kLeftHanded).
   /// @param forward The forward vector (Vector to face).
   /// @param up The up vector.
-  /// @param handedness 1.0f for RH, -1.0f for LH.
   /// @param Forward and up do not have to be orthogonal.
   /// @param Forward and up cannot be parallel.
   /// @param Forward and up cannot be zero vectors.
@@ -663,15 +664,15 @@ class Quaternion {
   /// Matrix::LookAt takes destination and source as first and second param.
   /// The params can be represented with zero-vector as source and
   /// forward-vector as destination.
+  template <Handedness H = Handedness::kRightHanded>
   static inline Quaternion<T> LookAt(const Vector<T, 3>& forward,
-                                     const Vector<T, 3>& up, T handedness = 1) {
+                                     const Vector<T, 3>& up) {
     // Matrix::LookAt produces a view matrix (world-to-camera transform).
     // Its rotation part is the inverse of the camera's world orientation.
     // Since the inverse of a unit quaternion is its conjugate, we conjugate
     // the result to obtain the camera's orientation quaternion.
-    return FromMatrix(Matrix<T, 4>::LookAt(forward,
-                                           Vector<T, 3>(static_cast<T>(0)), up,
-                                           handedness))
+    return FromMatrix(Matrix<T, 4>::template LookAt<H>(
+                          forward, Vector<T, 3>(static_cast<T>(0)), up))
         .Conjugate();
   }
 
