@@ -616,6 +616,52 @@ void RandomInRange_Test(const T& precision) {
 }
 TEST_SCALAR_AND_INT_F(RandomInRange)
 
+// Tests the InRange function for vectors.
+// A vector should be in range when every component is within
+// [range_start..range_end).
+template <class T, int d>
+void Vector_InRange_Test(const T& precision) {
+  (void)precision;
+
+  // Build range_start and range_end vectors.
+  mathfu::Vector<T, d> range_start;
+  mathfu::Vector<T, d> range_end;
+  for (int i = 0; i < d; ++i) {
+    range_start[i] = static_cast<T>(i);
+    range_end[i] = static_cast<T>(i + 10);
+  }
+
+  // A value in the middle of the range should be in range.
+  mathfu::Vector<T, d> mid;
+  for (int i = 0; i < d; ++i) {
+    mid[i] = static_cast<T>(i + 5);
+  }
+  EXPECT_TRUE(mathfu::InRange(mid, range_start, range_end));
+  EXPECT_TRUE((mathfu::Vector<T, d>::InRange(mid, range_start, range_end)));
+
+  // A value equal to range_start should be in range (inclusive).
+  EXPECT_TRUE(mathfu::InRange(range_start, range_start, range_end));
+
+  // A value equal to range_end should NOT be in range (non-inclusive).
+  EXPECT_FALSE(mathfu::InRange(range_end, range_start, range_end));
+
+  // A value with one component out of range should fail.
+  for (int axis = 0; axis < d; ++axis) {
+    mathfu::Vector<T, d> out_of_range = mid;
+    out_of_range[axis] = static_cast<T>(axis + 11);
+    EXPECT_FALSE(mathfu::InRange(out_of_range, range_start, range_end));
+  }
+
+  // A value with one component below the start should fail.
+  for (int axis = 0; axis < d; ++axis) {
+    mathfu::Vector<T, d> below_range = mid;
+    below_range[axis] = static_cast<T>(axis - 1);
+    EXPECT_FALSE(mathfu::InRange(below_range, range_start, range_end));
+  }
+}
+TEST_ALL_F(Vector_InRange)
+TEST_ALL_INTS_F(Vector_InRange)
+
 // This will test initialization by passing in values. The template parameter d
 // corresponds to the size of the vector.
 template <class T, int d>
@@ -1185,9 +1231,9 @@ TEST_F(VectorTests, OutputStream_Test_float_1) {
 // Test that the kDims static member is present and correct for each
 // specialization.
 TEST_F(VectorTests, kDims) {
-  EXPECT_EQ(mathfu::Vector<float, 2>::kDims, 2);
-  EXPECT_EQ(mathfu::Vector<float, 3>::kDims, 3);
-  EXPECT_EQ(mathfu::Vector<float, 4>::kDims, 4);
+  EXPECT_EQ((mathfu::Vector<float, 2>::kDims), 2);
+  EXPECT_EQ((mathfu::Vector<float, 3>::kDims), 3);
+  EXPECT_EQ((mathfu::Vector<float, 4>::kDims), 4);
 }
 
 // Test that the SIMD padding lane (w / data_[3]) of Vector<float,3> is
