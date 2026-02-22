@@ -104,6 +104,16 @@ enum class DepthRange {
   kDirectX  ///< z maps to [0, 1] (DirectX / Metal / Vulkan default)
 };
 
+/// @brief Specifies the coordinate system handedness for projection and view
+/// matrices.
+///
+/// Right-handed is the default and matches OpenGL conventions.
+/// Left-handed matches DirectX conventions.
+enum class Handedness {
+  kRightHanded = 1,  ///< Right-handed coordinate system (OpenGL convention)
+  kLeftHanded = -1   ///< Left-handed coordinate system (DirectX convention)
+};
+
 /// @cond MATHFU_INTERNAL
 template <class T, int Rows, int Cols = Rows>
 class Matrix;
@@ -119,18 +129,17 @@ inline void TimesHelper(const Matrix<T, size1, size2>& m1,
 template <class T, int Rows, int Cols>
 static inline Matrix<T, Rows, Cols> OuterProductHelper(
     const Vector<T, Rows>& v1, const Vector<T, Cols>& v2);
-template <class T>
+template <class T, Handedness H>
 inline Matrix<T, 4, 4> PerspectiveHelper(T fovy, T aspect, T znear, T zfar,
-                                         T handedness, DepthRange depth_range);
-template <class T>
+                                         DepthRange depth_range);
+template <class T, Handedness H>
 static inline Matrix<T, 4, 4> OrthoHelper(T left, T right, T bottom, T top,
-                                          T znear, T zfar, T handedness,
+                                          T znear, T zfar,
                                           DepthRange depth_range);
-template <class T>
+template <class T, Handedness H>
 static inline Matrix<T, 4, 4> LookAtHelper(const Vector<T, 3>& at,
                                            const Vector<T, 3>& eye,
-                                           const Vector<T, 3>& up,
-                                           T handedness);
+                                           const Vector<T, 3>& up);
 template <class T>
 static inline bool UnProjectHelper(const Vector<T, 3>& window_coord,
                                    const Matrix<T, 4, 4>& model_view,
@@ -846,53 +855,57 @@ class Matrix {
 
   /// @brief Create a 4x4 perspective Matrix.
   ///
+  /// @tparam H Coordinate system handedness
+  ///           (Handedness::kRightHanded or Handedness::kLeftHanded).
   /// @param fovy Field of view.
   /// @param aspect Aspect ratio.
   /// @param znear Near plane location.
   /// @param zfar Far plane location.
-  /// @param handedness 1.0f for RH, -1.0f for LH
   /// @param depth_range DepthRange::kOpenGL for z in [-1,1] (default),
   ///                    DepthRange::kDirectX for z in [0,1].
   /// @return 4x4 perspective Matrix.
+  template <Handedness H = Handedness::kRightHanded>
   static inline Matrix<T, 4, 4> Perspective(
-      T fovy, T aspect, T znear, T zfar, T handedness = 1,
+      T fovy, T aspect, T znear, T zfar,
       DepthRange depth_range = DepthRange::kOpenGL) {
-    return PerspectiveHelper(fovy, aspect, znear, zfar, handedness,
-                             depth_range);
+    return PerspectiveHelper<T, H>(fovy, aspect, znear, zfar, depth_range);
   }
 
   /// @brief Create a 4x4 orthographic Matrix.
   ///
+  /// @tparam H Coordinate system handedness
+  ///           (Handedness::kRightHanded or Handedness::kLeftHanded).
   /// @param left Left extent.
   /// @param right Right extent.
   /// @param bottom Bottom extent.
   /// @param top Top extent.
   /// @param znear Near plane location.
   /// @param zfar Far plane location.
-  /// @param handedness 1.0f for RH, -1.0f for LH
   /// @param depth_range DepthRange::kOpenGL for z in [-1,1] (default),
   ///                    DepthRange::kDirectX for z in [0,1].
   /// @return 4x4 orthographic Matrix.
+  template <Handedness H = Handedness::kRightHanded>
   static inline Matrix<T, 4, 4> Ortho(
-      T left, T right, T bottom, T top, T znear, T zfar, T handedness = 1,
+      T left, T right, T bottom, T top, T znear, T zfar,
       DepthRange depth_range = DepthRange::kOpenGL) {
-    return OrthoHelper(left, right, bottom, top, znear, zfar, handedness,
-                       depth_range);
+    return OrthoHelper<T, H>(left, right, bottom, top, znear, zfar,
+                             depth_range);
   }
 
   /// @brief Create a 3-dimensional camera Matrix.
   ///
+  /// @tparam H Coordinate system handedness
+  ///           (Handedness::kRightHanded or Handedness::kLeftHanded).
   /// @param at The look-at target of the camera.
   /// @param eye The position of the camera.
   /// @param up The up vector in the world, for example (0, 1, 0) if the
   /// y-axis is up.
-  /// @param handedness 1.0f for RH, -1.0f for LH.
   /// @return 3-dimensional camera Matrix.
+  template <Handedness H = Handedness::kRightHanded>
   static inline Matrix<T, 4, 4> LookAt(const Vector<T, 3>& at,
                                        const Vector<T, 3>& eye,
-                                       const Vector<T, 3>& up,
-                                       T handedness = 1) {
-    return LookAtHelper(at, eye, up, handedness);
+                                       const Vector<T, 3>& up) {
+    return LookAtHelper<T, H>(at, eye, up);
   }
 
   /// @brief Create a 3-dimensional transform Matrix.
@@ -1552,9 +1565,10 @@ bool InverseHelper(const Matrix<T, 4, 4>& m, Matrix<T, 4, 4>* const inverse,
 /// DirectX convention (z maps to [0, 1]):
 ///   m[2][2] = zfar / (znear - zfar)
 ///   m[3][2] = (znear * zfar) / (znear - zfar)
-template <class T>
+template <class T, Handedness H>
 inline Matrix<T, 4, 4> PerspectiveHelper(T fovy, T aspect, T znear, T zfar,
-                                         T handedness, DepthRange depth_range) {
+                                         DepthRange depth_range) {
+  const T handedness = static_cast<T>(H);
   const T y = T(1) / std::tan(fovy * T(0.5));
   const T x = y / aspect;
   const T zdist = (znear - zfar);
@@ -1583,10 +1597,11 @@ inline Matrix<T, 4, 4> PerspectiveHelper(T fovy, T aspect, T znear, T zfar,
 /// DirectX convention (z maps to [0, 1]):
 ///   m[2][2] = -1 / (zfar - znear)
 ///   m[3][2] = -znear / (zfar - znear)
-template <class T>
+template <class T, Handedness H>
 static inline Matrix<T, 4, 4> OrthoHelper(T left, T right, T bottom, T top,
-                                          T znear, T zfar, T handedness,
+                                          T znear, T zfar,
                                           DepthRange depth_range) {
+  const T handedness = static_cast<T>(H);
   const T zdist = zfar - znear;
   T zz, zw;
   if (depth_range == DepthRange::kOpenGL) {
@@ -1610,11 +1625,12 @@ static inline Matrix<T, 4, 4> OrthoHelper(T left, T right, T bottom, T top,
 /// Calculate the axes required to construct a 3-dimensional camera matrix that
 /// looks at "at" from eye position "eye" with the up vector "up".  The axes
 /// are returned in a 4 element "axes" array.
-template <class T>
+template <class T, Handedness H>
 static void LookAtHelperCalculateAxes(const Vector<T, 3>& at,
                                       const Vector<T, 3>& eye,
-                                      const Vector<T, 3>& up, T handedness,
+                                      const Vector<T, 3>& up,
                                       Vector<T, 3>* const axes) {
+  const T handedness = static_cast<T>(H);
   // Notice that y-axis is always the same regardless of handedness.
   axes[2] = (at - eye).Normalized();
   axes[0] = Vector<T, 3>::CrossProduct(up, axes[2]).Normalized();
@@ -1633,13 +1649,12 @@ static void LookAtHelperCalculateAxes(const Vector<T, 3>& at,
 
 /// @cond MATHFU_INTERNAL
 /// Create a 3-dimensional camera matrix.
-template <class T>
+template <class T, Handedness H>
 static inline Matrix<T, 4, 4> LookAtHelper(const Vector<T, 3>& at,
                                            const Vector<T, 3>& eye,
-                                           const Vector<T, 3>& up,
-                                           T handedness) {
+                                           const Vector<T, 3>& up) {
   Vector<T, 3> axes[4];
-  LookAtHelperCalculateAxes(at, eye, up, handedness, axes);
+  LookAtHelperCalculateAxes<T, H>(at, eye, up, axes);
   const Vector<T, 4> column0(axes[0][0], axes[1][0], axes[2][0], 0);
   const Vector<T, 4> column1(axes[0][1], axes[1][1], axes[2][1], 0);
   const Vector<T, 4> column2(axes[0][2], axes[1][2], axes[2][2], 0);

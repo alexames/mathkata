@@ -50,14 +50,13 @@ using Mat4 = mathfu::Matrix<T, 4, 4>;
 // Maps x in [-hw, hw], y in [-hh, hh], z in [-near, -far] to NDC.
 template <class T>
 Mat4<T> MakeOrthoMatrix(T hw, T hh, T near_val, T far_val) {
-  return Mat4<T>::Ortho(-hw, hw, -hh, hh, near_val, far_val, static_cast<T>(1));
+  return Mat4<T>::Ortho(-hw, hw, -hh, hh, near_val, far_val);
 }
 
 // Helper to create a symmetric perspective projection matrix for testing.
 template <class T>
 Mat4<T> MakePerspectiveMatrix(T fovy, T aspect, T near_val, T far_val) {
-  return Mat4<T>::Perspective(fovy, aspect, near_val, far_val,
-                              static_cast<T>(1));
+  return Mat4<T>::Perspective(fovy, aspect, near_val, far_val);
 }
 
 // Test: Construction from 6 planes.

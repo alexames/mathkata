@@ -662,7 +662,8 @@ void RotateFromTo_Test(const T& precision) {
   mathfu::Quaternion<T> arbitrary_to_arbitrary =
       mathfu::Quaternion<T>::RotateFromTo(arbitrary_1, arbitrary_2);
 
-  mathfu::Vector<T, 3> arbitrary_1_to_2 = arbitrary_to_arbitrary.Rotate(arbitrary_1);
+  mathfu::Vector<T, 3> arbitrary_1_to_2 =
+      arbitrary_to_arbitrary.Rotate(arbitrary_1);
   arbitrary_1_to_2.Normalize();
   mathfu::Vector<T, 3> arbitrary_2_normalized = arbitrary_2.Normalized();
 
@@ -735,6 +736,8 @@ template <class T>
 void LookAt_Test(const T& precision) {
   using Quaternion = mathfu::Quaternion<T>;
   using Vector3 = mathfu::Vector<T, 3>;
+  constexpr auto kRH = mathfu::Handedness::kRightHanded;
+  constexpr auto kLH = mathfu::Handedness::kLeftHanded;
   const T one = static_cast<T>(1);
   const T neg_one = static_cast<T>(-1);
   const T zero = static_cast<T>(0);
@@ -744,19 +747,20 @@ void LookAt_Test(const T& precision) {
   // The default forward direction for right-handed coordinates is -Z,
   // and for left-handed coordinates is +Z.
 
-  // ---- Right-handed (default handedness = 1) ----
+  // ---- Right-handed (default) ----
 
   // Looking along -Z (RH default forward) should give identity.
   {
     const Quaternion q =
-        Quaternion::LookAt(Vector3(zero, zero, neg_one), up, one);
+        Quaternion::template LookAt<kRH>(Vector3(zero, zero, neg_one), up);
     EXPECT_NEAR_ORIENTATION(Quaternion::identity, q, epsilon);
   }
 
   // Looking along +Z (opposite of RH default forward) should give a
   // 180-degree rotation around the Y axis.
   {
-    const Quaternion q = Quaternion::LookAt(Vector3(zero, zero, one), up, one);
+    const Quaternion q =
+        Quaternion::template LookAt<kRH>(Vector3(zero, zero, one), up);
     const Quaternion expected =
         Quaternion::FromAngleAxis(static_cast<T>(M_PI), up);
     EXPECT_NEAR_ORIENTATION(expected, q, epsilon);
@@ -765,7 +769,8 @@ void LookAt_Test(const T& precision) {
   // Looking along +X should give a 90-degree rotation around Y (turning
   // from -Z forward to +X).
   {
-    const Quaternion q = Quaternion::LookAt(Vector3(one, zero, zero), up, one);
+    const Quaternion q =
+        Quaternion::template LookAt<kRH>(Vector3(one, zero, zero), up);
     const Quaternion expected =
         Quaternion::FromAngleAxis(static_cast<T>(-M_PI / 2), up);
     EXPECT_NEAR_ORIENTATION(expected, q, epsilon);
@@ -776,16 +781,16 @@ void LookAt_Test(const T& precision) {
     const Quaternion q_default =
         Quaternion::LookAt(Vector3(one, zero, zero), up);
     const Quaternion q_explicit =
-        Quaternion::LookAt(Vector3(one, zero, zero), up, one);
+        Quaternion::template LookAt<kRH>(Vector3(one, zero, zero), up);
     EXPECT_NEAR_QUAT(q_default, q_explicit, epsilon);
   }
 
-  // ---- Left-handed (handedness = -1) ----
+  // ---- Left-handed ----
 
   // Looking along +Z (LH default forward) should give identity.
   {
     const Quaternion q =
-        Quaternion::LookAt(Vector3(zero, zero, one), up, neg_one);
+        Quaternion::template LookAt<kLH>(Vector3(zero, zero, one), up);
     EXPECT_NEAR_ORIENTATION(Quaternion::identity, q, epsilon);
   }
 
@@ -793,7 +798,7 @@ void LookAt_Test(const T& precision) {
   // 180-degree rotation around the Y axis.
   {
     const Quaternion q =
-        Quaternion::LookAt(Vector3(zero, zero, neg_one), up, neg_one);
+        Quaternion::template LookAt<kLH>(Vector3(zero, zero, neg_one), up);
     const Quaternion expected =
         Quaternion::FromAngleAxis(static_cast<T>(M_PI), up);
     EXPECT_NEAR_ORIENTATION(expected, q, epsilon);
@@ -803,7 +808,7 @@ void LookAt_Test(const T& precision) {
   // from +Z forward to +X).
   {
     const Quaternion q =
-        Quaternion::LookAt(Vector3(one, zero, zero), up, neg_one);
+        Quaternion::template LookAt<kLH>(Vector3(one, zero, zero), up);
     const Quaternion expected =
         Quaternion::FromAngleAxis(static_cast<T>(M_PI / 2), up);
     EXPECT_NEAR_ORIENTATION(expected, q, epsilon);
@@ -816,7 +821,7 @@ void LookAt_Test(const T& precision) {
   {
     const Vector3 rh_forward(zero, zero, neg_one);
     const Vector3 target(one, zero, zero);
-    const Quaternion q = Quaternion::LookAt(target, up, one);
+    const Quaternion q = Quaternion::template LookAt<kRH>(target, up);
     const Vector3 result = q.Rotate(rh_forward);
     EXPECT_NEAR_VEC3(target, result, epsilon);
   }
@@ -825,7 +830,7 @@ void LookAt_Test(const T& precision) {
   {
     const Vector3 lh_forward(zero, zero, one);
     const Vector3 target(one, zero, zero);
-    const Quaternion q = Quaternion::LookAt(target, up, neg_one);
+    const Quaternion q = Quaternion::template LookAt<kLH>(target, up);
     const Vector3 result = q.Rotate(lh_forward);
     EXPECT_NEAR_VEC3(target, result, epsilon);
   }
@@ -841,11 +846,11 @@ void LookAt_Test(const T& precision) {
         Vector3(one, zero, one).Normalized(),
     };
     for (const auto& dir : directions) {
-      const Quaternion q_rh = Quaternion::LookAt(dir, up, one);
+      const Quaternion q_rh = Quaternion::template LookAt<kRH>(dir, up);
       T length_rh = Quaternion::DotProduct(q_rh, q_rh);
       EXPECT_NEAR(static_cast<T>(1), length_rh, epsilon);
 
-      const Quaternion q_lh = Quaternion::LookAt(dir, up, neg_one);
+      const Quaternion q_lh = Quaternion::template LookAt<kLH>(dir, up);
       T length_lh = Quaternion::DotProduct(q_lh, q_lh);
       EXPECT_NEAR(static_cast<T>(1), length_lh, epsilon);
     }
