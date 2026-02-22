@@ -1600,6 +1600,134 @@ TEST_F(MatrixTests, OutputStream_Test_float_1) {
   OutputStream_Test<float, 1>(0.0f);
 }
 
+// Test non-square matrix multiplication via mathfu::Multiply().
+// Multiplies a 2x3 matrix by a 3x4 matrix and verifies the 2x4 result.
+template <class T>
+void MultiplyNonSquare_2x3_times_3x4_Test(const T& precision) {
+  // m1 is 2 rows x 3 cols (column-major storage: col0={1,4}, col1={2,5},
+  // col2={3,6}).
+  //   | 1  2  3 |
+  //   | 4  5  6 |
+  const T data1[] = {T(1), T(4), T(2), T(5), T(3), T(6)};
+  mathfu::Matrix<T, 2, 3> m1(data1);
+
+  // m2 is 3 rows x 4 cols (column-major storage).
+  //   | 7  8  9  10 |
+  //   | 11 12 13 14 |
+  //   | 15 16 17 18 |
+  const T data2[] = {T(7), T(11), T(15), T(8),  T(12), T(16),
+                     T(9), T(13), T(17), T(10), T(14), T(18)};
+  mathfu::Matrix<T, 3, 4> m2(data2);
+
+  mathfu::Matrix<T, 2, 4> result = mathfu::Multiply(m1, m2);
+
+  // Expected result (2x4):
+  //   row0: 1*7+2*11+3*15=74   1*8+2*12+3*16=80   1*9+2*13+3*17=86
+  //   1*10+2*14+3*18=92 row1: 4*7+5*11+6*15=173  4*8+5*12+6*16=188
+  //   4*9+5*13+6*17=203  4*10+5*14+6*18=218
+  EXPECT_NEAR(result(0, 0), T(74), precision);
+  EXPECT_NEAR(result(1, 0), T(173), precision);
+  EXPECT_NEAR(result(0, 1), T(80), precision);
+  EXPECT_NEAR(result(1, 1), T(188), precision);
+  EXPECT_NEAR(result(0, 2), T(86), precision);
+  EXPECT_NEAR(result(1, 2), T(203), precision);
+  EXPECT_NEAR(result(0, 3), T(92), precision);
+  EXPECT_NEAR(result(1, 3), T(218), precision);
+}
+
+TEST_F(MatrixTests, MultiplyNonSquare_2x3_times_3x4_float) {
+  MultiplyNonSquare_2x3_times_3x4_Test<float>(FLOAT_PRECISION);
+}
+TEST_F(MatrixTests, MultiplyNonSquare_2x3_times_3x4_double) {
+  MultiplyNonSquare_2x3_times_3x4_Test<double>(DOUBLE_PRECISION);
+}
+
+// Test that Multiply() also works correctly for square matrices and matches
+// operator*.
+template <class T, int d>
+void MultiplySquareMatchesOperator_Test(const T& precision) {
+  T x1[d * d], x2[d * d];
+  for (int i = 0; i < d * d; ++i) x1[i] = rand() / static_cast<T>(RAND_MAX);
+  for (int i = 0; i < d * d; ++i) x2[i] = rand() / static_cast<T>(RAND_MAX);
+  mathfu::Matrix<T, d> m1(x1), m2(x2);
+
+  mathfu::Matrix<T, d> via_operator = m1 * m2;
+  mathfu::Matrix<T, d> via_multiply = mathfu::Multiply(m1, m2);
+
+  for (int i = 0; i < d; ++i) {
+    for (int j = 0; j < d; ++j) {
+      EXPECT_NEAR(via_operator(i, j), via_multiply(i, j), precision);
+    }
+  }
+}
+TEST_ALL_F(MultiplySquareMatchesOperator, FLOAT_PRECISION, DOUBLE_PRECISION)
+
+// Test Multiply() with a 4x3 times 3x2 producing a 4x2 result.
+template <class T>
+void MultiplyNonSquare_4x3_times_3x2_Test(const T& precision) {
+  // m1 is 4 rows x 3 cols.
+  //   | 1  2  3 |
+  //   | 4  5  6 |
+  //   | 7  8  9 |
+  //   | 10 11 12|
+  const T data1[] = {T(1), T(4),  T(7), T(10), T(2), T(5),
+                     T(8), T(11), T(3), T(6),  T(9), T(12)};
+  mathfu::Matrix<T, 4, 3> m1(data1);
+
+  // m2 is 3 rows x 2 cols.
+  //   | 2  1 |
+  //   | 0  3 |
+  //   | 4  2 |
+  const T data2[] = {T(2), T(0), T(4), T(1), T(3), T(2)};
+  mathfu::Matrix<T, 3, 2> m2(data2);
+
+  mathfu::Matrix<T, 4, 2> result = mathfu::Multiply(m1, m2);
+
+  // Expected result (4x2):
+  //   row0: 1*2+2*0+3*4=14   1*1+2*3+3*2=13
+  //   row1: 4*2+5*0+6*4=32   4*1+5*3+6*2=31
+  //   row2: 7*2+8*0+9*4=50   7*1+8*3+9*2=49
+  //   row3: 10*2+11*0+12*4=68  10*1+11*3+12*2=67
+  EXPECT_NEAR(result(0, 0), T(14), precision);
+  EXPECT_NEAR(result(1, 0), T(32), precision);
+  EXPECT_NEAR(result(2, 0), T(50), precision);
+  EXPECT_NEAR(result(3, 0), T(68), precision);
+  EXPECT_NEAR(result(0, 1), T(13), precision);
+  EXPECT_NEAR(result(1, 1), T(31), precision);
+  EXPECT_NEAR(result(2, 1), T(49), precision);
+  EXPECT_NEAR(result(3, 1), T(67), precision);
+}
+
+TEST_F(MatrixTests, MultiplyNonSquare_4x3_times_3x2_float) {
+  MultiplyNonSquare_4x3_times_3x2_Test<float>(FLOAT_PRECISION);
+}
+TEST_F(MatrixTests, MultiplyNonSquare_4x3_times_3x2_double) {
+  MultiplyNonSquare_4x3_times_3x2_Test<double>(DOUBLE_PRECISION);
+}
+
+// Test Multiply() with a 1x3 row vector times a 3x1 column vector (dot
+// product).
+template <class T>
+void MultiplyNonSquare_1x3_times_3x1_Test(const T& precision) {
+  const T data1[] = {T(2), T(3), T(4)};
+  mathfu::Matrix<T, 1, 3> m1(data1);
+
+  const T data2[] = {T(5), T(6), T(7)};
+  mathfu::Matrix<T, 3, 1> m2(data2);
+
+  mathfu::Matrix<T, 1, 1> result = mathfu::Multiply(m1, m2);
+
+  // Expected: 2*5 + 3*6 + 4*7 = 10 + 18 + 28 = 56
+  EXPECT_NEAR(result(0, 0), T(56), precision);
+}
+
+TEST_F(MatrixTests, MultiplyNonSquare_1x3_times_3x1_float) {
+  MultiplyNonSquare_1x3_times_3x1_Test<float>(FLOAT_PRECISION);
+}
+TEST_F(MatrixTests, MultiplyNonSquare_1x3_times_3x1_double) {
+  MultiplyNonSquare_1x3_times_3x1_Test<double>(DOUBLE_PRECISION);
+}
+
 int main(int argc, char** argv) {
   ::testing::InitGoogleTest(&argc, argv);
   printf("%s (%s)\n", argv[0], MATHFU_BUILD_OPTIONS_STRING);
