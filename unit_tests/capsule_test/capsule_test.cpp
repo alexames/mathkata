@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "mathfu/capsule.h"
+#include "mathkata/capsule.h"
 
 #include <cmath>
 
@@ -43,50 +43,50 @@ class CapsuleTests : public ::testing::Test {
 
 // Helper to create a 2D or 3D vector with the first two components set.
 template <class T, int N>
-mathfu::Vector<T, N> MakeVec(T x, T y);
+mathkata::Vector<T, N> MakeVec(T x, T y);
 
 template <>
-mathfu::Vector<float, 2> MakeVec<float, 2>(float x, float y) {
-  return mathfu::Vector<float, 2>(x, y);
+mathkata::Vector<float, 2> MakeVec<float, 2>(float x, float y) {
+  return mathkata::Vector<float, 2>(x, y);
 }
 
 template <>
-mathfu::Vector<double, 2> MakeVec<double, 2>(double x, double y) {
-  return mathfu::Vector<double, 2>(x, y);
+mathkata::Vector<double, 2> MakeVec<double, 2>(double x, double y) {
+  return mathkata::Vector<double, 2>(x, y);
 }
 
 template <>
-mathfu::Vector<float, 3> MakeVec<float, 3>(float x, float y) {
-  return mathfu::Vector<float, 3>(x, y, 0.0f);
+mathkata::Vector<float, 3> MakeVec<float, 3>(float x, float y) {
+  return mathkata::Vector<float, 3>(x, y, 0.0f);
 }
 
 template <>
-mathfu::Vector<double, 3> MakeVec<double, 3>(double x, double y) {
-  return mathfu::Vector<double, 3>(x, y, 0.0);
+mathkata::Vector<double, 3> MakeVec<double, 3>(double x, double y) {
+  return mathkata::Vector<double, 3>(x, y, 0.0);
 }
 
 // Helper to create a vector with a z component (only meaningful for 3D).
 template <class T, int N>
-mathfu::Vector<T, N> MakeVec3(T x, T y, T z);
+mathkata::Vector<T, N> MakeVec3(T x, T y, T z);
 
 template <>
-mathfu::Vector<float, 2> MakeVec3<float, 2>(float x, float y, float) {
-  return mathfu::Vector<float, 2>(x, y);
+mathkata::Vector<float, 2> MakeVec3<float, 2>(float x, float y, float) {
+  return mathkata::Vector<float, 2>(x, y);
 }
 
 template <>
-mathfu::Vector<double, 2> MakeVec3<double, 2>(double x, double y, double) {
-  return mathfu::Vector<double, 2>(x, y);
+mathkata::Vector<double, 2> MakeVec3<double, 2>(double x, double y, double) {
+  return mathkata::Vector<double, 2>(x, y);
 }
 
 template <>
-mathfu::Vector<float, 3> MakeVec3<float, 3>(float x, float y, float z) {
-  return mathfu::Vector<float, 3>(x, y, z);
+mathkata::Vector<float, 3> MakeVec3<float, 3>(float x, float y, float z) {
+  return mathkata::Vector<float, 3>(x, y, z);
 }
 
 template <>
-mathfu::Vector<double, 3> MakeVec3<double, 3>(double x, double y, double z) {
-  return mathfu::Vector<double, 3>(x, y, z);
+mathkata::Vector<double, 3> MakeVec3<double, 3>(double x, double y, double z) {
+  return mathkata::Vector<double, 3>(x, y, z);
 }
 
 // Test construction from start, end, and radius.
@@ -97,7 +97,7 @@ void Construction_Test(T precision) {
   const auto end = MakeVec<T, N>(static_cast<T>(4), static_cast<T>(6));
   const T radius = static_cast<T>(0.5);
 
-  mathfu::Capsule<T, N> capsule(start, end, radius);
+  mathkata::Capsule<T, N> capsule(start, end, radius);
 
   EXPECT_EQ(capsule.start, start);
   EXPECT_EQ(capsule.end, end);
@@ -109,7 +109,7 @@ TEST_ALL_CAPSULE_F(Construction)
 template <class T, int N>
 void DefaultConstruction_Test(T precision) {
   (void)precision;
-  mathfu::Capsule<T, N> capsule;
+  mathkata::Capsule<T, N> capsule;
   // Just verify it compiles and doesn't crash. Values are indeterminate.
   (void)capsule;
 }
@@ -122,7 +122,7 @@ void Center_Test(T precision) {
   const auto end = MakeVec<T, N>(static_cast<T>(4), static_cast<T>(6));
   const T radius = static_cast<T>(1);
 
-  mathfu::Capsule<T, N> capsule(start, end, radius);
+  mathkata::Capsule<T, N> capsule(start, end, radius);
   const auto center = capsule.Center();
 
   const auto expected = MakeVec<T, N>(static_cast<T>(2), static_cast<T>(3));
@@ -139,7 +139,7 @@ void CenterNonOrigin_Test(T precision) {
   const auto end = MakeVec<T, N>(static_cast<T>(6), static_cast<T>(7));
   const T radius = static_cast<T>(0.5);
 
-  mathfu::Capsule<T, N> capsule(start, end, radius);
+  mathkata::Capsule<T, N> capsule(start, end, radius);
   const auto center = capsule.Center();
 
   const auto expected = MakeVec<T, N>(static_cast<T>(4), static_cast<T>(5));
@@ -156,7 +156,7 @@ void Length_Test(T precision) {
   const auto end = MakeVec<T, N>(static_cast<T>(3), static_cast<T>(4));
   const T radius = static_cast<T>(1);
 
-  mathfu::Capsule<T, N> capsule(start, end, radius);
+  mathkata::Capsule<T, N> capsule(start, end, radius);
 
   EXPECT_NEAR(capsule.Length(), static_cast<T>(5), precision);
 }
@@ -168,7 +168,7 @@ void LengthDegenerate_Test(T precision) {
   const auto point = MakeVec<T, N>(static_cast<T>(3), static_cast<T>(4));
   const T radius = static_cast<T>(2);
 
-  mathfu::Capsule<T, N> capsule(point, point, radius);
+  mathkata::Capsule<T, N> capsule(point, point, radius);
 
   EXPECT_NEAR(capsule.Length(), static_cast<T>(0), precision);
 }
@@ -182,7 +182,7 @@ void ContainsOnSegment_Test(T precision) {
   const auto end = MakeVec<T, N>(static_cast<T>(10), static_cast<T>(0));
   const T radius = static_cast<T>(1);
 
-  mathfu::Capsule<T, N> capsule(start, end, radius);
+  mathkata::Capsule<T, N> capsule(start, end, radius);
 
   // Point exactly on the segment midpoint.
   EXPECT_TRUE(
@@ -206,7 +206,7 @@ void ContainsAtRadius_Test(T precision) {
   const auto end = MakeVec<T, N>(static_cast<T>(10), static_cast<T>(0));
   const T radius = static_cast<T>(2);
 
-  mathfu::Capsule<T, N> capsule(start, end, radius);
+  mathkata::Capsule<T, N> capsule(start, end, radius);
 
   // Point exactly at the radius boundary perpendicular to the segment.
   EXPECT_TRUE(
@@ -228,7 +228,7 @@ void ContainsAtCaps_Test(T precision) {
   const auto end = MakeVec<T, N>(static_cast<T>(10), static_cast<T>(0));
   const T radius = static_cast<T>(2);
 
-  mathfu::Capsule<T, N> capsule(start, end, radius);
+  mathkata::Capsule<T, N> capsule(start, end, radius);
 
   // Point at the start cap (extending beyond start along the segment axis).
   EXPECT_TRUE(
@@ -260,7 +260,7 @@ void ContainsOutside_Test(T precision) {
   const auto end = MakeVec<T, N>(static_cast<T>(10), static_cast<T>(0));
   const T radius = static_cast<T>(1);
 
-  mathfu::Capsule<T, N> capsule(start, end, radius);
+  mathkata::Capsule<T, N> capsule(start, end, radius);
 
   // Far away from the capsule.
   EXPECT_FALSE(
@@ -286,7 +286,7 @@ void ContainsDegenerate_Test(T precision) {
   const auto center = MakeVec<T, N>(static_cast<T>(5), static_cast<T>(5));
   const T radius = static_cast<T>(3);
 
-  mathfu::Capsule<T, N> capsule(center, center, radius);
+  mathkata::Capsule<T, N> capsule(center, center, radius);
 
   // Point at the center.
   EXPECT_TRUE(capsule.Contains(center));
@@ -307,45 +307,45 @@ TEST_ALL_CAPSULE_F(ContainsDegenerate)
 
 // Test Contains() with a 3D point off the XY plane.
 TEST_F(CapsuleTests, Contains3D_float) {
-  const mathfu::Vector<float, 3> start(0, 0, 0);
-  const mathfu::Vector<float, 3> end(10, 0, 0);
+  const mathkata::Vector<float, 3> start(0, 0, 0);
+  const mathkata::Vector<float, 3> end(10, 0, 0);
   const float radius = 2.0f;
 
-  mathfu::Capsule<float, 3> capsule(start, end, radius);
+  mathkata::Capsule<float, 3> capsule(start, end, radius);
 
   // Point above the segment in Z.
-  EXPECT_TRUE(capsule.Contains(mathfu::Vector<float, 3>(5, 0, 1.5f)));
-  EXPECT_TRUE(capsule.Contains(mathfu::Vector<float, 3>(5, 0, 2.0f)));
-  EXPECT_FALSE(capsule.Contains(mathfu::Vector<float, 3>(5, 0, 2.1f)));
+  EXPECT_TRUE(capsule.Contains(mathkata::Vector<float, 3>(5, 0, 1.5f)));
+  EXPECT_TRUE(capsule.Contains(mathkata::Vector<float, 3>(5, 0, 2.0f)));
+  EXPECT_FALSE(capsule.Contains(mathkata::Vector<float, 3>(5, 0, 2.1f)));
 
   // Point diagonally offset in Y and Z.
   const float diag = radius / std::sqrt(2.0f);
-  EXPECT_TRUE(capsule.Contains(mathfu::Vector<float, 3>(5, diag, diag)));
+  EXPECT_TRUE(capsule.Contains(mathkata::Vector<float, 3>(5, diag, diag)));
   // Just outside diagonally.
   const float diag_out = (radius * 1.1f) / std::sqrt(2.0f);
   EXPECT_FALSE(
-      capsule.Contains(mathfu::Vector<float, 3>(5, diag_out, diag_out)));
+      capsule.Contains(mathkata::Vector<float, 3>(5, diag_out, diag_out)));
 }
 
 TEST_F(CapsuleTests, Contains3D_double) {
-  const mathfu::Vector<double, 3> start(0, 0, 0);
-  const mathfu::Vector<double, 3> end(10, 0, 0);
+  const mathkata::Vector<double, 3> start(0, 0, 0);
+  const mathkata::Vector<double, 3> end(10, 0, 0);
   const double radius = 2.0;
 
-  mathfu::Capsule<double, 3> capsule(start, end, radius);
+  mathkata::Capsule<double, 3> capsule(start, end, radius);
 
   // Point above the segment in Z.
-  EXPECT_TRUE(capsule.Contains(mathfu::Vector<double, 3>(5, 0, 1.5)));
-  EXPECT_TRUE(capsule.Contains(mathfu::Vector<double, 3>(5, 0, 2.0)));
-  EXPECT_FALSE(capsule.Contains(mathfu::Vector<double, 3>(5, 0, 2.1)));
+  EXPECT_TRUE(capsule.Contains(mathkata::Vector<double, 3>(5, 0, 1.5)));
+  EXPECT_TRUE(capsule.Contains(mathkata::Vector<double, 3>(5, 0, 2.0)));
+  EXPECT_FALSE(capsule.Contains(mathkata::Vector<double, 3>(5, 0, 2.1)));
 
   // Point diagonally offset in Y and Z.
   const double diag = radius / std::sqrt(2.0);
-  EXPECT_TRUE(capsule.Contains(mathfu::Vector<double, 3>(5, diag, diag)));
+  EXPECT_TRUE(capsule.Contains(mathkata::Vector<double, 3>(5, diag, diag)));
   // Just outside diagonally.
   const double diag_out = (radius * 1.1) / std::sqrt(2.0);
   EXPECT_FALSE(
-      capsule.Contains(mathfu::Vector<double, 3>(5, diag_out, diag_out)));
+      capsule.Contains(mathkata::Vector<double, 3>(5, diag_out, diag_out)));
 }
 
 // Test equality operator.
@@ -356,8 +356,8 @@ void Equality_Test(T precision) {
   const auto end = MakeVec<T, N>(static_cast<T>(3), static_cast<T>(4));
   const T radius = static_cast<T>(0.5);
 
-  mathfu::Capsule<T, N> c1(start, end, radius);
-  mathfu::Capsule<T, N> c2(start, end, radius);
+  mathkata::Capsule<T, N> c1(start, end, radius);
+  mathkata::Capsule<T, N> c2(start, end, radius);
 
   EXPECT_TRUE(c1 == c2);
   EXPECT_FALSE(c1 != c2);
@@ -373,8 +373,8 @@ void InequalityStart_Test(T precision) {
   const auto end = MakeVec<T, N>(static_cast<T>(3), static_cast<T>(4));
   const T radius = static_cast<T>(0.5);
 
-  mathfu::Capsule<T, N> c1(start1, end, radius);
-  mathfu::Capsule<T, N> c2(start2, end, radius);
+  mathkata::Capsule<T, N> c1(start1, end, radius);
+  mathkata::Capsule<T, N> c2(start2, end, radius);
 
   EXPECT_FALSE(c1 == c2);
   EXPECT_TRUE(c1 != c2);
@@ -390,8 +390,8 @@ void InequalityEnd_Test(T precision) {
   const auto end2 = MakeVec<T, N>(static_cast<T>(3), static_cast<T>(5));
   const T radius = static_cast<T>(0.5);
 
-  mathfu::Capsule<T, N> c1(start, end1, radius);
-  mathfu::Capsule<T, N> c2(start, end2, radius);
+  mathkata::Capsule<T, N> c1(start, end1, radius);
+  mathkata::Capsule<T, N> c2(start, end2, radius);
 
   EXPECT_FALSE(c1 == c2);
   EXPECT_TRUE(c1 != c2);
@@ -405,8 +405,8 @@ void InequalityRadius_Test(T precision) {
   const auto start = MakeVec<T, N>(static_cast<T>(1), static_cast<T>(2));
   const auto end = MakeVec<T, N>(static_cast<T>(3), static_cast<T>(4));
 
-  mathfu::Capsule<T, N> c1(start, end, static_cast<T>(0.5));
-  mathfu::Capsule<T, N> c2(start, end, static_cast<T>(1.0));
+  mathkata::Capsule<T, N> c1(start, end, static_cast<T>(0.5));
+  mathkata::Capsule<T, N> c2(start, end, static_cast<T>(1.0));
 
   EXPECT_FALSE(c1 == c2);
   EXPECT_TRUE(c1 != c2);

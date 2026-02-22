@@ -1,5 +1,5 @@
 {
-  "name": "mathfu",
+  "name": "mathkata",
   "version": "2.0.0",
   "dependencies": ["gtest", "xsimd"]
 }

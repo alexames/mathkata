@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef MATHFU_IO_H_
-#define MATHFU_IO_H_
+#ifndef MATHKATA_IO_H_
+#define MATHKATA_IO_H_
 
 #include <ostream>
 
-#include "mathfu/matrix.h"
-#include "mathfu/quaternion.h"
-#include "mathfu/vector.h"
+#include "mathkata/matrix.h"
+#include "mathkata/quaternion.h"
+#include "mathkata/vector.h"
 
-namespace mathfu {
+namespace mathkata {
 
 /// @brief Print the vector contents to the output stream.
 template <typename T, int d>
@@ -56,6 +56,6 @@ inline std::ostream& operator<<(std::ostream& os, const Quaternion<T>& q) {
             << ")";
 }
 
-}  // namespace mathfu
+}  // namespace mathkata
 
-#endif  // MATHFU_IO_H_
+#endif  // MATHKATA_IO_H_

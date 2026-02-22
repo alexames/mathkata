@@ -13,27 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef MATHFU_MATRIX_H_
-#define MATHFU_MATRIX_H_
+#ifndef MATHKATA_MATRIX_H_
+#define MATHKATA_MATRIX_H_
 
 #include <cassert>
 #include <cmath>
 #include <cstring>
 
-#include "mathfu/utilities.h"
-#include "mathfu/vector.h"
+#include "mathkata/utilities.h"
+#include "mathkata/vector.h"
 
-/// @file mathfu/matrix.h
+/// @file mathkata/matrix.h
 /// @brief Matrix class and functions.
-/// @addtogroup mathfu_matrix
+/// @addtogroup mathkata_matrix
 ///
-/// MathFu provides a generic Matrix implementation which is specialized
+/// MathKata provides a generic Matrix implementation which is specialized
 /// for 4x4 matrices to take advantage of optimization opportunities using
 /// SIMD instructions.
 
 #ifdef _MSC_VER
 #pragma warning(push)
-// The following disables warnings for MATHFU_MAT_OPERATION.
+// The following disables warnings for MATHKATA_MAT_OPERATION.
 // The buffer overrun warning must be disabled as MSVC doesn't treat
 // "Cols" as constant and therefore assumes that it's possible
 // to overrun arrays indexed by "i".
@@ -47,50 +47,50 @@
 #pragma warning(disable : 4723)  // suppress "potential divide by 0" warning
 #endif                           // _MSC_VER
 
-/// @cond MATHFU_INTERNAL
+/// @cond MATHKATA_INTERNAL
 /// The stride of a vector (e.g Vector<T, 3>) when cast as an array of floats.
-#define MATHFU_VECTOR_STRIDE_FLOATS(vector) (sizeof(vector) / sizeof(float))
+#define MATHKATA_VECTOR_STRIDE_FLOATS(vector) (sizeof(vector) / sizeof(float))
 /// @endcond
 
-/// @cond MATHFU_INTERNAL
+/// @cond MATHKATA_INTERNAL
 /// This will unroll loops for matrices with <= 4 Cols
-#define MATHFU_MAT_OPERATION(OP) MATHFU_UNROLLED_LOOP(i, Cols, OP)
+#define MATHKATA_MAT_OPERATION(OP) MATHKATA_UNROLLED_LOOP(i, Cols, OP)
 /// @endcond
 
-/// @cond MATHFU_INTERNAL
+/// @cond MATHKATA_INTERNAL
 /// This will perform a given OP on each matrix column and return the result
-#define MATHFU_MAT_OPERATOR(OP)                   \
-  {                                               \
-    Matrix<T, Rows, Cols> result;                 \
-    MATHFU_MAT_OPERATION(result.data_[i] = (OP)); \
-    return result;                                \
+#define MATHKATA_MAT_OPERATOR(OP)                   \
+  {                                                 \
+    Matrix<T, Rows, Cols> result;                   \
+    MATHKATA_MAT_OPERATION(result.data_[i] = (OP)); \
+    return result;                                  \
   }
 /// @endcond
 
-/// @cond MATHFU_INTERNAL
+/// @cond MATHKATA_INTERNAL
 /// This will perform a given OP on each matrix column
-#define MATHFU_MAT_SELF_OPERATOR(OP) \
-  {                                  \
-    MATHFU_MAT_OPERATION(OP);        \
-    return *this;                    \
+#define MATHKATA_MAT_SELF_OPERATOR(OP) \
+  {                                    \
+    MATHKATA_MAT_OPERATION(OP);        \
+    return *this;                      \
   }
 /// @endcond
 
-/// @cond MATHFU_INTERNAL
+/// @cond MATHKATA_INTERNAL
 /// This macro will take the dot product for a row from data1 and a column from
 /// data2.
-#define MATHFU_MATRIX_4X4_DOT(data1, data2, r)             \
+#define MATHKATA_MATRIX_4X4_DOT(data1, data2, r)           \
   ((data1)[r] * (data2)[0] + (data1)[(r) + 4] * (data2)[1] \
    + (data1)[(r) + 8] * (data2)[2] + (data1)[(r) + 12] * (data2)[3])
 /// @endcond
 
-/// @cond MATHFU_INTERNAL
-#define MATHFU_MATRIX_3X3_DOT(data1, data2, r, size)            \
+/// @cond MATHKATA_INTERNAL
+#define MATHKATA_MATRIX_3X3_DOT(data1, data2, r, size)          \
   ((data1)[r] * (data2)[0] + (data1)[(r) + (size)] * (data2)[1] \
    + (data1)[(r) + 2 * (size)] * (data2)[2])
 /// @endcond
 
-namespace mathfu {
+namespace mathkata {
 
 /// @brief Specifies the depth range convention for projection matrices.
 ///
@@ -111,7 +111,7 @@ enum class Handedness {
   kLeftHanded = -1   ///< Left-handed coordinate system (DirectX convention)
 };
 
-/// @cond MATHFU_INTERNAL
+/// @cond MATHKATA_INTERNAL
 template <class T, int Rows, int Cols = Rows>
 class Matrix;
 template <class T, int Rows, int Cols>
@@ -164,7 +164,7 @@ class Constants {
   /// @returns Minimum absolute value of the determinant of an invertible
   /// <code>float</code> Matrix.
   ///
-  /// @related mathfu::Matrix::InverseWithDeterminantCheck()
+  /// @related mathkata::Matrix::InverseWithDeterminantCheck()
   static T GetDeterminantThreshold() {
     // No constant defined for the general case.
     assert(false);
@@ -189,7 +189,7 @@ class Constants<double> {
   static double GetDeterminantThreshold() { return 1e-15; }
 };
 
-/// @addtogroup mathfu_matrix
+/// @addtogroup mathkata_matrix
 /// @{
 /// @class Matrix
 /// @brief Matrix stores a set of "Rows" by "Cols" elements of type T
@@ -212,14 +212,14 @@ class Matrix {
   ////
   /// @param m Matrix that the data will be copied from.
   constexpr Matrix(const Matrix<T, Rows, Cols>& m) {
-    MATHFU_MAT_OPERATION(data_[i] = m.data_[i]);
+    MATHKATA_MAT_OPERATION(data_[i] = m.data_[i]);
   }
 
   /// @brief Construct a Matrix from a single float.
   ///
   /// @param s Scalar value used to initialize each element of the matrix.
   explicit constexpr Matrix(T s) {
-    MATHFU_MAT_OPERATION((data_[i] = Vector<T, Rows>(s)));
+    MATHKATA_MAT_OPERATION((data_[i] = Vector<T, Rows>(s)));
   }
 
   /// @brief Construct a Matrix from four floats.
@@ -332,7 +332,7 @@ class Matrix {
   ///
   /// @param a Array of values that the matrix will be iniitlized to.
   explicit constexpr Matrix(const T* const a) {
-    MATHFU_MAT_OPERATION((data_[i] = Vector<T, Rows>(&a[i * Rows])));
+    MATHKATA_MAT_OPERATION((data_[i] = Vector<T, Rows>(&a[i * Rows])));
   }
 
   /// @brief Create a Matrix from an array of "Cols", "Rows" element packed
@@ -340,7 +340,7 @@ class Matrix {
   ///
   /// @param vectors Array of "Cols", "Rows" element packed vectors.
   explicit constexpr Matrix(const VectorPacked<T, Rows>* const vectors) {
-    MATHFU_MAT_OPERATION((data_[i] = Vector<T, Rows>(vectors[i])));
+    MATHKATA_MAT_OPERATION((data_[i] = Vector<T, Rows>(vectors[i])));
   }
 
   /// @brief Access an element of the matrix.
@@ -402,7 +402,7 @@ class Matrix {
   ///
   /// @param vector Array of "Cols" entries to write to.
   constexpr void Pack(VectorPacked<T, Rows>* const vector) const {
-    MATHFU_MAT_OPERATION(GetColumn(i).Pack(&vector[i]));
+    MATHKATA_MAT_OPERATION(GetColumn(i).Pack(&vector[i]));
   }
 
   /// @brief Access a column vector of the Matrix.
@@ -438,7 +438,7 @@ class Matrix {
   ///
   /// @return Matrix containing the result.
   constexpr Matrix<T, Rows, Cols> operator-() const {
-    MATHFU_MAT_OPERATOR(-data_[i]);
+    MATHKATA_MAT_OPERATOR(-data_[i]);
   }
 
   /// @brief Add a Matrix to this Matrix.
@@ -447,7 +447,7 @@ class Matrix {
   /// @return Matrix containing the result.
   constexpr Matrix<T, Rows, Cols> operator+(
       const Matrix<T, Rows, Cols>& m) const {
-    MATHFU_MAT_OPERATOR(data_[i] + m.data_[i]);
+    MATHKATA_MAT_OPERATOR(data_[i] + m.data_[i]);
   }
 
   /// @brief Subtract a Matrix from this Matrix.
@@ -456,7 +456,7 @@ class Matrix {
   /// @return Matrix containing the result.
   constexpr Matrix<T, Rows, Cols> operator-(
       const Matrix<T, Rows, Cols>& m) const {
-    MATHFU_MAT_OPERATOR(data_[i] - m.data_[i]);
+    MATHKATA_MAT_OPERATOR(data_[i] - m.data_[i]);
   }
 
   /// @brief Add a scalar to each element of this Matrix.
@@ -464,7 +464,7 @@ class Matrix {
   /// @param s Scalar to add to this Matrix.
   /// @return Matrix containing the result.
   constexpr Matrix<T, Rows, Cols> operator+(T s) const {
-    MATHFU_MAT_OPERATOR(data_[i] + s);
+    MATHKATA_MAT_OPERATOR(data_[i] + s);
   }
 
   /// @brief Subtract a scalar from each element of this Matrix.
@@ -472,7 +472,7 @@ class Matrix {
   /// @param s Scalar to subtract from this matrix.
   /// @return Matrix containing the result.
   constexpr Matrix<T, Rows, Cols> operator-(T s) const {
-    MATHFU_MAT_OPERATOR(data_[i] - s);
+    MATHKATA_MAT_OPERATOR(data_[i] - s);
   }
 
   /// @brief Multiply each element of this Matrix with a scalar.
@@ -480,7 +480,7 @@ class Matrix {
   /// @param s Scalar to multiply with this Matrix.
   /// @return Matrix containing the result.
   constexpr Matrix<T, Rows, Cols> operator*(T s) const {
-    MATHFU_MAT_OPERATOR(data_[i] * s);
+    MATHKATA_MAT_OPERATOR(data_[i] * s);
   }
 
   /// @brief Divide each element of this Matrix by a scalar.
@@ -495,7 +495,7 @@ class Matrix {
   ///
   /// @note This operator requires square matrices (Rows == Cols).
   /// For non-square matrix multiplication, use the free function
-  /// mathfu::Multiply() instead.
+  /// mathkata::Multiply() instead.
   ///
   /// @param m Matrix to multiply with this Matrix.
   /// @return Matrix containing the result.
@@ -514,7 +514,7 @@ class Matrix {
   /// @param m Matrix to add to this Matrix.
   /// @return Reference to this class.
   constexpr Matrix<T, Rows, Cols>& operator+=(const Matrix<T, Rows, Cols>& m) {
-    MATHFU_MAT_SELF_OPERATOR(data_[i] += m.data_[i]);
+    MATHKATA_MAT_SELF_OPERATOR(data_[i] += m.data_[i]);
   }
 
   /// @brief Subtract a Matrix from this Matrix (in-place).
@@ -522,7 +522,7 @@ class Matrix {
   /// @param m Matrix to subtract from this Matrix.
   /// @return Reference to this class.
   constexpr Matrix<T, Rows, Cols>& operator-=(const Matrix<T, Rows, Cols>& m) {
-    MATHFU_MAT_SELF_OPERATOR(data_[i] -= m.data_[i]);
+    MATHKATA_MAT_SELF_OPERATOR(data_[i] -= m.data_[i]);
   }
 
   /// @brief Add a scalar to each element of this Matrix (in-place).
@@ -530,7 +530,7 @@ class Matrix {
   /// @param s Scalar to add to each element of this Matrix.
   /// @return Reference to this class.
   constexpr Matrix<T, Rows, Cols>& operator+=(T s) {
-    MATHFU_MAT_SELF_OPERATOR(data_[i] += s);
+    MATHKATA_MAT_SELF_OPERATOR(data_[i] += s);
   }
 
   /// @brief Subtract a scalar from each element of this Matrix (in-place).
@@ -538,7 +538,7 @@ class Matrix {
   /// @param s Scalar to subtract from each element of this Matrix.
   /// @return Reference to this class.
   constexpr Matrix<T, Rows, Cols>& operator-=(T s) {
-    MATHFU_MAT_SELF_OPERATOR(data_[i] -= s);
+    MATHKATA_MAT_SELF_OPERATOR(data_[i] -= s);
   }
 
   /// @brief Multiply each element of this Matrix with a scalar (in-place).
@@ -546,7 +546,7 @@ class Matrix {
   /// @param s Scalar to multiply with each element of this Matrix.
   /// @return Reference to this class.
   constexpr Matrix<T, Rows, Cols>& operator*=(T s) {
-    MATHFU_MAT_SELF_OPERATOR(data_[i] *= s);
+    MATHKATA_MAT_SELF_OPERATOR(data_[i] *= s);
   }
 
   /// @brief Divide each element of this Matrix by a scalar (in-place).
@@ -561,7 +561,7 @@ class Matrix {
   ///
   /// @note This operator requires square matrices (Rows == Cols).
   /// For non-square matrix multiplication, use the free function
-  /// mathfu::Multiply() instead.
+  /// mathkata::Multiply() instead.
   ///
   /// @param m Matrix to multiply with this Matrix.
   /// @return Reference to this class.
@@ -617,10 +617,10 @@ class Matrix {
   /// @return The transpose of the specified Matrix.
   constexpr Matrix<T, Cols, Rows> Transpose() const {
     Matrix<T, Cols, Rows> transpose;
-    MATHFU_UNROLLED_LOOP(
+    MATHKATA_UNROLLED_LOOP(
         i, Cols,
-        MATHFU_UNROLLED_LOOP(j, Rows,
-                             transpose.GetColumn(j)[i] = GetColumn(i)[j]))
+        MATHKATA_UNROLLED_LOOP(j, Rows,
+                               transpose.GetColumn(j)[i] = GetColumn(i)[j]))
     return transpose;
   }
 
@@ -659,16 +659,16 @@ class Matrix {
   ///
   /// Use this for safe conversion from external matrix classes.
   /// Often, external libraries will have their own matrix types that are,
-  /// byte-for-byte, exactly the same as mathfu::Matrix. This function allows
-  /// you to load a mathfu::Matrix from those external types, without potential
-  /// aliasing bugs that are caused by casting.
+  /// byte-for-byte, exactly the same as mathkata::Matrix. This function allows
+  /// you to load a mathkata::Matrix from those external types, without
+  /// potential aliasing bugs that are caused by casting.
   ///
   /// @note If your external type gives you access to a T*, then you can
   ///       equivalently use the Matrix(const T*) constructor.
   ///
   /// @param compatible reference to a byte-wise compatible matrix structure;
   ///                   array of Cols x Rows Ts.
-  /// @returns `compatible` loaded as a mathfu::Matrix.
+  /// @returns `compatible` loaded as a mathkata::Matrix.
   template <typename CompatibleT>
   static inline Matrix<T, Rows, Cols> FromType(const CompatibleT& compatible) {
     return FromTypeHelper<T, Rows, Cols, CompatibleT>(compatible);
@@ -680,11 +680,11 @@ class Matrix {
   ///
   /// Use this for safe conversion to external matrix classes.
   /// Often, external libraries will have their own matrix types that are,
-  /// byte-for-byte, exactly the same as mathfu::Matrix. This function allows
-  /// you to load an external type from a mathfu::Matrix, without potential
+  /// byte-for-byte, exactly the same as mathkata::Matrix. This function allows
+  /// you to load an external type from a mathkata::Matrix, without potential
   /// aliasing bugs that are caused by casting.
   ///
-  /// @param m reference to mathfu::Matrix to convert.
+  /// @param m reference to mathkata::Matrix to convert.
   /// @returns CompatibleT loaded from m.
   template <typename CompatibleT>
   static inline CompatibleT ToType(const Matrix<T, Rows, Cols>& m) {
@@ -706,7 +706,7 @@ class Matrix {
   /// @return Matrix containing the result.
   static constexpr Matrix<T, Rows, Cols> HadamardProduct(
       const Matrix<T, Rows, Cols>& m1, const Matrix<T, Rows, Cols>& m2) {
-    MATHFU_MAT_OPERATOR(HadamardProductHelper(m1.data_[i], m2.data_[i]));
+    MATHKATA_MAT_OPERATOR(HadamardProductHelper(m1.data_[i], m2.data_[i]));
   }
 
   /// @brief Calculate the identity Matrix.
@@ -954,7 +954,7 @@ class Matrix {
   friend constexpr Vector<T, Cols> operator*(const Vector<T, Rows>& v,
                                              const Matrix<T, Rows, Cols>& m) {
     const int Dims = Cols;
-    MATHFU_VECTOR_OPERATOR((Vector<T, Rows>::DotProduct(m.data_[i], v)));
+    MATHKATA_VECTOR_OPERATOR((Vector<T, Rows>::DotProduct(m.data_[i], v)));
   }
 
   // Dimensions of the matrix.
@@ -975,17 +975,17 @@ class Matrix {
   /// @return Pointer to the first column vector.
   constexpr Vector<T, Rows>* data() { return data_; }
 
-  MATHFU_DEFINE_CLASS_SIMD_AWARE_NEW_DELETE
+  MATHKATA_DEFINE_CLASS_SIMD_AWARE_NEW_DELETE
 
  private:
   Vector<T, Rows> data_[Cols];
 };
 /// @}
 
-/// @addtogroup mathfu_matrix
+/// @addtogroup mathkata_matrix
 /// @{
 
-/// @cond MATHFU_INTERNAL
+/// @cond MATHKATA_INTERNAL
 template <int index>
 struct MathfuMatrixUnroller {
   template <class T, int Rows, int Cols>
@@ -1034,7 +1034,7 @@ constexpr bool operator==(const Matrix<T, Rows, Cols>& lhs,
 /// @tparam Rows Number of Rows in the matrix.
 /// @tparam Cols Number of Cols in the matrix.
 ///
-/// @related mathfu::Matrix
+/// @related mathkata::Matrix
 template <class T, int Rows, int Cols>
 constexpr Matrix<T, Rows, Cols> operator*(T s, const Matrix<T, Cols, Rows>& m) {
   return m * s;
@@ -1050,7 +1050,7 @@ constexpr Matrix<T, Rows, Cols> operator*(T s, const Matrix<T, Cols, Rows>& m) {
 /// @param v Vector to multiply.
 /// @return Vector containing the result.
 ///
-/// @related mathfu::Matrix
+/// @related mathkata::Matrix
 template <class T, int Rows, int Cols>
 constexpr Vector<T, Rows> operator*(const Matrix<T, Rows, Cols>& m,
                                     const Vector<T, Cols>& v) {
@@ -1065,7 +1065,7 @@ constexpr Vector<T, Rows> operator*(const Matrix<T, Rows, Cols>& m,
   return result;
 }
 
-/// @cond MATHFU_INTERNAL
+/// @cond MATHKATA_INTERNAL
 template <class T>
 constexpr Vector<T, 2> operator*(const Matrix<T, 2, 2>& m,
                                  const Vector<T, 2>& v) {
@@ -1073,38 +1073,39 @@ constexpr Vector<T, 2> operator*(const Matrix<T, 2, 2>& m,
 }
 /// @endcond
 
-/// @cond MATHFU_INTERNAL
+/// @cond MATHKATA_INTERNAL
 template <class T>
 constexpr Vector<T, 3> operator*(const Matrix<T, 3, 3>& m,
                                  const Vector<T, 3>& v) {
-  return Vector<T, 3>(MATHFU_MATRIX_3X3_DOT(&m.GetColumn(0).data_[0], v, 0, 3),
-                      MATHFU_MATRIX_3X3_DOT(&m.GetColumn(0).data_[0], v, 1, 3),
-                      MATHFU_MATRIX_3X3_DOT(&m.GetColumn(0).data_[0], v, 2, 3));
+  return Vector<T, 3>(
+      MATHKATA_MATRIX_3X3_DOT(&m.GetColumn(0).data_[0], v, 0, 3),
+      MATHKATA_MATRIX_3X3_DOT(&m.GetColumn(0).data_[0], v, 1, 3),
+      MATHKATA_MATRIX_3X3_DOT(&m.GetColumn(0).data_[0], v, 2, 3));
 }
 /// @endcond
 
-/// @cond MATHFU_INTERNAL
+/// @cond MATHKATA_INTERNAL
 template <>
 inline Vector<float, 3> operator*(const Matrix<float, 3, 3>& m,
                                   const Vector<float, 3>& v) {
   return Vector<float, 3>(
-      MATHFU_MATRIX_3X3_DOT(&m.GetColumn(0).data_[0], v, 0,
-                            MATHFU_VECTOR_STRIDE_FLOATS(v)),
-      MATHFU_MATRIX_3X3_DOT(&m.GetColumn(0).data_[0], v, 1,
-                            MATHFU_VECTOR_STRIDE_FLOATS(v)),
-      MATHFU_MATRIX_3X3_DOT(&m.GetColumn(0).data_[0], v, 2,
-                            MATHFU_VECTOR_STRIDE_FLOATS(v)));
+      MATHKATA_MATRIX_3X3_DOT(&m.GetColumn(0).data_[0], v, 0,
+                              MATHKATA_VECTOR_STRIDE_FLOATS(v)),
+      MATHKATA_MATRIX_3X3_DOT(&m.GetColumn(0).data_[0], v, 1,
+                              MATHKATA_VECTOR_STRIDE_FLOATS(v)),
+      MATHKATA_MATRIX_3X3_DOT(&m.GetColumn(0).data_[0], v, 2,
+                              MATHKATA_VECTOR_STRIDE_FLOATS(v)));
 }
 /// @endcond
 
-/// @cond MATHFU_INTERNAL
+/// @cond MATHKATA_INTERNAL
 template <class T>
 constexpr Vector<T, 4> operator*(const Matrix<T, 4, 4>& m,
                                  const Vector<T, 4>& v) {
-  return Vector<T, 4>(MATHFU_MATRIX_4X4_DOT(&m.GetColumn(0).data_[0], v, 0),
-                      MATHFU_MATRIX_4X4_DOT(&m.GetColumn(0).data_[0], v, 1),
-                      MATHFU_MATRIX_4X4_DOT(&m.GetColumn(0).data_[0], v, 2),
-                      MATHFU_MATRIX_4X4_DOT(&m.GetColumn(0).data_[0], v, 3));
+  return Vector<T, 4>(MATHKATA_MATRIX_4X4_DOT(&m.GetColumn(0).data_[0], v, 0),
+                      MATHKATA_MATRIX_4X4_DOT(&m.GetColumn(0).data_[0], v, 1),
+                      MATHKATA_MATRIX_4X4_DOT(&m.GetColumn(0).data_[0], v, 2),
+                      MATHKATA_MATRIX_4X4_DOT(&m.GetColumn(0).data_[0], v, 3));
 }
 /// @endcond
 
@@ -1130,7 +1131,7 @@ constexpr Vector<T, 4> operator*(const Matrix<T, 4, 4>& m,
 /// @param v 3-dimensional Vector.
 /// @return 3-dimensional Vector result after perspective division.
 ///
-/// @related mathfu::Matrix
+/// @related mathkata::Matrix
 template <class T>
 constexpr Vector<T, 3> operator*(const Matrix<T, 4, 4>& m,
                                  const Vector<T, 3>& v) {
@@ -1156,7 +1157,7 @@ constexpr Vector<T, 3> operator*(const Matrix<T, 4, 4>& m,
 /// @param v 3-dimensional Vector representing a point.
 /// @return 3-dimensional Vector result (no perspective division).
 ///
-/// @related mathfu::Matrix
+/// @related mathkata::Matrix
 template <class T>
 constexpr Vector<T, 3> TransformPoint3D(const Matrix<T, 4, 4>& m,
                                         const Vector<T, 3>& v) {
@@ -1165,7 +1166,7 @@ constexpr Vector<T, 3> TransformPoint3D(const Matrix<T, 4, 4>& m,
   return Vector<T, 3>(v4[0], v4[1], v4[2]);
 }
 
-/// @cond MATHFU_INTERNAL
+/// @cond MATHKATA_INTERNAL
 /// @brief Multiply a Matrix with another Matrix.
 ///
 /// @note Template specialized versions are implemented for 2x2, 3x3, and 4x4
@@ -1196,7 +1197,7 @@ constexpr void TimesHelper(const Matrix<T, size1, size2>& m1,
 }
 /// @endcond
 
-/// @cond MATHFU_INTERNAL
+/// @cond MATHKATA_INTERNAL
 template <class T>
 constexpr void TimesHelper(const Matrix<T, 2, 2>& m1, const Matrix<T, 2, 2>& m2,
                            Matrix<T, 2, 2>* out_m) {
@@ -1208,7 +1209,7 @@ constexpr void TimesHelper(const Matrix<T, 2, 2>& m1, const Matrix<T, 2, 2>& m2,
 }
 /// @endcond
 
-/// @cond MATHFU_INTERNAL
+/// @cond MATHKATA_INTERNAL
 template <typename T>
 constexpr void TimesHelper(const Matrix<T, 3, 3>& m1, const Matrix<T, 3, 3>& m2,
                            Matrix<T, 3, 3>* out_m) {
@@ -1234,7 +1235,7 @@ constexpr void TimesHelper(const Matrix<T, 3, 3>& m1, const Matrix<T, 3, 3>& m2,
 }
 /// @endcond
 
-/// @cond MATHFU_INTERNAL
+/// @cond MATHKATA_INTERNAL
 template <class T>
 constexpr void TimesHelper(const Matrix<T, 4, 4>& m1, const Matrix<T, 4, 4>& m2,
                            Matrix<T, 4, 4>* out_m) {
@@ -1286,7 +1287,7 @@ constexpr void TimesHelper(const Matrix<T, 4, 4>& m1, const Matrix<T, 4, 4>& m2,
 /// @tparam C1 Number of columns in m1 / rows in m2.
 /// @tparam C2 Number of columns in m2 and the result.
 ///
-/// @related mathfu::Matrix
+/// @related mathkata::Matrix
 template <class T, int R1, int C1, int C2>
 constexpr Matrix<T, R1, C2> Multiply(const Matrix<T, R1, C1>& m1,
                                      const Matrix<T, C1, C2>& m2) {
@@ -1303,7 +1304,7 @@ constexpr Matrix<T, R1, C2> Multiply(const Matrix<T, R1, C1>& m1,
   return result;
 }
 
-/// @cond MATHFU_INTERNAL
+/// @cond MATHKATA_INTERNAL
 /// @brief Compute the identity matrix.
 ///
 /// @note There are template specializations for 2x2, 3x3, and 4x4 matrices to
@@ -1322,28 +1323,28 @@ constexpr Matrix<T, Rows, Cols> IdentityHelper() {
 }
 /// @endcond
 
-/// @cond MATHFU_INTERNAL
+/// @cond MATHKATA_INTERNAL
 template <class T>
 constexpr Matrix<T, 2, 2> IdentityHelper() {
   return Matrix<T, 2, 2>(1, 0, 0, 1);
 }
 /// @endcond
 
-/// @cond MATHFU_INTERNAL
+/// @cond MATHKATA_INTERNAL
 template <class T>
 constexpr Matrix<T, 3, 3> IdentityHelper() {
   return Matrix<T, 3, 3>(1, 0, 0, 0, 1, 0, 0, 0, 1);
 }
 /// @endcond
 
-/// @cond MATHFU_INTERNAL
+/// @cond MATHKATA_INTERNAL
 template <class T>
 constexpr Matrix<T, 4, 4> IdentityHelper() {
   return Matrix<T, 4, 4>(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
 }
 /// @endcond
 
-/// @cond MATHFU_INTERNAL
+/// @cond MATHKATA_INTERNAL
 /// @brief Compute the outer product of two vectors.
 ///
 /// @note There are template specialization for 2x2, 3x3, and 4x4 matrices to
@@ -1363,7 +1364,7 @@ static constexpr Matrix<T, Rows, Cols> OuterProductHelper(
 }
 /// @endcond
 
-/// @cond MATHFU_INTERNAL
+/// @cond MATHKATA_INTERNAL
 template <class T>
 static constexpr Matrix<T, 2, 2> OuterProductHelper(const Vector<T, 2>& v1,
                                                     const Vector<T, 2>& v2) {
@@ -1372,7 +1373,7 @@ static constexpr Matrix<T, 2, 2> OuterProductHelper(const Vector<T, 2>& v1,
 }
 /// @endcond
 
-/// @cond MATHFU_INTERNAL
+/// @cond MATHKATA_INTERNAL
 template <class T>
 static constexpr Matrix<T, 3, 3> OuterProductHelper(const Vector<T, 3>& v1,
                                                     const Vector<T, 3>& v2) {
@@ -1382,7 +1383,7 @@ static constexpr Matrix<T, 3, 3> OuterProductHelper(const Vector<T, 3>& v1,
 }
 /// @endcond
 
-/// @cond MATHFU_INTERNAL
+/// @cond MATHKATA_INTERNAL
 template <class T>
 static constexpr Matrix<T, 4, 4> OuterProductHelper(const Vector<T, 4>& v1,
                                                     const Vector<T, 4>& v2) {
@@ -1394,7 +1395,7 @@ static constexpr Matrix<T, 4, 4> OuterProductHelper(const Vector<T, 4>& v1,
 }
 /// @endcond
 
-/// @cond MATHFU_INTERNAL
+/// @cond MATHKATA_INTERNAL
 /// @brief Compute the inverse of a matrix.
 ///
 /// There is template specialization  for 2x2, 3x3, and 4x4 matrices to
@@ -1416,7 +1417,7 @@ inline bool InverseHelper(const Matrix<T, Rows, Cols>& m,
 }
 /// @endcond
 
-/// @cond MATHFU_INTERNAL
+/// @cond MATHKATA_INTERNAL
 template <bool check_invertible, class T>
 inline bool InverseHelper(const Matrix<T, 2, 2>& m,
                           Matrix<T, 2, 2>* const inverse, T det_thresh) {
@@ -1433,7 +1434,7 @@ inline bool InverseHelper(const Matrix<T, 2, 2>& m,
 }
 /// @endcond
 
-/// @cond MATHFU_INTERNAL
+/// @cond MATHKATA_INTERNAL
 template <bool check_invertible, class T>
 inline bool InverseHelper(const Matrix<T, 3, 3>& m,
                           Matrix<T, 3, 3>* const inverse, T det_thresh) {
@@ -1454,7 +1455,7 @@ inline bool InverseHelper(const Matrix<T, 3, 3>& m,
 }
 /// @endcond
 
-/// @cond MATHFU_INTERNAL
+/// @cond MATHKATA_INTERNAL
 template <class T>
 inline int FindLargestPivotElem(const Matrix<T, 4, 4>& m) {
   Vector<T, 4> fabs_column(fabs(m[0]), fabs(m[1]), fabs(m[2]), fabs(m[3]));
@@ -1484,7 +1485,7 @@ inline int FindLargestPivotElem(const Matrix<T, 4, 4>& m) {
 }
 /// @endcond
 
-/// @cond MATHFU_INTERNAL
+/// @cond MATHKATA_INTERNAL
 template <bool check_invertible, class T>
 bool InverseHelper(const Matrix<T, 4, 4>& m, Matrix<T, 4, 4>* const inverse,
                    T det_thresh) {
@@ -1561,7 +1562,7 @@ bool InverseHelper(const Matrix<T, 4, 4>& m, Matrix<T, 4, 4>* const inverse,
 }
 /// @endcond
 
-/// @cond MATHFU_INTERNAL
+/// @cond MATHKATA_INTERNAL
 /// Create a 4x4 perspective matrix.
 ///
 /// OpenGL convention (z maps to [-1, 1]):
@@ -1593,7 +1594,7 @@ inline Matrix<T, 4, 4> PerspectiveHelper(T fovy, T aspect, T znear, T zfar,
 }
 /// @endcond
 
-/// @cond MATHFU_INTERNAL
+/// @cond MATHKATA_INTERNAL
 /// Create a 4x4 orthographic matrix.
 ///
 /// OpenGL convention (z maps to [-1, 1]):
@@ -1627,7 +1628,7 @@ static inline Matrix<T, 4, 4> OrthoHelper(T left, T right, T bottom, T top,
 }
 /// @endcond
 
-/// @cond MATHFU_INTERNAL
+/// @cond MATHKATA_INTERNAL
 /// Calculate the axes required to construct a 3-dimensional camera matrix that
 /// looks at "at" from eye position "eye" with the up vector "up".  The axes
 /// are returned in a 4 element "axes" array.
@@ -1653,7 +1654,7 @@ static void LookAtHelperCalculateAxes(const Vector<T, 3>& at,
 }
 /// @endcond
 
-/// @cond MATHFU_INTERNAL
+/// @cond MATHKATA_INTERNAL
 /// Create a 3-dimensional camera matrix.
 template <class T, Handedness H>
 static inline Matrix<T, 4, 4> LookAtHelper(const Vector<T, 3>& at,
@@ -1669,7 +1670,7 @@ static inline Matrix<T, 4, 4> LookAtHelper(const Vector<T, 3>& at,
 }
 /// @endcond
 
-/// @cond MATHFU_INTERNAL
+/// @cond MATHKATA_INTERNAL
 /// Create a 3-dimensional transform matrix.
 template <class T>
 static constexpr Matrix<T, 4, 4> TransformHelper(
@@ -1689,7 +1690,7 @@ static constexpr Matrix<T, 4, 4> TransformHelper(
 }
 /// @endcond
 
-/// @cond MATHFU_INTERNAL
+/// @cond MATHKATA_INTERNAL
 /// Get the 3D position in object space from a window coordinate.
 template <class T>
 static inline bool UnProjectHelper(const Vector<T, 3>& window_coord,
@@ -1726,7 +1727,7 @@ static inline bool UnProjectHelper(const Vector<T, 3>& window_coord,
 }
 /// @endcond
 
-/// @cond MATHFU_INTERNAL
+/// @cond MATHKATA_INTERNAL
 template <typename T, int Rows, int Cols, typename CompatibleT>
 static inline Matrix<T, Rows, Cols> FromTypeHelper(
     const CompatibleT& compatible) {
@@ -1741,7 +1742,7 @@ static inline Matrix<T, Rows, Cols> FromTypeHelper(
 }
 /// @endcond
 
-/// @cond MATHFU_INTERNAL
+/// @cond MATHKATA_INTERNAL
 template <typename T, int Rows, int Cols, typename CompatibleT>
 static inline CompatibleT ToTypeHelper(const Matrix<T, Rows, Cols>& m) {
   // Use memcpy to safely reinterpret between compatible types without
@@ -1765,7 +1766,7 @@ static inline CompatibleT ToTypeHelper(const Matrix<T, Rows, Cols>& m) {
 typedef Matrix<float, 4, 3> AffineTransform;
 /// @}
 
-}  // namespace mathfu
+}  // namespace mathkata
 
 #ifdef _MSC_VER
 #pragma warning(pop)
@@ -1773,6 +1774,6 @@ typedef Matrix<float, 4, 3> AffineTransform;
 
 // Include SIMD-optimized 4x4 matrix operations when SIMD is enabled.
 // These replace the scalar TimesHelper and operator* specializations above.
-#include "mathfu/internal/matrix_4x4_simd.h"
+#include "mathkata/internal/matrix_4x4_simd.h"
 
-#endif  // MATHFU_MATRIX_H_
+#endif  // MATHKATA_MATRIX_H_

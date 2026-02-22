@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "mathfu/matrix.h"
+#include "mathkata/matrix.h"
 
 #include <cmath>
 #include <numbers>
@@ -23,10 +23,10 @@
 #include <type_traits>
 
 #include "gtest/gtest.h"
-#include "mathfu/io.h"
-#include "mathfu/quaternion.h"
-#include "mathfu/utilities.h"
-#include "mathfu/vector.h"
+#include "mathkata/io.h"
+#include "mathkata/quaternion.h"
+#include "mathkata/utilities.h"
+#include "mathkata/vector.h"
 #include "precision.h"
 
 // Thread-local random engine seeded deterministically for reproducible tests.
@@ -58,8 +58,8 @@ class MatrixTests : public ::testing::Test {
 template <class T, int rows, int columns>
 struct MatrixExpectation {
   const char* description;
-  mathfu::Matrix<T, rows, columns> calculated;
-  mathfu::Matrix<T, rows, columns> expected;
+  mathkata::Matrix<T, rows, columns> calculated;
+  mathkata::Matrix<T, rows, columns> expected;
 };
 
 // This will automatically generate tests for each template parameter.
@@ -98,7 +98,7 @@ template <class T, int d>
 void Initialize_Test(const T& precision) {
   // This will test initialization of the matrix using a random single value.
   // The expected result is that all entries equal the given value.
-  mathfu::Matrix<T, d> matrix_splat(static_cast<T>(3.1));
+  mathkata::Matrix<T, d> matrix_splat(static_cast<T>(3.1));
   for (int i = 0; i < d * d; ++i) {
     EXPECT_NEAR(3.1, matrix_splat[i], precision);
   }
@@ -115,7 +115,7 @@ void Initialize_Test(const T& precision) {
   for (int i = 0; i < d * d; ++i) {
     x[i] = TestRandom01<T>() * static_cast<T>(100);
   }
-  mathfu::Matrix<T, d> matrix_arr(x);
+  mathkata::Matrix<T, d> matrix_arr(x);
   for (int i = 0; i < d; ++i) {
     for (int j = 0; j < d; ++j) {
       EXPECT_NEAR(x[i + d * j], matrix_arr(i, j), precision);
@@ -123,7 +123,7 @@ void Initialize_Test(const T& precision) {
   }
   // This will test the copy constructor making sure that the new matrix
   // equals the old one.
-  mathfu::Matrix<T, d> matrix_copy(matrix_arr);
+  mathkata::Matrix<T, d> matrix_copy(matrix_arr);
   for (int i = 0; i < d; ++i) {
     for (int j = 0; j < d; ++j) {
       EXPECT_NEAR(x[i + d * j], matrix_copy(i, j), precision);
@@ -131,10 +131,10 @@ void Initialize_Test(const T& precision) {
   }
   // This will verify that the copy was deep and changing the values of the
   // copied matrix does not effect the original.
-  matrix_copy = matrix_copy - mathfu::Matrix<T, d>(1);
+  matrix_copy = matrix_copy - mathkata::Matrix<T, d>(1);
   EXPECT_NE(matrix_copy(0, 0), matrix_arr(0, 0));
   // This will test creation of the identity matrix.
-  mathfu::Matrix<T, d> identity(mathfu::Matrix<T, d>::Identity());
+  mathkata::Matrix<T, d> identity(mathkata::Matrix<T, d>::Identity());
   for (int i = 0; i < d; ++i) {
     for (int j = 0; j < d; ++j) {
       EXPECT_NEAR(i == j ? 1 : 0, identity(i, j), precision);
@@ -146,13 +146,13 @@ TEST_ALL_F(Initialize, FLOAT_PRECISION, DOUBLE_PRECISION)
 // This will test initialization by specifying all values explicitly.
 template <class T>
 void InitializePerDimension_Test(const T& precision) {
-  mathfu::Matrix<T, 2> matrix_f2x2(static_cast<T>(4.5), static_cast<T>(3.4),
-                                   static_cast<T>(2.6), static_cast<T>(9.8));
+  mathkata::Matrix<T, 2> matrix_f2x2(static_cast<T>(4.5), static_cast<T>(3.4),
+                                     static_cast<T>(2.6), static_cast<T>(9.8));
   EXPECT_NEAR(4.5, matrix_f2x2(0, 0), precision);
   EXPECT_NEAR(3.4, matrix_f2x2(1, 0), precision);
   EXPECT_NEAR(2.6, matrix_f2x2(0, 1), precision);
   EXPECT_NEAR(9.8, matrix_f2x2(1, 1), precision);
-  mathfu::Matrix<T, 3> matrix_f3x3(
+  mathkata::Matrix<T, 3> matrix_f3x3(
       static_cast<T>(3.7), static_cast<T>(2.4), static_cast<T>(6.4),
       static_cast<T>(1.1), static_cast<T>(5.2), static_cast<T>(6.4),
       static_cast<T>(2.7), static_cast<T>(7.4), static_cast<T>(0.1));
@@ -165,7 +165,7 @@ void InitializePerDimension_Test(const T& precision) {
   EXPECT_NEAR(2.7, matrix_f3x3(0, 2), precision);
   EXPECT_NEAR(7.4, matrix_f3x3(1, 2), precision);
   EXPECT_NEAR(0.1, matrix_f3x3(2, 2), precision);
-  mathfu::Matrix<T, 4> matrix_f4x4(
+  mathkata::Matrix<T, 4> matrix_f4x4(
       static_cast<T>(4.1), static_cast<T>(8.4), static_cast<T>(7.2),
       static_cast<T>(4.8), static_cast<T>(0.9), static_cast<T>(7.8),
       static_cast<T>(5.6), static_cast<T>(8.7), static_cast<T>(2.3),
@@ -195,13 +195,13 @@ TEST_SCALAR_F(InitializePerDimension, FLOAT_PRECISION, DOUBLE_PRECISION)
 template <class T, int d>
 void InitializePacked_Test(const T& precision) {
   (void)precision;
-  mathfu::VectorPacked<T, d> packed[d];
+  mathkata::VectorPacked<T, d> packed[d];
   for (int i = 0; i < d; ++i) {
     for (int j = 0; j < d; ++j) {
       packed[i].data_[j] = static_cast<T>((i * d) + j);
     }
   }
-  mathfu::Matrix<T, d> matrix(packed);
+  mathkata::Matrix<T, d> matrix(packed);
   for (int i = 0; i < d * d; ++i) {
     EXPECT_NEAR(packed[i / d].data_[i % d], matrix[i], static_cast<T>(0))
         << "Element " << i;
@@ -213,11 +213,11 @@ TEST_ALL_F(InitializePacked, FLOAT_PRECISION, DOUBLE_PRECISION)
 template <class T, int d>
 void PackedSerialization_Test(const T& precision) {
   (void)precision;
-  mathfu::Matrix<T, d> matrix;
+  mathkata::Matrix<T, d> matrix;
   for (int i = 0; i < d * d; ++i) {
     matrix[i] = static_cast<T>(i);
   }
-  mathfu::VectorPacked<T, d> packed[d];
+  mathkata::VectorPacked<T, d> packed[d];
   matrix.Pack(packed);
   for (int i = 0; i < d * d; ++i) {
     EXPECT_NEAR(matrix[i], packed[i / d].data_[i % d], static_cast<T>(0))
@@ -237,10 +237,10 @@ void AddSub_Test(const T& precision) {
   for (int i = 0; i < d * d; ++i) {
     x2[i] = TestRandom01<T>() * static_cast<T>(100);
   }
-  mathfu::Matrix<T, d> matrix1(x1), matrix2(x2);
+  mathkata::Matrix<T, d> matrix1(x1), matrix2(x2);
   // This will test the negation of a matrix and verify that each element
   // is negated.
-  mathfu::Matrix<T, d> neg_mat1(-matrix1);
+  mathkata::Matrix<T, d> neg_mat1(-matrix1);
   for (int i = 0; i < d; ++i) {
     for (int j = 0; j < d; ++j) {
       EXPECT_NEAR(-x1[i + d * j], neg_mat1(i, j), precision);
@@ -248,7 +248,7 @@ void AddSub_Test(const T& precision) {
   }
   // This will test the addition of two matrices and verify that each element
   // equal to the sum of the input values.
-  mathfu::Matrix<T, d> matrix_add(matrix1 + matrix2);
+  mathkata::Matrix<T, d> matrix_add(matrix1 + matrix2);
   for (int i = 0; i < d; ++i) {
     for (int j = 0; j < d; ++j) {
       EXPECT_NEAR(x1[i + d * j] + x2[i + d * j], matrix_add(i, j), precision);
@@ -256,7 +256,7 @@ void AddSub_Test(const T& precision) {
   }
   // This will test the subtraction of two matrices and verify that each
   // element equal to the difference of the input values.
-  mathfu::Matrix<T, d> matrix_sub(matrix1 - matrix2);
+  mathkata::Matrix<T, d> matrix_sub(matrix1 - matrix2);
   for (int i = 0; i < d; ++i) {
     for (int j = 0; j < d; ++j) {
       EXPECT_NEAR(x1[i + d * j] - x2[i + d * j], matrix_sub(i, j), precision);
@@ -273,10 +273,10 @@ void Mult_Test(const T& precision) {
   T x1[d * d], x2[d * d];
   for (int i = 0; i < d * d; ++i) x1[i] = TestRandom01<T>();
   for (int i = 0; i < d * d; ++i) x2[i] = TestRandom01<T>();
-  mathfu::Matrix<T, d> matrix1(x1), matrix2(x2);
+  mathkata::Matrix<T, d> matrix1(x1), matrix2(x2);
   // This will test scalar matrix multiplication and verify that each element
   // is equal to multiplication by the scalar.
-  mathfu::Matrix<T, d> matrix_mults(matrix1 * static_cast<T>(1.1));
+  mathkata::Matrix<T, d> matrix_mults(matrix1 * static_cast<T>(1.1));
   for (int i = 0; i < d; ++i) {
     for (int j = 0; j < d; ++j) {
       EXPECT_NEAR(x1[i + d * j] * 1.1, matrix_mults(i, j), precision);
@@ -284,27 +284,27 @@ void Mult_Test(const T& precision) {
   }
   T v[d];
   for (int i = 0; i < d; ++i) v[i] = TestRandom01<T>();
-  mathfu::Vector<T, d> vector(v);
+  mathkata::Vector<T, d> vector(v);
   // This will test matrix vector multiplication and verify that the resulting
   // vector is mathematically correct.
-  mathfu::Vector<T, d> vector_multv(matrix1 * vector);
+  mathkata::Vector<T, d> vector_multv(matrix1 * vector);
   for (int i = 0; i < d; ++i) {
     T v1[d];
     for (int k = 0; k < d; ++k) v1[k] = matrix1(i, k);
-    mathfu::Vector<T, d> vec1(v1);
-    T dot = mathfu::Vector<T, d>::DotProduct(vec1, vector);
+    mathkata::Vector<T, d> vec1(v1);
+    T dot = mathkata::Vector<T, d>::DotProduct(vec1, vector);
     EXPECT_NEAR(dot, vector_multv[i], precision);
   }
   // This will test matrix multiplication and verify that the resulting
   // matrix is mathematically correct.
-  mathfu::Matrix<T, d> matrix_multm(matrix1 * matrix2);
+  mathkata::Matrix<T, d> matrix_multm(matrix1 * matrix2);
   for (int i = 0; i < d; ++i) {
     for (int j = 0; j < d; ++j) {
       T v1[d], v2[d];
       for (int k = 0; k < d; ++k) v1[k] = matrix1(i, k);
       for (int k = 0; k < d; ++k) v2[k] = matrix2(k, j);
-      mathfu::Vector<T, d> vec1(v1), vec2(v2);
-      T dot = mathfu::Vector<T, d>::DotProduct(vec1, vec2);
+      mathkata::Vector<T, d> vec1(v1), vec2(v2);
+      T dot = mathkata::Vector<T, d>::DotProduct(vec1, vec2);
       EXPECT_NEAR(dot, matrix_multm(i, j), precision);
     }
   }
@@ -320,9 +320,9 @@ void OuterProduct_Test(const T& precision) {
   T x1[d], x2[d];
   for (int i = 0; i < d; ++i) x1[i] = TestRandom01<T>();
   for (int i = 0; i < d; ++i) x2[i] = TestRandom01<T>();
-  mathfu::Vector<T, d> vector1(x1), vector2(x2);
-  mathfu::Matrix<T, d> matrix(
-      mathfu::Matrix<T, d>::OuterProduct(vector1, vector2));
+  mathkata::Vector<T, d> vector1(x1), vector2(x2);
+  mathkata::Matrix<T, d> matrix(
+      mathkata::Matrix<T, d>::OuterProduct(vector1, vector2));
   // This will verify that each element is mathematically correct.
   for (int i = 0; i < d; ++i) {
     for (int j = 0; j < d; ++j) {
@@ -334,7 +334,7 @@ TEST_ALL_F(OuterProduct, FLOAT_PRECISION, DOUBLE_PRECISION)
 
 // Print the specified matrix to output_string in the form.
 template <class T, int rows, int columns>
-std::string MatrixToString(const mathfu::Matrix<T, rows, columns>& matrix) {
+std::string MatrixToString(const mathkata::Matrix<T, rows, columns>& matrix) {
   std::stringstream ss;
   ss.flags(std::ios::fixed);
   ss.precision(4);
@@ -354,7 +354,7 @@ void InverseNonInvertible_Test(const T& precision) {
   T m[d * d];
   const size_t matrix_size = sizeof(m) / sizeof(m[0]);
   static const T kDeterminantThreshold =
-      mathfu::Constants<T>::GetDeterminantThreshold();
+      mathkata::Constants<T>::GetDeterminantThreshold();
   static const T kDeterminantThresholdSmall = kDeterminantThreshold / 100;
   static const T kDeterminantThresholdLarge = kDeterminantThreshold * 100;
   static const T kDeterminantThresholdInverse = 1 / kDeterminantThreshold;
@@ -366,8 +366,8 @@ void InverseNonInvertible_Test(const T& precision) {
   for (size_t i = 0; i < matrix_size; ++i) m[i] = 0;
   // Verify that it's not possible to invert the matrix.
   {
-    mathfu::Matrix<T, d> matrix(m);
-    mathfu::Matrix<T, d> inverse_matrix;
+    mathkata::Matrix<T, d> matrix(m);
+    mathkata::Matrix<T, d> inverse_matrix;
     EXPECT_FALSE(matrix.InverseWithDeterminantCheck(&inverse_matrix));
     EXPECT_FALSE(matrix.InverseWithDeterminantCheck(
         &inverse_matrix, kDeterminantThresholdSmall));
@@ -377,8 +377,8 @@ void InverseNonInvertible_Test(const T& precision) {
   // Check a matrix with all elements at the determinant threshold.
   for (size_t i = 0; i < matrix_size; ++i) m[i] = kDeterminantThreshold;
   {
-    mathfu::Matrix<T, d> matrix(m);
-    mathfu::Matrix<T, d> inverse_matrix;
+    mathkata::Matrix<T, d> matrix(m);
+    mathkata::Matrix<T, d> inverse_matrix;
     EXPECT_FALSE(matrix.InverseWithDeterminantCheck(&inverse_matrix));
     EXPECT_FALSE(matrix.InverseWithDeterminantCheck(
         &inverse_matrix, kDeterminantThresholdSmall));
@@ -400,8 +400,8 @@ void InverseNonInvertible_Test(const T& precision) {
     }
     m[matrix_size - 1] = kDeterminantThresholdInverseLarge;
     {
-      mathfu::Matrix<T, d> matrix(m);
-      mathfu::Matrix<T, d> inverse_matrix;
+      mathkata::Matrix<T, d> matrix(m);
+      mathkata::Matrix<T, d> inverse_matrix;
       EXPECT_FALSE(matrix.InverseWithDeterminantCheck(&inverse_matrix));
       EXPECT_FALSE(matrix.InverseWithDeterminantCheck(
           &inverse_matrix, kDeterminantThresholdSmall));
@@ -422,7 +422,7 @@ template <class T, int d>
 void InverseSmallScale_Test(const T& precision) {
   (void)precision;
   static const T kDeterminantThreshold =
-      mathfu::Constants<T>::GetDeterminantThreshold();
+      mathkata::Constants<T>::GetDeterminantThreshold();
   static const T kDeterminantThresholdSmall = kDeterminantThreshold / 100;
   static const T kDeterminantThresholdLarge = kDeterminantThreshold * 100;
 
@@ -431,8 +431,8 @@ void InverseSmallScale_Test(const T& precision) {
   static const T kDeterminantPower = static_cast<T>(1) / (d == 2 ? 2 : 3);
   static const T kScaleMin = pow(kDeterminantThreshold, kDeterminantPower);
 
-  mathfu::Matrix<T, d> matrix = mathfu::Matrix<T, d>::Identity();
-  mathfu::Matrix<T, d> inverse_matrix;
+  mathkata::Matrix<T, d> matrix = mathkata::Matrix<T, d>::Identity();
+  mathkata::Matrix<T, d> inverse_matrix;
 
   // Scale too small - non-invertible.
   {
@@ -466,14 +466,14 @@ void Inverse_Test(const T& precision) {
     // there is a tiny probability that a randomly generated matrix will be
     // noninvertible.  This does mean that this test can be flakey by
     // occasionally generating noninvertible matrices.
-    for (int i = 0; i < mathfu::Matrix<T, d>::kElements; ++i) {
+    for (int i = 0; i < mathkata::Matrix<T, d>::kElements; ++i) {
       x[i] = TestRandomRange<T>(1);
     }
-    mathfu::Matrix<T, d> matrix(x);
+    mathkata::Matrix<T, d> matrix(x);
     std::string error_string = MatrixToString(matrix);
     error_string += "\n";
-    mathfu::Matrix<T, d> inverse_matrix(matrix.Inverse());
-    mathfu::Matrix<T, d> identity_matrix(matrix * inverse_matrix);
+    mathkata::Matrix<T, d> inverse_matrix(matrix.Inverse());
+    mathkata::Matrix<T, d> identity_matrix(matrix * inverse_matrix);
 
     error_string += MatrixToString(inverse_matrix);
     error_string += "\n";
@@ -497,11 +497,11 @@ TEST_ALL_F(Inverse, 1e-4f, 1e-8)
 template <class T>
 void TranslationVector3D_Test(const T& precision) {
   (void)precision;
-  const mathfu::Vector<T, 3> trans(static_cast<T>(-100.0), static_cast<T>(0.0),
-                                   static_cast<T>(0.00003));
-  const mathfu::Matrix<T, 4> trans_matrix =
-      mathfu::Matrix<T, 4>::FromTranslationVector(trans);
-  const mathfu::Vector<T, 3> trans_back = trans_matrix.TranslationVector3D();
+  const mathkata::Vector<T, 3> trans(
+      static_cast<T>(-100.0), static_cast<T>(0.0), static_cast<T>(0.00003));
+  const mathkata::Matrix<T, 4> trans_matrix =
+      mathkata::Matrix<T, 4>::FromTranslationVector(trans);
+  const mathkata::Vector<T, 3> trans_back = trans_matrix.TranslationVector3D();
 
   // This will verify that the translation vector has not changed.
   for (int i = 0; i < 3; ++i) {
@@ -514,11 +514,11 @@ TEST_SCALAR_F(TranslationVector3D, FLOAT_PRECISION, DOUBLE_PRECISION)
 template <class T>
 void TranslationVector2D_Test(const T& precision) {
   (void)precision;
-  const mathfu::Vector<T, 2> trans(static_cast<T>(-100.0),
-                                   static_cast<T>(0.00003));
-  const mathfu::Matrix<T, 3> trans_matrix =
-      mathfu::Matrix<T, 3>::FromTranslationVector(trans);
-  const mathfu::Vector<T, 2> trans_back = trans_matrix.TranslationVector2D();
+  const mathkata::Vector<T, 2> trans(static_cast<T>(-100.0),
+                                     static_cast<T>(0.00003));
+  const mathkata::Matrix<T, 3> trans_matrix =
+      mathkata::Matrix<T, 3>::FromTranslationVector(trans);
+  const mathkata::Vector<T, 2> trans_back = trans_matrix.TranslationVector2D();
 
   // This will verify that the translation vector has not changed.
   for (int i = 0; i < 2; ++i) {
@@ -531,14 +531,14 @@ TEST_SCALAR_F(TranslationVector2D, FLOAT_PRECISION, DOUBLE_PRECISION)
 // a vector of 1's, which should produce the original scale again.
 template <class T, int d>
 void FromScaleVector_Test(const T& precision) {
-  mathfu::Vector<T, d> ones(static_cast<T>(1));
-  mathfu::Vector<T, d - 1> v;
+  mathkata::Vector<T, d> ones(static_cast<T>(1));
+  mathkata::Vector<T, d - 1> v;
 
   // Tests that the scale vector is placed in the correct order in the matrix.
   for (int i = 0; i < d - 1; ++i) {
     v[i] = static_cast<T>(i + 10);
   }
-  mathfu::Matrix<T, d> m = mathfu::Matrix<T, d>::FromScaleVector(v);
+  mathkata::Matrix<T, d> m = mathkata::Matrix<T, d>::FromScaleVector(v);
 
   // Ensure that the v is on the diagonal.
   for (int i = 0; i < d - 1; ++i) {
@@ -566,9 +566,9 @@ void VerifyMatrixExpectations(
     const size_t number_of_test_cases, const T& precision) {
   for (size_t i = 0; i < number_of_test_cases; ++i) {
     const MatrixExpectation<T, rows, columns>& test = test_cases[i];
-    for (int j = 0; j < mathfu::Matrix<T, rows, columns>::kElements; ++j) {
-      const mathfu::Matrix<T, rows, columns>& calculated = test.calculated;
-      const mathfu::Matrix<T, rows, columns>& expected = test.expected;
+    for (int j = 0; j < mathkata::Matrix<T, rows, columns>::kElements; ++j) {
+      const mathkata::Matrix<T, rows, columns>& calculated = test.calculated;
+      const mathkata::Matrix<T, rows, columns>& expected = test.expected;
       EXPECT_NEAR(calculated[j], expected[j], precision)
           << "element " << j << " (" << (j / columns) << ", " << (j % columns)
           << "), case " << test.description << "\n"
@@ -581,53 +581,53 @@ void VerifyMatrixExpectations(
 // Test perspective matrix calculation.
 template <class T>
 void Perspective_Test(const T& precision) {
-  using RH = std::integral_constant<mathfu::Handedness,
-                                    mathfu::Handedness::kRightHanded>;
-  using LH = std::integral_constant<mathfu::Handedness,
-                                    mathfu::Handedness::kLeftHanded>;
+  using RH = std::integral_constant<mathkata::Handedness,
+                                    mathkata::Handedness::kRightHanded>;
+  using LH = std::integral_constant<mathkata::Handedness,
+                                    mathkata::Handedness::kLeftHanded>;
   // clang-format off
   const MatrixExpectation<T, 4, 4> kTestCasesRH[] = {
     {
       "normalized right-handed",
-      mathfu::Matrix<T, 4>::template Perspective<RH::value>(
+      mathkata::Matrix<T, 4>::template Perspective<RH::value>(
           atan(static_cast<T>(1)) * 2, 1, 0, 1),
-      mathfu::Matrix<T, 4>(1, 0, 0, 0,
+      mathkata::Matrix<T, 4>(1, 0, 0, 0,
                            0, 1, 0, 0,
                            0, 0, -1, -1,
                            0, 0, 0, 0),
     },
     {
       "widefov",
-      mathfu::Matrix<T, 4>::Perspective(
+      mathkata::Matrix<T, 4>::Perspective(
           atan(static_cast<T>(2)) * 2, 1, 0, 1),
-      mathfu::Matrix<T, 4>(0.5, 0, 0, 0,
+      mathkata::Matrix<T, 4>(0.5, 0, 0, 0,
                            0, 0.5, 0, 0,
                            0, 0, -1, -1,
                            0, 0, 0, 0),
     },
     {
       "narrowfov",
-      mathfu::Matrix<T, 4>::Perspective(
+      mathkata::Matrix<T, 4>::Perspective(
           atan(static_cast<T>(0.1)) * 2, 1, 0, 1),
-      mathfu::Matrix<T, 4>(10, 0, 0, 0,
+      mathkata::Matrix<T, 4>(10, 0, 0, 0,
                            0, 10, 0, 0,
                            0, 0, -1, -1,
                            0, 0, 0, 0),
     },
     {
       "2:1 aspect ratio",
-      mathfu::Matrix<T, 4>::Perspective(
+      mathkata::Matrix<T, 4>::Perspective(
           atan(static_cast<T>(1)) * 2, 0.5, 0, 1),
-      mathfu::Matrix<T, 4>(2, 0, 0, 0,
+      mathkata::Matrix<T, 4>(2, 0, 0, 0,
                            0, 1, 0, 0,
                            0, 0, -1, -1,
                            0, 0, 0, 0),
     },
     {
       "deeper view frustrum",
-      mathfu::Matrix<T, 4>::Perspective(
+      mathkata::Matrix<T, 4>::Perspective(
           atan(static_cast<T>(1)) * 2, 1, -2, 2),
-      mathfu::Matrix<T, 4>(1, 0, 0, 0,
+      mathkata::Matrix<T, 4>(1, 0, 0, 0,
                            0, 1, 0, 0,
                            0, 0, 0, -1,
                            0, 0, 2, 0),
@@ -636,9 +636,9 @@ void Perspective_Test(const T& precision) {
   const MatrixExpectation<T, 4, 4> kTestCasesLH[] = {
     {
       "normalized left-handed",
-      mathfu::Matrix<T, 4>::template Perspective<LH::value>(
+      mathkata::Matrix<T, 4>::template Perspective<LH::value>(
           atan(static_cast<T>(1)) * 2, 1, 0, 1),
-      mathfu::Matrix<T, 4>(1, 0, 0, 0,
+      mathkata::Matrix<T, 4>(1, 0, 0, 0,
                            0, 1, 0, 0,
                            0, 0, 1, 1,
                            0, 0, 0, 0),
@@ -661,18 +661,18 @@ void PerspectiveOpenGLDepth_Test(const T& precision) {
   const T znear = static_cast<T>(0.1);
   const T zfar = static_cast<T>(100.0);
 
-  mathfu::Matrix<T, 4> proj = mathfu::Matrix<T, 4>::Perspective(
-      fovy, aspect, znear, zfar, mathfu::DepthRange::kOpenGL);
+  mathkata::Matrix<T, 4> proj = mathkata::Matrix<T, 4>::Perspective(
+      fovy, aspect, znear, zfar, mathkata::DepthRange::kOpenGL);
 
   // Transform a point on the near plane (z = -znear in view space for RH).
-  mathfu::Vector<T, 4> near_point(0, 0, -znear, 1);
-  mathfu::Vector<T, 4> near_clip = proj * near_point;
+  mathkata::Vector<T, 4> near_point(0, 0, -znear, 1);
+  mathkata::Vector<T, 4> near_clip = proj * near_point;
   T near_ndc_z = near_clip.z / near_clip.w;
   EXPECT_NEAR(near_ndc_z, static_cast<T>(-1), precision);
 
   // Transform a point on the far plane (z = -zfar in view space for RH).
-  mathfu::Vector<T, 4> far_point(0, 0, -zfar, 1);
-  mathfu::Vector<T, 4> far_clip = proj * far_point;
+  mathkata::Vector<T, 4> far_point(0, 0, -zfar, 1);
+  mathkata::Vector<T, 4> far_clip = proj * far_point;
   T far_ndc_z = far_clip.z / far_clip.w;
   EXPECT_NEAR(far_ndc_z, static_cast<T>(1), precision);
 }
@@ -687,18 +687,18 @@ void PerspectiveDirectXDepth_Test(const T& precision) {
   const T znear = static_cast<T>(0.1);
   const T zfar = static_cast<T>(100.0);
 
-  mathfu::Matrix<T, 4> proj = mathfu::Matrix<T, 4>::Perspective(
-      fovy, aspect, znear, zfar, mathfu::DepthRange::kDirectX);
+  mathkata::Matrix<T, 4> proj = mathkata::Matrix<T, 4>::Perspective(
+      fovy, aspect, znear, zfar, mathkata::DepthRange::kDirectX);
 
   // Transform a point on the near plane (z = -znear in view space for RH).
-  mathfu::Vector<T, 4> near_point(0, 0, -znear, 1);
-  mathfu::Vector<T, 4> near_clip = proj * near_point;
+  mathkata::Vector<T, 4> near_point(0, 0, -znear, 1);
+  mathkata::Vector<T, 4> near_clip = proj * near_point;
   T near_ndc_z = near_clip.z / near_clip.w;
   EXPECT_NEAR(near_ndc_z, static_cast<T>(0), precision);
 
   // Transform a point on the far plane (z = -zfar in view space for RH).
-  mathfu::Vector<T, 4> far_point(0, 0, -zfar, 1);
-  mathfu::Vector<T, 4> far_clip = proj * far_point;
+  mathkata::Vector<T, 4> far_point(0, 0, -zfar, 1);
+  mathkata::Vector<T, 4> far_clip = proj * far_point;
   T far_ndc_z = far_clip.z / far_clip.w;
   EXPECT_NEAR(far_ndc_z, static_cast<T>(1), precision);
 }
@@ -713,10 +713,10 @@ void PerspectiveDefaultIsOpenGL_Test(const T& precision) {
   const T znear = static_cast<T>(1.0);
   const T zfar = static_cast<T>(500.0);
 
-  mathfu::Matrix<T, 4> default_proj =
-      mathfu::Matrix<T, 4>::Perspective(fovy, aspect, znear, zfar);
-  mathfu::Matrix<T, 4> opengl_proj = mathfu::Matrix<T, 4>::Perspective(
-      fovy, aspect, znear, zfar, mathfu::DepthRange::kOpenGL);
+  mathkata::Matrix<T, 4> default_proj =
+      mathkata::Matrix<T, 4>::Perspective(fovy, aspect, znear, zfar);
+  mathkata::Matrix<T, 4> opengl_proj = mathkata::Matrix<T, 4>::Perspective(
+      fovy, aspect, znear, zfar, mathkata::DepthRange::kOpenGL);
 
   for (int i = 0; i < 16; ++i) {
     EXPECT_NEAR(default_proj[i], opengl_proj[i], precision);
@@ -727,30 +727,30 @@ TEST_SCALAR_F(PerspectiveDefaultIsOpenGL, FLOAT_PRECISION, DOUBLE_PRECISION)
 // Test orthographic matrix calculation.
 template <class T>
 void Ortho_Test(const T& precision) {
-  using LH = std::integral_constant<mathfu::Handedness,
-                                    mathfu::Handedness::kLeftHanded>;
+  using LH = std::integral_constant<mathkata::Handedness,
+                                    mathkata::Handedness::kLeftHanded>;
   // clang-format off
   const MatrixExpectation<T, 4, 4> kTestCasesRH[] = {
     {
       "normalized",
-      mathfu::Matrix<T, 4, 4>::Ortho(0, 2, 0, 2, 2, 0),
-      mathfu::Matrix<T, 4, 4>(1, 0, 0, 0,
+      mathkata::Matrix<T, 4, 4>::Ortho(0, 2, 0, 2, 2, 0),
+      mathkata::Matrix<T, 4, 4>(1, 0, 0, 0,
                               0, 1, 0, 0,
                               0, 0, 1, 0,
                               -1, -1, 1, 1),
     },
     {
       "normalized RH",
-      mathfu::Matrix<T, 4, 4>::Ortho(0, 2, 0, 2, 2, 0),
-      mathfu::Matrix<T, 4, 4>(1, 0, 0, 0,
+      mathkata::Matrix<T, 4, 4>::Ortho(0, 2, 0, 2, 2, 0),
+      mathkata::Matrix<T, 4, 4>(1, 0, 0, 0,
                               0, 1, 0, 0,
                               0, 0, 1, 0,
                               -1, -1, 1, 1),
     },
     {
       "narrow RH",
-      mathfu::Matrix<T, 4, 4>::Ortho(1, 3, 0, 2, 2, 0),
-      mathfu::Matrix<T, 4, 4>(1, 0, 0, 0,
+      mathkata::Matrix<T, 4, 4>::Ortho(1, 3, 0, 2, 2, 0),
+      mathkata::Matrix<T, 4, 4>(1, 0, 0, 0,
                               0, 1, 0, 0,
                               0, 0, 1, 0,
                               -2, -1, 1, 1),
@@ -758,8 +758,8 @@ void Ortho_Test(const T& precision) {
     },
     {
       "squat RH",
-      mathfu::Matrix<T, 4, 4>::Ortho(0, 2, 1, 3, 2, 0),
-      mathfu::Matrix<T, 4, 4>(1, 0, 0, 0,
+      mathkata::Matrix<T, 4, 4>::Ortho(0, 2, 1, 3, 2, 0),
+      mathkata::Matrix<T, 4, 4>(1, 0, 0, 0,
                               0, 1, 0, 0,
                               0, 0, 1, 0,
                               -1, -2, 1, 1),
@@ -767,8 +767,8 @@ void Ortho_Test(const T& precision) {
     },
     {
       "deep RH",
-      mathfu::Matrix<T, 4, 4>::Ortho(0, 2, 0, 2, 3, 1),
-      mathfu::Matrix<T, 4, 4>(1, 0, 0, 0,
+      mathkata::Matrix<T, 4, 4>::Ortho(0, 2, 0, 2, 3, 1),
+      mathkata::Matrix<T, 4, 4>(1, 0, 0, 0,
                               0, 1, 0, 0,
                               0, 0, 1, 0,
                               -1, -1, 2, 1),
@@ -778,16 +778,16 @@ void Ortho_Test(const T& precision) {
   const MatrixExpectation<T, 4, 4> kTestCasesLH[] = {
     {
       "normalized LH",
-      mathfu::Matrix<T, 4, 4>::template Ortho<LH::value>(0, 2, 0, 2, 2, 0),
-      mathfu::Matrix<T, 4, 4>(1, 0, 0, 0,
+      mathkata::Matrix<T, 4, 4>::template Ortho<LH::value>(0, 2, 0, 2, 2, 0),
+      mathkata::Matrix<T, 4, 4>(1, 0, 0, 0,
                               0, 1, 0, 0,
                               0, 0, -1, 0,
                               -1, -1, 1, 1),
     },
     {
       "Canonical LH",
-      mathfu::Matrix<T, 4, 4>::template Ortho<LH::value>(1, 3, 1, 3, 1, 3),
-      mathfu::Matrix<T, 4, 4>(1, 0, 0, 0,
+      mathkata::Matrix<T, 4, 4>::template Ortho<LH::value>(1, 3, 1, 3, 1, 3),
+      mathkata::Matrix<T, 4, 4>(1, 0, 0, 0,
                               0, 1, 0, 0,
                               0, 0, 1, 0,
                              -2,-2,-2, 1),
@@ -813,18 +813,18 @@ void OrthoOpenGLDepth_Test(const T& precision) {
   const T znear = static_cast<T>(1);
   const T zfar = static_cast<T>(100);
 
-  mathfu::Matrix<T, 4> proj = mathfu::Matrix<T, 4>::Ortho(
-      left, right, bottom, top, znear, zfar, mathfu::DepthRange::kOpenGL);
+  mathkata::Matrix<T, 4> proj = mathkata::Matrix<T, 4>::Ortho(
+      left, right, bottom, top, znear, zfar, mathkata::DepthRange::kOpenGL);
 
   // Transform a point on the near plane (z = -znear in view space for RH).
-  mathfu::Vector<T, 4> near_point(0, 0, -znear, 1);
-  mathfu::Vector<T, 4> near_clip = proj * near_point;
+  mathkata::Vector<T, 4> near_point(0, 0, -znear, 1);
+  mathkata::Vector<T, 4> near_clip = proj * near_point;
   T near_ndc_z = near_clip.z / near_clip.w;
   EXPECT_NEAR(near_ndc_z, static_cast<T>(-1), precision);
 
   // Transform a point on the far plane (z = -zfar in view space for RH).
-  mathfu::Vector<T, 4> far_point(0, 0, -zfar, 1);
-  mathfu::Vector<T, 4> far_clip = proj * far_point;
+  mathkata::Vector<T, 4> far_point(0, 0, -zfar, 1);
+  mathkata::Vector<T, 4> far_clip = proj * far_point;
   T far_ndc_z = far_clip.z / far_clip.w;
   EXPECT_NEAR(far_ndc_z, static_cast<T>(1), precision);
 }
@@ -841,18 +841,18 @@ void OrthoDirectXDepth_Test(const T& precision) {
   const T znear = static_cast<T>(1);
   const T zfar = static_cast<T>(100);
 
-  mathfu::Matrix<T, 4> proj = mathfu::Matrix<T, 4>::Ortho(
-      left, right, bottom, top, znear, zfar, mathfu::DepthRange::kDirectX);
+  mathkata::Matrix<T, 4> proj = mathkata::Matrix<T, 4>::Ortho(
+      left, right, bottom, top, znear, zfar, mathkata::DepthRange::kDirectX);
 
   // Transform a point on the near plane (z = -znear in view space for RH).
-  mathfu::Vector<T, 4> near_point(0, 0, -znear, 1);
-  mathfu::Vector<T, 4> near_clip = proj * near_point;
+  mathkata::Vector<T, 4> near_point(0, 0, -znear, 1);
+  mathkata::Vector<T, 4> near_clip = proj * near_point;
   T near_ndc_z = near_clip.z / near_clip.w;
   EXPECT_NEAR(near_ndc_z, static_cast<T>(0), precision);
 
   // Transform a point on the far plane (z = -zfar in view space for RH).
-  mathfu::Vector<T, 4> far_point(0, 0, -zfar, 1);
-  mathfu::Vector<T, 4> far_clip = proj * far_point;
+  mathkata::Vector<T, 4> far_point(0, 0, -zfar, 1);
+  mathkata::Vector<T, 4> far_clip = proj * far_point;
   T far_ndc_z = far_clip.z / far_clip.w;
   EXPECT_NEAR(far_ndc_z, static_cast<T>(1), precision);
 }
@@ -869,10 +869,10 @@ void OrthoDefaultIsOpenGL_Test(const T& precision) {
   const T znear = static_cast<T>(0.5);
   const T zfar = static_cast<T>(200);
 
-  mathfu::Matrix<T, 4> default_proj =
-      mathfu::Matrix<T, 4>::Ortho(left, right, bottom, top, znear, zfar);
-  mathfu::Matrix<T, 4> opengl_proj = mathfu::Matrix<T, 4>::Ortho(
-      left, right, bottom, top, znear, zfar, mathfu::DepthRange::kOpenGL);
+  mathkata::Matrix<T, 4> default_proj =
+      mathkata::Matrix<T, 4>::Ortho(left, right, bottom, top, znear, zfar);
+  mathkata::Matrix<T, 4> opengl_proj = mathkata::Matrix<T, 4>::Ortho(
+      left, right, bottom, top, znear, zfar, mathkata::DepthRange::kOpenGL);
 
   for (int i = 0; i < 16; ++i) {
     EXPECT_NEAR(default_proj[i], opengl_proj[i], precision);
@@ -883,28 +883,28 @@ TEST_SCALAR_F(OrthoDefaultIsOpenGL, FLOAT_PRECISION, DOUBLE_PRECISION)
 // Test look-at matrix calculation.
 template <class T>
 void LookAt_Test(const T& precision) {
-  using RH = std::integral_constant<mathfu::Handedness,
-                                    mathfu::Handedness::kRightHanded>;
-  using LH = std::integral_constant<mathfu::Handedness,
-                                    mathfu::Handedness::kLeftHanded>;
+  using RH = std::integral_constant<mathkata::Handedness,
+                                    mathkata::Handedness::kRightHanded>;
+  using LH = std::integral_constant<mathkata::Handedness,
+                                    mathkata::Handedness::kLeftHanded>;
   // clang-format off
   const MatrixExpectation<T, 4, 4> kTestCasesRH[] = {
     {
       "default RH origin along z",
-      mathfu::Matrix<T, 4, 4>::LookAt(
-          mathfu::Vector<T, 3>(0, 0, 1), mathfu::Vector<T, 3>(0, 0, 0),
-          mathfu::Vector<T, 3>(0, 1, 0)),
-      mathfu::Matrix<T, 4, 4>(-1, 0, 0, 0,
+      mathkata::Matrix<T, 4, 4>::LookAt(
+          mathkata::Vector<T, 3>(0, 0, 1), mathkata::Vector<T, 3>(0, 0, 0),
+          mathkata::Vector<T, 3>(0, 1, 0)),
+      mathkata::Matrix<T, 4, 4>(-1, 0, 0, 0,
                                0, 1, 0, 0,
                                0, 0, -1,0,
                                0, 0, 0, 1),
     },
     {
       "right-handed diagonal along diagonal",
-      mathfu::Matrix<T, 4, 4>::template LookAt<RH::value>(
-          mathfu::Vector<T, 3>(0, 0, 0), mathfu::Vector<T, 3>(1, 1, 1),
-          mathfu::Vector<T, 3>(0, 1, 0)),
-      mathfu::Matrix<T, 4, 4>(
+      mathkata::Matrix<T, 4, 4>::template LookAt<RH::value>(
+          mathkata::Vector<T, 3>(0, 0, 0), mathkata::Vector<T, 3>(1, 1, 1),
+          mathkata::Vector<T, 3>(0, 1, 0)),
+      mathkata::Matrix<T, 4, 4>(
           static_cast<T>(0.707106781), static_cast<T>(-0.408248290),
               static_cast<T>(0.577350269), 0,
           0, static_cast<T>(0.816496581), static_cast<T>(0.577350269), 0,
@@ -914,40 +914,40 @@ void LookAt_Test(const T& precision) {
     },
     {
       "right-handed origin along z",
-      mathfu::Matrix<T, 4, 4>::template LookAt<RH::value>(
-          mathfu::Vector<T, 3>(0, 0, 1), mathfu::Vector<T, 3>(0, 0, 0),
-          mathfu::Vector<T, 3>(0, 1, 0)),
-      mathfu::Matrix<T, 4, 4>(-1, 0, 0, 0,
+      mathkata::Matrix<T, 4, 4>::template LookAt<RH::value>(
+          mathkata::Vector<T, 3>(0, 0, 1), mathkata::Vector<T, 3>(0, 0, 0),
+          mathkata::Vector<T, 3>(0, 1, 0)),
+      mathkata::Matrix<T, 4, 4>(-1, 0, 0, 0,
                                0, 1, 0, 0,
                                0, 0, -1,0,
                                0, 0, 0, 1),
     },
     {
       "right-handed origin along x",
-      mathfu::Matrix<T, 4, 4>::template LookAt<RH::value>(
-          mathfu::Vector<T, 3>(1, 0, 0), mathfu::Vector<T, 3>(0, 0, 0),
-          mathfu::Vector<T, 3>(0, 1, 0)),
-      mathfu::Matrix<T, 4, 4>(0, 0, -1, 0,
+      mathkata::Matrix<T, 4, 4>::template LookAt<RH::value>(
+          mathkata::Vector<T, 3>(1, 0, 0), mathkata::Vector<T, 3>(0, 0, 0),
+          mathkata::Vector<T, 3>(0, 1, 0)),
+      mathkata::Matrix<T, 4, 4>(0, 0, -1, 0,
                               0, 1, 0, 0,
                               1, 0, 0, 0,
                               0, 0, 0, 1),
     },
     {
       "right-handed origin along y",
-      mathfu::Matrix<T, 4, 4>::template LookAt<RH::value>(
-          mathfu::Vector<T, 3>(0, 1, 0), mathfu::Vector<T, 3>(0, 0, 0),
-          mathfu::Vector<T, 3>(1, 0, 0)),
-      mathfu::Matrix<T, 4, 4>(0, 1, 0, 0,
+      mathkata::Matrix<T, 4, 4>::template LookAt<RH::value>(
+          mathkata::Vector<T, 3>(0, 1, 0), mathkata::Vector<T, 3>(0, 0, 0),
+          mathkata::Vector<T, 3>(1, 0, 0)),
+      mathkata::Matrix<T, 4, 4>(0, 1, 0, 0,
                               0, 0, -1, 0,
                               -1, 0, 0, 0,
                               0,  0, 0, 1),
     },
     {
       "right-handed translated eye along x",
-      mathfu::Matrix<T, 4, 4>::template LookAt<RH::value>(
-          mathfu::Vector<T, 3>(2, 1, 1), mathfu::Vector<T, 3>(1, 1, 1),
-          mathfu::Vector<T, 3>(0, 1, 0)),
-      mathfu::Matrix<T, 4, 4>(0, 0, -1, 0,
+      mathkata::Matrix<T, 4, 4>::template LookAt<RH::value>(
+          mathkata::Vector<T, 3>(2, 1, 1), mathkata::Vector<T, 3>(1, 1, 1),
+          mathkata::Vector<T, 3>(0, 1, 0)),
+      mathkata::Matrix<T, 4, 4>(0, 0, -1, 0,
                               0, 1, 0, 0,
                               1, 0, 0, 0,
                              -1,-1, 1, 1),
@@ -956,20 +956,20 @@ void LookAt_Test(const T& precision) {
   const MatrixExpectation<T, 4, 4> kTestCasesLH[] = {
     {
       "left-handed origin along z",
-      mathfu::Matrix<T, 4, 4>::template LookAt<LH::value>(
-          mathfu::Vector<T, 3>(0, 0, 1), mathfu::Vector<T, 3>(0, 0, 0),
-          mathfu::Vector<T, 3>(0, 1, 0)),
-      mathfu::Matrix<T, 4, 4>(1, 0, 0, 0,
+      mathkata::Matrix<T, 4, 4>::template LookAt<LH::value>(
+          mathkata::Vector<T, 3>(0, 0, 1), mathkata::Vector<T, 3>(0, 0, 0),
+          mathkata::Vector<T, 3>(0, 1, 0)),
+      mathkata::Matrix<T, 4, 4>(1, 0, 0, 0,
                               0, 1, 0, 0,
                               0, 0, 1, 0,
                               0, 0, 0, 1),
     },
     {
       "origin along diagonal",
-      mathfu::Matrix<T, 4, 4>::template LookAt<LH::value>(
-          mathfu::Vector<T, 3>(0, 0, 0), mathfu::Vector<T, 3>(1, 1, 1),
-          mathfu::Vector<T, 3>(0, 1, 0)),
-      mathfu::Matrix<T, 4, 4>(
+      mathkata::Matrix<T, 4, 4>::template LookAt<LH::value>(
+          mathkata::Vector<T, 3>(0, 0, 0), mathkata::Vector<T, 3>(1, 1, 1),
+          mathkata::Vector<T, 3>(0, 1, 0)),
+      mathkata::Matrix<T, 4, 4>(
           static_cast<T>(-0.707106781), static_cast<T>(-0.408248290),
               static_cast<T>(-0.577350269), 0,
           0, static_cast<T>(0.816496580), static_cast<T>(-0.577350269), 0,
@@ -979,40 +979,40 @@ void LookAt_Test(const T& precision) {
     },
     {
       "origin along z",
-      mathfu::Matrix<T, 4, 4>::template LookAt<LH::value>(
-          mathfu::Vector<T, 3>(0, 0, 2), mathfu::Vector<T, 3>(0, 0, 0),
-          mathfu::Vector<T, 3>(0, 1, 0)),
-      mathfu::Matrix<T, 4, 4>(1, 0, 0, 0,
+      mathkata::Matrix<T, 4, 4>::template LookAt<LH::value>(
+          mathkata::Vector<T, 3>(0, 0, 2), mathkata::Vector<T, 3>(0, 0, 0),
+          mathkata::Vector<T, 3>(0, 1, 0)),
+      mathkata::Matrix<T, 4, 4>(1, 0, 0, 0,
                               0, 1, 0, 0,
                               0, 0, 1, 0,
                               0, 0, 0, 1),
     },
     {
       "origin along x",
-      mathfu::Matrix<T, 4, 4>::template LookAt<LH::value>(
-          mathfu::Vector<T, 3>(1, 0, 0), mathfu::Vector<T, 3>(0, 0, 0),
-          mathfu::Vector<T, 3>(0, 1, 0)),
-      mathfu::Matrix<T, 4, 4>(0, 0, 1, 0,
+      mathkata::Matrix<T, 4, 4>::template LookAt<LH::value>(
+          mathkata::Vector<T, 3>(1, 0, 0), mathkata::Vector<T, 3>(0, 0, 0),
+          mathkata::Vector<T, 3>(0, 1, 0)),
+      mathkata::Matrix<T, 4, 4>(0, 0, 1, 0,
                               0, 1, 0, 0,
                               -1, 0, 0, 0,
                               0, 0, 0, 1),
     },
     {
       "origin along y",
-      mathfu::Matrix<T, 4, 4>::template LookAt<LH::value>(
-          mathfu::Vector<T, 3>(0, 1, 0), mathfu::Vector<T, 3>(0, 0, 0),
-          mathfu::Vector<T, 3>(1, 0, 0)),
-      mathfu::Matrix<T, 4, 4>(0, 1, 0, 0,
+      mathkata::Matrix<T, 4, 4>::template LookAt<LH::value>(
+          mathkata::Vector<T, 3>(0, 1, 0), mathkata::Vector<T, 3>(0, 0, 0),
+          mathkata::Vector<T, 3>(1, 0, 0)),
+      mathkata::Matrix<T, 4, 4>(0, 1, 0, 0,
                               0, 0, 1, 0,
                               1, 0, 0, 0,
                               0, 0, 0, 1),
     },
     {
       "translated eye, looking along z",
-      mathfu::Matrix<T, 4, 4>::template LookAt<LH::value>(
-          mathfu::Vector<T, 3>(1, 1, 2), mathfu::Vector<T, 3>(1, 1, 1),
-          mathfu::Vector<T, 3>(0, 1, 0)),
-      mathfu::Matrix<T, 4, 4>(1, 0, 0, 0,
+      mathkata::Matrix<T, 4, 4>::template LookAt<LH::value>(
+          mathkata::Vector<T, 3>(1, 1, 2), mathkata::Vector<T, 3>(1, 1, 1),
+          mathkata::Vector<T, 3>(0, 1, 0)),
+      mathkata::Matrix<T, 4, 4>(1, 0, 0, 0,
                               0, 1, 0, 0,
                               0, 0, 1, 0,
                               -1, -1, -1, 1),
@@ -1030,21 +1030,21 @@ TEST_SCALAR_F(LookAt, FLOAT_PRECISION, kLookAtDoublePrecision)
 template <class T>
 void UnProject_Test(const T& precision) {
   // clang-format off
-  mathfu::Matrix<T, 4, 4> modelView =
-      mathfu::Matrix<T, 4, 4>(-1, 0,                   0, 0,
+  mathkata::Matrix<T, 4, 4> modelView =
+      mathkata::Matrix<T, 4, 4>(-1, 0,                   0, 0,
                                0, 1,                   0, 0,
                                0, 0,                  -1, 0,
                                0, 0, static_cast<T>(-10), 1);
-  mathfu::Matrix<T, 4, 4> projection =
-      mathfu::Matrix<T, 4, 4>(
+  mathkata::Matrix<T, 4, 4> projection =
+      mathkata::Matrix<T, 4, 4>(
           static_cast<T>(1.81066),  0,                            0,   0,
                         0, static_cast<T>(2.41421342),            0,   0,
                         0,          0,   static_cast<T>(-1.00001991), -1,
                         0,          0,  static_cast<T>(-0.200001985),  0);
   // clang-format on
-  mathfu::Vector<T, 3> result;
-  bool success = mathfu::Matrix<T, 4, 4>::UnProject(
-      mathfu::Vector<T, 3>(754, 1049, 1), modelView, projection, 1600, 1200,
+  mathkata::Vector<T, 3> result;
+  bool success = mathkata::Matrix<T, 4, 4>::UnProject(
+      mathkata::Vector<T, 3>(754, 1049, 1), modelView, projection, 1600, 1200,
       &result);
   EXPECT_TRUE(success);
   EXPECT_NEAR(result.x, 319.00242400912055, 300.0 * precision);
@@ -1058,17 +1058,17 @@ template <class T>
 void UnProject_SingularMatrix_Test(const T& precision) {
   (void)precision;
   // A zero matrix is singular and cannot be inverted.
-  mathfu::Matrix<T, 4, 4> singular =
-      mathfu::Matrix<T, 4, 4>(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-  mathfu::Matrix<T, 4, 4> identity = mathfu::Matrix<T, 4, 4>::Identity();
-  mathfu::Vector<T, 3> window_coord(400, 300, static_cast<T>(0.5));
-  mathfu::Vector<T, 3> result;
+  mathkata::Matrix<T, 4, 4> singular =
+      mathkata::Matrix<T, 4, 4>(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+  mathkata::Matrix<T, 4, 4> identity = mathkata::Matrix<T, 4, 4>::Identity();
+  mathkata::Vector<T, 3> window_coord(400, 300, static_cast<T>(0.5));
+  mathkata::Vector<T, 3> result;
   // Singular model-view matrix.
-  bool success_mv = mathfu::Matrix<T, 4, 4>::UnProject(
+  bool success_mv = mathkata::Matrix<T, 4, 4>::UnProject(
       window_coord, singular, identity, 800, 600, &result);
   EXPECT_FALSE(success_mv);
   // Singular projection matrix.
-  bool success_proj = mathfu::Matrix<T, 4, 4>::UnProject(
+  bool success_proj = mathkata::Matrix<T, 4, 4>::UnProject(
       window_coord, identity, singular, 800, 600, &result);
   EXPECT_FALSE(success_proj);
 }
@@ -1078,11 +1078,11 @@ TEST_SCALAR_F(UnProject_SingularMatrix, FLOAT_PRECISION, DOUBLE_PRECISION)
 template <class T, int d>
 void Transpose_Test(const T& precision) {
   (void)precision;
-  mathfu::Matrix<T, d> matrix;
+  mathkata::Matrix<T, d> matrix;
   for (int i = 0; i < d * d; ++i) {
     matrix[i] = static_cast<T>(i);
   }
-  mathfu::Matrix<T, d> transpose = matrix.Transpose();
+  mathkata::Matrix<T, d> transpose = matrix.Transpose();
   for (int i = 0; i < d; ++i) {
     for (int j = 0; j < d; ++j) {
       EXPECT_NEAR(matrix(i, j), transpose(j, i), static_cast<T>(0));
@@ -1096,12 +1096,12 @@ TEST_ALL_F(Transpose, FLOAT_PRECISION, DOUBLE_PRECISION)
 template <class T, int d>
 void GetColumn_Test(const T& precision) {
   (void)precision;
-  mathfu::Matrix<T, d> matrix;
+  mathkata::Matrix<T, d> matrix;
   for (int i = 0; i < d * d; ++i) {
     matrix[i] = static_cast<T>(i);
   }
   for (int col = 0; col < d; ++col) {
-    mathfu::Vector<T, d> column = matrix.GetColumn(col);
+    mathkata::Vector<T, d> column = matrix.GetColumn(col);
     for (int row = 0; row < d; ++row) {
       EXPECT_EQ(matrix(row, col), column[row])
           << "col=" << col << " row=" << row;
@@ -1114,9 +1114,9 @@ TEST_ALL_F(GetColumn, FLOAT_PRECISION, DOUBLE_PRECISION)
 template <class T, int d>
 void GetColumnMutable_Test(const T& precision) {
   (void)precision;
-  mathfu::Matrix<T, d> matrix(static_cast<T>(0));
+  mathkata::Matrix<T, d> matrix(static_cast<T>(0));
   for (int col = 0; col < d; ++col) {
-    mathfu::Vector<T, d> new_col;
+    mathkata::Vector<T, d> new_col;
     for (int row = 0; row < d; ++row) {
       new_col[row] = static_cast<T>(col * d + row + 1);
     }
@@ -1135,12 +1135,12 @@ TEST_ALL_F(GetColumnMutable, FLOAT_PRECISION, DOUBLE_PRECISION)
 template <class T, int d>
 void GetRow_Test(const T& precision) {
   (void)precision;
-  mathfu::Matrix<T, d> matrix;
+  mathkata::Matrix<T, d> matrix;
   for (int i = 0; i < d * d; ++i) {
     matrix[i] = static_cast<T>(i);
   }
   for (int row = 0; row < d; ++row) {
-    mathfu::Vector<T, d> r = matrix.GetRow(row);
+    mathkata::Vector<T, d> r = matrix.GetRow(row);
     for (int col = 0; col < d; ++col) {
       EXPECT_EQ(matrix(row, col), r[col]) << "row=" << row << " col=" << col;
     }
@@ -1154,14 +1154,14 @@ TEST_ALL_F(GetRow, FLOAT_PRECISION, DOUBLE_PRECISION)
 template <class T, int d>
 void GetRowColumnConsistency_Test(const T& precision) {
   (void)precision;
-  mathfu::Matrix<T, d> matrix;
+  mathkata::Matrix<T, d> matrix;
   for (int i = 0; i < d * d; ++i) {
     matrix[i] = static_cast<T>(i * 3 + 1);
   }
   for (int row = 0; row < d; ++row) {
-    mathfu::Vector<T, d> r = matrix.GetRow(row);
+    mathkata::Vector<T, d> r = matrix.GetRow(row);
     for (int col = 0; col < d; ++col) {
-      mathfu::Vector<T, d> c = matrix.GetColumn(col);
+      mathkata::Vector<T, d> c = matrix.GetColumn(col);
       EXPECT_EQ(r[col], c[row]) << "row=" << row << " col=" << col;
       EXPECT_EQ(r[col], matrix(row, col)) << "row=" << row << " col=" << col;
     }
@@ -1198,8 +1198,8 @@ static T WellSpacedNumber(int i, int prime, T width, T offset) {
 // the identity. Matrices become progressively less numerically stable the
 // further the get from identity.
 template <class T, int d>
-static mathfu::Matrix<T, d> InvertableMatrix() {
-  mathfu::Matrix<T, d> invertable = mathfu::Matrix<T, d>::Identity();
+static mathkata::Matrix<T, d> InvertableMatrix() {
+  mathkata::Matrix<T, d> invertable = mathkata::Matrix<T, d>::Identity();
 
   for (int i = 0; i < d; ++i) {
     // The width and offset constants are arbitrary. We do want to keep the
@@ -1215,8 +1215,8 @@ static mathfu::Matrix<T, d> InvertableMatrix() {
 }
 
 template <class T, int d>
-static void ExpectEqualMatrices(const mathfu::Matrix<T, d>& a,
-                                const mathfu::Matrix<T, d>& b, T precision) {
+static void ExpectEqualMatrices(const mathkata::Matrix<T, d>& a,
+                                const mathkata::Matrix<T, d>& b, T precision) {
   for (int i = 0; i < d; ++i) {
     for (int j = 0; j < d; ++j) {
       EXPECT_NEAR(a(i, j), b(i, j), precision);
@@ -1228,7 +1228,7 @@ static void ExpectEqualMatrices(const mathfu::Matrix<T, d>& a,
 // inverse. Should end up with identity.
 template <class T, int d>
 void MultiplyOperatorInverse_Test(const T& precision) {
-  typedef typename mathfu::Matrix<T, d> Mat;
+  typedef typename mathkata::Matrix<T, d> Mat;
   const Mat identity = Mat::Identity();
   const Mat invertable = InvertableMatrix<T, d>();
 
@@ -1247,7 +1247,7 @@ TEST_ALL_F(MultiplyOperatorInverse, FLOAT_PRECISION, DOUBLE_PRECISION)
 // inverse. Should end up with identity.
 template <class T, int d>
 void ExternalMultiplyOperatorInverse_Test(const T& precision) {
-  typedef typename mathfu::Matrix<T, d> Mat;
+  typedef typename mathkata::Matrix<T, d> Mat;
   const Mat identity = Mat::Identity();
   const Mat invertable = InvertableMatrix<T, d>();
 
@@ -1266,7 +1266,7 @@ TEST_ALL_F(ExternalMultiplyOperatorInverse, FLOAT_PRECISION, DOUBLE_PRECISION)
 // Should be no change.
 template <class T, int d>
 void MultiplyOperatorIdentity_Test(const T& precision) {
-  typedef typename mathfu::Matrix<T, d> Mat;
+  typedef typename mathkata::Matrix<T, d> Mat;
   const Mat identity = Mat::Identity();
   const Mat invertable = InvertableMatrix<T, d>();
 
@@ -1284,7 +1284,7 @@ TEST_ALL_F(MultiplyOperatorIdentity, FLOAT_PRECISION, DOUBLE_PRECISION)
 // Should be no change.
 template <class T, int d>
 void ExternalMultiplyOperatorIdentity_Test(const T& precision) {
-  typedef typename mathfu::Matrix<T, d> Mat;
+  typedef typename mathkata::Matrix<T, d> Mat;
   const Mat identity = Mat::Identity();
   const Mat invertable = InvertableMatrix<T, d>();
 
@@ -1301,7 +1301,7 @@ TEST_ALL_F(ExternalMultiplyOperatorIdentity, FLOAT_PRECISION, DOUBLE_PRECISION)
 // Should be no change.
 template <class T, int d>
 void MultiplyOperatorZero_Test(const T& precision) {
-  typedef typename mathfu::Matrix<T, d> Mat;
+  typedef typename mathkata::Matrix<T, d> Mat;
   const Mat zero(static_cast<T>(0));
   const Mat invertable = InvertableMatrix<T, d>();
 
@@ -1319,7 +1319,7 @@ TEST_ALL_F(MultiplyOperatorZero, FLOAT_PRECISION, DOUBLE_PRECISION)
 // Should be no change.
 template <class T, int d>
 void ExternalMultiplyOperatorZero_Test(const T& precision) {
-  typedef typename mathfu::Matrix<T, d> Mat;
+  typedef typename mathkata::Matrix<T, d> Mat;
   const Mat zero(static_cast<T>(0));
   const Mat invertable = InvertableMatrix<T, d>();
 
@@ -1335,8 +1335,8 @@ TEST_ALL_F(ExternalMultiplyOperatorZero, FLOAT_PRECISION, DOUBLE_PRECISION)
 // Test Matrix<>::ToAffineTransform().
 template <class T>
 void Mat4ToAffine_Test(const T&) {
-  typedef typename mathfu::Matrix<T, 4> Mat4;
-  typedef typename mathfu::Matrix<T, 4, 3> Affine;
+  typedef typename mathkata::Matrix<T, 4> Mat4;
+  typedef typename mathkata::Matrix<T, 4, 3> Affine;
   const Mat4 indices4(0, 1, 2, 0, 4, 5, 6, 0, 8, 9, 10, 0, 12, 13, 14, 1);
   const Affine indices_affine(0, 4, 8, 12, 1, 5, 9, 13, 2, 6, 10, 14);
 
@@ -1353,8 +1353,8 @@ TEST_SCALAR_F(Mat4ToAffine, FLOAT_PRECISION, DOUBLE_PRECISION)
 // Test Matrix<>::FromAffineTransform().
 template <class T>
 void Mat4FromAffine_Test(const T&) {
-  typedef typename mathfu::Matrix<T, 4> Mat4;
-  typedef typename mathfu::Matrix<T, 4, 3> Affine;
+  typedef typename mathkata::Matrix<T, 4> Mat4;
+  typedef typename mathkata::Matrix<T, 4, 3> Affine;
   const Mat4 indices4(0, 1, 2, 0, 4, 5, 6, 0, 8, 9, 10, 0, 12, 13, 14, 1);
   const Affine indices_affine(0, 4, 8, 12, 1, 5, 9, 13, 2, 6, 10, 14);
 
@@ -1367,8 +1367,8 @@ TEST_SCALAR_F(Mat4FromAffine, FLOAT_PRECISION, DOUBLE_PRECISION)
 // Test converting back and forth via Matrix<>::To/FromAffineTransform().
 template <class T>
 void Mat4ToAndFromAffine_Test(const T&) {
-  typedef typename mathfu::Matrix<T, 4> Mat4;
-  typedef typename mathfu::Matrix<T, 4, 3> Affine;
+  typedef typename mathkata::Matrix<T, 4> Mat4;
+  typedef typename mathkata::Matrix<T, 4, 3> Affine;
   const Mat4 indices4(0, 1, 2, 0, 4, 5, 6, 0, 8, 9, 10, 0, 12, 13, 14, 1);
   const Affine indices_affine(0, 4, 8, 12, 1, 5, 9, 13, 2, 6, 10, 14);
 
@@ -1415,7 +1415,7 @@ void MatrixPointerConstructorNonSquare_Test(const T& precision) {
   // A 4x3 matrix (4 rows, 3 cols) stored column-major:
   // Column 0: {1, 2, 3, 4}, Column 1: {5, 6, 7, 8}, Column 2: {9, 10, 11, 12}
   const T data[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
-  mathfu::Matrix<T, 4, 3> mat(data);
+  mathkata::Matrix<T, 4, 3> mat(data);
   // Verify each element using (row, col) access.
   EXPECT_NEAR(mat(0, 0), T(1), precision);
   EXPECT_NEAR(mat(1, 0), T(2), precision);
@@ -1437,8 +1437,8 @@ TEST_SCALAR_F(MatrixPointerConstructorNonSquare, FLOAT_PRECISION,
 // Test extracting the 3x3 rotation Matrix portion from a 4x4 Matrix.
 template <class T>
 void Mat4ToRotationMatrix_Test(const T&) {
-  typedef typename mathfu::Matrix<T, 4> Mat4;
-  typedef typename mathfu::Matrix<T, 3> Mat3;
+  typedef typename mathkata::Matrix<T, 4> Mat4;
+  typedef typename mathkata::Matrix<T, 3> Mat3;
   const Mat4 input(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
   const Mat3 expect(1, 2, 3, 5, 6, 7, 9, 10, 11);
   Mat3 result = input.ToRotationMatrix(input);
@@ -1454,7 +1454,7 @@ TEST_SCALAR_F(Mat4ToRotationMatrix, FLOAT_PRECISION, DOUBLE_PRECISION)
 // double) rather than cosf/sinf (which truncate to float).
 template <class T>
 void RotationPrecision_Test(const T& precision) {
-  typedef mathfu::Matrix<T, 3> Mat3;
+  typedef mathkata::Matrix<T, 3> Mat3;
   const T angle = static_cast<T>(1.0);
   const T c = std::cos(angle);
   const T s = std::sin(angle);
@@ -1485,13 +1485,14 @@ TEST_SCALAR_F(RotationPrecision, FLOAT_PRECISION, DOUBLE_PRECISION)
 // Test HadamardProduct (component-wise multiplication).
 template <class T, int d>
 void HadamardProduct_Test(const T& precision) {
-  mathfu::Matrix<T, d> m1;
-  mathfu::Matrix<T, d> m2;
+  mathkata::Matrix<T, d> m1;
+  mathkata::Matrix<T, d> m2;
   for (int i = 0; i < d * d; ++i) {
     m1[i] = static_cast<T>(i + 1);
     m2[i] = static_cast<T>(d * d - i);
   }
-  mathfu::Matrix<T, d> result = mathfu::Matrix<T, d>::HadamardProduct(m1, m2);
+  mathkata::Matrix<T, d> result =
+      mathkata::Matrix<T, d>::HadamardProduct(m1, m2);
   for (int i = 0; i < d * d; ++i) {
     EXPECT_NEAR(result[i], m1[i] * m2[i], precision);
   }
@@ -1503,7 +1504,7 @@ TEST_ALL_F(HadamardProduct, FLOAT_PRECISION, DOUBLE_PRECISION)
 // Test the compilation of basic matrix operations given in the sample file.
 // This will test transforming a vector with a matrix.
 TEST_F(MatrixTests, MatrixSample) {
-  using namespace mathfu;
+  using namespace mathkata;
   /// @doxysnippetstart Chapter04_Matrices.md Matrix_Sample
   Vector<float, 3> trans(3.f, 2.f, 8.f);
   Vector<float, 3> rotation(0.4f, 1.4f, 0.33f);
@@ -1527,14 +1528,14 @@ TEST_F(MatrixTests, MatrixSample) {
 // to the number of rows and columns.
 template <class T, int d>
 void Equal_Test(const T& precision) {
-  mathfu::Matrix<T, d> expected;
+  mathkata::Matrix<T, d> expected;
   for (int i = 0; i < d * d; ++i) {
     expected[i] = static_cast<T>(i * precision);
   }
-  mathfu::Matrix<T, d> copy(expected);
+  mathkata::Matrix<T, d> copy(expected);
   EXPECT_TRUE(expected == copy);
 
-  mathfu::Matrix<T, d> close(expected - static_cast<T>(1));
+  mathkata::Matrix<T, d> close(expected - static_cast<T>(1));
   EXPECT_FALSE(expected == close);
 }
 TEST_ALL_F(Equal, FLOAT_PRECISION, DOUBLE_PRECISION)
@@ -1543,14 +1544,14 @@ TEST_ALL_F(Equal, FLOAT_PRECISION, DOUBLE_PRECISION)
 // to the number of rows and columns.
 template <class T, int d>
 void NotEqual_Test(const T& precision) {
-  mathfu::Matrix<T, d> expected;
+  mathkata::Matrix<T, d> expected;
   for (int i = 0; i < d * d; ++i) {
     expected[i] = static_cast<T>(i * precision);
   }
-  mathfu::Matrix<T, d> copy(expected);
+  mathkata::Matrix<T, d> copy(expected);
   EXPECT_FALSE(expected != copy);
 
-  mathfu::Matrix<T, d> close(expected - static_cast<T>(1));
+  mathkata::Matrix<T, d> close(expected - static_cast<T>(1));
   EXPECT_TRUE(expected != close);
 }
 TEST_ALL_F(NotEqual, FLOAT_PRECISION, DOUBLE_PRECISION)
@@ -1562,19 +1563,19 @@ TEST_ALL_F(NotEqual, FLOAT_PRECISION, DOUBLE_PRECISION)
 template <class T, int d>
 void EqualityPerElement_Test(const T& precision) {
   (void)precision;
-  mathfu::Matrix<T, d> base;
+  mathkata::Matrix<T, d> base;
   for (int i = 0; i < d * d; ++i) {
     base[i] = static_cast<T>(i + 1);
   }
 
   // A copy should be equal.
-  mathfu::Matrix<T, d> copy(base);
+  mathkata::Matrix<T, d> copy(base);
   EXPECT_TRUE(base == copy);
   EXPECT_FALSE(base != copy);
 
   // Changing any single element should make the matrices not equal.
   for (int i = 0; i < d * d; ++i) {
-    mathfu::Matrix<T, d> modified(base);
+    mathkata::Matrix<T, d> modified(base);
     modified[i] = base[i] + static_cast<T>(100);
     EXPECT_FALSE(base == modified)
         << "Element " << i << " difference not detected by operator==";
@@ -1586,7 +1587,7 @@ TEST_ALL_F(EqualityPerElement, FLOAT_PRECISION, DOUBLE_PRECISION)
 
 // Simple class that represents a possible compatible type for a vector.
 // That is, it's just an array of T of length d, so can be loaded and
-// stored from mathfu::Vector<T,d> using ToType() and FromType().
+// stored from mathkata::Vector<T,d> using ToType() and FromType().
 template <class T, int d>
 struct SimpleMatrix {
   T values[d * d];
@@ -1596,21 +1597,21 @@ struct SimpleMatrix {
 template <class T, int d>
 void FromType_Test(const T& precision) {
   typedef SimpleMatrix<T, d> CompatibleT;
-  typedef mathfu::Matrix<T, d> MatrixT;
+  typedef mathkata::Matrix<T, d> MatrixT;
 
   CompatibleT compatible;
   for (int i = 0; i < d * d; ++i) {
     compatible.values[i] = static_cast<T>(i * precision);
   }
 
-#ifdef MATHFU_COMPILE_WITH_PADDING
+#ifdef MATHKATA_COMPILE_WITH_PADDING
   // With padding, vec3s take up 4-floats worth of memory, so byte-wise
   // conversion won't work.
   if (sizeof(CompatibleT) != sizeof(MatrixT)) {
     EXPECT_EQ(d, 3);
     return;
   }
-#endif  // MATHFU_COMPILE_WITH_PADDING
+#endif  // MATHKATA_COMPILE_WITH_PADDING
 
   const MatrixT matrix = MatrixT::FromType(compatible);
 
@@ -1624,21 +1625,21 @@ TEST_ALL_F(FromType, 0.0f, 0.0)
 template <class T, int d>
 void ToType_Test(const T& precision) {
   typedef SimpleMatrix<T, d> CompatibleT;
-  typedef mathfu::Matrix<T, d> MatrixT;
+  typedef mathkata::Matrix<T, d> MatrixT;
 
   MatrixT matrix;
   for (int i = 0; i < d * d; ++i) {
     matrix[i] = static_cast<T>(i * precision);
   }
 
-#ifdef MATHFU_COMPILE_WITH_PADDING
+#ifdef MATHKATA_COMPILE_WITH_PADDING
   // With padding, vec3s take up 4-floats worth of memory, so byte-wise
   // conversion won't work.
   if (sizeof(CompatibleT) != sizeof(MatrixT)) {
     EXPECT_EQ(d, 3);
     return;
   }
-#endif  // MATHFU_COMPILE_WITH_PADDING
+#endif  // MATHKATA_COMPILE_WITH_PADDING
 
   const CompatibleT compatible = MatrixT::template ToType<CompatibleT>(matrix);
 
@@ -1654,21 +1655,21 @@ TEST_ALL_F(ToType, 0.0f, 0.0)
 template <class T, int d>
 void FromTypeToTypeRoundtrip_Test(const T& precision) {
   typedef SimpleMatrix<T, d> CompatibleT;
-  typedef mathfu::Matrix<T, d> MatrixT;
+  typedef mathkata::Matrix<T, d> MatrixT;
 
   CompatibleT original;
   for (int i = 0; i < d * d; ++i) {
     original.values[i] = static_cast<T>(i * precision + static_cast<T>(1));
   }
 
-#ifdef MATHFU_COMPILE_WITH_PADDING
+#ifdef MATHKATA_COMPILE_WITH_PADDING
   // With padding, vec3s take up 4-floats worth of memory, so byte-wise
   // conversion won't work.
   if (sizeof(CompatibleT) != sizeof(MatrixT)) {
     EXPECT_EQ(d, 3);
     return;
   }
-#endif  // MATHFU_COMPILE_WITH_PADDING
+#endif  // MATHKATA_COMPILE_WITH_PADDING
 
   // SimpleMatrix -> Matrix -> SimpleMatrix
   const MatrixT matrix = MatrixT::FromType(original);
@@ -1683,7 +1684,7 @@ TEST_ALL_F(FromTypeToTypeRoundtrip, 0.0f, 0.0)
 
 template <class T, int d>
 void OutputStream_Test(const T&) {
-  mathfu::Matrix<T, d> matrix;
+  mathkata::Matrix<T, d> matrix;
   for (int i = 0; i < d * d; ++i) {
     matrix[i] = static_cast<T>(i);
   }
@@ -1713,7 +1714,7 @@ TEST_F(MatrixTests, OutputStream_Test_float_1) {
   OutputStream_Test<float, 1>(0.0f);
 }
 
-// Test non-square matrix multiplication via mathfu::Multiply().
+// Test non-square matrix multiplication via mathkata::Multiply().
 // Multiplies a 2x3 matrix by a 3x4 matrix and verifies the 2x4 result.
 template <class T>
 void MultiplyNonSquare_2x3_times_3x4_Test(const T& precision) {
@@ -1722,7 +1723,7 @@ void MultiplyNonSquare_2x3_times_3x4_Test(const T& precision) {
   //   | 1  2  3 |
   //   | 4  5  6 |
   const T data1[] = {T(1), T(4), T(2), T(5), T(3), T(6)};
-  mathfu::Matrix<T, 2, 3> m1(data1);
+  mathkata::Matrix<T, 2, 3> m1(data1);
 
   // m2 is 3 rows x 4 cols (column-major storage).
   //   | 7  8  9  10 |
@@ -1730,9 +1731,9 @@ void MultiplyNonSquare_2x3_times_3x4_Test(const T& precision) {
   //   | 15 16 17 18 |
   const T data2[] = {T(7), T(11), T(15), T(8),  T(12), T(16),
                      T(9), T(13), T(17), T(10), T(14), T(18)};
-  mathfu::Matrix<T, 3, 4> m2(data2);
+  mathkata::Matrix<T, 3, 4> m2(data2);
 
-  mathfu::Matrix<T, 2, 4> result = mathfu::Multiply(m1, m2);
+  mathkata::Matrix<T, 2, 4> result = mathkata::Multiply(m1, m2);
 
   // Expected result (2x4):
   //   row0: 1*7+2*11+3*15=74   1*8+2*12+3*16=80   1*9+2*13+3*17=86
@@ -1762,10 +1763,10 @@ void MultiplySquareMatchesOperator_Test(const T& precision) {
   T x1[d * d], x2[d * d];
   for (int i = 0; i < d * d; ++i) x1[i] = rand() / static_cast<T>(RAND_MAX);
   for (int i = 0; i < d * d; ++i) x2[i] = rand() / static_cast<T>(RAND_MAX);
-  mathfu::Matrix<T, d> m1(x1), m2(x2);
+  mathkata::Matrix<T, d> m1(x1), m2(x2);
 
-  mathfu::Matrix<T, d> via_operator = m1 * m2;
-  mathfu::Matrix<T, d> via_multiply = mathfu::Multiply(m1, m2);
+  mathkata::Matrix<T, d> via_operator = m1 * m2;
+  mathkata::Matrix<T, d> via_multiply = mathkata::Multiply(m1, m2);
 
   for (int i = 0; i < d; ++i) {
     for (int j = 0; j < d; ++j) {
@@ -1785,16 +1786,16 @@ void MultiplyNonSquare_4x3_times_3x2_Test(const T& precision) {
   //   | 10 11 12|
   const T data1[] = {T(1), T(4),  T(7), T(10), T(2), T(5),
                      T(8), T(11), T(3), T(6),  T(9), T(12)};
-  mathfu::Matrix<T, 4, 3> m1(data1);
+  mathkata::Matrix<T, 4, 3> m1(data1);
 
   // m2 is 3 rows x 2 cols.
   //   | 2  1 |
   //   | 0  3 |
   //   | 4  2 |
   const T data2[] = {T(2), T(0), T(4), T(1), T(3), T(2)};
-  mathfu::Matrix<T, 3, 2> m2(data2);
+  mathkata::Matrix<T, 3, 2> m2(data2);
 
-  mathfu::Matrix<T, 4, 2> result = mathfu::Multiply(m1, m2);
+  mathkata::Matrix<T, 4, 2> result = mathkata::Multiply(m1, m2);
 
   // Expected result (4x2):
   //   row0: 1*2+2*0+3*4=14   1*1+2*3+3*2=13
@@ -1823,12 +1824,12 @@ TEST_F(MatrixTests, MultiplyNonSquare_4x3_times_3x2_double) {
 template <class T>
 void MultiplyNonSquare_1x3_times_3x1_Test(const T& precision) {
   const T data1[] = {T(2), T(3), T(4)};
-  mathfu::Matrix<T, 1, 3> m1(data1);
+  mathkata::Matrix<T, 1, 3> m1(data1);
 
   const T data2[] = {T(5), T(6), T(7)};
-  mathfu::Matrix<T, 3, 1> m2(data2);
+  mathkata::Matrix<T, 3, 1> m2(data2);
 
-  mathfu::Matrix<T, 1, 1> result = mathfu::Multiply(m1, m2);
+  mathkata::Matrix<T, 1, 1> result = mathkata::Multiply(m1, m2);
 
   // Expected: 2*5 + 3*6 + 4*7 = 10 + 18 + 28 = 56
   EXPECT_NEAR(result(0, 0), T(56), precision);
@@ -1843,6 +1844,6 @@ TEST_F(MatrixTests, MultiplyNonSquare_1x3_times_3x1_double) {
 
 int main(int argc, char** argv) {
   ::testing::InitGoogleTest(&argc, argv);
-  printf("%s (%s)\n", argv[0], MATHFU_BUILD_OPTIONS_STRING);
+  printf("%s (%s)\n", argv[0], MATHKATA_BUILD_OPTIONS_STRING);
   return RUN_ALL_TESTS();
 }

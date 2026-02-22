@@ -13,60 +13,60 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef MATHFU_VECTOR_3_SIMD_H_
-#define MATHFU_VECTOR_3_SIMD_H_
+#ifndef MATHKATA_VECTOR_3_SIMD_H_
+#define MATHKATA_VECTOR_3_SIMD_H_
 
 #include <cmath>
 
-#include "mathfu/internal/vector_3.h"
-#include "mathfu/utilities.h"
+#include "mathkata/internal/vector_3.h"
+#include "mathkata/utilities.h"
 
-#ifdef MATHFU_COMPILE_WITH_SIMD
-#include "mathfu/internal/simd_helpers.h"
+#ifdef MATHKATA_COMPILE_WITH_SIMD
+#include "mathkata/internal/simd_helpers.h"
 #endif
 
-/// @file mathfu/internal/vector_3_simd.h MathFu Vector<T, 3> Specialization
-/// @brief 3-dimensional specialization of mathfu::Vector for SIMD optimized
+/// @file mathkata/internal/vector_3_simd.h MathKata Vector<T, 3> Specialization
+/// @brief 3-dimensional specialization of mathkata::Vector for SIMD optimized
 /// builds.
-/// @see mathfu::Vector
+/// @see mathkata::Vector
 
-/// @cond MATHFU_INTERNAL
+/// @cond MATHKATA_INTERNAL
 /// Add macros to account for both the case where the vector is stored as a
 /// simd intrinsic using 4 elements or as 3 values of type T.
-/// MATHFU_VECTOR3_STORE3/MATHFU_VECTOR3_LOAD3 are additional operations used
-/// to load/store the non simd values from and to simd datatypes. If intrinsics
-/// are used these amount to essentially noops. MATHFU_VECTOR3_INIT3 either
-/// creates a simd datatype if the intrinsic is used or sets the T values if
-/// not.
-#ifdef MATHFU_COMPILE_WITH_PADDING
-#define MATHFU_VECTOR3_STORE3(simd_to_store, data) \
-  {                                                \
-    (data).simd3 = simd4f_zero_w(simd_to_store);   \
+/// MATHKATA_VECTOR3_STORE3/MATHKATA_VECTOR3_LOAD3 are additional operations
+/// used to load/store the non simd values from and to simd datatypes. If
+/// intrinsics are used these amount to essentially noops.
+/// MATHKATA_VECTOR3_INIT3 either creates a simd datatype if the intrinsic is
+/// used or sets the T values if not.
+#ifdef MATHKATA_COMPILE_WITH_PADDING
+#define MATHKATA_VECTOR3_STORE3(simd_to_store, data) \
+  {                                                  \
+    (data).simd3 = simd4f_zero_w(simd_to_store);     \
   }
-#define MATHFU_VECTOR3_LOAD3(data) (data).simd3
-#define MATHFU_VECTOR3_INIT3(data, v1, v2, v3)   \
+#define MATHKATA_VECTOR3_LOAD3(data) (data).simd3
+#define MATHKATA_VECTOR3_INIT3(data, v1, v2, v3) \
   {                                              \
     (data).simd3 = simd4f_create(v1, v2, v3, 0); \
   }
 #else
-#define MATHFU_VECTOR3_STORE3(simd_to_store, data) \
-  {                                                \
-    simd4f_ustore3(simd_to_store, (data).data_);   \
+#define MATHKATA_VECTOR3_STORE3(simd_to_store, data) \
+  {                                                  \
+    simd4f_ustore3(simd_to_store, (data).data_);     \
   }
-#define MATHFU_VECTOR3_LOAD3(data) simd4f_uload3((data).data_)
-#define MATHFU_VECTOR3_INIT3(data, v1, v2, v3) \
-  {                                            \
-    (data).data_[0] = v1;                      \
-    (data).data_[1] = v2;                      \
-    (data).data_[2] = v3;                      \
+#define MATHKATA_VECTOR3_LOAD3(data) simd4f_uload3((data).data_)
+#define MATHKATA_VECTOR3_INIT3(data, v1, v2, v3) \
+  {                                              \
+    (data).data_[0] = v1;                        \
+    (data).data_[1] = v2;                        \
+    (data).data_[2] = v3;                        \
   }
-#endif  // MATHFU_COMPILE_WITH_PADDING
+#endif  // MATHKATA_COMPILE_WITH_PADDING
 /// @endcond
 
-namespace mathfu {
+namespace mathkata {
 
-#ifdef MATHFU_COMPILE_WITH_SIMD
-/// @cond MATHFU_INTERNAL
+#ifdef MATHKATA_COMPILE_WITH_SIMD
+/// @cond MATHKATA_INTERNAL
 // This class should remain plain old data.
 template <>
 class Vector<float, 3> {
@@ -82,47 +82,47 @@ class Vector<float, 3> {
   inline Vector() {}
 
   inline Vector(const Vector<float, 3>& v) {
-#ifdef MATHFU_COMPILE_WITH_PADDING
+#ifdef MATHKATA_COMPILE_WITH_PADDING
     simd3 = v.simd3;
 #else
-    MATHFU_VECTOR3_INIT3(*this, v[0], v[1], v[2])
-#endif  // MATHFU_COMPILE_WITH_PADDING
+    MATHKATA_VECTOR3_INIT3(*this, v[0], v[1], v[2])
+#endif  // MATHKATA_COMPILE_WITH_PADDING
   }
 
   explicit inline Vector(const Vector<int, 3>& v) {
-    MATHFU_VECTOR3_INIT3(*this, static_cast<float>(v[0]),
-                         static_cast<float>(v[1]), static_cast<float>(v[2]))
+    MATHKATA_VECTOR3_INIT3(*this, static_cast<float>(v[0]),
+                           static_cast<float>(v[1]), static_cast<float>(v[2]))
   }
 
-  explicit inline Vector(const simd4f& v) { MATHFU_VECTOR3_STORE3(v, *this) }
+  explicit inline Vector(const simd4f& v) { MATHKATA_VECTOR3_STORE3(v, *this) }
 
   explicit inline Vector(const float& s) {
-    MATHFU_VECTOR3_INIT3(*this, s, s, s)
+    MATHKATA_VECTOR3_INIT3(*this, s, s, s)
   }
 
   inline Vector(const float& v1, const float& v2, const float& v3) {
-    MATHFU_VECTOR3_INIT3(*this, v1, v2, v3)
+    MATHKATA_VECTOR3_INIT3(*this, v1, v2, v3)
   }
 
   inline Vector(const Vector<float, 2>& v12, const float& v3) {
-    MATHFU_VECTOR3_INIT3(*this, v12[0], v12[1], v3)
+    MATHKATA_VECTOR3_INIT3(*this, v12[0], v12[1], v3)
   }
 
   explicit inline Vector(const float* v) {
-#ifdef MATHFU_COMPILE_WITH_PADDING
+#ifdef MATHKATA_COMPILE_WITH_PADDING
     simd3 = simd4f_uload3(v);
 #else
-    MATHFU_VECTOR3_INIT3(*this, v[0], v[1], v[2])
-#endif  // MATHFU_COMPILE_WITH_PADDING
+    MATHKATA_VECTOR3_INIT3(*this, v[0], v[1], v[2])
+#endif  // MATHKATA_COMPILE_WITH_PADDING
   }
 
   explicit inline Vector(const VectorPacked<float, 3>& vector) {
-#ifdef MATHFU_COMPILE_WITH_PADDING
+#ifdef MATHKATA_COMPILE_WITH_PADDING
     simd3 = simd4f_uload3(vector.data_);
 #else
-    MATHFU_VECTOR3_INIT3(*this, vector.data_[0], vector.data_[1],
-                         vector.data_[2])
-#endif  // MATHFU_COMPILE_WITH_PADDING
+    MATHKATA_VECTOR3_INIT3(*this, vector.data_[0], vector.data_[1],
+                           vector.data_[2])
+#endif  // MATHKATA_COMPILE_WITH_PADDING
   }
 
   inline float& operator()(const int i) { return data_[i]; }
@@ -143,101 +143,103 @@ class Vector<float, 3> {
   inline const Vector<float, 2> xy() const { return Vector<float, 2>(x, y); }
 
   inline void Pack(VectorPacked<float, 3>* const vector) const {
-#ifdef MATHFU_COMPILE_WITH_PADDING
+#ifdef MATHKATA_COMPILE_WITH_PADDING
     simd4f_ustore3(simd3, vector->data_);
 #else
     vector->data_[0] = data_[0];
     vector->data_[1] = data_[1];
     vector->data_[2] = data_[2];
-#endif  // MATHFU_COMPILE_WITH_PADDING
+#endif  // MATHKATA_COMPILE_WITH_PADDING
   }
 
   inline Vector<float, 3> operator-() const {
     return Vector<float, 3>(
-        simd4f_sub(simd4f_zero(), MATHFU_VECTOR3_LOAD3(*this)));
+        simd4f_sub(simd4f_zero(), MATHKATA_VECTOR3_LOAD3(*this)));
   }
 
   inline Vector<float, 3> operator+(const Vector<float, 3>& v) const {
     return Vector<float, 3>(
-        simd4f_add(MATHFU_VECTOR3_LOAD3(*this), MATHFU_VECTOR3_LOAD3(v)));
+        simd4f_add(MATHKATA_VECTOR3_LOAD3(*this), MATHKATA_VECTOR3_LOAD3(v)));
   }
 
   inline Vector<float, 3> operator-(const Vector<float, 3>& v) const {
     return Vector<float, 3>(
-        simd4f_sub(MATHFU_VECTOR3_LOAD3(*this), MATHFU_VECTOR3_LOAD3(v)));
+        simd4f_sub(MATHKATA_VECTOR3_LOAD3(*this), MATHKATA_VECTOR3_LOAD3(v)));
   }
 
   inline Vector<float, 3> operator*(const float& s) const {
     return Vector<float, 3>(
-        simd4f_mul(MATHFU_VECTOR3_LOAD3(*this), simd4f_splat(s)));
+        simd4f_mul(MATHKATA_VECTOR3_LOAD3(*this), simd4f_splat(s)));
   }
 
   friend inline Vector<float, 3> operator*(const float& s,
                                            const Vector<float, 3>& v) {
     return Vector<float, 3>(
-        simd4f_mul(simd4f_splat(s), MATHFU_VECTOR3_LOAD3(v)));
+        simd4f_mul(simd4f_splat(s), MATHKATA_VECTOR3_LOAD3(v)));
   }
 
   inline Vector<float, 3> operator/(const float& s) const {
     return Vector<float, 3>(
-        simd4f_div(MATHFU_VECTOR3_LOAD3(*this), simd4f_splat(s)));
+        simd4f_div(MATHKATA_VECTOR3_LOAD3(*this), simd4f_splat(s)));
   }
 
   inline Vector<float, 3> operator+(const float& s) const {
     return Vector<float, 3>(
-        simd4f_add(MATHFU_VECTOR3_LOAD3(*this), simd4f_splat(s)));
+        simd4f_add(MATHKATA_VECTOR3_LOAD3(*this), simd4f_splat(s)));
   }
 
   friend inline Vector<float, 3> operator+(const float& s,
                                            const Vector<float, 3>& v) {
     return Vector<float, 3>(
-        simd4f_add(simd4f_splat(s), MATHFU_VECTOR3_LOAD3(v)));
+        simd4f_add(simd4f_splat(s), MATHKATA_VECTOR3_LOAD3(v)));
   }
 
   inline Vector<float, 3> operator-(const float& s) const {
     return Vector<float, 3>(
-        simd4f_sub(MATHFU_VECTOR3_LOAD3(*this), simd4f_splat(s)));
+        simd4f_sub(MATHKATA_VECTOR3_LOAD3(*this), simd4f_splat(s)));
   }
 
   friend inline Vector<float, 3> operator-(const float& s,
                                            const Vector<float, 3>& v) {
     return Vector<float, 3>(
-        simd4f_sub(simd4f_splat(s), MATHFU_VECTOR3_LOAD3(v)));
+        simd4f_sub(simd4f_splat(s), MATHKATA_VECTOR3_LOAD3(v)));
   }
 
   inline Vector<float, 3>& operator+=(const Vector<float, 3>& v) {
-    MATHFU_VECTOR3_STORE3(
-        simd4f_add(MATHFU_VECTOR3_LOAD3(*this), MATHFU_VECTOR3_LOAD3(v)), *this)
+    MATHKATA_VECTOR3_STORE3(
+        simd4f_add(MATHKATA_VECTOR3_LOAD3(*this), MATHKATA_VECTOR3_LOAD3(v)),
+        *this)
     return *this;
   }
 
   inline Vector<float, 3>& operator-=(const Vector<float, 3>& v) {
-    MATHFU_VECTOR3_STORE3(
-        simd4f_sub(MATHFU_VECTOR3_LOAD3(*this), MATHFU_VECTOR3_LOAD3(v)), *this)
+    MATHKATA_VECTOR3_STORE3(
+        simd4f_sub(MATHKATA_VECTOR3_LOAD3(*this), MATHKATA_VECTOR3_LOAD3(v)),
+        *this)
     return *this;
   }
 
   inline Vector<float, 3>& operator*=(const float& s) {
-    MATHFU_VECTOR3_STORE3(
-        simd4f_mul(MATHFU_VECTOR3_LOAD3(*this), simd4f_splat(s)), *this)
+    MATHKATA_VECTOR3_STORE3(
+        simd4f_mul(MATHKATA_VECTOR3_LOAD3(*this), simd4f_splat(s)), *this)
     return *this;
   }
 
   inline Vector<float, 3>& operator/=(const float& s) {
-    MATHFU_VECTOR3_STORE3(
-        simd4f_div(MATHFU_VECTOR3_LOAD3(*this), simd4f_splat(s)), *this)
+    MATHKATA_VECTOR3_STORE3(
+        simd4f_div(MATHKATA_VECTOR3_LOAD3(*this), simd4f_splat(s)), *this)
     return *this;
   }
 
   inline Vector<float, 3>& operator+=(const float& s) {
-    MATHFU_VECTOR3_STORE3(
-        simd4f_add(MATHFU_VECTOR3_LOAD3(*this), simd4f_splat(s)), *this)
+    MATHKATA_VECTOR3_STORE3(
+        simd4f_add(MATHKATA_VECTOR3_LOAD3(*this), simd4f_splat(s)), *this)
     return *this;
   }
 
   inline Vector<float, 3>& operator-=(const float& s) {
-    MATHFU_VECTOR3_STORE3(
-        simd4f_sub(MATHFU_VECTOR3_LOAD3(*this), simd4f_splat(s)), *this)
+    MATHKATA_VECTOR3_STORE3(
+        simd4f_sub(MATHKATA_VECTOR3_LOAD3(*this), simd4f_splat(s)), *this)
     return *this;
   }
 
@@ -253,12 +255,12 @@ class Vector<float, 3> {
   }
 
   inline float LengthSquared() const {
-    return simd4f_dot3_scalar(MATHFU_VECTOR3_LOAD3(*this),
-                              MATHFU_VECTOR3_LOAD3(*this));
+    return simd4f_dot3_scalar(MATHKATA_VECTOR3_LOAD3(*this),
+                              MATHKATA_VECTOR3_LOAD3(*this));
   }
 
   inline float Length() const {
-    return simd4f_get_x(simd4f_length3(MATHFU_VECTOR3_LOAD3(*this)));
+    return simd4f_get_x(simd4f_length3(MATHKATA_VECTOR3_LOAD3(*this)));
   }
 
   /// @brief Normalize this vector in-place.
@@ -269,8 +271,8 @@ class Vector<float, 3> {
   /// @return The length of this vector.
   inline float Normalize() {
     const float length = Length();
-    MATHFU_VECTOR3_STORE3(
-        simd4f_mul(MATHFU_VECTOR3_LOAD3(*this), simd4f_splat(1 / length)),
+    MATHKATA_VECTOR3_STORE3(
+        simd4f_mul(MATHKATA_VECTOR3_LOAD3(*this), simd4f_splat(1 / length)),
         *this)
     return length;
   }
@@ -282,7 +284,7 @@ class Vector<float, 3> {
   ///
   /// @return The normalized vector.
   inline Vector<float, 3> Normalized() const {
-    return Vector<float, 3>(simd4f_normalize3(MATHFU_VECTOR3_LOAD3(*this)));
+    return Vector<float, 3>(simd4f_normalize3(MATHKATA_VECTOR3_LOAD3(*this)));
   }
 
   template <typename CompatibleT>
@@ -297,34 +299,34 @@ class Vector<float, 3> {
 
   static inline float DotProduct(const Vector<float, 3>& v1,
                                  const Vector<float, 3>& v2) {
-    return simd4f_dot3_scalar(MATHFU_VECTOR3_LOAD3(v1),
-                              MATHFU_VECTOR3_LOAD3(v2));
+    return simd4f_dot3_scalar(MATHKATA_VECTOR3_LOAD3(v1),
+                              MATHKATA_VECTOR3_LOAD3(v2));
   }
 
   static inline Vector<float, 3> CrossProduct(const Vector<float, 3>& v1,
                                               const Vector<float, 3>& v2) {
     return Vector<float, 3>(
-        simd4f_cross3(MATHFU_VECTOR3_LOAD3(v1), MATHFU_VECTOR3_LOAD3(v2)));
+        simd4f_cross3(MATHKATA_VECTOR3_LOAD3(v1), MATHKATA_VECTOR3_LOAD3(v2)));
   }
 
   static inline Vector<float, 3> HadamardProduct(const Vector<float, 3>& v1,
                                                  const Vector<float, 3>& v2) {
     return Vector<float, 3>(
-        simd4f_mul(MATHFU_VECTOR3_LOAD3(v1), MATHFU_VECTOR3_LOAD3(v2)));
+        simd4f_mul(MATHKATA_VECTOR3_LOAD3(v1), MATHKATA_VECTOR3_LOAD3(v2)));
   }
 
   static inline Vector<float, 3> HadamardDivide(const Vector<float, 3>& v1,
                                                 const Vector<float, 3>& v2) {
     return Vector<float, 3>(
-        simd4f_div(MATHFU_VECTOR3_LOAD3(v1), MATHFU_VECTOR3_LOAD3(v2)));
+        simd4f_div(MATHKATA_VECTOR3_LOAD3(v1), MATHKATA_VECTOR3_LOAD3(v2)));
   }
 
   static inline Vector<float, 3> Lerp(const Vector<float, 3>& v1,
                                       const Vector<float, 3>& v2,
                                       float percent) {
     const simd4f percentv = simd4f_splat(percent);
-    const simd4f v1s = MATHFU_VECTOR3_LOAD3(v1);
-    const simd4f v2s = MATHFU_VECTOR3_LOAD3(v2);
+    const simd4f v1s = MATHKATA_VECTOR3_LOAD3(v1);
+    const simd4f v2s = MATHKATA_VECTOR3_LOAD3(v2);
     return Vector<float, 3>(
         simd4f_add(v1s, simd4f_mul(simd4f_sub(v2s, v1s), percentv)));
   }
@@ -337,24 +339,24 @@ class Vector<float, 3> {
 
   static inline Vector<float, 3> Max(const Vector<float, 3>& v1,
                                      const Vector<float, 3>& v2) {
-#ifdef MATHFU_COMPILE_WITH_PADDING
+#ifdef MATHKATA_COMPILE_WITH_PADDING
     return Vector<float, 3>(
-        simd4f_max(MATHFU_VECTOR3_LOAD3(v1), MATHFU_VECTOR3_LOAD3(v2)));
+        simd4f_max(MATHKATA_VECTOR3_LOAD3(v1), MATHKATA_VECTOR3_LOAD3(v2)));
 #else
     return Vector<float, 3>(std::max(v1[0], v2[0]), std::max(v1[1], v2[1]),
                             std::max(v1[2], v2[2]));
-#endif  // MATHFU_COMPILE_WITH_PADDING
+#endif  // MATHKATA_COMPILE_WITH_PADDING
   }
 
   static inline Vector<float, 3> Min(const Vector<float, 3>& v1,
                                      const Vector<float, 3>& v2) {
-#ifdef MATHFU_COMPILE_WITH_PADDING
+#ifdef MATHKATA_COMPILE_WITH_PADDING
     return Vector<float, 3>(
-        simd4f_min(MATHFU_VECTOR3_LOAD3(v1), MATHFU_VECTOR3_LOAD3(v2)));
+        simd4f_min(MATHKATA_VECTOR3_LOAD3(v1), MATHKATA_VECTOR3_LOAD3(v2)));
 #else
     return Vector<float, 3>(std::min(v1[0], v2[0]), std::min(v1[1], v2[1]),
                             std::min(v1[2], v2[2]));
-#endif  // MATHFU_COMPILE_WITH_PADDING
+#endif  // MATHKATA_COMPILE_WITH_PADDING
   }
 
   static inline float Distance(const Vector<float, 3>& v1,
@@ -393,16 +395,16 @@ class Vector<float, 3> {
     return RefractHelper(incident, normal, eta);
   }
 
-  MATHFU_DEFINE_CLASS_SIMD_AWARE_NEW_DELETE
+  MATHKATA_DEFINE_CLASS_SIMD_AWARE_NEW_DELETE
 
-#include "mathfu/internal/disable_warnings_begin.h"
+#include "mathkata/internal/disable_warnings_begin.h"
   union {
-#ifdef MATHFU_COMPILE_WITH_PADDING
+#ifdef MATHKATA_COMPILE_WITH_PADDING
     simd4f simd3;
     float data_[4];
 #else
     float data_[3];
-#endif  // MATHFU_COMPILE_WITH_PADDING
+#endif  // MATHKATA_COMPILE_WITH_PADDING
 
     struct {
       float x;
@@ -410,11 +412,11 @@ class Vector<float, 3> {
       float z;
     };
   };
-#include "mathfu/internal/disable_warnings_end.h"
+#include "mathkata/internal/disable_warnings_end.h"
 };
 /// @endcond
-#endif  // MATHFU_COMPILE_WITH_SIMD
+#endif  // MATHKATA_COMPILE_WITH_SIMD
 
-}  // namespace mathfu
+}  // namespace mathkata
 
-#endif  // MATHFU_VECTOR_3_SIMD_H_
+#endif  // MATHKATA_VECTOR_3_SIMD_H_

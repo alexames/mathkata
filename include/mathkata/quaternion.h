@@ -13,26 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef MATHFU_QUATERNION_H_
-#define MATHFU_QUATERNION_H_
+#ifndef MATHKATA_QUATERNION_H_
+#define MATHKATA_QUATERNION_H_
 
 #include <cmath>
 #include <limits>
 #include <numbers>
 
-#include "mathfu/matrix.h"
-#include "mathfu/vector.h"
+#include "mathkata/matrix.h"
+#include "mathkata/vector.h"
 
-/// @file mathfu/quaternion.h
+/// @file mathkata/quaternion.h
 /// @brief Quaternion class and functions.
-/// @addtogroup mathfu_quaternion
+/// @addtogroup mathkata_quaternion
 ///
-/// MathFu provides a Quaternion class that utilizes SIMD optimized
+/// MathKata provides a Quaternion class that utilizes SIMD optimized
 /// Matrix and Vector classes.
 
-namespace mathfu {
+namespace mathkata {
 
-/// @addtogroup mathfu_quaternion
+/// @addtogroup mathkata_quaternion
 /// @{
 /// @class Quaternion
 ///
@@ -149,7 +149,9 @@ class Quaternion {
   ///
   /// @param q Quaternion to compare against.
   /// @return true if the scalar or vector components differ.
-  constexpr bool operator!=(const Quaternion<T>& q) const { return !(*this == q); }
+  constexpr bool operator!=(const Quaternion<T>& q) const {
+    return !(*this == q);
+  }
 
   /// @brief Multiply this Quaternion with another Quaternion.
   ///
@@ -457,7 +459,8 @@ class Quaternion {
   /// @param q1 First quaternion.
   /// @param q2 Second quaternion
   /// @return The scalar dot product of both Quaternions.
-  static constexpr T DotProduct(const Quaternion<T>& q1, const Quaternion<T>& q2) {
+  static constexpr T DotProduct(const Quaternion<T>& q1,
+                                const Quaternion<T>& q2) {
     return Vector<T, 4>::DotProduct(q1.data_, q2.data_);
   }
 
@@ -640,7 +643,7 @@ class Quaternion {
   /// @brief Contains a quaternion doing the identity transform.
   static Quaternion<T> identity;
 
-  MATHFU_DEFINE_CLASS_SIMD_AWARE_NEW_DELETE
+  MATHKATA_DEFINE_CLASS_SIMD_AWARE_NEW_DELETE
 
  private:
   /// @brief Construct a Quaternion directly from a Vector<T, 4>.
@@ -683,7 +686,7 @@ template <typename T>
 Quaternion<T> Quaternion<T>::identity = Quaternion<T>(1, 0, 0, 0);
 /// @}
 
-/// @addtogroup mathfu_quaternion
+/// @addtogroup mathkata_quaternion
 /// @{
 
 /// @brief Multiply a Quaternion by a scalar (component-wise).
@@ -702,5 +705,5 @@ constexpr Quaternion<T> operator*(T s, const Quaternion<T>& q) {
 }
 /// @}
 
-}  // namespace mathfu
-#endif  // MATHFU_QUATERNION_H_
+}  // namespace mathkata
+#endif  // MATHKATA_QUATERNION_H_

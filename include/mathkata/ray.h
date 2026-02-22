@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef MATHFU_RAY_H_
-#define MATHFU_RAY_H_
+#ifndef MATHKATA_RAY_H_
+#define MATHKATA_RAY_H_
 
-#include "mathfu/vector.h"
+#include "mathkata/vector.h"
 
-namespace mathfu {
+namespace mathkata {
 
-/// @addtogroup mathfu_ray
+/// @addtogroup mathkata_ray
 /// @{
-/// @class Ray "mathfu/ray.h"
+/// @class Ray "mathkata/ray.h"
 /// @brief Ray defined by an origin and a direction.
 ///
 /// Ray stores an origin point and a direction vector. The direction should be
@@ -79,9 +79,9 @@ constexpr bool operator!=(const Ray<T, Dims>& r1, const Ray<T, Dims>& r2) {
   return !(r1 == r2);
 }
 
-/// @addtogroup mathfu_line
+/// @addtogroup mathkata_line
 /// @{
-/// @class Line "mathfu/ray.h"
+/// @class Line "mathkata/ray.h"
 /// @brief Infinite line defined by a point and a direction.
 ///
 /// Line stores a point on the line and a direction vector. The direction
@@ -147,9 +147,9 @@ constexpr bool operator!=(const Line<T, Dims>& l1, const Line<T, Dims>& l2) {
   return !(l1 == l2);
 }
 
-/// @addtogroup mathfu_line_segment
+/// @addtogroup mathkata_line_segment
 /// @{
-/// @class LineSegment "mathfu/ray.h"
+/// @class LineSegment "mathkata/ray.h"
 /// @brief Line segment defined by two endpoints.
 ///
 /// LineSegment stores two endpoints, start and end.
@@ -241,6 +241,6 @@ constexpr bool operator!=(const LineSegment<T, Dims>& s1,
   return !(s1 == s2);
 }
 
-}  // namespace mathfu
+}  // namespace mathkata
 
-#endif  // MATHFU_RAY_H_
+#endif  // MATHKATA_RAY_H_

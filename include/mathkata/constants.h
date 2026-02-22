@@ -13,18 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef MATHFU_CONSTANTS_H
-#define MATHFU_CONSTANTS_H
+#ifndef MATHKATA_CONSTANTS_H
+#define MATHKATA_CONSTANTS_H
 
-#include "mathfu/matrix.h"
-#include "mathfu/quaternion.h"
-#include "mathfu/vector.h"
+#include "mathkata/matrix.h"
+#include "mathkata/quaternion.h"
+#include "mathkata/vector.h"
 
-namespace mathfu {
+namespace mathkata {
 
-/// @file mathfu/constants.h
+/// @file mathkata/constants.h
 /// @brief Vector constants for specific dimensions.
-/// @addtogroup mathfu_constants
+/// @addtogroup mathkata_constants
 ///
 /// It is preferable to use these constants rather than constructing them
 /// when they're required. Construction most-likely slower than loading them
@@ -32,12 +32,12 @@ namespace mathfu {
 /// <p>
 /// For example, the following:<br>
 /// <code>
-/// lookat = mat4::LookAt(target, position, mathfu::kAxisY3f);
+/// lookat = mat4::LookAt(target, position, mathkata::kAxisY3f);
 /// </code>
 /// <br>is preferable to:<br>
 /// <code>
 /// lookat = mat4::LookAt(target, position,
-///                       mathfu::Vector<float, 3>(0.0f, 1.0f, 0.0f));
+///                       mathkata::Vector<float, 3>(0.0f, 1.0f, 0.0f));
 /// </code>
 /// <br> in terms of efficiency and in addition to resulting in more concise
 /// code.
@@ -46,7 +46,7 @@ namespace mathfu {
 /// These constants are declared as `inline const` (a C++17 feature) to ensure
 /// a single definition exists across all translation units.
 
-/// @addtogroup mathfu_constants
+/// @addtogroup mathkata_constants
 /// @{
 
 /// 21 digits of Pi (20 after the decimal point).
@@ -166,6 +166,6 @@ inline const AffineTransform kAffineIdentity(1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
                                              0.0f);
 /// @}
 
-}  // namespace mathfu
+}  // namespace mathkata
 
-#endif  // MATHFU_CONSTANTS_H
+#endif  // MATHKATA_CONSTANTS_H

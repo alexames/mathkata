@@ -13,28 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef MATHFU_GLSL_MAPPINGS_H_
-#define MATHFU_GLSL_MAPPINGS_H_
+#ifndef MATHKATA_GLSL_MAPPINGS_H_
+#define MATHKATA_GLSL_MAPPINGS_H_
 
-#include "mathfu/matrix.h"
-#include "mathfu/quaternion.h"
-#include "mathfu/rect.h"
-#include "mathfu/vector.h"
+#include "mathkata/matrix.h"
+#include "mathkata/quaternion.h"
+#include "mathkata/rect.h"
+#include "mathkata/vector.h"
 
-/// @file mathfu/glsl_mappings.h
+/// @file mathkata/glsl_mappings.h
 /// @brief GLSL compatible data types.
-/// @addtogroup mathfu_glsl
+/// @addtogroup mathkata_glsl
 ///
-/// To simplify the use of MathFu template classes and make it possible to
+/// To simplify the use of MathKata template classes and make it possible to
 /// write code that looks similar to
 /// <a href="http://www.opengl.org/documentation/glsl/">GLSL</a> in C++,
-/// MathFu provides a set of data types that are similar in style to
+/// MathKata provides a set of data types that are similar in style to
 /// GLSL Vector and Matrix data types.
 
-/// @brief Namespace for MathFu library.
-namespace mathfu {
+/// @brief Namespace for MathKata library.
+namespace mathkata {
 
-/// @addtogroup mathfu_glsl
+/// @addtogroup mathkata_glsl
 /// @{
 
 /// 2-dimensional <code>float</code> Vector.
@@ -74,7 +74,7 @@ typedef VectorPacked<int, 4> vec4i_packed;
 
 /// Float-based quaternion.  Note that this is not technically
 /// a GLES type, but is included for convenience.
-typedef mathfu::Quaternion<float> quat;
+typedef mathkata::Quaternion<float> quat;
 
 /// Rect composed of type <code>float</code>.
 typedef Rect<float> rectf;
@@ -111,6 +111,6 @@ inline Vector<T, d> refract(const Vector<T, d>& incident,
 
 /// @}
 
-}  // namespace mathfu
+}  // namespace mathkata
 
-#endif  // MATHFU_GLSL_MAPPINGS_H_
+#endif  // MATHKATA_GLSL_MAPPINGS_H_

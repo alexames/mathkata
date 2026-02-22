@@ -16,161 +16,161 @@
   <navindex>
     <tab type="mainpage" visible="no" title=""/>
     <tab type="usergroup" url="" title="Programmer's Guide">
-      <tab type="usergroup" url="@ref mathfu_guide_introduction"
+      <tab type="usergroup" url="@ref mathkata_guide_introduction"
            title="Introduction">
-        <tab type="user" url="@ref mathfu_guide_about_mathfu"
-             title="About MathFu"/>
-        <tab type="user" url="@ref mathfu_guide_prerequisites"
+        <tab type="user" url="@ref mathkata_guide_about_mathkata"
+             title="About MathKata"/>
+        <tab type="user" url="@ref mathkata_guide_prerequisites"
              title="Prerequisites"/>
-        <tab type="user" url="@ref mathfu_guide_about_guide"
+        <tab type="user" url="@ref mathkata_guide_about_guide"
              title="About This Guide"/>
-        <tab type="user" url="@ref mathfu_guide_concepts"
+        <tab type="user" url="@ref mathkata_guide_concepts"
              title="Concepts"/>
-        <tab type="user" url="@ref mathfu_guide_optimization"
+        <tab type="user" url="@ref mathkata_guide_optimization"
              title="Optimization"/>
       </tab>
-      <tab type="usergroup" url="@ref mathfu_guide_building"
+      <tab type="usergroup" url="@ref mathkata_guide_building"
            title="Building">
-        <tab type="user" url="@ref mathfu_guide_building_options"
+        <tab type="user" url="@ref mathkata_guide_building_options"
              title="Integration Options"/>
-        <tab type="user" url="@ref mathfu_guide_building_compiler_config"
+        <tab type="user" url="@ref mathkata_guide_building_compiler_config"
              title="Manual Compiler Configuration"/>
-        <tab type="user" url="@ref mathfu_guide_building_cmake"
+        <tab type="user" url="@ref mathkata_guide_building_cmake"
              title="CMake"/>
-        <tab type="user" url="@ref mathfu_guide_building_android_makefiles"
+        <tab type="user" url="@ref mathkata_guide_building_android_makefiles"
              title="Android NDK Makefiles"/>
         <tab type="usergroup" url="" title="Building Unit Tests">
-          <tab type="usergroup" url="@ref mathfu_guide_building_android"
+          <tab type="usergroup" url="@ref mathkata_guide_building_android"
                title="Building for Android">
-            <tab type="user" url="@ref mathfu_guide_building_android_version"
+            <tab type="user" url="@ref mathkata_guide_building_android_version"
                  title="Version Requirements"/>
             <tab type="user"
-                 url="@ref mathfu_guide_building_android_prerequisites"
+                 url="@ref mathkata_guide_building_android_prerequisites"
                  title="Prerequisites"/>
             <tab type="user"
-                 url="@ref mathfu_guide_building_android_building"
+                 url="@ref mathkata_guide_building_android_building"
                  title="Building"/>
             <tab type="user"
-                 url="@ref mathfu_guide_building_android_building_ndk_build"
+                 url="@ref mathkata_guide_building_android_building_ndk_build"
                  title="Building with ndk-build"/>
             <tab type="user"
-                 url="@ref mathfu_guide_building_android_running"
+                 url="@ref mathkata_guide_building_android_running"
                  title="Installing and Running Applications"/>
             <tab type="user"
-                 url="@ref mathfu_guide_building_android_eclipse"
+                 url="@ref mathkata_guide_building_android_eclipse"
                  title="Using Eclipse"/>
             <tab type="user"
-                 url="@ref mathfu_guide_building_android_code_generation"
+                 url="@ref mathkata_guide_building_android_code_generation"
                  title="Code Generation"/>
           </tab>
-          <tab type="usergroup" url="@ref mathfu_guide_building_linux"
+          <tab type="usergroup" url="@ref mathkata_guide_building_linux"
                title="Building for Linux">
-            <tab type="user" url="@ref mathfu_guide_building_linux_version"
+            <tab type="user" url="@ref mathkata_guide_building_linux_version"
                  title="Version Requirements"/>
             <tab type="user"
-                 url="@ref mathfu_guide_building_linux_prerequisites"
+                 url="@ref mathkata_guide_building_linux_prerequisites"
                  title="Prerequisites"/>
-            <tab type="user" url="@ref mathfu_guide_building_linux_building"
+            <tab type="user" url="@ref mathkata_guide_building_linux_building"
                  title="Building"/>
-            <tab type="user" url="@ref mathfu_guide_building_linux_running"
+            <tab type="user" url="@ref mathkata_guide_building_linux_running"
                  title="Running Applications"/>
           </tab>
-          <tab type="usergroup" url="@ref mathfu_guide_building_osx"
+          <tab type="usergroup" url="@ref mathkata_guide_building_osx"
                title="Building for OS X">
-            <tab type="user" url="@ref mathfu_guide_building_osx_version"
+            <tab type="user" url="@ref mathkata_guide_building_osx_version"
                  title="Version Requirements"/>
             <tab type="user"
-                 url="@ref mathfu_guide_building_osx_prerequisites"
+                 url="@ref mathkata_guide_building_osx_prerequisites"
                  title="Prerequisites"/>
-            <tab type="user" url="@ref mathfu_guide_building_osx_building"
+            <tab type="user" url="@ref mathkata_guide_building_osx_building"
                  title="Building with Xcode"/>
-            <tab type="user" url="@ref mathfu_guide_building_osx_running"
+            <tab type="user" url="@ref mathkata_guide_building_osx_running"
                  title="Running Applications"/>
           </tab>
-          <tab type="usergroup" url="@ref mathfu_guide_building_windows"
+          <tab type="usergroup" url="@ref mathkata_guide_building_windows"
                title="Building for Windows">
-            <tab type="user" url="@ref mathfu_guide_building_windows_version"
+            <tab type="user" url="@ref mathkata_guide_building_windows_version"
                  title="Version Requirements"/>
             <tab type="user"
-                 url="@ref mathfu_guide_building_windows_prerequisites"
+                 url="@ref mathkata_guide_building_windows_prerequisites"
                  title="Prerequisites"/>
-            <tab type="user" url="@ref mathfu_guide_building_windows_building"
+            <tab type="user" url="@ref mathkata_guide_building_windows_building"
                  title="Building with Visual Studio"/>
-            <tab type="user" url="@ref mathfu_guide_building_windows_running"
+            <tab type="user" url="@ref mathkata_guide_building_windows_running"
                  title="Running Applications"/>
           </tab>
         </tab>
       </tab>
-      <tab type="usergroup" url="@ref mathfu_guide_vectors"
+      <tab type="usergroup" url="@ref mathkata_guide_vectors"
            title="Vectors">
-        <tab type="usergroup" url="@ref mathfu_guide_vectors_declaration"
+        <tab type="usergroup" url="@ref mathkata_guide_vectors_declaration"
              title="Declaration">
-          <tab type="user" url="@ref mathfu_guide_vectors_initialization"
+          <tab type="user" url="@ref mathkata_guide_vectors_initialization"
                title="Initialization"/>
         </tab>
-        <tab type="usergroup" url="@ref mathfu_guide_vectors_accessors"
+        <tab type="usergroup" url="@ref mathkata_guide_vectors_accessors"
              title="Accessors">
-          <tab type="user" url="@ref mathfu_guide_vectors_assignment"
+          <tab type="user" url="@ref mathkata_guide_vectors_assignment"
                title="Assignment"/>
         </tab>
-        <tab type="user" url="@ref mathfu_guide_vectors_arithmetic"
+        <tab type="user" url="@ref mathkata_guide_vectors_arithmetic"
              title="Arithmetic"/>
-        <tab type="user" url="@ref mathfu_guide_vectors_constants"
+        <tab type="user" url="@ref mathkata_guide_vectors_constants"
              title="Constants"/>
-        <tab type="user" url="@ref mathfu_guide_vectors_geometric"
+        <tab type="user" url="@ref mathkata_guide_vectors_geometric"
              title="Geometric Operations"/>
-        <tab type="user" url="@ref mathfu_guide_vectors_other"
+        <tab type="user" url="@ref mathkata_guide_vectors_other"
              title="Other Operations"/>
-        <tab type="user" url="@ref mathfu_guide_vectors_packing"
+        <tab type="user" url="@ref mathkata_guide_vectors_packing"
              title="Packing"/>
       </tab>
-      <tab type="usergroup" url="@ref mathfu_guide_quaternions"
+      <tab type="usergroup" url="@ref mathkata_guide_quaternions"
            title="Quaternions">
-        <tab type="usergroup" url="@ref mathfu_guide_quaternions_declaration"
+        <tab type="usergroup" url="@ref mathkata_guide_quaternions_declaration"
              title="Declaration">
-          <tab type="user" url="@ref mathfu_guide_quaternions_initialization"
+          <tab type="user" url="@ref mathkata_guide_quaternions_initialization"
                title="Initialization"/>
         </tab>
-        <tab type="usergroup" url="@ref mathfu_guide_quaternions_accessors"
+        <tab type="usergroup" url="@ref mathkata_guide_quaternions_accessors"
              title="Accessors">
-          <tab type="user" url="@ref mathfu_guide_quaternions_assignment"
+          <tab type="user" url="@ref mathkata_guide_quaternions_assignment"
                title="Assignment"/>
         </tab>
-        <tab type="user" url="@ref mathfu_guide_quaternions_repr"
+        <tab type="user" url="@ref mathkata_guide_quaternions_repr"
              title="Converting Between Representations"/>
-        <tab type="user" url="@ref mathfu_guide_quaternions_manipulation"
+        <tab type="user" url="@ref mathkata_guide_quaternions_manipulation"
              title="Manipulation"/>
-        <tab type="user" url="@ref mathfu_guide_quaternions_application"
+        <tab type="user" url="@ref mathkata_guide_quaternions_application"
              title="Application"/>
       </tab>
-      <tab type="usergroup" url="@ref mathfu_guide_matrices"
+      <tab type="usergroup" url="@ref mathkata_guide_matrices"
            title="Matrices">
-        <tab type="usergroup" url="@ref mathfu_guide_matrices_declaration"
+        <tab type="usergroup" url="@ref mathkata_guide_matrices_declaration"
              title="Declaration">
-          <tab type="user" url="@ref mathfu_guide_matrices_initialization"
+          <tab type="user" url="@ref mathkata_guide_matrices_initialization"
                title="Initialization"/>
         </tab>
-        <tab type="usergroup" url="@ref mathfu_guide_matrices_accessors"
+        <tab type="usergroup" url="@ref mathkata_guide_matrices_accessors"
              title="Accessors">
-          <tab type="user" url="@ref mathfu_guide_matrices_assignment"
+          <tab type="user" url="@ref mathkata_guide_matrices_assignment"
                title="Assignment"/>
         </tab>
-        <tab type="user" url="@ref mathfu_guide_matrices_arithmetic"
+        <tab type="user" url="@ref mathkata_guide_matrices_arithmetic"
              title="Arithmetic"/>
-        <tab type="user" url="@ref mathfu_guide_matrices_matrix_ops"
+        <tab type="user" url="@ref mathkata_guide_matrices_matrix_ops"
              title="Matrix Operations"/>
-        <tab type="user" url="@ref mathfu_guide_matrices_packing"
+        <tab type="user" url="@ref mathkata_guide_matrices_packing"
              title="Packing"/>
       </tab>
-      <tab type="usergroup" url="@ref mathfu_guide_utilities"
+      <tab type="usergroup" url="@ref mathkata_guide_utilities"
            title="Utilities">
-        <tab type="user" url="@ref mathfu_guide_utilities_allocation"
+        <tab type="user" url="@ref mathkata_guide_utilities_allocation"
              title="Memory Allocation"/>
-        <tab type="user" url="@ref mathfu_guide_utilities_misc"
+        <tab type="user" url="@ref mathkata_guide_utilities_misc"
              title="Miscellaneous Functions"/>
       </tab>
     </tab>
-    <tab type="usergroup" url="@ref mathfu_api_reference"
+    <tab type="usergroup" url="@ref mathkata_api_reference"
          title="API reference">
       <tab type="modules" visible="yes" title="" intro=""/>
       <tab type="classes" visible="yes" title="">
@@ -185,7 +185,7 @@
       </tab>
       <!--tab type="examples" visible="yes" title="" intro=""/-->
     </tab>
-    <tab type="user" url="@ref mathfu_readme" title="readme"/>
+    <tab type="user" url="@ref mathkata_readme" title="readme"/>
     <tab type="user" url="@ref contributing" title="contributing"/>
   </navindex>
 

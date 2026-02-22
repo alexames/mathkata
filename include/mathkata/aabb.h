@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef MATHFU_AABB_H_
-#define MATHFU_AABB_H_
+#ifndef MATHKATA_AABB_H_
+#define MATHKATA_AABB_H_
 
-#include "mathfu/vector.h"
+#include "mathkata/vector.h"
 
-namespace mathfu {
+namespace mathkata {
 
-/// @addtogroup mathfu_aabb
+/// @addtogroup mathkata_aabb
 /// @{
-/// @class AABB "mathfu/aabb.h"
+/// @class AABB "mathkata/aabb.h"
 /// @brief Axis-aligned bounding box of dimension N with scalar type T.
 ///
 /// AABB stores two N-dimensional <b>Vector</b>s of type <b>T</b> representing
@@ -189,6 +189,6 @@ constexpr bool operator!=(const AABB<T, N>& a, const AABB<T, N>& b) {
   return !(a == b);
 }
 
-}  // namespace mathfu
+}  // namespace mathkata
 
-#endif  // MATHFU_AABB_H_
+#endif  // MATHKATA_AABB_H_

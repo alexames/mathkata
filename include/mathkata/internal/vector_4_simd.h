@@ -13,26 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef MATHFU_VECTOR_4_SIMD_H_
-#define MATHFU_VECTOR_4_SIMD_H_
+#ifndef MATHKATA_VECTOR_4_SIMD_H_
+#define MATHKATA_VECTOR_4_SIMD_H_
 
 #include <cmath>
 
-#include "mathfu/internal/vector_4.h"
-#include "mathfu/utilities.h"
+#include "mathkata/internal/vector_4.h"
+#include "mathkata/utilities.h"
 
-#ifdef MATHFU_COMPILE_WITH_SIMD
-#include "mathfu/internal/simd_helpers.h"
+#ifdef MATHKATA_COMPILE_WITH_SIMD
+#include "mathkata/internal/simd_helpers.h"
 #endif
 
-/// @file mathfu/internal/vector_4_simd.h MathFu Vector<T, 4> Specialization
-/// @brief 4-dimensional specialization of mathfu::Vector for SIMD optimized
+/// @file mathkata/internal/vector_4_simd.h MathKata Vector<T, 4> Specialization
+/// @brief 4-dimensional specialization of mathkata::Vector for SIMD optimized
 /// builds.
-/// @see mathfu::Vector
+/// @see mathkata::Vector
 
-namespace mathfu {
+namespace mathkata {
 
-#ifdef MATHFU_COMPILE_WITH_SIMD
+#ifdef MATHKATA_COMPILE_WITH_SIMD
 
 template <>
 class Vector<float, 4> {
@@ -68,12 +68,12 @@ class Vector<float, 4> {
   explicit inline Vector(const float* v) { simd4 = simd4f_uload4(v); }
 
   inline Vector(const Vector<float, 3>& vector3, const float& value) {
-#ifdef MATHFU_COMPILE_WITH_PADDING
+#ifdef MATHKATA_COMPILE_WITH_PADDING
     simd4 = vector3.simd3;
     (*this)[3] = value;
 #else
     simd4 = simd4f_create(vector3[0], vector3[1], vector3[2], value);
-#endif  // MATHFU_COMPILE_WITH_PADDING
+#endif  // MATHKATA_COMPILE_WITH_PADDING
   }
 
   inline Vector(const Vector<float, 2>& vector12,
@@ -291,9 +291,9 @@ class Vector<float, 4> {
     return RefractHelper(incident, normal, eta);
   }
 
-  MATHFU_DEFINE_CLASS_SIMD_AWARE_NEW_DELETE
+  MATHKATA_DEFINE_CLASS_SIMD_AWARE_NEW_DELETE
 
-#include "mathfu/internal/disable_warnings_begin.h"
+#include "mathkata/internal/disable_warnings_begin.h"
   union {
     simd4f simd4;
     float data_[4];
@@ -304,11 +304,11 @@ class Vector<float, 4> {
       float w;
     };
   };
-#include "mathfu/internal/disable_warnings_end.h"
+#include "mathkata/internal/disable_warnings_end.h"
 };
 /// @endcond
-#endif  // MATHFU_COMPILE_WITH_SIMD
+#endif  // MATHKATA_COMPILE_WITH_SIMD
 
-}  // namespace mathfu
+}  // namespace mathkata
 
-#endif  // MATHFU_VECTOR_4_SIMD_H_
+#endif  // MATHKATA_VECTOR_4_SIMD_H_

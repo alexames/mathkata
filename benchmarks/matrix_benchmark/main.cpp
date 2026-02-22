@@ -18,15 +18,15 @@
 #include <random>
 
 #include "benchmark_common.h"
-#include "mathfu/matrix.h"
-#include "mathfu/utilities.h"
+#include "mathkata/matrix.h"
+#include "mathkata/utilities.h"
 
 // Number of elements to iterate over
 static const size_t kMatrixSize = 1000;
 // Number of iterations of each operation.
 static const size_t kIterations = 50;
 
-using mathfu::Matrix;
+using mathkata::Matrix;
 
 static std::mt19937& BenchRng() {
   static std::mt19937 rng(42);
@@ -63,16 +63,16 @@ int main(int argc, char** argv) {
   }
   // Start matrix benchmark, running a number of loops for more accurate
   // numbers.
-  printf("Running matrix benchmark (%s)...\n", MATHFU_BUILD_OPTIONS_STRING);
+  printf("Running matrix benchmark (%s)...\n", MATHKATA_BUILD_OPTIONS_STRING);
   Timer timer;
   PERFTEST_2D_VECTOR_LOOP(kIterations, kMatrixSize) mul += matrices[j];
   PERFTEST_2D_VECTOR_LOOP(kIterations, kMatrixSize) mul *= matrices[j];
 
 #if MATRIX_DIMENSIONS == 4
   PERFTEST_2D_VECTOR_LOOP(kIterations, kMatrixSize) {
-    mathfu::Vector<T, MATRIX_DIMENSIONS> tmp =
+    mathkata::Vector<T, MATRIX_DIMENSIONS> tmp =
         matrices[j]
-        * mathfu::Vector<T, MATRIX_DIMENSIONS>(
+        * mathkata::Vector<T, MATRIX_DIMENSIONS>(
             matrices[i](0, 0), matrices[i](1, 0), matrices[i](2, 0),
             matrices[i](3, 0));
     mul -= TestMatrix::OuterProduct(tmp, tmp);

@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef MATHFU_UTILITIES_H_
-#define MATHFU_UTILITIES_H_
+#ifndef MATHKATA_UTILITIES_H_
+#define MATHKATA_UTILITIES_H_
 
 #include <algorithm>
 #include <cassert>
@@ -26,51 +26,52 @@
 #include <memory>
 #include <type_traits>
 
-/// @file mathfu/utilities.h Utilities
+/// @file mathkata/utilities.h Utilities
 /// @brief Utility macros and functions.
 
-/// @addtogroup mathfu_build_config
+/// @addtogroup mathkata_build_config
 ///
-/// By default MathFu will attempt to build with SIMD optimizations enabled
+/// By default MathKata will attempt to build with SIMD optimizations enabled
 /// based upon the target architecture and compiler options.  However, it's
 /// possible to change the default build configuration using the following
 /// macros:
 ///
-/// @li @ref MATHFU_COMPILE_WITHOUT_SIMD_SUPPORT
-/// @li @ref MATHFU_COMPILE_FORCE_PADDING
+/// @li @ref MATHKATA_COMPILE_WITHOUT_SIMD_SUPPORT
+/// @li @ref MATHKATA_COMPILE_FORCE_PADDING
 ///
 /// <table>
 /// <tr>
-///   <th>MATHFU_COMPILE_WITHOUT_SIMD_SUPPORT</th>
-///   <th>MATHFU_COMPILE_FORCE_PADDING</th>
+///   <th>MATHKATA_COMPILE_WITHOUT_SIMD_SUPPORT</th>
+///   <th>MATHKATA_COMPILE_FORCE_PADDING</th>
 ///   <th>Configuration</th>
 /// </tr>
 /// <tr>
 ///   <td><em>undefined</em></td>
 ///   <td><em>undefined</em> or 1</td>
 ///   <td>Default build configuration, SIMD optimization is enabled based upon
-///       the target architecture, compiler options and MathFu library
+///       the target architecture, compiler options and MathKata library
 ///       support.</td>
 /// </tr>
 /// <tr>
 ///   <td><em>undefined</em></td>
 ///   <td>0</td>
 ///   <td>If SIMD is supported, padding of data structures is disabled.  See
-///       @ref MATHFU_COMPILE_FORCE_PADDING for more information.</td>
+///       @ref MATHKATA_COMPILE_FORCE_PADDING for more information.</td>
 /// </tr>
 /// <tr>
 ///   <td><em>defined</em></td>
 ///   <td><em>undefined/0/1</em></td>
-///   <td>Builds MathFu with explicit SIMD optimization disabled.  The compiler
+///   <td>Builds MathKata with explicit SIMD optimization disabled.  The
+///   compiler
 ///       could still potentially optimize some code paths with SIMD
 ///       instructions based upon the compiler options.</td>
 /// </tr>
 /// </table>
 
 #ifdef DOXYGEN
-/// @addtogroup mathfu_build_config
+/// @addtogroup mathkata_build_config
 /// @{
-/// @def MATHFU_COMPILE_WITHOUT_SIMD_SUPPORT
+/// @def MATHKATA_COMPILE_WITHOUT_SIMD_SUPPORT
 /// @brief Disable SIMD build configuration.
 ///
 /// When defined, this macro <b>disables</b> the default behavior of trying to
@@ -79,39 +80,39 @@
 ///
 /// To use this build option, this macro <b>must</b> be defined in all modules
 /// of the project.
-#define MATHFU_COMPILE_WITHOUT_SIMD_SUPPORT
+#define MATHKATA_COMPILE_WITHOUT_SIMD_SUPPORT
 /// @}
 #endif  // DOXYGEN
-#if !defined(MATHFU_COMPILE_WITHOUT_SIMD_SUPPORT)
+#if !defined(MATHKATA_COMPILE_WITHOUT_SIMD_SUPPORT)
 #if defined(__SSE__)
-#define MATHFU_COMPILE_WITH_SIMD
+#define MATHKATA_COMPILE_WITH_SIMD
 #elif defined(__ARM_NEON__)
-#define MATHFU_COMPILE_WITH_SIMD
+#define MATHKATA_COMPILE_WITH_SIMD
 #elif defined(_M_X64) || defined(_M_AMD64)  // MSVC x64: SSE2 always available
-#define MATHFU_COMPILE_WITH_SIMD
+#define MATHKATA_COMPILE_WITH_SIMD
 #elif defined(_M_IX86_FP)  // MSVC x86
 #if _M_IX86_FP >= 1        // SSE enabled
-#define MATHFU_COMPILE_WITH_SIMD
+#define MATHKATA_COMPILE_WITH_SIMD
 #endif  // _M_IX86_FP >= 1
 #endif
-#endif  // !defined(MATHFU_COMPILE_WITHOUT_SIMD_SUPPORT)
+#endif  // !defined(MATHKATA_COMPILE_WITHOUT_SIMD_SUPPORT)
 
 #ifdef DOXYGEN
-/// @addtogroup mathfu_build_config
+/// @addtogroup mathkata_build_config
 /// @{
-/// @def MATHFU_COMPILE_FORCE_PADDING
+/// @def MATHKATA_COMPILE_FORCE_PADDING
 /// @brief Enable / disable padding of data structures.
 ///
-/// By default, when @ref MATHFU_COMPILE_FORCE_PADDING is <b>not</b> defined,
+/// By default, when @ref MATHKATA_COMPILE_FORCE_PADDING is <b>not</b> defined,
 /// data structures are padded when SIMD is enabled
-/// (i.e when @ref MATHFU_COMPILE_WITHOUT_SIMD_SUPPORT is also not defined).
+/// (i.e when @ref MATHKATA_COMPILE_WITHOUT_SIMD_SUPPORT is also not defined).
 ///
-/// If @ref MATHFU_COMPILE_FORCE_PADDING is defined as <b>1</b>, all data
+/// If @ref MATHKATA_COMPILE_FORCE_PADDING is defined as <b>1</b>, all data
 /// structures are padded to a power of 2 size which enables more efficient
 /// SIMD operations.  This  is the default build configuration when SIMD is
 /// enabled.
 ///
-/// If @ref MATHFU_COMPILE_FORCE_PADDING is defined as <b>0</b>, all data
+/// If @ref MATHKATA_COMPILE_FORCE_PADDING is defined as <b>0</b>, all data
 /// structures are packed by the compiler (with no padding) even when the SIMD
 /// build configuration is enabled.  This build option can be useful in the
 /// rare occasion an application is CPU memory bandwidth constrained, at the
@@ -120,118 +121,118 @@
 /// To use this build option, this macro <b>must</b> be defined in all modules
 /// of the project.
 ///
-/// @see MATHFU_COMPILE_WITHOUT_SIMD_SUPPORT
-#define MATHFU_COMPILE_FORCE_PADDING
+/// @see MATHKATA_COMPILE_WITHOUT_SIMD_SUPPORT
+#define MATHKATA_COMPILE_FORCE_PADDING
 /// @}
 #endif  // DOXYGEN
 
-#ifdef MATHFU_COMPILE_WITH_SIMD
-/// @cond MATHFU_INTERNAL
-/// @addtogroup mathfu_build_config
+#ifdef MATHKATA_COMPILE_WITH_SIMD
+/// @cond MATHKATA_INTERNAL
+/// @addtogroup mathkata_build_config
 /// @{
-/// @def MATHFU_COMPILE_WITH_PADDING
+/// @def MATHKATA_COMPILE_WITH_PADDING
 /// @brief Enable padding of data structures to be efficient with SIMD.
 ///
 /// When defined, this option enables padding of some data structures (e.g
 /// @ref vec3) to be more efficient with SIMD operations.  This option is
-/// only applicable when @ref MATHFU_COMPILE_WITHOUT_SIMD is not defined and
+/// only applicable when @ref MATHKATA_COMPILE_WITHOUT_SIMD is not defined and
 /// the target architecture and compiler support SIMD.
 ///
 /// To use this build option, this macro <b>must</b> be defined in all modules
 /// of the project.
-/// @see MATHFU_COMPILE_FORCE_PADDING
-#define MATHFU_COMPILE_WITH_PADDING
+/// @see MATHKATA_COMPILE_FORCE_PADDING
+#define MATHKATA_COMPILE_WITH_PADDING
 /// @}
-#if defined(MATHFU_COMPILE_FORCE_PADDING)
-#if MATHFU_COMPILE_FORCE_PADDING == 1
-#if !defined(MATHFU_COMPILE_WITH_PADDING)
-#define MATHFU_COMPILE_WITH_PADDING
-#endif  // !defined(MATHFU_COMPILE_WITH_PADDING)
+#if defined(MATHKATA_COMPILE_FORCE_PADDING)
+#if MATHKATA_COMPILE_FORCE_PADDING == 1
+#if !defined(MATHKATA_COMPILE_WITH_PADDING)
+#define MATHKATA_COMPILE_WITH_PADDING
+#endif  // !defined(MATHKATA_COMPILE_WITH_PADDING)
 #else
-#if defined(MATHFU_COMPILE_WITH_PADDING)
-#undef MATHFU_COMPILE_WITH_PADDING
-#endif  // MATHFU_COMPILE_WITH_PADDING
-#endif  // MATHFU_COMPILE_FORCE_PADDING == 1
-#endif  // MATHFU_COMPILE_FORCE_PADDING
+#if defined(MATHKATA_COMPILE_WITH_PADDING)
+#undef MATHKATA_COMPILE_WITH_PADDING
+#endif  // MATHKATA_COMPILE_WITH_PADDING
+#endif  // MATHKATA_COMPILE_FORCE_PADDING == 1
+#endif  // MATHKATA_COMPILE_FORCE_PADDING
 /// @endcond
-#endif  // MATHFU_COMPILE_WITH_SIMD
+#endif  // MATHKATA_COMPILE_WITH_SIMD
 
-/// @cond MATHFU_INTERNAL
+/// @cond MATHKATA_INTERNAL
 // Generate string which contains build options for the library.
-#if defined(MATHFU_COMPILE_WITH_SIMD)
-#define MATHFU_BUILD_OPTIONS_SIMD "[simd]"
+#if defined(MATHKATA_COMPILE_WITH_SIMD)
+#define MATHKATA_BUILD_OPTIONS_SIMD "[simd]"
 #else
-#define MATHFU_BUILD_OPTIONS_SIMD "[no simd]"
-#endif  // defined(MATHFU_COMPILE_WITH_SIMD)
-#if defined(MATHFU_COMPILE_WITH_PADDING)
-#define MATHFU_BUILD_OPTIONS_PADDING "[padding]"
+#define MATHKATA_BUILD_OPTIONS_SIMD "[no simd]"
+#endif  // defined(MATHKATA_COMPILE_WITH_SIMD)
+#if defined(MATHKATA_COMPILE_WITH_PADDING)
+#define MATHKATA_BUILD_OPTIONS_PADDING "[padding]"
 #else
-#define MATHFU_BUILD_OPTIONS_PADDING "[no padding]"
-#endif  // defined(MATHFU_COMPILE_WITH_PADDING)
+#define MATHKATA_BUILD_OPTIONS_PADDING "[no padding]"
+#endif  // defined(MATHKATA_COMPILE_WITH_PADDING)
 /// @endcond
 
-/// @addtogroup mathfu_version
+/// @addtogroup mathkata_version
 /// @{
-/// @def MATHFU_BUILD_OPTIONS_STRING
+/// @def MATHKATA_BUILD_OPTIONS_STRING
 /// @brief String that describes the library's build configuration.
-#define MATHFU_BUILD_OPTIONS_STRING \
-  (MATHFU_BUILD_OPTIONS_SIMD " " MATHFU_BUILD_OPTIONS_PADDING)
+#define MATHKATA_BUILD_OPTIONS_STRING \
+  (MATHKATA_BUILD_OPTIONS_SIMD " " MATHKATA_BUILD_OPTIONS_PADDING)
 /// @}
 
-/// @cond MATHFU_INTERNAL
+/// @cond MATHKATA_INTERNAL
 /// Unroll an loop up to 4 iterations, where iterator is the identifier
 /// used in each operation (e.g "i"), number_of_iterations is a constant which
 /// specifies the number of times to perform the operation and "operation" is
 /// the statement to execute for each iteration of the loop (e.g data[i] = v).
-#define MATHFU_UNROLLED_LOOP(iterator, number_of_iterations, operation) \
-  {                                                                     \
-    const int iterator = 0;                                             \
-    {                                                                   \
-      operation;                                                        \
-    }                                                                   \
-    if ((number_of_iterations) > 1) {                                   \
-      const int iterator = 1;                                           \
-      {                                                                 \
-        operation;                                                      \
-      }                                                                 \
-      if ((number_of_iterations) > 2) {                                 \
-        const int iterator = 2;                                         \
-        {                                                               \
-          operation;                                                    \
-        }                                                               \
-        if ((number_of_iterations) > 3) {                               \
-          const int iterator = 3;                                       \
-          {                                                             \
-            operation;                                                  \
-          }                                                             \
-          if ((number_of_iterations) > 4) {                             \
-            for (int iterator = 4; iterator < (number_of_iterations);   \
-                 ++iterator) {                                          \
-              operation;                                                \
-            }                                                           \
-          }                                                             \
-        }                                                               \
-      }                                                                 \
-    }                                                                   \
+#define MATHKATA_UNROLLED_LOOP(iterator, number_of_iterations, operation) \
+  {                                                                       \
+    const int iterator = 0;                                               \
+    {                                                                     \
+      operation;                                                          \
+    }                                                                     \
+    if ((number_of_iterations) > 1) {                                     \
+      const int iterator = 1;                                             \
+      {                                                                   \
+        operation;                                                        \
+      }                                                                   \
+      if ((number_of_iterations) > 2) {                                   \
+        const int iterator = 2;                                           \
+        {                                                                 \
+          operation;                                                      \
+        }                                                                 \
+        if ((number_of_iterations) > 3) {                                 \
+          const int iterator = 3;                                         \
+          {                                                               \
+            operation;                                                    \
+          }                                                               \
+          if ((number_of_iterations) > 4) {                               \
+            for (int iterator = 4; iterator < (number_of_iterations);     \
+                 ++iterator) {                                            \
+              operation;                                                  \
+            }                                                             \
+          }                                                               \
+        }                                                                 \
+      }                                                                   \
+    }                                                                     \
   }
 /// @endcond
 
-namespace mathfu {
+namespace mathkata {
 
-/// @addtogroup mathfu_version
+/// @addtogroup mathkata_version
 /// @{
 
 /// @var kVersion
-/// @brief String which identifies the current version of MathFu.
+/// @brief String which identifies the current version of MathKata.
 static constexpr const char *kVersion = "2.0.0";
 
 /// @}
 
-/// @addtogroup mathfu_utilities
+/// @addtogroup mathkata_utilities
 /// @{
 
 /// @brief Clamp x within [lower, upper].
-/// @anchor mathfu_Clamp
+/// @anchor mathkata_Clamp
 ///
 /// @note Results are undefined if lower > upper.
 ///
@@ -246,7 +247,7 @@ constexpr T Clamp(const T &x, const T &lower, const T &upper) {
 
 /// @brief Linearly interpolate between range_start and range_end, based on
 /// percent.
-/// @anchor mathfu_Lerp
+/// @anchor mathkata_Lerp
 ///
 /// @param range_start Start of the range.
 /// @param range_end End of the range.
@@ -265,7 +266,7 @@ constexpr T Lerp(const T &range_start, const T &range_end, const T2 &percent) {
 
 /// @brief Linearly interpolate between range_start and range_end, based on
 /// percent.
-/// @anchor mathfu_Lerp2
+/// @anchor mathkata_Lerp2
 ///
 /// @param range_start Start of the range.
 /// @param range_end End of the range.
@@ -281,7 +282,7 @@ constexpr T Lerp(const T &range_start, const T &range_end, const T &percent) {
 }
 
 /// @brief Check if val is within [range_start..range_end).
-/// @anchor mathfu_InRange
+/// @anchor mathkata_InRange
 ///
 /// @param val Value to be tested.
 /// @param range_start Starting point of the range (inclusive).
@@ -358,32 +359,32 @@ constexpr size_t RoundUpToTypeBoundary(size_t v) {
 
 /// @}
 
-/// @addtogroup mathfu_allocator
+/// @addtogroup mathkata_allocator
 ///
-/// If you use MathFu with SIMD (SSE in particular), you need to have all
+/// If you use MathKata with SIMD (SSE in particular), you need to have all
 /// your allocations be 16-byte aligned (which isn't the case with the default
 /// allocators on most platforms except OS X).
 ///
 /// You can either use simd_allocator, which solves the problem for
 /// any STL containers, but not for manual dynamic allocations or the
-/// new/delete override MATHFU_DEFINE_GLOBAL_SIMD_AWARE_NEW_DELETE will
-/// solve it for all allocations, at the cost of MATHFU_ALIGNMENT bytes per
+/// new/delete override MATHKATA_DEFINE_GLOBAL_SIMD_AWARE_NEW_DELETE will
+/// solve it for all allocations, at the cost of MATHKATA_ALIGNMENT bytes per
 /// allocation.
 
-/// @addtogroup mathfu_allocator
+/// @addtogroup mathkata_allocator
 /// @{
 
-/// @def MATHFU_ALIGNMENT
+/// @def MATHKATA_ALIGNMENT
 /// @brief Alignment (in bytes) of memory allocated by AllocateAligned.
 ///
-/// @see mathfu::AllocateAligned()
-/// @see mathfu::simd_allocator
-#define MATHFU_ALIGNMENT 16
+/// @see mathkata::AllocateAligned()
+/// @see mathkata::simd_allocator
+#define MATHKATA_ALIGNMENT 16
 
 /// @brief Allocate an aligned block of memory.
-/// @anchor mathfu_AllocateAligned
+/// @anchor mathkata_AllocateAligned
 ///
-/// This function allocates a block of memory aligned to MATHFU_ALIGNMENT
+/// This function allocates a block of memory aligned to MATHKATA_ALIGNMENT
 /// bytes.
 ///
 /// @param n Size of memory to allocate.
@@ -391,14 +392,14 @@ constexpr size_t RoundUpToTypeBoundary(size_t v) {
 /// allocation failed.
 inline void *AllocateAligned(size_t n) {
 #if defined(_MSC_VER)
-  return _aligned_malloc(n, MATHFU_ALIGNMENT);
+  return _aligned_malloc(n, MATHKATA_ALIGNMENT);
 #else
-  return std::aligned_alloc(MATHFU_ALIGNMENT, n);
+  return std::aligned_alloc(MATHKATA_ALIGNMENT, n);
 #endif
 }
 
 /// @brief Deallocate a block of memory allocated with AllocateAligned().
-/// @anchor mathfu_FreeAligned
+/// @anchor mathkata_FreeAligned
 ///
 /// @param p Pointer to memory to deallocate.
 inline void FreeAligned(void *p) {
@@ -413,10 +414,10 @@ inline void FreeAligned(void *p) {
 ///
 /// For example:
 /// <blockquote><code><pre>
-/// std::vector<vec4, mathfu::simd_allocator<vec4>> myvector;
+/// std::vector<vec4, mathkata::simd_allocator<vec4>> myvector;
 /// </pre></code></blockquote>
 ///
-/// @see MATHFU_DEFINE_GLOBAL_SIMD_AWARE_NEW_DELETE
+/// @see MATHKATA_DEFINE_GLOBAL_SIMD_AWARE_NEW_DELETE
 /// @tparam T type allocated by this object.
 template <typename T>
 class simd_allocator : public std::allocator<T> {
@@ -466,50 +467,50 @@ class simd_allocator : public std::allocator<T> {
   void deallocate(pointer p, size_type) { FreeAligned(p); }
 };
 
-/// @def MATHFU_DEFINE_GLOBAL_SIMD_AWARE_NEW_DELETE
+/// @def MATHKATA_DEFINE_GLOBAL_SIMD_AWARE_NEW_DELETE
 /// @brief Macro which overrides the default new and delete allocators.
 ///
 /// To globally override new and delete, simply add the line:
 /// <blockquote><code><pre>
-/// MATHFU_DEFINE_GLOBAL_SIMD_AWARE_NEW_DELETE
+/// MATHKATA_DEFINE_GLOBAL_SIMD_AWARE_NEW_DELETE
 /// </pre></code></blockquote>
 /// to the end of your main .cpp file.
-#define MATHFU_DEFINE_GLOBAL_SIMD_AWARE_NEW_DELETE                           \
-  void *operator new(std::size_t n) { return mathfu::AllocateAligned(n); }   \
-  void *operator new[](std::size_t n) { return mathfu::AllocateAligned(n); } \
-  void operator delete(void *p) noexcept { mathfu::FreeAligned(p); }         \
-  void operator delete[](void *p) noexcept { mathfu::FreeAligned(p); }       \
-  void *operator new(std::size_t n, const std::nothrow_t &) noexcept {       \
-    return mathfu::AllocateAligned(n);                                       \
-  }                                                                          \
-  void *operator new[](std::size_t n, const std::nothrow_t &) noexcept {     \
-    return mathfu::AllocateAligned(n);                                       \
-  }                                                                          \
-  void operator delete(void *p, const std::nothrow_t &) noexcept {           \
-    mathfu::FreeAligned(p);                                                  \
-  }                                                                          \
-  void operator delete[](void *p, const std::nothrow_t &) noexcept {         \
-    mathfu::FreeAligned(p);                                                  \
+#define MATHKATA_DEFINE_GLOBAL_SIMD_AWARE_NEW_DELETE                           \
+  void *operator new(std::size_t n) { return mathkata::AllocateAligned(n); }   \
+  void *operator new[](std::size_t n) { return mathkata::AllocateAligned(n); } \
+  void operator delete(void *p) noexcept { mathkata::FreeAligned(p); }         \
+  void operator delete[](void *p) noexcept { mathkata::FreeAligned(p); }       \
+  void *operator new(std::size_t n, const std::nothrow_t &) noexcept {         \
+    return mathkata::AllocateAligned(n);                                       \
+  }                                                                            \
+  void *operator new[](std::size_t n, const std::nothrow_t &) noexcept {       \
+    return mathkata::AllocateAligned(n);                                       \
+  }                                                                            \
+  void operator delete(void *p, const std::nothrow_t &) noexcept {             \
+    mathkata::FreeAligned(p);                                                  \
+  }                                                                            \
+  void operator delete[](void *p, const std::nothrow_t &) noexcept {           \
+    mathkata::FreeAligned(p);                                                  \
   }
 
-/// @def MATHFU_DEFINE_CLASS_SIMD_AWARE_NEW_DELETE
-/// @brief Macro which defines the new and delete for MathFu classes.
-#define MATHFU_DEFINE_CLASS_SIMD_AWARE_NEW_DELETE                       \
+/// @def MATHKATA_DEFINE_CLASS_SIMD_AWARE_NEW_DELETE
+/// @brief Macro which defines the new and delete for MathKata classes.
+#define MATHKATA_DEFINE_CLASS_SIMD_AWARE_NEW_DELETE                     \
   static void *operator new(std::size_t n) {                            \
-    return mathfu::AllocateAligned(n);                                  \
+    return mathkata::AllocateAligned(n);                                \
   }                                                                     \
   static void *operator new[](std::size_t n) {                          \
-    return mathfu::AllocateAligned(n);                                  \
+    return mathkata::AllocateAligned(n);                                \
   }                                                                     \
   static void *operator new(std::size_t /*n*/, void *p) { return p; }   \
   static void *operator new[](std::size_t /*n*/, void *p) { return p; } \
-  static void operator delete(void *p) { mathfu::FreeAligned(p); }      \
-  static void operator delete[](void *p) { mathfu::FreeAligned(p); }    \
+  static void operator delete(void *p) { mathkata::FreeAligned(p); }    \
+  static void operator delete[](void *p) { mathkata::FreeAligned(p); }  \
   static void operator delete(void * /*p*/, void * /*place*/) {}        \
   static void operator delete[](void * /*p*/, void * /*place*/) {}
 
 /// @}
 
-}  // namespace mathfu
+}  // namespace mathkata
 
-#endif  // MATHFU_UTILITIES_H_
+#endif  // MATHKATA_UTILITIES_H_

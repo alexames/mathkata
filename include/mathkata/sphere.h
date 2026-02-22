@@ -13,23 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef MATHFU_SPHERE_H_
-#define MATHFU_SPHERE_H_
+#ifndef MATHKATA_SPHERE_H_
+#define MATHKATA_SPHERE_H_
 
 #include <cmath>
 #include <numbers>
 
-#include "mathfu/vector.h"
+#include "mathkata/vector.h"
 
-/// @file mathfu/sphere.h Sphere
+/// @file mathkata/sphere.h Sphere
 /// @brief Sphere/Circle class and functions.
-/// @addtogroup mathfu_sphere
+/// @addtogroup mathkata_sphere
 
-namespace mathfu {
+namespace mathkata {
 
-/// @addtogroup mathfu_sphere
+/// @addtogroup mathkata_sphere
 /// @{
-/// @class Sphere "mathfu/sphere.h"
+/// @class Sphere "mathkata/sphere.h"
 /// @brief Sphere (or Circle) of type T in N dimensions.
 ///
 /// Sphere stores a center point as a <b>Vector<T, N></b> and a radius of type
@@ -129,6 +129,6 @@ constexpr bool operator!=(const Sphere<T, N>& s1, const Sphere<T, N>& s2) {
   return !(s1 == s2);
 }
 
-}  // namespace mathfu
+}  // namespace mathkata
 
-#endif  // MATHFU_SPHERE_H_
+#endif  // MATHKATA_SPHERE_H_

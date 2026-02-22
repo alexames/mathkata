@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef MATHFU_CAPSULE_H_
-#define MATHFU_CAPSULE_H_
+#ifndef MATHKATA_CAPSULE_H_
+#define MATHKATA_CAPSULE_H_
 
-#include "mathfu/vector.h"
+#include "mathkata/vector.h"
 
-namespace mathfu {
+namespace mathkata {
 
-/// @addtogroup mathfu_capsule
+/// @addtogroup mathkata_capsule
 /// @{
-/// @class Capsule "mathfu/capsule.h"
+/// @class Capsule "mathkata/capsule.h"
 /// @brief Capsule of type T in N dimensions.
 ///
 /// A capsule is the Minkowski sum of a line segment and a sphere. It is
@@ -120,6 +120,6 @@ constexpr bool operator!=(const Capsule<T, N>& c1, const Capsule<T, N>& c2) {
   return !(c1 == c2);
 }
 
-}  // namespace mathfu
+}  // namespace mathkata
 
-#endif  // MATHFU_CAPSULE_H_
+#endif  // MATHKATA_CAPSULE_H_

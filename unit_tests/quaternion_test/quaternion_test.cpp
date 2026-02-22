@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "mathfu/quaternion.h"
+#include "mathkata/quaternion.h"
 
 #include <cmath>
 #include <numbers>
 
 #include "gtest/gtest.h"
-#include "mathfu/constants.h"
-#include "mathfu/io.h"
+#include "mathkata/constants.h"
+#include "mathkata/io.h"
 #include "precision.h"
 
 namespace {
@@ -35,8 +35,8 @@ class QuaternionTests : public ::testing::Test {
 
 // Verify that Quaternion<float> is 16 bytes (4 floats) and
 // Quaternion<double> is 32 bytes (4 doubles), not inflated by SIMD padding.
-static_assert(sizeof(mathfu::Quaternion<float>) == 4 * sizeof(float));
-static_assert(sizeof(mathfu::Quaternion<double>) == 4 * sizeof(double));
+static_assert(sizeof(mathkata::Quaternion<float>) == 4 * sizeof(float));
+static_assert(sizeof(mathkata::Quaternion<double>) == 4 * sizeof(double));
 
 // This will automatically generate tests for each template parameter.
 #define TEST_ALL_F(MY_TEST)                   \
@@ -72,8 +72,8 @@ AssertionResult IsNearDouble(double val1, double val2, double abs_error) {
 }
 
 template <class T, int d>
-AssertionResult IsNearVector(mathfu::Vector<T, d> v1, mathfu::Vector<T, d> v2,
-                             double abs_error) {
+AssertionResult IsNearVector(mathkata::Vector<T, d> v1,
+                             mathkata::Vector<T, d> v2, double abs_error) {
   for (int i = 0; i < d; ++i) {
     AssertionResult result = IsNearDouble(v1[i], v2[i], abs_error);
     if (!result) {
@@ -84,8 +84,8 @@ AssertionResult IsNearVector(mathfu::Vector<T, d> v1, mathfu::Vector<T, d> v2,
 }
 
 template <class T>
-AssertionResult IsNearQuat(mathfu::Quaternion<T> q1, mathfu::Quaternion<T> q2,
-                           double abs_error) {
+AssertionResult IsNearQuat(mathkata::Quaternion<T> q1,
+                           mathkata::Quaternion<T> q2, double abs_error) {
   {
     AssertionResult result = IsNearDouble(q1.scalar(), q2.scalar(), abs_error);
     if (!result) {
@@ -105,11 +105,12 @@ AssertionResult IsNearQuat(mathfu::Quaternion<T> q1, mathfu::Quaternion<T> q2,
 // This is appropriate when treating quats as orientations (rather than
 // rotations).
 template <class T>
-AssertionResult IsNearOrientation(mathfu::Quaternion<T> q1,
-                                  mathfu::Quaternion<T> q2, double abs_error) {
+AssertionResult IsNearOrientation(mathkata::Quaternion<T> q1,
+                                  mathkata::Quaternion<T> q2,
+                                  double abs_error) {
   // Put them both into the same hemisphere.
-  if (mathfu::Quaternion<T>::DotProduct(q1, q2) < 0) {
-    q2 = mathfu::Quaternion<T>(-q2.scalar(), -q2.vector());
+  if (mathkata::Quaternion<T>::DotProduct(q1, q2) < 0) {
+    q2 = mathkata::Quaternion<T>(-q2.scalar(), -q2.vector());
   }
   return IsNearQuat(q1, q2, abs_error);
 }
@@ -118,7 +119,7 @@ AssertionResult IsNearOrientation(mathfu::Quaternion<T> q1,
 template <class T>
 void TestHelpers_Test(const T& precision) {
   (void)precision;
-  using Quaternion = mathfu::Quaternion<T>;
+  using Quaternion = mathkata::Quaternion<T>;
   const double epsilon = 1e-5;
 
   EXPECT_NEAR_QUAT(Quaternion(1, 0, 0, 1e-6f), Quaternion::identity, epsilon);
@@ -136,7 +137,7 @@ TEST_ALL_F(TestHelpers)
 template <class T>
 void ConstAccessor_Test(const T& precision) {
   (void)precision;
-  const mathfu::Quaternion<T> quaternion(
+  const mathkata::Quaternion<T> quaternion(
       static_cast<T>(0.50), static_cast<T>(0.76), static_cast<T>(0.38),
       static_cast<T>(0.19));
   EXPECT_EQ(static_cast<T>(0.50), quaternion[0]);
@@ -151,8 +152,9 @@ TEST_ALL_F(ConstAccessor)
 template <class T>
 void MutableAccessor_Test(const T& precision) {
   (void)precision;
-  mathfu::Quaternion<T> quaternion(static_cast<T>(0.50), static_cast<T>(0.76),
-                                   static_cast<T>(0.38), static_cast<T>(0.19));
+  mathkata::Quaternion<T> quaternion(static_cast<T>(0.50), static_cast<T>(0.76),
+                                     static_cast<T>(0.38),
+                                     static_cast<T>(0.19));
 
   // Verify reading via operator[] matches the scalar and vector accessors.
   EXPECT_EQ(quaternion.scalar(), quaternion[0]);
@@ -182,12 +184,12 @@ TEST_ALL_F(MutableAccessor)
 template <class T>
 void Equality_Test(const T& precision) {
   (void)precision;
-  const mathfu::Quaternion<T> q1(static_cast<T>(0.50), static_cast<T>(0.76),
-                                 static_cast<T>(0.38), static_cast<T>(0.19));
-  const mathfu::Quaternion<T> q2(static_cast<T>(0.50), static_cast<T>(0.76),
-                                 static_cast<T>(0.38), static_cast<T>(0.19));
-  const mathfu::Quaternion<T> q3(static_cast<T>(0.10), static_cast<T>(0.76),
-                                 static_cast<T>(0.38), static_cast<T>(0.19));
+  const mathkata::Quaternion<T> q1(static_cast<T>(0.50), static_cast<T>(0.76),
+                                   static_cast<T>(0.38), static_cast<T>(0.19));
+  const mathkata::Quaternion<T> q2(static_cast<T>(0.50), static_cast<T>(0.76),
+                                   static_cast<T>(0.38), static_cast<T>(0.19));
+  const mathkata::Quaternion<T> q3(static_cast<T>(0.10), static_cast<T>(0.76),
+                                   static_cast<T>(0.38), static_cast<T>(0.19));
   // Identical quaternions should be equal.
   EXPECT_TRUE(q1 == q2);
   EXPECT_FALSE(q1 != q2);
@@ -201,17 +203,17 @@ TEST_ALL_F(Equality)
 template <class T>
 void Inequality_Test(const T& precision) {
   (void)precision;
-  const mathfu::Quaternion<T> q1(static_cast<T>(1), static_cast<T>(2),
-                                 static_cast<T>(3), static_cast<T>(4));
+  const mathkata::Quaternion<T> q1(static_cast<T>(1), static_cast<T>(2),
+                                   static_cast<T>(3), static_cast<T>(4));
   // Differ in first vector element.
-  const mathfu::Quaternion<T> q2(static_cast<T>(1), static_cast<T>(9),
-                                 static_cast<T>(3), static_cast<T>(4));
+  const mathkata::Quaternion<T> q2(static_cast<T>(1), static_cast<T>(9),
+                                   static_cast<T>(3), static_cast<T>(4));
   // Differ in second vector element.
-  const mathfu::Quaternion<T> q3(static_cast<T>(1), static_cast<T>(2),
-                                 static_cast<T>(9), static_cast<T>(4));
+  const mathkata::Quaternion<T> q3(static_cast<T>(1), static_cast<T>(2),
+                                   static_cast<T>(9), static_cast<T>(4));
   // Differ in third vector element.
-  const mathfu::Quaternion<T> q4(static_cast<T>(1), static_cast<T>(2),
-                                 static_cast<T>(3), static_cast<T>(9));
+  const mathkata::Quaternion<T> q4(static_cast<T>(1), static_cast<T>(2),
+                                   static_cast<T>(3), static_cast<T>(9));
   EXPECT_TRUE(q1 != q2);
   EXPECT_TRUE(q1 != q3);
   EXPECT_TRUE(q1 != q4);
@@ -219,10 +221,10 @@ void Inequality_Test(const T& precision) {
   EXPECT_FALSE(q1 == q3);
   EXPECT_FALSE(q1 == q4);
   // Identity should equal itself.
-  EXPECT_TRUE(mathfu::Quaternion<T>::identity
-              == mathfu::Quaternion<T>::identity);
-  EXPECT_FALSE(mathfu::Quaternion<T>::identity
-               != mathfu::Quaternion<T>::identity);
+  EXPECT_TRUE(mathkata::Quaternion<T>::identity
+              == mathkata::Quaternion<T>::identity);
+  EXPECT_FALSE(mathkata::Quaternion<T>::identity
+               != mathkata::Quaternion<T>::identity);
 }
 TEST_ALL_F(Inequality)
 
@@ -231,8 +233,9 @@ TEST_ALL_F(Inequality)
 template <class T>
 void ScalarAccessor_Test(const T& precision) {
   (void)precision;
-  mathfu::Quaternion<T> quaternion(static_cast<T>(0.50), static_cast<T>(0.76),
-                                   static_cast<T>(0.38), static_cast<T>(0.19));
+  mathkata::Quaternion<T> quaternion(static_cast<T>(0.50), static_cast<T>(0.76),
+                                     static_cast<T>(0.38),
+                                     static_cast<T>(0.19));
   EXPECT_EQ(static_cast<T>(0.50), quaternion.scalar());
 }
 TEST_ALL_F(ScalarAccessor)
@@ -242,7 +245,7 @@ TEST_ALL_F(ScalarAccessor)
 template <class T>
 void ConstScalarAccessor_Test(const T& precision) {
   (void)precision;
-  const mathfu::Quaternion<T> quaternion(
+  const mathkata::Quaternion<T> quaternion(
       static_cast<T>(0.50), static_cast<T>(0.76), static_cast<T>(0.38),
       static_cast<T>(0.19));
   EXPECT_EQ(static_cast<T>(0.50), quaternion.scalar());
@@ -254,7 +257,7 @@ TEST_ALL_F(ConstScalarAccessor)
 template <class T>
 void ScalarMutator_Test(const T& precision) {
   (void)precision;
-  mathfu::Quaternion<T> quaternion;
+  mathkata::Quaternion<T> quaternion;
   quaternion.set_scalar(static_cast<T>(0.38));
   EXPECT_EQ(static_cast<T>(0.38), quaternion[0]);
 }
@@ -264,8 +267,9 @@ TEST_ALL_F(ScalarMutator)
 template <class T>
 void VectorAccessor_Test(const T& precision) {
   (void)precision;
-  mathfu::Quaternion<T> quaternion(static_cast<T>(0.50), static_cast<T>(0.76),
-                                   static_cast<T>(0.38), static_cast<T>(0.19));
+  mathkata::Quaternion<T> quaternion(static_cast<T>(0.50), static_cast<T>(0.76),
+                                     static_cast<T>(0.38),
+                                     static_cast<T>(0.19));
   EXPECT_EQ(static_cast<T>(0.76), quaternion.vector()[0]);
   EXPECT_EQ(static_cast<T>(0.38), quaternion.vector()[1]);
   EXPECT_EQ(static_cast<T>(0.19), quaternion.vector()[2]);
@@ -276,7 +280,7 @@ TEST_ALL_F(VectorAccessor)
 template <class T>
 void ConstVectorAccessor_Test(const T& precision) {
   (void)precision;
-  const mathfu::Quaternion<T> quaternion(
+  const mathkata::Quaternion<T> quaternion(
       static_cast<T>(0.50), static_cast<T>(0.76), static_cast<T>(0.38),
       static_cast<T>(0.19));
   EXPECT_EQ(static_cast<T>(0.76), quaternion.vector()[0]);
@@ -290,8 +294,8 @@ TEST_ALL_F(ConstVectorAccessor)
 template <class T>
 void VectorMutator_Test(const T& precision) {
   (void)precision;
-  mathfu::Quaternion<T> quaternion;
-  quaternion.set_vector(mathfu::Vector<T, 3>(
+  mathkata::Quaternion<T> quaternion;
+  quaternion.set_vector(mathkata::Vector<T, 3>(
       static_cast<T>(0.38), static_cast<T>(0.76), static_cast<T>(0.50)));
   EXPECT_EQ(static_cast<T>(0.38), quaternion.vector()[0]);
   EXPECT_EQ(static_cast<T>(0.76), quaternion.vector()[1]);
@@ -303,23 +307,24 @@ TEST_ALL_F(VectorMutator)
 // Euler Angles, and Matrices
 template <class T>
 void Conversion_Test(const T& precision) {
-  mathfu::Vector<T, 3> angles(static_cast<T>(1.5), static_cast<T>(2.3),
-                              static_cast<T>(0.6));
+  mathkata::Vector<T, 3> angles(static_cast<T>(1.5), static_cast<T>(2.3),
+                                static_cast<T>(0.6));
   // This will create a Quaternion from Euler Angles, convert back to
   // Euler Angles, and verify that they match
-  mathfu::Quaternion<T> qea(mathfu::Quaternion<T>::FromEulerAngles(angles));
-  mathfu::Vector<T, 3> convertedAngles(qea.ToEulerAngles());
+  mathkata::Quaternion<T> qea(mathkata::Quaternion<T>::FromEulerAngles(angles));
+  mathkata::Vector<T, 3> convertedAngles(qea.ToEulerAngles());
   EXPECT_NEAR(angles[0], std::numbers::pi_v<T> + convertedAngles[0], precision);
   EXPECT_NEAR(angles[1], std::numbers::pi_v<T> - convertedAngles[1], precision);
   EXPECT_NEAR(angles[2], std::numbers::pi_v<T> + convertedAngles[2], precision);
   // This will create a Quaternion from Axis Angle, convert back to
   // Axis Angle, and verify that they match.
-  mathfu::Vector<T, 3> axis(static_cast<T>(4.3), static_cast<T>(7.6),
-                            static_cast<T>(1.2));
+  mathkata::Vector<T, 3> axis(static_cast<T>(4.3), static_cast<T>(7.6),
+                              static_cast<T>(1.2));
   axis.Normalize();
   T angle = static_cast<T>(1.2);
-  mathfu::Quaternion<T> qaa(mathfu::Quaternion<T>::FromAngleAxis(angle, axis));
-  mathfu::Vector<T, 3> convertedAxis;
+  mathkata::Quaternion<T> qaa(
+      mathkata::Quaternion<T>::FromAngleAxis(angle, axis));
+  mathkata::Vector<T, 3> convertedAxis;
   T convertedAngle;
   qaa.ToAngleAxis(&convertedAngle, &convertedAxis);
   EXPECT_NEAR(angle, convertedAngle, precision);
@@ -328,22 +333,22 @@ void Conversion_Test(const T& precision) {
   EXPECT_NEAR(axis[2], convertedAxis[2], precision);
   // This will create a Quaternion from a 3x3 Matrix, convert back to a Matrix,
   // and verify that they match.
-  mathfu::Matrix<T, 3> rx(1, 0, 0, 0, cos(angles[0]), sin(angles[0]), 0,
-                          -sin(angles[0]), cos(angles[0]));
-  mathfu::Matrix<T, 3> ry(cos(angles[1]), 0, -sin(angles[1]), 0, 1, 0,
-                          sin(angles[1]), 0, cos(angles[1]));
-  mathfu::Matrix<T, 3> rz(cos(angles[2]), sin(angles[2]), 0, -sin(angles[2]),
-                          cos(angles[2]), 0, 0, 0, 1);
-  mathfu::Matrix<T, 3> m(rz * ry * rx);
-  mathfu::Quaternion<T> qm(mathfu::Quaternion<T>::FromMatrix(m));
-  mathfu::Matrix<T, 3> convertedM(qm.ToMatrix());
+  mathkata::Matrix<T, 3> rx(1, 0, 0, 0, cos(angles[0]), sin(angles[0]), 0,
+                            -sin(angles[0]), cos(angles[0]));
+  mathkata::Matrix<T, 3> ry(cos(angles[1]), 0, -sin(angles[1]), 0, 1, 0,
+                            sin(angles[1]), 0, cos(angles[1]));
+  mathkata::Matrix<T, 3> rz(cos(angles[2]), sin(angles[2]), 0, -sin(angles[2]),
+                            cos(angles[2]), 0, 0, 0, 1);
+  mathkata::Matrix<T, 3> m(rz * ry * rx);
+  mathkata::Quaternion<T> qm(mathkata::Quaternion<T>::FromMatrix(m));
+  mathkata::Matrix<T, 3> convertedM(qm.ToMatrix());
   for (int i = 0; i < 9; ++i) EXPECT_NEAR(m[i], convertedM[i], precision);
   // This will create a Quaternion from a 4x4 Matrix, convert back to a Matrix,
   // and verify that they match.
   // Recycling the 3x3 matrix from before.
-  mathfu::Matrix<T, 4> m4 = mathfu::Matrix<T, 4>::FromRotationMatrix(m);
-  mathfu::Quaternion<T> qm4(mathfu::Quaternion<T>::FromMatrix(m4));
-  mathfu::Matrix<T, 4> convertedM4(qm4.ToMatrix4());
+  mathkata::Matrix<T, 4> m4 = mathkata::Matrix<T, 4>::FromRotationMatrix(m);
+  mathkata::Quaternion<T> qm4(mathkata::Quaternion<T>::FromMatrix(m4));
+  mathkata::Matrix<T, 4> convertedM4(qm4.ToMatrix4());
   for (int i = 0; i < 15; ++i) EXPECT_NEAR(m4[i], convertedM4[i], precision);
 }
 TEST_ALL_F(Conversion)
@@ -353,9 +358,9 @@ TEST_ALL_F(Conversion)
 template <class T>
 void Conjugate_Test(const T& precision) {
   (void)precision;
-  mathfu::Quaternion<T> q(static_cast<T>(1.4), static_cast<T>(6.3),
-                          static_cast<T>(8.5), static_cast<T>(5.9));
-  mathfu::Quaternion<T> conj = q.Conjugate();
+  mathkata::Quaternion<T> q(static_cast<T>(1.4), static_cast<T>(6.3),
+                            static_cast<T>(8.5), static_cast<T>(5.9));
+  mathkata::Quaternion<T> conj = q.Conjugate();
   EXPECT_EQ(q.scalar(), conj.scalar());
   EXPECT_EQ(-q.vector()[0], conj.vector()[0]);
   EXPECT_EQ(-q.vector()[1], conj.vector()[1]);
@@ -370,41 +375,41 @@ void Inverse_Test(const T& precision) {
   const double epsilon = static_cast<double>(precision) * 10;
 
   // Test with a non-unit quaternion.
-  mathfu::Quaternion<T> q1(static_cast<T>(1.4), static_cast<T>(6.3),
-                           static_cast<T>(8.5), static_cast<T>(5.9));
-  mathfu::Quaternion<T> product1 = q1 * q1.Inverse();
-  EXPECT_NEAR_QUAT(mathfu::Quaternion<T>::identity, product1, epsilon);
+  mathkata::Quaternion<T> q1(static_cast<T>(1.4), static_cast<T>(6.3),
+                             static_cast<T>(8.5), static_cast<T>(5.9));
+  mathkata::Quaternion<T> product1 = q1 * q1.Inverse();
+  EXPECT_NEAR_QUAT(mathkata::Quaternion<T>::identity, product1, epsilon);
 
   // Also test q.Inverse() * q.
-  mathfu::Quaternion<T> product2 = q1.Inverse() * q1;
-  EXPECT_NEAR_QUAT(mathfu::Quaternion<T>::identity, product2, epsilon);
+  mathkata::Quaternion<T> product2 = q1.Inverse() * q1;
+  EXPECT_NEAR_QUAT(mathkata::Quaternion<T>::identity, product2, epsilon);
 
   // Test with a unit quaternion.
-  mathfu::Vector<T, 3> axis(static_cast<T>(4.3), static_cast<T>(7.6),
-                            static_cast<T>(1.2));
+  mathkata::Vector<T, 3> axis(static_cast<T>(4.3), static_cast<T>(7.6),
+                              static_cast<T>(1.2));
   axis.Normalize();
-  mathfu::Quaternion<T> q2 =
-      mathfu::Quaternion<T>::FromAngleAxis(static_cast<T>(1.2), axis);
-  mathfu::Quaternion<T> product3 = q2 * q2.Inverse();
-  EXPECT_NEAR_QUAT(mathfu::Quaternion<T>::identity, product3, epsilon);
+  mathkata::Quaternion<T> q2 =
+      mathkata::Quaternion<T>::FromAngleAxis(static_cast<T>(1.2), axis);
+  mathkata::Quaternion<T> product3 = q2 * q2.Inverse();
+  EXPECT_NEAR_QUAT(mathkata::Quaternion<T>::identity, product3, epsilon);
 }
 TEST_ALL_F(Inverse)
 
 // This will test the multiplication of quaternions.
 template <class T>
 void Mult_Test(const T& precision) {
-  mathfu::Vector<T, 3> axis(static_cast<T>(4.3), static_cast<T>(7.6),
-                            static_cast<T>(1.2));
+  mathkata::Vector<T, 3> axis(static_cast<T>(4.3), static_cast<T>(7.6),
+                              static_cast<T>(1.2));
   axis.Normalize();
   T angle1 = static_cast<T>(1.2), angle2 = static_cast<T>(0.7),
     angle3 = angle2 + precision * 10;
-  mathfu::Quaternion<T> qaa1(
-      mathfu::Quaternion<T>::FromAngleAxis(angle1, axis));
-  mathfu::Quaternion<T> qaa2(
-      mathfu::Quaternion<T>::FromAngleAxis(angle2, axis));
-  mathfu::Quaternion<T> qaa3(
-      mathfu::Quaternion<T>::FromAngleAxis(angle3, axis));
-  mathfu::Vector<T, 3> convertedAxis;
+  mathkata::Quaternion<T> qaa1(
+      mathkata::Quaternion<T>::FromAngleAxis(angle1, axis));
+  mathkata::Quaternion<T> qaa2(
+      mathkata::Quaternion<T>::FromAngleAxis(angle2, axis));
+  mathkata::Quaternion<T> qaa3(
+      mathkata::Quaternion<T>::FromAngleAxis(angle3, axis));
+  mathkata::Vector<T, 3> convertedAxis;
   T convertedAngle;
   // This will verify that multiplying two quaternions corresponds to the sum
   // of the rotations.
@@ -414,13 +419,13 @@ void Mult_Test(const T& precision) {
   // to scaling the rotation.
   qaa1.ScaleAngle(2).ToAngleAxis(&convertedAngle, &convertedAxis);
   EXPECT_NEAR(angle1 * 2, convertedAngle, precision);
-  mathfu::Vector<T, 3> v(3.5f, 6.4f, 7.0f);
-  mathfu::Vector<T, 4> v4(3.5f, 6.4f, 7.0f, 0.0f);
+  mathkata::Vector<T, 3> v(3.5f, 6.4f, 7.0f);
+  mathkata::Vector<T, 4> v4(3.5f, 6.4f, 7.0f, 0.0f);
   // This will verify that multiplying by a vector corresponds to applying
   // the rotation to that vector.
-  mathfu::Vector<T, 3> quatRotatedV(qaa1.Rotate(v));
-  mathfu::Vector<T, 3> matRotatedV(qaa1.ToMatrix() * v);
-  mathfu::Vector<T, 4> mat4RotatedV(qaa1.ToMatrix4() * v4);
+  mathkata::Vector<T, 3> quatRotatedV(qaa1.Rotate(v));
+  mathkata::Vector<T, 3> matRotatedV(qaa1.ToMatrix() * v);
+  mathkata::Vector<T, 4> mat4RotatedV(qaa1.ToMatrix4() * v4);
   EXPECT_NEAR(quatRotatedV[0], matRotatedV[0], 10 * precision);
   EXPECT_NEAR(quatRotatedV[1], matRotatedV[1], 10 * precision);
   EXPECT_NEAR(quatRotatedV[2], matRotatedV[2], 10 * precision);
@@ -430,13 +435,16 @@ void Mult_Test(const T& precision) {
   EXPECT_NEAR(quatRotatedV[2], mat4RotatedV[2], 10 * precision);
   // This will verify that interpolating two quaternions corresponds to
   // interpolating the angle.
-  mathfu::Quaternion<T> slerp1(mathfu::Quaternion<T>::Slerp(qaa1, qaa2, 0.5));
+  mathkata::Quaternion<T> slerp1(
+      mathkata::Quaternion<T>::Slerp(qaa1, qaa2, 0.5));
   slerp1.ToAngleAxis(&convertedAngle, &convertedAxis);
   EXPECT_NEAR(.5 * (angle1 + angle2), convertedAngle, precision);
-  mathfu::Quaternion<T> slerp2(mathfu::Quaternion<T>::Slerp(qaa2, qaa3, 0.5));
+  mathkata::Quaternion<T> slerp2(
+      mathkata::Quaternion<T>::Slerp(qaa2, qaa3, 0.5));
   slerp2.ToAngleAxis(&convertedAngle, &convertedAxis);
   EXPECT_NEAR(.5 * (angle2 + angle3), convertedAngle, precision);
-  mathfu::Quaternion<T> slerp3(mathfu::Quaternion<T>::Slerp(qaa2, qaa2, 0.5));
+  mathkata::Quaternion<T> slerp3(
+      mathkata::Quaternion<T>::Slerp(qaa2, qaa2, 0.5));
   slerp3.ToAngleAxis(&convertedAngle, &convertedAxis);
   EXPECT_NEAR(angle2, convertedAngle, precision);
 }
@@ -448,7 +456,7 @@ TEST_ALL_F(Mult)
 template <class T>
 void MultQuatScalarComponentWise_Test(const T& precision) {
   (void)precision;
-  using Quaternion = mathfu::Quaternion<T>;
+  using Quaternion = mathkata::Quaternion<T>;
   const double epsilon = 1e-5;
 
   const Quaternion q(static_cast<T>(1), static_cast<T>(2), static_cast<T>(3),
@@ -477,20 +485,20 @@ TEST_ALL_F(MultQuatScalarComponentWise)
 template <class T>
 void ScaleAngle_Test(const T& precision) {
   (void)precision;
-  using Quaternion = mathfu::Quaternion<T>;
-  using Vector3 = mathfu::Vector<T, 3>;
+  using Quaternion = mathkata::Quaternion<T>;
+  using Vector3 = mathkata::Vector<T, 3>;
   const double epsilon = 1e-5;
   const Vector3 up(0, 1, 0);
 
   // ScaleAngle(1) on a big quaternion should condition it to the short path.
   const Quaternion bigQuat =
-      Quaternion::FromAngleAxis(static_cast<T>(mathfu::kPi * 1.5), up);
+      Quaternion::FromAngleAxis(static_cast<T>(mathkata::kPi * 1.5), up);
   EXPECT_NEAR_QUAT(Quaternion(-bigQuat.scalar(), -bigQuat.vector()),
                    bigQuat.ScaleAngle(1), epsilon);
 
   // ScaleAngle is not associative for factors > 1.
   const Quaternion base =
-      Quaternion::FromAngleAxis(static_cast<T>(mathfu::kPi * .75), up);
+      Quaternion::FromAngleAxis(static_cast<T>(mathkata::kPi * .75), up);
   const Quaternion q1 = base.ScaleAngle(2).ScaleAngle(static_cast<T>(.5));
   const Quaternion q2 = base.ScaleAngle(static_cast<T>(2 * .5));
   EXPECT_FALSE(IsNearOrientation(q1, q2, epsilon));
@@ -505,7 +513,7 @@ TEST_ALL_F(ScaleAngle)
 template <class T>
 void ScalarMultDistributesOverAdd_Test(const T& precision) {
   (void)precision;
-  using Quaternion = mathfu::Quaternion<T>;
+  using Quaternion = mathkata::Quaternion<T>;
   const double epsilon = 1e-5;
 
   const Quaternion q1(static_cast<T>(1), static_cast<T>(2), static_cast<T>(3),
@@ -522,29 +530,29 @@ TEST_ALL_F(ScalarMultDistributesOverAdd)
 // This will test the dot product of quaternions.
 template <class T>
 void Dot_Test(const T& precision) {
-  mathfu::Vector<T, 3> axis(static_cast<T>(4.3), static_cast<T>(7.6),
-                            static_cast<T>(1.2));
+  mathkata::Vector<T, 3> axis(static_cast<T>(4.3), static_cast<T>(7.6),
+                              static_cast<T>(1.2));
   axis.Normalize();
   T angle1 = static_cast<T>(1.2),
     angle2 = static_cast<T>(angle1 + std::numbers::pi_v<T> / 2),
     angle3 = static_cast<T>(angle1 + std::numbers::pi_v<T>),
     angle4 = static_cast<T>(0.7);
-  mathfu::Quaternion<T> qaa1(
-      mathfu::Quaternion<T>::FromAngleAxis(angle1, axis));
-  mathfu::Quaternion<T> qaa2(
-      mathfu::Quaternion<T>::FromAngleAxis(angle2, axis));
-  mathfu::Quaternion<T> qaa3(
-      mathfu::Quaternion<T>::FromAngleAxis(angle3, axis));
-  mathfu::Quaternion<T> qaa4(
-      mathfu::Quaternion<T>::FromAngleAxis(angle4, axis));
+  mathkata::Quaternion<T> qaa1(
+      mathkata::Quaternion<T>::FromAngleAxis(angle1, axis));
+  mathkata::Quaternion<T> qaa2(
+      mathkata::Quaternion<T>::FromAngleAxis(angle2, axis));
+  mathkata::Quaternion<T> qaa3(
+      mathkata::Quaternion<T>::FromAngleAxis(angle3, axis));
+  mathkata::Quaternion<T> qaa4(
+      mathkata::Quaternion<T>::FromAngleAxis(angle4, axis));
 
   // This will verify that Dotting two quaternions works correctly.
-  EXPECT_NEAR(mathfu::Quaternion<T>::DotProduct(qaa1, qaa1), 1.0, precision);
-  EXPECT_NEAR(mathfu::Quaternion<T>::DotProduct(qaa1, qaa2), sqrt(2.0) / 2.0,
+  EXPECT_NEAR(mathkata::Quaternion<T>::DotProduct(qaa1, qaa1), 1.0, precision);
+  EXPECT_NEAR(mathkata::Quaternion<T>::DotProduct(qaa1, qaa2), sqrt(2.0) / 2.0,
               precision);
-  EXPECT_NEAR(mathfu::Quaternion<T>::DotProduct(qaa1, qaa3), 0.0, precision);
+  EXPECT_NEAR(mathkata::Quaternion<T>::DotProduct(qaa1, qaa3), 0.0, precision);
   // 2 x acos(dot) should be the angle between two quaternions:
-  EXPECT_NEAR(acos(mathfu::Quaternion<T>::DotProduct(qaa1, qaa4)) * 2.0,
+  EXPECT_NEAR(acos(mathkata::Quaternion<T>::DotProduct(qaa1, qaa4)) * 2.0,
               angle1 - angle4, precision);
 }
 TEST_ALL_F(Dot)
@@ -552,13 +560,14 @@ TEST_ALL_F(Dot)
 // This will test normalization of quaternions.
 template <class T>
 void Normalize_Test(const T& precision) {
-  mathfu::Quaternion<T> quat_1(static_cast<T>(12), static_cast<T>(0),
-                               static_cast<T>(0), static_cast<T>(0));
-  const mathfu::Quaternion<T> const_quat_1 = quat_1;
-  const mathfu::Quaternion<T> normalized_quat_1 = const_quat_1.Normalized();
+  mathkata::Quaternion<T> quat_1(static_cast<T>(12), static_cast<T>(0),
+                                 static_cast<T>(0), static_cast<T>(0));
+  const mathkata::Quaternion<T> const_quat_1 = quat_1;
+  const mathkata::Quaternion<T> normalized_quat_1 = const_quat_1.Normalized();
   quat_1.Normalize();
-  mathfu::Quaternion<T> reference_quat_1(static_cast<T>(1), static_cast<T>(0),
-                                         static_cast<T>(0), static_cast<T>(0));
+  mathkata::Quaternion<T> reference_quat_1(static_cast<T>(1), static_cast<T>(0),
+                                           static_cast<T>(0),
+                                           static_cast<T>(0));
   EXPECT_NEAR(reference_quat_1[0], quat_1[0], precision);
   EXPECT_NEAR(reference_quat_1[1], quat_1[1], precision);
   EXPECT_NEAR(reference_quat_1[2], quat_1[2], precision);
@@ -568,11 +577,11 @@ void Normalize_Test(const T& precision) {
   EXPECT_NEAR(reference_quat_1[2], normalized_quat_1[2], precision);
   EXPECT_NEAR(reference_quat_1[3], normalized_quat_1[3], precision);
 
-  mathfu::Quaternion<T> quat_2(static_cast<T>(123), static_cast<T>(123),
-                               static_cast<T>(123), static_cast<T>(123));
-  mathfu::Quaternion<T> normalized_quat_2 = quat_2.Normalized();
+  mathkata::Quaternion<T> quat_2(static_cast<T>(123), static_cast<T>(123),
+                                 static_cast<T>(123), static_cast<T>(123));
+  mathkata::Quaternion<T> normalized_quat_2 = quat_2.Normalized();
   quat_2.Normalize();
-  mathfu::Quaternion<T> reference_quat_2(
+  mathkata::Quaternion<T> reference_quat_2(
       static_cast<T>(sqrt(.25)), static_cast<T>(sqrt(.25)),
       static_cast<T>(sqrt(.25)), static_cast<T>(sqrt(.25)));
   EXPECT_NEAR(reference_quat_2[0], quat_2[0], precision);
@@ -591,19 +600,19 @@ TEST_ALL_F(Normalize)
 template <class T>
 void ToAngleAxisReturnsSmallQuat_Test(const T& precision) {
   (void)precision;
-  using Quaternion = mathfu::Quaternion<T>;
-  using Vector3 = mathfu::Vector<T, 3>;
+  using Quaternion = mathkata::Quaternion<T>;
+  using Vector3 = mathkata::Vector<T, 3>;
   const float epsilon = 1e-5f;
 
   // Test the specific example called out in the documentation:
   // "For example, if *this represents "Rotate 350 degrees left", you will
   //  get the angle-axis "Rotate 10 degrees right"."
   const Vector3 kUp(0, 1, 0);
-  const float k350Degrees = 350 * mathfu::kDegreesToRadians;
+  const float k350Degrees = 350 * mathkata::kDegreesToRadians;
   const Quaternion k350Left = Quaternion::FromAngleAxis(k350Degrees, kUp);
 
   const Vector3 kDown(0, -1, 0);
-  const float k10Degrees = 10 * mathfu::kDegreesToRadians;
+  const float k10Degrees = 10 * mathkata::kDegreesToRadians;
   const Quaternion k10Right = Quaternion::FromAngleAxis(k10Degrees, kDown);
 
   {
@@ -628,69 +637,69 @@ TEST_ALL_F(ToAngleAxisReturnsSmallQuat)
 // This will test normalization of quaternions.
 template <class T>
 void RotateFromTo_Test(const T& precision) {
-  mathfu::Vector<T, 3> x_axis = mathfu::Vector<T, 3>(
+  mathkata::Vector<T, 3> x_axis = mathkata::Vector<T, 3>(
       static_cast<T>(1), static_cast<T>(0), static_cast<T>(0));
-  mathfu::Vector<T, 3> y_axis = mathfu::Vector<T, 3>(
+  mathkata::Vector<T, 3> y_axis = mathkata::Vector<T, 3>(
       static_cast<T>(0), static_cast<T>(1), static_cast<T>(0));
-  mathfu::Vector<T, 3> z_axis = mathfu::Vector<T, 3>(
+  mathkata::Vector<T, 3> z_axis = mathkata::Vector<T, 3>(
       static_cast<T>(0), static_cast<T>(0), static_cast<T>(1));
 
-  mathfu::Quaternion<T> x_to_y =
-      mathfu::Quaternion<T>::RotateFromTo(x_axis, y_axis);
-  mathfu::Quaternion<T> y_to_z =
-      mathfu::Quaternion<T>::RotateFromTo(y_axis, z_axis);
-  mathfu::Quaternion<T> z_to_x =
-      mathfu::Quaternion<T>::RotateFromTo(z_axis, x_axis);
+  mathkata::Quaternion<T> x_to_y =
+      mathkata::Quaternion<T>::RotateFromTo(x_axis, y_axis);
+  mathkata::Quaternion<T> y_to_z =
+      mathkata::Quaternion<T>::RotateFromTo(y_axis, z_axis);
+  mathkata::Quaternion<T> z_to_x =
+      mathkata::Quaternion<T>::RotateFromTo(z_axis, x_axis);
 
   // Check some axis rotations:
   // By definition, rotateFromTo(v1, v2) * v2 should always equal v2.
   // if v1 and v2 are 90 degrees apart (as they are in the case of axes)
   // then applying the same rotation twice should invert the vector.
-  mathfu::Vector<T, 3> x_to_y_result = x_to_y.Rotate(x_axis);
-  mathfu::Vector<T, 3> x_to_y_twice_result = (x_to_y * x_to_y).Rotate(x_axis);
+  mathkata::Vector<T, 3> x_to_y_result = x_to_y.Rotate(x_axis);
+  mathkata::Vector<T, 3> x_to_y_twice_result = (x_to_y * x_to_y).Rotate(x_axis);
   EXPECT_NEAR_VEC3(x_to_y_result, y_axis, precision);
   EXPECT_NEAR_VEC3(x_to_y_twice_result, -x_axis, precision);
 
-  mathfu::Vector<T, 3> y_to_z_result = y_to_z.Rotate(y_axis);
-  mathfu::Vector<T, 3> y_to_z_twice_result = (y_to_z * y_to_z).Rotate(y_axis);
+  mathkata::Vector<T, 3> y_to_z_result = y_to_z.Rotate(y_axis);
+  mathkata::Vector<T, 3> y_to_z_twice_result = (y_to_z * y_to_z).Rotate(y_axis);
   EXPECT_NEAR_VEC3(y_to_z_result, z_axis, precision);
   EXPECT_NEAR_VEC3(y_to_z_twice_result, -y_axis, precision);
 
-  mathfu::Vector<T, 3> z_to_x_result = z_to_x.Rotate(z_axis);
-  mathfu::Vector<T, 3> z_to_x_twice_result = (z_to_x * z_to_x).Rotate(z_axis);
+  mathkata::Vector<T, 3> z_to_x_result = z_to_x.Rotate(z_axis);
+  mathkata::Vector<T, 3> z_to_x_twice_result = (z_to_x * z_to_x).Rotate(z_axis);
   EXPECT_NEAR_VEC3(z_to_x_result, x_axis, precision);
   EXPECT_NEAR_VEC3(z_to_x_twice_result, -z_axis, precision);
 
   // Try some weirder vectors:
-  mathfu::Vector<T, 3> arbitrary_1 = mathfu::Vector<T, 3>(
+  mathkata::Vector<T, 3> arbitrary_1 = mathkata::Vector<T, 3>(
       static_cast<T>(2), static_cast<T>(-5), static_cast<T>(9));
-  mathfu::Vector<T, 3> arbitrary_2 = mathfu::Vector<T, 3>(
+  mathkata::Vector<T, 3> arbitrary_2 = mathkata::Vector<T, 3>(
       static_cast<T>(-1), static_cast<T>(3), static_cast<T>(16));
 
-  mathfu::Quaternion<T> arbitrary_to_arbitrary =
-      mathfu::Quaternion<T>::RotateFromTo(arbitrary_1, arbitrary_2);
+  mathkata::Quaternion<T> arbitrary_to_arbitrary =
+      mathkata::Quaternion<T>::RotateFromTo(arbitrary_1, arbitrary_2);
 
-  mathfu::Vector<T, 3> arbitrary_1_to_2 =
+  mathkata::Vector<T, 3> arbitrary_1_to_2 =
       arbitrary_to_arbitrary.Rotate(arbitrary_1);
   arbitrary_1_to_2.Normalize();
-  mathfu::Vector<T, 3> arbitrary_2_normalized = arbitrary_2.Normalized();
+  mathkata::Vector<T, 3> arbitrary_2_normalized = arbitrary_2.Normalized();
 
   EXPECT_NEAR_VEC3(arbitrary_1_to_2, arbitrary_2_normalized, precision);
 
   // Using RotateFromTo on one vector should give us the identity quaternion:
-  mathfu::Quaternion<T> identity =
-      mathfu::Quaternion<T>::RotateFromTo(arbitrary_1, arbitrary_1);
+  mathkata::Quaternion<T> identity =
+      mathkata::Quaternion<T>::RotateFromTo(arbitrary_1, arbitrary_1);
 
-  mathfu::Vector<T, 3> arbitrary_2_identity = identity.Rotate(arbitrary_2);
+  mathkata::Vector<T, 3> arbitrary_2_identity = identity.Rotate(arbitrary_2);
   EXPECT_NEAR_VEC3(arbitrary_2_identity, arbitrary_2, precision);
 
   // Using RotateFromTo on an inverted vector should give a 180 degree rotation:
-  mathfu::Quaternion<T> reverse =
-      mathfu::Quaternion<T>::RotateFromTo(arbitrary_1, -arbitrary_1);
+  mathkata::Quaternion<T> reverse =
+      mathkata::Quaternion<T>::RotateFromTo(arbitrary_1, -arbitrary_1);
 
   // Relaxing the precision slightly, because there are a lot of chained
   // float operations in here.
-  mathfu::Vector<T, 3> arbitrary_1_reversed = reverse.Rotate(arbitrary_1);
+  mathkata::Vector<T, 3> arbitrary_1_reversed = reverse.Rotate(arbitrary_1);
   EXPECT_NEAR_VEC3(arbitrary_1_reversed, -arbitrary_1, precision * 2.0);
 }
 TEST_ALL_F(RotateFromTo)
@@ -698,7 +707,7 @@ TEST_ALL_F(RotateFromTo)
 // Test the compilation of basic quaternion operations given in the sample
 // file. This will test interpolating two rotations.
 TEST_F(QuaternionTests, QuaternionSample) {
-  using namespace mathfu;
+  using namespace mathkata;
   /// @doxysnippetstart Chapter03_Quaternions.md Quaternion_Sample
   // Use radians for angles
   Vector<float, 3> angles1(0.66f, 1.3f, 0.76f);
@@ -718,22 +727,24 @@ TEST_F(QuaternionTests, QuaternionSample) {
 
 // Test that the quaternion identity constants give the identity transform.
 TEST_F(QuaternionTests, IdentityConst) {
-  EXPECT_EQ_QUAT(mathfu::kQuatIdentityf, mathfu::Quaternion<float>::identity);
-  EXPECT_EQ_QUAT(mathfu::kQuatIdentityf,
-                 mathfu::Quaternion<float>(1.0f, 0.0f, 0.0f, 0.0f));
-  EXPECT_EQ(mathfu::kQuatIdentityf.ToEulerAngles(), mathfu::kZeros3f);
+  EXPECT_EQ_QUAT(mathkata::kQuatIdentityf,
+                 mathkata::Quaternion<float>::identity);
+  EXPECT_EQ_QUAT(mathkata::kQuatIdentityf,
+                 mathkata::Quaternion<float>(1.0f, 0.0f, 0.0f, 0.0f));
+  EXPECT_EQ(mathkata::kQuatIdentityf.ToEulerAngles(), mathkata::kZeros3f);
 
-  EXPECT_EQ_QUAT(mathfu::kQuatIdentityd, mathfu::Quaternion<double>::identity);
-  EXPECT_EQ_QUAT(mathfu::kQuatIdentityd,
-                 mathfu::Quaternion<double>(1.0, 0.0, 0.0, 0.0));
-  EXPECT_EQ(mathfu::kQuatIdentityd.ToEulerAngles(), mathfu::kZeros3d);
+  EXPECT_EQ_QUAT(mathkata::kQuatIdentityd,
+                 mathkata::Quaternion<double>::identity);
+  EXPECT_EQ_QUAT(mathkata::kQuatIdentityd,
+                 mathkata::Quaternion<double>(1.0, 0.0, 0.0, 0.0));
+  EXPECT_EQ(mathkata::kQuatIdentityd.ToEulerAngles(), mathkata::kZeros3d);
 }
 
 template <class T>
 void OutputStream_Test(const T&) {
-  mathfu::Quaternion<T> q =
-      mathfu::Quaternion<T>(static_cast<T>(1), static_cast<T>(2),
-                            static_cast<T>(3), static_cast<T>(4));
+  mathkata::Quaternion<T> q =
+      mathkata::Quaternion<T>(static_cast<T>(1), static_cast<T>(2),
+                              static_cast<T>(3), static_cast<T>(4));
   std::stringstream ss;
   ss << q;
   EXPECT_EQ("(1, 2, 3, 4)", ss.str());
@@ -742,10 +753,10 @@ TEST_ALL_F(OutputStream)
 
 template <class T>
 void LookAt_Test(const T& precision) {
-  using Quaternion = mathfu::Quaternion<T>;
-  using Vector3 = mathfu::Vector<T, 3>;
-  constexpr auto kRH = mathfu::Handedness::kRightHanded;
-  constexpr auto kLH = mathfu::Handedness::kLeftHanded;
+  using Quaternion = mathkata::Quaternion<T>;
+  using Vector3 = mathkata::Vector<T, 3>;
+  constexpr auto kRH = mathkata::Handedness::kRightHanded;
+  constexpr auto kLH = mathkata::Handedness::kLeftHanded;
   const T one = static_cast<T>(1);
   const T neg_one = static_cast<T>(-1);
   const T zero = static_cast<T>(0);
@@ -868,11 +879,11 @@ TEST_ALL_F(LookAt)
 
 template <class T>
 void FromEulerAnglesSplit_Test(const T& precision) {
-  mathfu::Vector<T, 3> eulers(static_cast<T>(0.1), static_cast<T>(0.2),
-                              static_cast<T>(0.3));
+  mathkata::Vector<T, 3> eulers(static_cast<T>(0.1), static_cast<T>(0.2),
+                                static_cast<T>(0.3));
   EXPECT_NEAR_QUAT(
-      mathfu::Quaternion<T>::FromEulerAngles(eulers),
-      mathfu::Quaternion<T>::FromEulerAngles(eulers[0], eulers[1], eulers[2]),
+      mathkata::Quaternion<T>::FromEulerAngles(eulers),
+      mathkata::Quaternion<T>::FromEulerAngles(eulers[0], eulers[1], eulers[2]),
       precision);
 }
 TEST_ALL_F(FromEulerAnglesSplit)
@@ -904,14 +915,14 @@ const float kSlerpTestAnglesInDegrees[]{
 template <class T>
 void SlerpResultIsUnit_Test(const T& precision) {
   (void)precision;
-  using Quaternion = mathfu::Quaternion<T>;
+  using Quaternion = mathkata::Quaternion<T>;
 
-  const mathfu::Vector<T, 3> axis(0, 1, 0);
+  const mathkata::Vector<T, 3> axis(0, 1, 0);
   const float kLengthEpsilon = 5e-6f;
 
   for (float angle : kSlerpTestAnglesInDegrees) {
     const Quaternion q2 =
-        Quaternion::FromAngleAxis(angle * mathfu::kDegreesToRadians, axis);
+        Quaternion::FromAngleAxis(angle * mathkata::kDegreesToRadians, axis);
 
     Quaternion slerp_result = Quaternion::Slerp(Quaternion::identity, q2, .5f);
     const T slerp_length = slerp_result.Normalize();
@@ -932,16 +943,16 @@ TEST_ALL_F(SlerpResultIsUnit)
 // Angles are in degrees.
 template <class T>
 void CheckSlerp(float angle, float t, float expected_angle) {
-  using Quaternion = mathfu::Quaternion<T>;
-  using Vector3 = mathfu::Vector<T, 3>;
+  using Quaternion = mathkata::Quaternion<T>;
+  using Vector3 = mathkata::Vector<T, 3>;
 
   // Transcendentals are involved, so be lenient on the epsilon.
   const T epsilon = 1e-6f;
   const Vector3 up(0, 1, 0);  // Could be any axis, really.
   const Quaternion original =
-      Quaternion::FromAngleAxis(angle * mathfu::kDegreesToRadians, up);
-  const Quaternion expected =
-      Quaternion::FromAngleAxis(expected_angle * mathfu::kDegreesToRadians, up);
+      Quaternion::FromAngleAxis(angle * mathkata::kDegreesToRadians, up);
+  const Quaternion expected = Quaternion::FromAngleAxis(
+      expected_angle * mathkata::kDegreesToRadians, up);
 
   // These are looser EXPECT_NEAR_ORIENTATION checks because Slerp() treats
   // quats as orientations. For checking a mathematical Slerp(), they can
@@ -1000,6 +1011,6 @@ TEST_ALL_F(Slerp)
 
 int main(int argc, char** argv) {
   ::testing::InitGoogleTest(&argc, argv);
-  printf("%s (%s)\n", argv[0], MATHFU_BUILD_OPTIONS_STRING);
+  printf("%s (%s)\n", argv[0], MATHKATA_BUILD_OPTIONS_STRING);
   return RUN_ALL_TESTS();
 }

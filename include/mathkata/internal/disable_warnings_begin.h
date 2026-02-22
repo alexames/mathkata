@@ -15,7 +15,7 @@
  */
 
 // Suppress pedantic warnings.
-// To re-enable, include "mathfu/internal/disable_warnings_end.h".
+// To re-enable, include "mathkata/internal/disable_warnings_end.h".
 //
 // We need this to use anonymous unions and structs, which generate the
 // the following warning in GCC and Clang,

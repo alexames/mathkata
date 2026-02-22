@@ -15,11 +15,11 @@ cmake_minimum_required(VERSION 3.14)
 
 # Generate a rule to build a performance test executable
 # ${benchmark_executable_name} from ${benchmark_source}.  For details of
-# additional arguments, see mathfu_configure_flags().
+# additional arguments, see mathkata_configure_flags().
 function(benchmark_executable benchmark_executable_name benchmark_source)
   add_executable(${benchmark_executable_name} ${benchmark_source})
-  mathfu_configure_flags(${benchmark_executable_name} ${ARGN})
-  mathfu_enable_warnings(${benchmark_executable_name})
+  mathkata_configure_flags(${benchmark_executable_name} ${ARGN})
+  mathkata_enable_warnings(${benchmark_executable_name})
   target_include_directories(${benchmark_executable_name}
     PRIVATE ${CMAKE_CURRENT_LIST_DIR})
   if(UNIX AND NOT APPLE)
@@ -28,13 +28,13 @@ function(benchmark_executable benchmark_executable_name benchmark_source)
 endfunction()
 
 # Generates a rule to build performance test executables.  This only builds
-# ${benchmark_name}_benchmarks if SIMD is disabled (see ${mathfu_enable_simd})
+# ${benchmark_name}_benchmarks if SIMD is disabled (see ${mathkata_enable_simd})
 # or ${benchmark_name}_benchmarks and ${benchmark_name}_no_simd_benchmarks if
 # SIMD is enabled where the no_simd_benchmarks binary has SIMD disabled.
 function(benchmark_executables benchmark_name benchmark_source)
   # Default build options.
   benchmark_executable(${benchmark_name}_benchmarks ${benchmark_source})
-  if(mathfu_enable_simd)
+  if(mathkata_enable_simd)
     # NOTE: A build configuration below will deliberately duplicate the
     # default build configuration, since these configs could result in
     # different compile time preprocessor code paths.
