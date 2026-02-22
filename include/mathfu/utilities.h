@@ -156,29 +156,6 @@
 /// @endcond
 #endif  // MATHFU_COMPILE_WITH_SIMD
 
-/// @addtogroup mathfu_version
-/// @{
-
-/// @def MATHFU_VERSION_MAJOR
-/// @brief Major version number of the library.
-/// @see kMathFuVersionString
-#define MATHFU_VERSION_MAJOR 1
-/// @def MATHFU_VERSION_MINOR
-/// @brief Minor version number of the library.
-/// @see kMathFuVersionString
-#define MATHFU_VERSION_MINOR 1
-/// @def MATHFU_VERSION_REVISION
-/// @brief Revision number of the library.
-/// @see kMathFuVersionString
-#define MATHFU_VERSION_REVISION 0
-
-/// @}
-
-/// @cond MATHFU_INTERNAL
-#define MATHFU_STRING_EXPAND(X) #X
-#define MATHFU_STRING(X) MATHFU_STRING_EXPAND(X)
-/// @endcond
-
 /// @cond MATHFU_INTERNAL
 // Generate string which contains build options for the library.
 #if defined(MATHFU_COMPILE_WITH_SIMD)
@@ -199,53 +176,6 @@
 /// @brief String that describes the library's build configuration.
 #define MATHFU_BUILD_OPTIONS_STRING \
   (MATHFU_BUILD_OPTIONS_SIMD " " MATHFU_BUILD_OPTIONS_PADDING)
-/// @}
-
-// Weak linkage is culled by VS & doesn't work on cygwin.
-#if !defined(_WIN32) && !defined(__CYGWIN__)
-
-extern volatile __attribute__((weak)) const char *kMathFuVersionString;
-/// @addtogroup mathfu_version
-/// @{
-
-/// @var kMathFuVersionString
-/// @brief String which identifies the current version of MathFu.
-///
-/// @ref kMathFuVersionString is used by Google developers to identify which
-/// applications uploaded to Google Play are using this library.  This allows
-/// the development team at Google to determine the popularity of the library.
-/// How it works: Applications that are uploaded to the Google Play Store are
-/// scanned for this version string.  We track which applications are using it
-/// to measure popularity.  You are free to remove it (of course) but we would
-/// appreciate if you left it in.
-///
-/// @see MATHFU_VERSION_MAJOR
-/// @see MATHFU_VERSION_MINOR
-/// @see MATHFU_VERSION_REVISION
-volatile __attribute__((weak)) const char *kMathFuVersionString =
-    "MathFu " MATHFU_STRING(MATHFU_VERSION_MAJOR) "." MATHFU_STRING(
-        MATHFU_VERSION_MINOR) "." MATHFU_STRING(MATHFU_VERSION_REVISION);
-/// @}
-
-#endif  // !defined(_WIN32) && !defined(__CYGWIN__)
-
-/// @cond MATHFU_INTERNAL
-template <bool>
-struct static_assert_util;
-template <>
-struct static_assert_util<true> {};
-/// @endcond
-
-/// @addtogroup mathfu_utilities
-/// @{
-/// @def MATHFU_STATIC_ASSERT
-/// @brief Compile time assert for pre-C++11 compilers.
-///
-/// For example:
-/// <blockquote><code>
-/// MATHFU_STATIC_ASSERT(0 == 1);
-/// </code></blockquote> will result in a compile error.
-#define MATHFU_STATIC_ASSERT(x) static_assert_util<(x)>()
 /// @}
 
 /// @cond MATHFU_INTERNAL
@@ -288,6 +218,15 @@ struct static_assert_util<true> {};
 
 namespace mathfu {
 
+/// @addtogroup mathfu_version
+/// @{
+
+/// @var kVersion
+/// @brief String which identifies the current version of MathFu.
+static constexpr const char *kVersion = "2.0.0";
+
+/// @}
+
 /// @addtogroup mathfu_utilities
 /// @{
 
@@ -321,8 +260,7 @@ T Clamp(const T &x, const T &lower, const T &upper) {
 ///         (e.g float or double).
 template <class T, class T2>
 T Lerp(const T &range_start, const T &range_end, const T2 &percent) {
-  const T2 one_minus_percent = T2(1) - percent;
-  return range_start * one_minus_percent + range_end * percent;
+  return range_start + (range_end - range_start) * percent;
 }
 
 /// @brief Linearly interpolate between range_start and range_end, based on
@@ -355,79 +293,6 @@ template <class T>
 bool InRange(T val, T range_start, T range_end) {
   return val >= range_start && val < range_end;
 }
-
-/// @brief  Generate a random value of type T.
-/// @anchor mathfu_Random
-///
-/// This method generates a random value of type T, greater than or equal to
-/// 0.0 and less than 1.0.
-///
-/// This function uses the standard C library function rand() from math.h to
-/// generate the random number.
-///
-/// @returns Random number greater than or equal to 0.0 and less than 1.0.
-///
-/// @see RandomRange()
-/// @see RandomInRange()
-template <class T>
-inline T Random() {
-  return static_cast<T>(rand()) / static_cast<T>(RAND_MAX);
-}
-
-/// @cond MATHFU_INTERNAL
-template <>
-inline float Random() {
-  return static_cast<float>(rand() >> 8)
-         / (static_cast<float>((RAND_MAX >> 8) + 1));
-}
-/// @endcond
-
-/// @cond MATHFU_INTERNAL
-template <>
-inline double Random() {
-  return static_cast<double>(rand()) / (static_cast<double>(RAND_MAX + 1LL));
-}
-/// @endcond
-
-/// @brief Generate a random value of type T in the range -range...+range
-/// @anchor mathfu_RandomRange
-///
-/// This function uses the standard C library function rand() from math.h to
-/// generate the random number.
-///
-/// @param range Range of the random value to generate.
-/// @return Random value in the range -range to +range
-///
-/// @see Random()
-template <class T>
-inline T RandomRange(T range) {
-  return (Random<T>() * range * 2) - range;
-}
-
-/// @brief Generate a random number between [range_start, range_end]
-/// @anchor mathfu_RandomInRange
-///
-/// This function uses the standard C library function rand() from math.h to
-/// generate the random number.
-///
-/// @param range_start Minimum value.
-/// @param range_end Maximum value.
-/// @return Random value in the range [range_start, range_end].
-///
-/// @see Lerp()
-/// @see Random()
-template <class T>
-inline T RandomInRange(T range_start, T range_end) {
-  return Lerp(range_start, range_end, Random<T>());
-}
-
-/// @cond MATHFU_INTERNAL
-template <>
-inline int RandomInRange<int>(int range_start, int range_end) {
-  return static_cast<int>(RandomInRange<float>(static_cast<float>(range_start),
-                                               static_cast<float>(range_end)));
-}
-/// @endcond
 
 /// @brief Round a value up to the nearest power of 2 (integer overload).
 ///
@@ -616,14 +481,6 @@ class simd_allocator : public std::allocator<T> {
   /// @param p Pointer to memory to deallocate.
   void deallocate(pointer p, size_type) { FreeAligned(p); }
 };
-
-#if defined(_MSC_VER)
-#if _MSC_VER <= 1800  // MSVC 2013
-#if !defined(noexcept)
-#define noexcept
-#endif  // !defined(noexcept)
-#endif  // _MSC_VER <= 1800
-#endif  //  defined(_MSC_VER)
 
 /// @def MATHFU_DEFINE_GLOBAL_SIMD_AWARE_NEW_DELETE
 /// @brief Macro which overrides the default new and delete allocators.

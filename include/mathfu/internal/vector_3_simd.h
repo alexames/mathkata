@@ -152,16 +152,6 @@ class Vector<float, 3> {
         simd4f_sub(simd4f_zero(), MATHFU_VECTOR3_LOAD3(*this)));
   }
 
-  inline Vector<float, 3> operator*(const Vector<float, 3>& v) const {
-    return Vector<float, 3>(
-        simd4f_mul(MATHFU_VECTOR3_LOAD3(*this), MATHFU_VECTOR3_LOAD3(v)));
-  }
-
-  inline Vector<float, 3> operator/(const Vector<float, 3>& v) const {
-    return Vector<float, 3>(
-        simd4f_div(MATHFU_VECTOR3_LOAD3(*this), MATHFU_VECTOR3_LOAD3(v)));
-  }
-
   inline Vector<float, 3> operator+(const Vector<float, 3>& v) const {
     return Vector<float, 3>(
         simd4f_add(MATHFU_VECTOR3_LOAD3(*this), MATHFU_VECTOR3_LOAD3(v)));
@@ -208,18 +198,6 @@ class Vector<float, 3> {
                                            const Vector<float, 3>& v) {
     return Vector<float, 3>(
         simd4f_sub(simd4f_splat(s), MATHFU_VECTOR3_LOAD3(v)));
-  }
-
-  inline Vector<float, 3>& operator*=(const Vector<float, 3>& v) {
-    MATHFU_VECTOR3_STORE3(
-        simd4f_mul(MATHFU_VECTOR3_LOAD3(*this), MATHFU_VECTOR3_LOAD3(v)), *this)
-    return *this;
-  }
-
-  inline Vector<float, 3>& operator/=(const Vector<float, 3>& v) {
-    MATHFU_VECTOR3_STORE3(
-        simd4f_div(MATHFU_VECTOR3_LOAD3(*this), MATHFU_VECTOR3_LOAD3(v)), *this)
-    return *this;
   }
 
   inline Vector<float, 3>& operator+=(const Vector<float, 3>& v) {
@@ -330,25 +308,20 @@ class Vector<float, 3> {
         simd4f_mul(MATHFU_VECTOR3_LOAD3(v1), MATHFU_VECTOR3_LOAD3(v2)));
   }
 
+  static inline Vector<float, 3> HadamardDivide(const Vector<float, 3>& v1,
+                                                const Vector<float, 3>& v2) {
+    return Vector<float, 3>(
+        simd4f_div(MATHFU_VECTOR3_LOAD3(v1), MATHFU_VECTOR3_LOAD3(v2)));
+  }
+
   static inline Vector<float, 3> Lerp(const Vector<float, 3>& v1,
                                       const Vector<float, 3>& v2,
                                       float percent) {
-    const Vector<float, 3> percentv(percent);
-    const Vector<float, 3> one(1.0f);
-    const Vector<float, 3> one_minus_percent = one - percentv;
-    return Vector<float, 3>(simd4f_add(
-        simd4f_mul(MATHFU_VECTOR3_LOAD3(one_minus_percent),
-                   MATHFU_VECTOR3_LOAD3(v1)),
-        simd4f_mul(MATHFU_VECTOR3_LOAD3(percentv), MATHFU_VECTOR3_LOAD3(v2))));
-  }
-
-  /// Generates a random vector, where the range for each component is
-  /// bounded by min and max.
-  static inline Vector<float, 3> RandomInRange(const Vector<float, 3>& min,
-                                               const Vector<float, 3>& max) {
-    return Vector<float, 3>(mathfu::RandomInRange<float>(min[0], max[0]),
-                            mathfu::RandomInRange<float>(min[1], max[1]),
-                            mathfu::RandomInRange<float>(min[2], max[2]));
+    const simd4f percentv = simd4f_splat(percent);
+    const simd4f v1s = MATHFU_VECTOR3_LOAD3(v1);
+    const simd4f v2s = MATHFU_VECTOR3_LOAD3(v2);
+    return Vector<float, 3>(
+        simd4f_add(v1s, simd4f_mul(simd4f_sub(v2s, v1s), percentv)));
   }
 
   static inline Vector<float, 3> Max(const Vector<float, 3>& v1,
