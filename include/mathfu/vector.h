@@ -518,16 +518,6 @@ class Vector {
     return LerpHelper(v1, v2, percent);
   }
 
-  /// @brief Generates a random vector.
-  ///
-  /// The range of each component is bounded by min and max.
-  /// @param min Minimum value of the vector.
-  /// @param max Maximum value of the vector.
-  static inline Vector<T, Dims> RandomInRange(const Vector<T, Dims>& min,
-                                              const Vector<T, Dims>& max) {
-    return RandomInRangeHelper(min, max);
-  }
-
   /// @brief Compare each component and returns max values.
   ///
   /// @param v1 First vector.
@@ -944,19 +934,6 @@ inline Vector<T, Dims> LerpHelper(const Vector<T, Dims>& v1,
                                   const Vector<T, Dims>& v2, const T percent) {
   const T one_minus_percent = T(1) - percent;
   MATHFU_VECTOR_OPERATOR(one_minus_percent * v1[i] + percent * v2[i]);
-}
-
-/// @brief Generates a random vector.
-///
-/// The range of each component is bounded by min and max.
-/// @param min Minimum value of the vector.
-/// @param max Maximum value of the vector.
-template <class T, int Dims>
-inline Vector<T, Dims> RandomInRangeHelper(const Vector<T, Dims>& min,
-                                           const Vector<T, Dims>& max) {
-  Vector<T, Dims> result;
-  MATHFU_VECTOR_OPERATION(result[i] = RandomInRange<T>(min[i], max[i]));
-  return result;
 }
 
 /// @brief Compare each component and returns max values.

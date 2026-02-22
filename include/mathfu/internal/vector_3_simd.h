@@ -342,15 +342,6 @@ class Vector<float, 3> {
         simd4f_mul(MATHFU_VECTOR3_LOAD3(percentv), MATHFU_VECTOR3_LOAD3(v2))));
   }
 
-  /// Generates a random vector, where the range for each component is
-  /// bounded by min and max.
-  static inline Vector<float, 3> RandomInRange(const Vector<float, 3>& min,
-                                               const Vector<float, 3>& max) {
-    return Vector<float, 3>(mathfu::RandomInRange<float>(min[0], max[0]),
-                            mathfu::RandomInRange<float>(min[1], max[1]),
-                            mathfu::RandomInRange<float>(min[2], max[2]));
-  }
-
   static inline Vector<float, 3> Max(const Vector<float, 3>& v1,
                                      const Vector<float, 3>& v2) {
 #ifdef MATHFU_COMPILE_WITH_PADDING
