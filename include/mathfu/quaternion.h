@@ -528,31 +528,11 @@ class Quaternion {
   /// @param v2 The vector to rotate to
   /// @param preferred_axis the axis to use, if v1 and v2 are parallel.
   /// @return A Quaternion describing the rotation from v1 to v2
-  /// See the comment on RotateFromToWithAxis for an explanation of the math.
+  /// See the comment on RotateFromTo for an explanation of the math.
   static inline Quaternion<T> RotateFromToWithAxis(
       const Vector<T, 3>& v1, const Vector<T, 3>& v2,
       const Vector<T, 3>& preferred_axis) {
-    Vector<T, 3> start = v1.Normalized();
-    Vector<T, 3> end = v2.Normalized();
-
-    T dot_product = Vector<T, 3>::DotProduct(start, end);
-    // Any rotation < 0.1 degrees is treated as no rotation
-    // in order to avoid division by zero errors.
-    // So we early-out in cases where it's less than 0.1 degrees.
-    // cos( 0.1 degrees) = 0.99999847691
-    if (dot_product >= static_cast<T>(0.99999847691)) {
-      return Quaternion<T>::identity;
-    }
-    // If the vectors point in opposite directions, return a 180 degree
-    // rotation, on the axis that they asked for.
-    if (dot_product <= static_cast<T>(-0.99999847691)) {
-      return Quaternion<T>(static_cast<T>(0), preferred_axis);
-    }
-    // Degenerate cases have been handled, so if we're here, we have to
-    // actually compute the angle we want:
-    Vector<T, 3> cross_product = Vector<T, 3>::CrossProduct(start, end);
-
-    return Quaternion<T>(T(1) + dot_product, cross_product).Normalized();
+    return RotateFromToImpl(v1.Normalized(), v2.Normalized(), preferred_axis);
   }
 
   /// @brief Returns the a Quaternion that rotates from start to end.
@@ -626,26 +606,7 @@ class Quaternion {
   static inline Quaternion<T> RotateFromTo(const Vector<T, 3>& v1,
                                            const Vector<T, 3>& v2) {
     Vector<T, 3> start = v1.Normalized();
-    Vector<T, 3> end = v2.Normalized();
-
-    T dot_product = Vector<T, 3>::DotProduct(start, end);
-    // Any rotation < 0.1 degrees is treated as no rotation
-    // in order to avoid division by zero errors.
-    // So we early-out in cases where it's less than 0.1 degrees.
-    // cos( 0.1 degrees) = 0.99999847691
-    if (dot_product >= static_cast<T>(0.99999847691)) {
-      return Quaternion<T>::identity;
-    }
-    // If the vectors point in opposite directions, return a 180 degree
-    // rotation, on an arbitrary axis.
-    if (dot_product <= static_cast<T>(-0.99999847691)) {
-      return Quaternion<T>(T(0), PerpendicularVector(start));
-    }
-    // Degenerate cases have been handled, so if we're here, we have to
-    // actually compute the angle we want:
-    Vector<T, 3> cross_product = Vector<T, 3>::CrossProduct(start, end);
-
-    return Quaternion<T>(T(1) + dot_product, cross_product).Normalized();
+    return RotateFromToImpl(start, v2.Normalized(), PerpendicularVector(start));
   }
 
   /// @brief Returns a quaternion looking at forward vector with an up vector.
@@ -682,6 +643,34 @@ class Quaternion {
   MATHFU_DEFINE_CLASS_SIMD_AWARE_NEW_DELETE
 
  private:
+  /// @brief Shared implementation for RotateFromTo variants.
+  ///
+  /// @param start Normalized starting direction.
+  /// @param end Normalized target direction.
+  /// @param fallback_axis Axis to use for 180-degree rotation when vectors
+  ///        are anti-parallel.
+  static inline Quaternion<T> RotateFromToImpl(
+      const Vector<T, 3>& start, const Vector<T, 3>& end,
+      const Vector<T, 3>& fallback_axis) {
+    T dot_product = Vector<T, 3>::DotProduct(start, end);
+    // Any rotation < 0.1 degrees is treated as no rotation
+    // in order to avoid division by zero errors.
+    // So we early-out in cases where it's less than 0.1 degrees.
+    // cos( 0.1 degrees) = 0.99999847691
+    if (dot_product >= static_cast<T>(0.99999847691)) {
+      return Quaternion<T>::identity;
+    }
+    // If the vectors point in opposite directions, return a 180 degree
+    // rotation on the fallback axis.
+    if (dot_product <= static_cast<T>(-0.99999847691)) {
+      return Quaternion<T>(static_cast<T>(0), fallback_axis);
+    }
+    // Degenerate cases have been handled, so if we're here, we have to
+    // actually compute the angle we want:
+    Vector<T, 3> cross_product = Vector<T, 3>::CrossProduct(start, end);
+    return Quaternion<T>(T(1) + dot_product, cross_product).Normalized();
+  }
+
   Vector<T, 3> v_;
   T s_;
 };
