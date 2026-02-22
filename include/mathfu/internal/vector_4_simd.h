@@ -290,9 +290,6 @@ class Vector<float, 4> {
     return AngleHelper(v1, v2);
   }
 
-  template <class T, int rows, int cols>
-  friend class Matrix;
-
   MATHFU_DEFINE_CLASS_SIMD_AWARE_NEW_DELETE
 
 #include "mathfu/internal/disable_warnings_begin.h"

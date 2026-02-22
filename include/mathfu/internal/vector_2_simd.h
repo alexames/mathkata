@@ -76,6 +76,10 @@ class Vector<float, 2> {
 
   inline const float& operator[](const int i) const { return data_[i]; }
 
+  /// GLSL style multi-component accessors.
+  inline Vector<float, 2> xy() { return Vector<float, 2>(x, y); }
+  inline const Vector<float, 2> xy() const { return Vector<float, 2>(x, y); }
+
   inline void Pack(VectorPacked<float, 2>* const vector) const {
     simd2f_ustore2(simd2, vector->data_);
   }
