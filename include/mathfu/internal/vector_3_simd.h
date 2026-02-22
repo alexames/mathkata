@@ -388,6 +388,16 @@ class Vector<float, 3> {
     return AngleHelper(v1, v2);
   }
 
+  static inline Vector<float, 3> Project(const Vector<float, 3>& v,
+                                         const Vector<float, 3>& onto) {
+    return ProjectHelper(v, onto);
+  }
+
+  static inline Vector<float, 3> Reject(const Vector<float, 3>& v,
+                                        const Vector<float, 3>& from) {
+    return RejectHelper(v, from);
+  }
+
   MATHFU_DEFINE_CLASS_SIMD_AWARE_NEW_DELETE
 
 #include "mathfu/internal/disable_warnings_begin.h"

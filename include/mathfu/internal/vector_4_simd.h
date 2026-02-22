@@ -290,6 +290,16 @@ class Vector<float, 4> {
     return AngleHelper(v1, v2);
   }
 
+  static inline Vector<float, 4> Project(const Vector<float, 4>& v,
+                                         const Vector<float, 4>& onto) {
+    return ProjectHelper(v, onto);
+  }
+
+  static inline Vector<float, 4> Reject(const Vector<float, 4>& v,
+                                        const Vector<float, 4>& from) {
+    return RejectHelper(v, from);
+  }
+
   template <class T, int rows, int cols>
   friend class Matrix;
 

@@ -120,6 +120,16 @@ class Vector<T, 2> {
     return AngleHelper(v1, v2);
   }
 
+  static inline Vector<T, 2> Project(const Vector<T, 2>& v,
+                                     const Vector<T, 2>& onto) {
+    return ProjectHelper(v, onto);
+  }
+
+  static inline Vector<T, 2> Reject(const Vector<T, 2>& v,
+                                    const Vector<T, 2>& from) {
+    return RejectHelper(v, from);
+  }
+
   MATHFU_DEFINE_CLASS_SIMD_AWARE_NEW_DELETE
 
 #include "mathfu/internal/disable_warnings_begin.h"
