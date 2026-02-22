@@ -1,0 +1,82 @@
+name: clang-format Check
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'include/**/*.h'
+      - 'unit_tests/**/*.cpp'
+      - 'unit_tests/**/*.h'
+      - 'benchmarks/**/*.cpp'
+      - 'benchmarks/**/*.h'
+      - '.clang-format'
+
+jobs:
+  check-formatting:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install clang-format-19
+        run: |
+          wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key | sudo tee /etc/apt/trusted.gpg.d/apt.llvm.org.asc
+          echo "deb http://apt.llvm.org/$(lsb_release -cs)/ llvm-toolchain-$(lsb_release -cs)-19 main" | sudo tee /etc/apt/sources.list.d/llvm-19.list
+          sudo apt-get update
+          sudo apt-get install -y clang-format-19
+          sudo ln -sf /usr/bin/clang-format-19 /usr/bin/clang-format
+
+      - name: Check clang-format version
+        run: clang-format --version
+
+      - name: Get changed C++ files
+        id: changed-files
+        run: |
+          git diff --name-only origin/${{ github.base_ref }}...HEAD \
+            | grep -E '\.(cpp|h)$' > changed_files.txt || true
+          if [ -s changed_files.txt ]; then
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check formatting
+        if: steps.changed-files.outputs.has_changes == 'true'
+        run: |
+          HAS_ERRORS=false
+          ERRORS=()
+
+          while IFS= read -r file; do
+            if [ -z "$file" ] || [ ! -f "$file" ]; then
+              continue
+            fi
+
+            ORIGINAL=$(cat "$file")
+            FORMATTED=$(clang-format "$file" 2>&1)
+
+            if [ $? -ne 0 ]; then
+              echo "Error: clang-format failed on $file"
+              HAS_ERRORS=true
+              ERRORS+=("$file")
+              continue
+            fi
+
+            if [ "$ORIGINAL" != "$FORMATTED" ]; then
+              HAS_ERRORS=true
+              ERRORS+=("$file")
+            fi
+          done < changed_files.txt
+
+          if [ "$HAS_ERRORS" = true ]; then
+            echo "::error::clang-format check failed!"
+            echo "The following files need formatting:"
+            for file in "${ERRORS[@]}"; do
+              echo "  - $file"
+              echo "::error file=$file::This file needs clang-format"
+            done
+            exit 1
+          fi
