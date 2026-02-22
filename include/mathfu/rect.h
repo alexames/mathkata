@@ -39,7 +39,8 @@ struct Rect {
   /// @brief Create a rect from a vector4 of the same type.
   ///
   /// @param v Vector that the data will be copied from.
-  explicit Rect(const Vector<T, 4>& v) : pos(v.x, v.y), size(v.z, v.w) {}
+  explicit constexpr Rect(const Vector<T, 4>& v)
+      : pos(v.x, v.y), size(v.z, v.w) {}
 
   /// @brief Create a rect from x, y, width and height values.
   ///
@@ -47,38 +48,40 @@ struct Rect {
   /// @param y the given y value.
   /// @param width the given width value.
   /// @param height the given height value.
-  inline Rect(T x = static_cast<T>(0), T y = static_cast<T>(0),
-              T width = static_cast<T>(0), T height = static_cast<T>(0))
+  constexpr Rect(T x = static_cast<T>(0), T y = static_cast<T>(0),
+                 T width = static_cast<T>(0), T height = static_cast<T>(0))
       : pos(x, y), size(width, height) {}
 
   /// @brief Create a rect from two vector2 representing position and size.
   ///
   /// @param pos Vector representing the position vector (x and y values).
   /// @param size Vector represening the size vector (width and height values).
-  inline Rect(const Vector<T, 2>& pos, const Vector<T, 2>& size)
+  constexpr Rect(const Vector<T, 2>& pos, const Vector<T, 2>& size)
       : pos(pos), size(size) {}
 
   /// @brief Returns the center point of the rect.
   ///
   /// @return A Vector<T, 2> at the center of the rect.
-  inline Vector<T, 2> Center() const { return pos + size / static_cast<T>(2); }
+  constexpr Vector<T, 2> Center() const {
+    return pos + size / static_cast<T>(2);
+  }
 
   /// @brief Returns the minimum corner of the rect.
   ///
   /// This is equivalent to the position.
   ///
   /// @return A Vector<T, 2> at the minimum corner (pos).
-  inline Vector<T, 2> Min() const { return pos; }
+  constexpr Vector<T, 2> Min() const { return pos; }
 
   /// @brief Returns the maximum corner of the rect.
   ///
   /// @return A Vector<T, 2> at the maximum corner (pos + size).
-  inline Vector<T, 2> Max() const { return pos + size; }
+  constexpr Vector<T, 2> Max() const { return pos + size; }
 
   /// @brief Returns the area of the rect.
   ///
   /// @return The product of width and height.
-  inline T Area() const { return size.x * size.y; }
+  constexpr T Area() const { return size.x * size.y; }
 
   /// @brief Tests whether a point is contained within the rect.
   ///
@@ -86,7 +89,7 @@ struct Rect {
   ///
   /// @param point The point to test.
   /// @return true if the point is inside or on the boundary of the rect.
-  inline bool Contains(const Vector<T, 2>& point) const {
+  constexpr bool Contains(const Vector<T, 2>& point) const {
     const Vector<T, 2> max = Max();
     return point.x >= pos.x && point.y >= pos.y && point.x <= max.x
            && point.y <= max.y;
@@ -96,7 +99,7 @@ struct Rect {
   ///
   /// @param other The rect to test.
   /// @return true if other is entirely inside or on the boundary of this rect.
-  inline bool Contains(const Rect<T>& other) const {
+  constexpr bool Contains(const Rect<T>& other) const {
     return Contains(other.Min()) && Contains(other.Max());
   }
 
@@ -104,7 +107,7 @@ struct Rect {
   ///
   /// @param other The rect to test.
   /// @return true if the rects overlap.
-  inline bool Intersects(const Rect<T>& other) const {
+  constexpr bool Intersects(const Rect<T>& other) const {
     const Vector<T, 2> this_max = Max();
     const Vector<T, 2> other_max = other.Max();
     return pos.x < other_max.x && this_max.x > other.pos.x
@@ -117,7 +120,7 @@ struct Rect {
   ///
   /// @param other The rect to intersect with.
   /// @return The intersection rect, or a zero-sized rect if no overlap.
-  inline Rect<T> Intersection(const Rect<T>& other) const {
+  constexpr Rect<T> Intersection(const Rect<T>& other) const {
     const Vector<T, 2> max1 = Max();
     const Vector<T, 2> max2 = other.Max();
     const Vector<T, 2> inter_min(std::max(pos.x, other.pos.x),
@@ -134,7 +137,7 @@ struct Rect {
   ///
   /// @param other The rect to union with.
   /// @return The smallest rect containing both this and other.
-  inline Rect<T> Union(const Rect<T>& other) const {
+  constexpr Rect<T> Union(const Rect<T>& other) const {
     const Vector<T, 2> union_min(std::min(pos.x, other.pos.x),
                                  std::min(pos.y, other.pos.y));
     const Vector<T, 2> union_max(std::max(Max().x, other.Max().x),
@@ -148,7 +151,7 @@ struct Rect {
   ///
   /// @param point The point to include.
   /// @return A new rect expanded to contain the point.
-  inline Rect<T> Expand(const Vector<T, 2>& point) const {
+  constexpr Rect<T> Expand(const Vector<T, 2>& point) const {
     const Vector<T, 2> new_min(std::min(pos.x, point.x),
                                std::min(pos.y, point.y));
     const Vector<T, 2> new_max(std::max(Max().x, point.x),
@@ -163,7 +166,7 @@ struct Rect {
   ///
   /// @param amount The amount to expand by.
   /// @return A new rect expanded by the given amount.
-  inline Rect<T> Expand(T amount) const {
+  constexpr Rect<T> Expand(T amount) const {
     return Rect<T>(Vector<T, 2>(pos.x - amount, pos.y - amount),
                    Vector<T, 2>(size.x + static_cast<T>(2) * amount,
                                 size.y + static_cast<T>(2) * amount));
@@ -176,7 +179,7 @@ struct Rect {
 /// @param r1 Rect to be tested.
 /// @param r2 Other rect to be tested.
 template <class T>
-bool operator==(const Rect<T>& r1, const Rect<T>& r2) {
+constexpr bool operator==(const Rect<T>& r1, const Rect<T>& r2) {
   return (r1.pos == r2.pos && r1.size == r2.size);
 }
 
@@ -185,7 +188,7 @@ bool operator==(const Rect<T>& r1, const Rect<T>& r2) {
 /// @param r1 Rect to be tested.
 /// @param r2 Other rect to be tested.
 template <class T>
-bool operator!=(const Rect<T>& r1, const Rect<T>& r2) {
+constexpr bool operator!=(const Rect<T>& r1, const Rect<T>& r2) {
   return !(r1 == r2);
 }
 
@@ -199,7 +202,7 @@ bool operator!=(const Rect<T>& r1, const Rect<T>& r2) {
 /// @param r2 Other rect to be tested.
 /// @return true if @p r1 is lexicographically less than @p r2.
 template <class T>
-bool operator<(const Rect<T>& r1, const Rect<T>& r2) {
+constexpr bool operator<(const Rect<T>& r1, const Rect<T>& r2) {
   if (r1.pos != r2.pos) return r1.pos < r2.pos;
   return r1.size < r2.size;
 }

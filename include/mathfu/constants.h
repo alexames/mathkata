@@ -90,75 +90,75 @@ inline const Vector<float, 4> kAxisZ4f(0.0f, 0.0f, 1.0f, 0.0f);
 inline const Vector<float, 4> kAxisW4f(0.0f, 0.0f, 0.0f, 1.0f);
 
 /// 2-dimensional <code>double</code> Vector of zeros.
-inline const Vector<double, 2> kZeros2d(0.0, 0.0);
+inline constexpr Vector<double, 2> kZeros2d(0.0, 0.0);
 /// 2-dimensional <code>double</code> Vector of ones.
-inline const Vector<double, 2> kOnes2d(1.0, 1.0);
+inline constexpr Vector<double, 2> kOnes2d(1.0, 1.0);
 /// 2-dimensional <code>double</code> unit Vector pointing along the X axis.
-inline const Vector<double, 2> kAxisX2d(1.0, 0.0);
+inline constexpr Vector<double, 2> kAxisX2d(1.0, 0.0);
 /// 2-dimensional <code>double</code> unit Vector pointing along the Y axis.
-inline const Vector<double, 2> kAxisY2d(0.0, 1.0);
+inline constexpr Vector<double, 2> kAxisY2d(0.0, 1.0);
 
 /// 3-dimensional <code>double</code> Vector of zeros.
-inline const Vector<double, 3> kZeros3d(0.0, 0.0, 0.0);
+inline constexpr Vector<double, 3> kZeros3d(0.0, 0.0, 0.0);
 /// 3-dimensional <code>double</code> Vector of ones.
-inline const Vector<double, 3> kOnes3d(1.0, 1.0, 1.0);
+inline constexpr Vector<double, 3> kOnes3d(1.0, 1.0, 1.0);
 /// 3-dimensional <code>double</code> unit Vector pointing along the X axis.
-inline const Vector<double, 3> kAxisX3d(1.0, 0.0, 0.0);
+inline constexpr Vector<double, 3> kAxisX3d(1.0, 0.0, 0.0);
 /// 3-dimensional <code>double</code> unit Vector pointing along the Y axis.
-inline const Vector<double, 3> kAxisY3d(0.0, 1.0, 0.0);
+inline constexpr Vector<double, 3> kAxisY3d(0.0, 1.0, 0.0);
 /// 3-dimensional <code>double</code> unit Vector pointing along the Z axis.
-inline const Vector<double, 3> kAxisZ3d(0.0, 0.0, 1.0);
+inline constexpr Vector<double, 3> kAxisZ3d(0.0, 0.0, 1.0);
 
 /// 4-dimensional <code>double</code> Vector of zeros.
-inline const Vector<double, 4> kZeros4d(0.0, 0.0, 0.0, 0.0);
+inline constexpr Vector<double, 4> kZeros4d(0.0, 0.0, 0.0, 0.0);
 /// 4-dimensional <code>double</code> Vector of ones.
-inline const Vector<double, 4> kOnes4d(1.0, 1.0, 1.0, 1.0);
+inline constexpr Vector<double, 4> kOnes4d(1.0, 1.0, 1.0, 1.0);
 /// 4-dimensional <code>double</code> unit Vector pointing along the X axis.
-inline const Vector<double, 4> kAxisX4d(1.0, 0.0, 0.0, 0.0);
+inline constexpr Vector<double, 4> kAxisX4d(1.0, 0.0, 0.0, 0.0);
 /// 4-dimensional <code>double</code> unit Vector pointing along the Y axis.
-inline const Vector<double, 4> kAxisY4d(0.0, 1.0, 0.0, 0.0);
+inline constexpr Vector<double, 4> kAxisY4d(0.0, 1.0, 0.0, 0.0);
 /// 4-dimensional <code>double</code> unit Vector pointing along the Z axis.
-inline const Vector<double, 4> kAxisZ4d(0.0, 0.0, 1.0, 0.0);
+inline constexpr Vector<double, 4> kAxisZ4d(0.0, 0.0, 1.0, 0.0);
 /// 4-dimensional <code>double</code> unit Vector pointing along the W axis.
-inline const Vector<double, 4> kAxisW4d(0.0, 0.0, 0.0, 1.0);
+inline constexpr Vector<double, 4> kAxisW4d(0.0, 0.0, 0.0, 1.0);
 
 /// 2-dimensional <code>int</code> Vector of ones.
-inline const Vector<int, 2> kOnes2i(1, 1);
+inline constexpr Vector<int, 2> kOnes2i(1, 1);
 /// 2-dimensional <code>int</code> Vector of zeros.
-inline const Vector<int, 2> kZeros2i(0, 0);
+inline constexpr Vector<int, 2> kZeros2i(0, 0);
 /// 2-dimensional <code>int</code> unit Vector pointing along the X axis.
-inline const Vector<int, 2> kAxisX2i(1, 0);
+inline constexpr Vector<int, 2> kAxisX2i(1, 0);
 /// 2-dimensional <code>int</code> unit Vector pointing along the Y axis.
-inline const Vector<int, 2> kAxisY2i(0, 1);
+inline constexpr Vector<int, 2> kAxisY2i(0, 1);
 
 /// 3-dimensional <code>int</code> Vector of zeros.
-inline const Vector<int, 3> kZeros3i(0, 0, 0);
+inline constexpr Vector<int, 3> kZeros3i(0, 0, 0);
 /// 3-dimensional <code>int</code> Vector of ones.
-inline const Vector<int, 3> kOnes3i(1, 1, 1);
+inline constexpr Vector<int, 3> kOnes3i(1, 1, 1);
 /// 3-dimensional <code>int</code> unit Vector pointing along the X axis.
-inline const Vector<int, 3> kAxisX3i(1, 0, 0);
+inline constexpr Vector<int, 3> kAxisX3i(1, 0, 0);
 /// 3-dimensional <code>int</code> unit Vector pointing along the Y axis.
-inline const Vector<int, 3> kAxisY3i(0, 1, 0);
+inline constexpr Vector<int, 3> kAxisY3i(0, 1, 0);
 /// 3-dimensional <code>int</code> unit Vector pointing along the Z axis.
-inline const Vector<int, 3> kAxisZ3i(0, 0, 1);
+inline constexpr Vector<int, 3> kAxisZ3i(0, 0, 1);
 
 /// 4-dimensional <code>int</code> Vector of zeros.
-inline const Vector<int, 4> kZeros4i(0, 0, 0, 0);
+inline constexpr Vector<int, 4> kZeros4i(0, 0, 0, 0);
 /// 4-dimensional <code>int</code> Vector of ones.
-inline const Vector<int, 4> kOnes4i(1, 1, 1, 1);
+inline constexpr Vector<int, 4> kOnes4i(1, 1, 1, 1);
 /// 4-dimensional <code>int</code> unit Vector pointing along the X axis.
-inline const Vector<int, 4> kAxisX4i(1, 0, 0, 0);
+inline constexpr Vector<int, 4> kAxisX4i(1, 0, 0, 0);
 /// 4-dimensional <code>int</code> unit Vector pointing along the Y axis.
-inline const Vector<int, 4> kAxisY4i(0, 1, 0, 0);
+inline constexpr Vector<int, 4> kAxisY4i(0, 1, 0, 0);
 /// 4-dimensional <code>int</code> unit Vector pointing along the Z axis.
-inline const Vector<int, 4> kAxisZ4i(0, 0, 1, 0);
+inline constexpr Vector<int, 4> kAxisZ4i(0, 0, 1, 0);
 /// 4-dimensional <code>int</code> unit Vector pointing along the W axis.
-inline const Vector<int, 4> kAxisW4i(0, 0, 0, 1);
+inline constexpr Vector<int, 4> kAxisW4i(0, 0, 0, 1);
 
 /// Quaternion Identity
 inline const Quaternion<float> kQuatIdentityf(1.0f, 0.0f, 0.0f, 0.0f);
 /// Quaternion Identity
-inline const Quaternion<double> kQuatIdentityd(1.0, 0.0, 0.0, 0.0);
+inline constexpr Quaternion<double> kQuatIdentityd(1.0, 0.0, 0.0, 0.0);
 
 // An AffineTransform versoin of the mat4 Identity matrix.
 inline const AffineTransform kAffineIdentity(1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,

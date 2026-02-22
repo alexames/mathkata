@@ -61,8 +61,8 @@ struct Transform {
   /// @param position Position vector.
   /// @param rotation Rotation quaternion.
   /// @param scale Scale vector.
-  inline Transform(const Vector<T, 3>& position, const Quaternion<T>& rotation,
-                   const Vector<T, 3>& scale)
+  constexpr Transform(const Vector<T, 3>& position,
+                      const Quaternion<T>& rotation, const Vector<T, 3>& scale)
       : position(position), rotation(rotation), scale(scale) {}
 
   /// @brief Create a transform from position only.
@@ -81,7 +81,8 @@ struct Transform {
   ///
   /// @param position Position vector.
   /// @param rotation Rotation quaternion.
-  inline Transform(const Vector<T, 3>& position, const Quaternion<T>& rotation)
+  constexpr Transform(const Vector<T, 3>& position,
+                      const Quaternion<T>& rotation)
       : position(position), rotation(rotation), scale(T(1), T(1), T(1)) {}
 
   /// @brief Convert this transform to a 4x4 matrix.
@@ -100,7 +101,7 @@ struct Transform {
   ///
   /// @param point The point to transform.
   /// @return The transformed point.
-  inline Vector<T, 3> TransformPoint(const Vector<T, 3>& point) const {
+  constexpr Vector<T, 3> TransformPoint(const Vector<T, 3>& point) const {
     return rotation.Rotate(Vector<T, 3>(point.x * scale.x, point.y * scale.y,
                                         point.z * scale.z))
            + position;
@@ -112,10 +113,10 @@ struct Transform {
   ///
   /// @param direction The direction vector to transform.
   /// @return The transformed direction.
-  inline Vector<T, 3> TransformDirection(const Vector<T, 3>& direction) const {
-    return rotation.Rotate(Vector<T, 3>(direction.x * scale.x,
-                                        direction.y * scale.y,
-                                        direction.z * scale.z));
+  constexpr Vector<T, 3> TransformDirection(
+      const Vector<T, 3>& direction) const {
+    return rotation.Rotate(Vector<T, 3>(
+        direction.x * scale.x, direction.y * scale.y, direction.z * scale.z));
   }
 
   /// @brief Compute the inverse of this transform.
@@ -128,7 +129,7 @@ struct Transform {
   /// is introduced because TRS decomposition is lossy for sheared matrices.
   ///
   /// @return The inverse transform.
-  inline Transform<T> Inverse() const {
+  constexpr Transform<T> Inverse() const {
     Quaternion<T> inv_rotation = rotation.Inverse();
     Vector<T, 3> inv_scale(T(1) / scale.x, T(1) / scale.y, T(1) / scale.z);
     // The inverse of T*R*S applied to a point:
@@ -156,7 +157,7 @@ struct Transform {
   ///
   /// @param rhs Transform to compose with.
   /// @return The composed transform.
-  inline Transform<T> operator*(const Transform<T>& rhs) const {
+  constexpr Transform<T> operator*(const Transform<T>& rhs) const {
     // Composing T1*R1*S1 with T2*R2*S2:
     //   position: r1 * (s1 .* rhs.position) + p1
     //   rotation: r1 * r2
@@ -182,7 +183,7 @@ struct Transform {
 /// @param t1 Transform to be tested.
 /// @param t2 Other transform to be tested.
 template <class T>
-bool operator==(const Transform<T>& t1, const Transform<T>& t2) {
+constexpr bool operator==(const Transform<T>& t1, const Transform<T>& t2) {
   return t1.position == t2.position && t1.rotation == t2.rotation
          && t1.scale == t2.scale;
 }
@@ -192,7 +193,7 @@ bool operator==(const Transform<T>& t1, const Transform<T>& t2) {
 /// @param t1 Transform to be tested.
 /// @param t2 Other transform to be tested.
 template <class T>
-bool operator!=(const Transform<T>& t1, const Transform<T>& t2) {
+constexpr bool operator!=(const Transform<T>& t1, const Transform<T>& t2) {
   return !(t1 == t2);
 }
 /// @}

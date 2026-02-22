@@ -27,40 +27,40 @@ class Vector<T, 2> {
   static const int Dims = 2;
   static const int kDims = 2;
 
-  inline Vector() {}
+  constexpr Vector() {}
 
-  inline Vector(const Vector<T, 2>& v) : x(v.x), y(v.y) {}
+  constexpr Vector(const Vector<T, 2>& v) : x(v.x), y(v.y) {}
 
-  explicit inline Vector(const VectorPacked<T, 2>& v) : x(v.x), y(v.y) {}
+  explicit constexpr Vector(const VectorPacked<T, 2>& v) : x(v.x), y(v.y) {}
 
-  explicit inline Vector(const T* a) : x(a[0]), y(a[1]) {}
+  explicit constexpr Vector(const T* a) : x(a[0]), y(a[1]) {}
 
-  explicit inline Vector(T s) : x(s), y(s) {}
+  explicit constexpr Vector(T s) : x(s), y(s) {}
 
-  inline Vector(T s1, T s2) : x(s1), y(s2) {}
+  constexpr Vector(T s1, T s2) : x(s1), y(s2) {}
 
   template <typename U>
-  explicit inline Vector(const Vector<U, 2>& v)
+  explicit constexpr Vector(const Vector<U, 2>& v)
       : x(static_cast<T>(v.x)), y(static_cast<T>(v.y)) {}
 
-  inline T& operator()(const int i) { return data_[i]; }
+  constexpr T& operator()(const int i) { return data_[i]; }
 
-  inline const T& operator()(const int i) const { return data_[i]; }
+  constexpr const T& operator()(const int i) const { return data_[i]; }
 
-  inline T& operator[](const int i) { return data_[i]; }
+  constexpr T& operator[](const int i) { return data_[i]; }
 
-  inline const T& operator[](const int i) const { return data_[i]; }
+  constexpr const T& operator[](const int i) const { return data_[i]; }
 
-  inline Vector<T, 2> xy() { return Vector<T, 2>(x, y); }
+  constexpr Vector<T, 2> xy() { return Vector<T, 2>(x, y); }
 
-  inline const Vector<T, 2> xy() const { return Vector<T, 2>(x, y); }
+  constexpr const Vector<T, 2> xy() const { return Vector<T, 2>(x, y); }
 
-  inline void Pack(VectorPacked<T, 2>* const vector) const {
+  constexpr void Pack(VectorPacked<T, 2>* const vector) const {
     vector->x = x;
     vector->y = y;
   }
 
-  inline T LengthSquared() const { return LengthSquaredHelper(*this); }
+  constexpr T LengthSquared() const { return LengthSquaredHelper(*this); }
 
   inline T Length() const { return LengthHelper(*this); }
 
@@ -78,39 +78,39 @@ class Vector<T, 2> {
     return ToTypeHelper<T, Dims, CompatibleT>(v);
   }
 
-  static inline T DotProduct(const Vector<T, 2>& v1, const Vector<T, 2>& v2) {
+  static constexpr T DotProduct(const Vector<T, 2>& v1,
+                                const Vector<T, 2>& v2) {
     return DotProductHelper(v1, v2);
   }
 
-  static inline Vector<T, 2> HadamardProduct(const Vector<T, 2>& v1,
-                                             const Vector<T, 2>& v2) {
+  static constexpr Vector<T, 2> HadamardProduct(const Vector<T, 2>& v1,
+                                                const Vector<T, 2>& v2) {
     return HadamardProductHelper(v1, v2);
   }
 
-  static inline Vector<T, 2> HadamardDivide(const Vector<T, 2>& v1,
-                                            const Vector<T, 2>& v2) {
+  static constexpr Vector<T, 2> HadamardDivide(const Vector<T, 2>& v1,
+                                               const Vector<T, 2>& v2) {
     return HadamardDivideHelper(v1, v2);
   }
 
-  static inline Vector<T, 2> Lerp(const Vector<T, 2>& v1,
-                                  const Vector<T, 2>& v2, const T percent) {
+  static constexpr Vector<T, 2> Lerp(const Vector<T, 2>& v1,
+                                     const Vector<T, 2>& v2, const T percent) {
     return LerpHelper(v1, v2, percent);
   }
 
-  static inline bool InRange(const Vector<T, 2>& val,
-                             const Vector<T, 2>& range_start,
-                             const Vector<T, 2>& range_end) {
+  static constexpr bool InRange(const Vector<T, 2>& val,
+                                const Vector<T, 2>& range_start,
+                                const Vector<T, 2>& range_end) {
     return InRangeHelper(val, range_start, range_end);
   }
 
-
-  static inline Vector<T, 2> Max(const Vector<T, 2>& v1,
-                                 const Vector<T, 2>& v2) {
+  static constexpr Vector<T, 2> Max(const Vector<T, 2>& v1,
+                                    const Vector<T, 2>& v2) {
     return MaxHelper(v1, v2);
   }
 
-  static inline Vector<T, 2> Min(const Vector<T, 2>& v1,
-                                 const Vector<T, 2>& v2) {
+  static constexpr Vector<T, 2> Min(const Vector<T, 2>& v1,
+                                    const Vector<T, 2>& v2) {
     return MinHelper(v1, v2);
   }
 
@@ -118,13 +118,13 @@ class Vector<T, 2> {
     return (v1 - v2).Length();
   }
 
-  static inline T DistanceSquared(const Vector<T, 2>& v1,
-                                  const Vector<T, 2>& v2) {
+  static constexpr T DistanceSquared(const Vector<T, 2>& v1,
+                                     const Vector<T, 2>& v2) {
     return (v1 - v2).LengthSquared();
   }
 
-  static inline T CrossProduct(const Vector<T, 2>& v1,
-                               const Vector<T, 2>& v2) {
+  static constexpr T CrossProduct(const Vector<T, 2>& v1,
+                                  const Vector<T, 2>& v2) {
     return CrossProductHelper(v1, v2);
   }
 
@@ -132,18 +132,18 @@ class Vector<T, 2> {
     return AngleHelper(v1, v2);
   }
 
-  static inline Vector<T, 2> Project(const Vector<T, 2>& v,
-                                     const Vector<T, 2>& onto) {
+  static constexpr Vector<T, 2> Project(const Vector<T, 2>& v,
+                                        const Vector<T, 2>& onto) {
     return ProjectHelper(v, onto);
   }
 
-  static inline Vector<T, 2> Reject(const Vector<T, 2>& v,
-                                    const Vector<T, 2>& from) {
+  static constexpr Vector<T, 2> Reject(const Vector<T, 2>& v,
+                                       const Vector<T, 2>& from) {
     return RejectHelper(v, from);
   }
 
-  static inline Vector<T, 2> Reflect(const Vector<T, 2>& incident,
-                                     const Vector<T, 2>& normal) {
+  static constexpr Vector<T, 2> Reflect(const Vector<T, 2>& incident,
+                                        const Vector<T, 2>& normal) {
     return ReflectHelper(incident, normal);
   }
 

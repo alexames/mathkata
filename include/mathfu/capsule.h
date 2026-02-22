@@ -47,7 +47,8 @@ struct Capsule {
   /// @param start The start endpoint of the capsule's line segment.
   /// @param end The end endpoint of the capsule's line segment.
   /// @param radius The radius of the capsule.
-  inline Capsule(const Vector<T, N>& start, const Vector<T, N>& end, T radius)
+  constexpr Capsule(const Vector<T, N>& start, const Vector<T, N>& end,
+                    T radius)
       : start(start), end(end), radius(radius) {}
 
   /// @brief Calculate the center of the capsule.
@@ -55,7 +56,7 @@ struct Capsule {
   /// The center is the midpoint of the start and end endpoints.
   ///
   /// @return The center point of the capsule.
-  inline Vector<T, N> Center() const {
+  constexpr Vector<T, N> Center() const {
     return (start + end) * static_cast<T>(0.5);
   }
 
@@ -73,7 +74,7 @@ struct Capsule {
   ///
   /// @param point The point to test.
   /// @return true if the point is inside the capsule, false otherwise.
-  inline bool Contains(const Vector<T, N>& point) const {
+  constexpr bool Contains(const Vector<T, N>& point) const {
     const Vector<T, N> closest = ClosestPointOnSegment(point, start, end);
     return Vector<T, N>::DistanceSquared(point, closest) <= radius * radius;
   }
@@ -85,7 +86,7 @@ struct Capsule {
   /// @param seg_start The start of the line segment.
   /// @param seg_end The end of the line segment.
   /// @return The closest point on the segment to the query point.
-  static inline Vector<T, N> ClosestPointOnSegment(
+  static constexpr Vector<T, N> ClosestPointOnSegment(
       const Vector<T, N>& point, const Vector<T, N>& seg_start,
       const Vector<T, N>& seg_end) {
     const Vector<T, N> segment = seg_end - seg_start;
@@ -106,7 +107,7 @@ struct Capsule {
 /// @param c1 Capsule to be tested.
 /// @param c2 Other capsule to be tested.
 template <class T, int N>
-bool operator==(const Capsule<T, N>& c1, const Capsule<T, N>& c2) {
+constexpr bool operator==(const Capsule<T, N>& c1, const Capsule<T, N>& c2) {
   return (c1.start == c2.start && c1.end == c2.end && c1.radius == c2.radius);
 }
 
@@ -115,7 +116,7 @@ bool operator==(const Capsule<T, N>& c1, const Capsule<T, N>& c2) {
 /// @param c1 Capsule to be tested.
 /// @param c2 Other capsule to be tested.
 template <class T, int N>
-bool operator!=(const Capsule<T, N>& c1, const Capsule<T, N>& c2) {
+constexpr bool operator!=(const Capsule<T, N>& c1, const Capsule<T, N>& c2) {
   return !(c1 == c2);
 }
 

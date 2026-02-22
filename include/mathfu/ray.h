@@ -41,7 +41,7 @@ struct Ray {
   ///
   /// @param origin The origin point of the ray.
   /// @param direction The direction vector of the ray.
-  Ray(const Vector<T, Dims>& origin, const Vector<T, Dims>& direction)
+  constexpr Ray(const Vector<T, Dims>& origin, const Vector<T, Dims>& direction)
       : origin(origin), direction(direction) {}
 
   /// @brief Compute the point at parameter t along the ray.
@@ -49,7 +49,9 @@ struct Ray {
   /// Returns origin + direction * t.
   /// @param t The parameter value.
   /// @return The point at parameter t.
-  Vector<T, Dims> PointAt(T t) const { return origin + direction * t; }
+  constexpr Vector<T, Dims> PointAt(T t) const {
+    return origin + direction * t;
+  }
 
   /// The origin point of the ray.
   Vector<T, Dims> origin;
@@ -64,7 +66,7 @@ struct Ray {
 /// @param r1 Ray to be tested.
 /// @param r2 Other ray to be tested.
 template <class T, int Dims>
-bool operator==(const Ray<T, Dims>& r1, const Ray<T, Dims>& r2) {
+constexpr bool operator==(const Ray<T, Dims>& r1, const Ray<T, Dims>& r2) {
   return (r1.origin == r2.origin && r1.direction == r2.direction);
 }
 
@@ -73,7 +75,7 @@ bool operator==(const Ray<T, Dims>& r1, const Ray<T, Dims>& r2) {
 /// @param r1 Ray to be tested.
 /// @param r2 Other ray to be tested.
 template <class T, int Dims>
-bool operator!=(const Ray<T, Dims>& r1, const Ray<T, Dims>& r2) {
+constexpr bool operator!=(const Ray<T, Dims>& r1, const Ray<T, Dims>& r2) {
   return !(r1 == r2);
 }
 
@@ -98,7 +100,7 @@ struct Line {
   ///
   /// @param point A point on the line.
   /// @param direction The direction vector of the line.
-  Line(const Vector<T, Dims>& point, const Vector<T, Dims>& direction)
+  constexpr Line(const Vector<T, Dims>& point, const Vector<T, Dims>& direction)
       : point(point), direction(direction) {}
 
   /// @brief Create a Line from two points.
@@ -117,7 +119,7 @@ struct Line {
   /// Returns point + direction * t.
   /// @param t The parameter value.
   /// @return The point at parameter t.
-  Vector<T, Dims> PointAt(T t) const { return point + direction * t; }
+  constexpr Vector<T, Dims> PointAt(T t) const { return point + direction * t; }
 
   /// A point on the line.
   Vector<T, Dims> point;
@@ -132,7 +134,7 @@ struct Line {
 /// @param l1 Line to be tested.
 /// @param l2 Other line to be tested.
 template <class T, int Dims>
-bool operator==(const Line<T, Dims>& l1, const Line<T, Dims>& l2) {
+constexpr bool operator==(const Line<T, Dims>& l1, const Line<T, Dims>& l2) {
   return (l1.point == l2.point && l1.direction == l2.direction);
 }
 
@@ -141,7 +143,7 @@ bool operator==(const Line<T, Dims>& l1, const Line<T, Dims>& l2) {
 /// @param l1 Line to be tested.
 /// @param l2 Other line to be tested.
 template <class T, int Dims>
-bool operator!=(const Line<T, Dims>& l1, const Line<T, Dims>& l2) {
+constexpr bool operator!=(const Line<T, Dims>& l1, const Line<T, Dims>& l2) {
   return !(l1 == l2);
 }
 
@@ -165,13 +167,16 @@ struct LineSegment {
   ///
   /// @param start The start point.
   /// @param end The end point.
-  LineSegment(const Vector<T, Dims>& start, const Vector<T, Dims>& end)
+  constexpr LineSegment(const Vector<T, Dims>& start,
+                        const Vector<T, Dims>& end)
       : start(start), end(end) {}
 
   /// @brief Compute the midpoint of the segment.
   ///
   /// @return The center point between start and end.
-  Vector<T, Dims> Center() const { return (start + end) * static_cast<T>(0.5); }
+  constexpr Vector<T, Dims> Center() const {
+    return (start + end) * static_cast<T>(0.5);
+  }
 
   /// @brief Compute the length of the segment.
   ///
@@ -181,7 +186,7 @@ struct LineSegment {
   /// @brief Compute the squared length of the segment.
   ///
   /// @return The squared distance between start and end.
-  T LengthSquared() const { return (end - start).LengthSquared(); }
+  constexpr T LengthSquared() const { return (end - start).LengthSquared(); }
 
   /// @brief Compute the normalized direction from start to end.
   ///
@@ -193,7 +198,7 @@ struct LineSegment {
   ///
   /// @param point The point to find the closest point to.
   /// @return The closest point on the segment to the given point.
-  Vector<T, Dims> ClosestPoint(const Vector<T, Dims>& point) const {
+  constexpr Vector<T, Dims> ClosestPoint(const Vector<T, Dims>& point) const {
     const Vector<T, Dims> segment = end - start;
     const T length_squared = segment.LengthSquared();
     if (length_squared == static_cast<T>(0)) {
@@ -221,8 +226,8 @@ struct LineSegment {
 /// @param s1 LineSegment to be tested.
 /// @param s2 Other LineSegment to be tested.
 template <class T, int Dims>
-bool operator==(const LineSegment<T, Dims>& s1,
-                const LineSegment<T, Dims>& s2) {
+constexpr bool operator==(const LineSegment<T, Dims>& s1,
+                          const LineSegment<T, Dims>& s2) {
   return (s1.start == s2.start && s1.end == s2.end);
 }
 
@@ -231,8 +236,8 @@ bool operator==(const LineSegment<T, Dims>& s1,
 /// @param s1 LineSegment to be tested.
 /// @param s2 Other LineSegment to be tested.
 template <class T, int Dims>
-bool operator!=(const LineSegment<T, Dims>& s1,
-                const LineSegment<T, Dims>& s2) {
+constexpr bool operator!=(const LineSegment<T, Dims>& s1,
+                          const LineSegment<T, Dims>& s2) {
   return !(s1 == s2);
 }
 

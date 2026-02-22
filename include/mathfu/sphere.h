@@ -56,14 +56,14 @@ struct Sphere {
   ///
   /// @param center The center point of the sphere.
   /// @param radius The radius of the sphere.
-  inline Sphere(const Vector<T, N>& center, T radius)
+  constexpr Sphere(const Vector<T, N>& center, T radius)
       : center(center), radius(radius) {}
 
   /// @brief Check whether a point is inside (or on the boundary of) the sphere.
   ///
   /// @param point The point to test.
   /// @return true if the point is inside the sphere, false otherwise.
-  inline bool Contains(const Vector<T, N>& point) const {
+  constexpr bool Contains(const Vector<T, N>& point) const {
     return Vector<T, N>::DistanceSquared(center, point) <= radius * radius;
   }
 
@@ -81,7 +81,7 @@ struct Sphere {
   ///
   /// @param other The sphere to test for intersection.
   /// @return true if the spheres overlap, false otherwise.
-  inline bool Intersects(const Sphere<T, N>& other) const {
+  constexpr bool Intersects(const Sphere<T, N>& other) const {
     T sum_radii = radius + other.radius;
     return Vector<T, N>::DistanceSquared(center, other.center)
            <= sum_radii * sum_radii;
@@ -90,7 +90,7 @@ struct Sphere {
   /// @brief Calculate the area of a 2D circle (N=2).
   ///
   /// @return The area of the circle (pi * r^2).
-  inline T Area() const {
+  constexpr T Area() const {
     static_assert(N == 2, "Area() is only defined for 2D circles (N=2).");
     return std::numbers::pi_v<T> * radius * radius;
   }
@@ -98,7 +98,7 @@ struct Sphere {
   /// @brief Calculate the volume of a 3D sphere (N=3).
   ///
   /// @return The volume of the sphere (4/3 * pi * r^3).
-  inline T Volume() const {
+  constexpr T Volume() const {
     static_assert(N == 3, "Volume() is only defined for 3D spheres (N=3).");
     return (static_cast<T>(4) / static_cast<T>(3)) * std::numbers::pi_v<T>
            * radius * radius * radius;
@@ -107,7 +107,7 @@ struct Sphere {
   /// @brief Calculate the diameter of the sphere.
   ///
   /// @return The diameter (2 * radius).
-  inline T Diameter() const { return static_cast<T>(2) * radius; }
+  constexpr T Diameter() const { return static_cast<T>(2) * radius; }
 };
 /// @}
 
@@ -116,7 +116,7 @@ struct Sphere {
 /// @param s1 Sphere to be tested.
 /// @param s2 Other sphere to be tested.
 template <class T, int N>
-bool operator==(const Sphere<T, N>& s1, const Sphere<T, N>& s2) {
+constexpr bool operator==(const Sphere<T, N>& s1, const Sphere<T, N>& s2) {
   return (s1.center == s2.center && s1.radius == s2.radius);
 }
 
@@ -125,7 +125,7 @@ bool operator==(const Sphere<T, N>& s1, const Sphere<T, N>& s2) {
 /// @param s1 Sphere to be tested.
 /// @param s2 Other sphere to be tested.
 template <class T, int N>
-bool operator!=(const Sphere<T, N>& s1, const Sphere<T, N>& s2) {
+constexpr bool operator!=(const Sphere<T, N>& s1, const Sphere<T, N>& s2) {
   return !(s1 == s2);
 }
 

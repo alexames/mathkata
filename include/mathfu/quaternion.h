@@ -48,11 +48,11 @@ class Quaternion {
   /// and have indeterminate values. This is intentional for performance: use
   /// Quaternion(T, T, T, T) or Quaternion::identity if you need specific
   /// values.
-  inline Quaternion() {}
+  constexpr Quaternion() {}
 
   /// @brief Construct a Quaternion from a copy.
   /// @param q Quaternion to copy.
-  inline Quaternion(const Quaternion<T>& q) : data_(q.data_) {}
+  constexpr Quaternion(const Quaternion<T>& q) : data_(q.data_) {}
 
   /// @brief Construct a Quaternion using scalar values to initialize each
   /// element.
@@ -61,36 +61,36 @@ class Quaternion {
   /// @param qs1 First element of the Vector component.
   /// @param qs2 Second element of the Vector component.
   /// @param qs3 Third element of the Vector component.
-  inline Quaternion(T s1, T qs1, T qs2, T qs3) : data_(s1, qs1, qs2, qs3) {}
+  constexpr Quaternion(T s1, T qs1, T qs2, T qs3) : data_(s1, qs1, qs2, qs3) {}
 
   /// @brief Construct a quaternion from a scalar and 3-dimensional Vector.
   ///
   /// @param s1 Scalar component.
   /// @param v1 Vector component.
-  inline Quaternion(T s1, const Vector<T, 3>& v1)
+  constexpr Quaternion(T s1, const Vector<T, 3>& v1)
       : data_(s1, v1[0], v1[1], v1[2]) {}
 
   /// @brief Return the scalar component of the quaternion.
   ///
   /// @return The scalar component
-  inline T scalar() const { return data_[0]; }
+  constexpr T scalar() const { return data_[0]; }
 
   /// @brief Set the scalar component of the quaternion.
   ///
   /// @param s Scalar component.
-  inline void set_scalar(T s) { data_[0] = s; }
+  constexpr void set_scalar(T s) { data_[0] = s; }
 
   /// @brief Return the vector component of the quaternion.
   ///
   /// @return The vector component
-  inline Vector<T, 3> vector() const {
+  constexpr Vector<T, 3> vector() const {
     return Vector<T, 3>(data_[1], data_[2], data_[3]);
   }
 
   /// @brief Set the vector component of the quaternion.
   ///
   /// @param v Vector component.
-  inline void set_vector(const Vector<T, 3>& v) {
+  constexpr void set_vector(const Vector<T, 3>& v) {
     data_[1] = v[0];
     data_[2] = v[1];
     data_[3] = v[2];
@@ -102,7 +102,7 @@ class Quaternion {
   /// For unit quaternions, the conjugate is equal to the inverse.
   ///
   /// @return Quaternion containing the result.
-  inline Quaternion<T> Conjugate() const {
+  constexpr Quaternion<T> Conjugate() const {
     return Quaternion<T>(data_[0], -data_[1], -data_[2], -data_[3]);
   }
 
@@ -113,7 +113,7 @@ class Quaternion {
   /// for any non-zero quaternion.
   ///
   /// @return Quaternion containing the result.
-  inline Quaternion<T> Inverse() const {
+  constexpr Quaternion<T> Inverse() const {
     T norm_sq = Vector<T, 4>::DotProduct(data_, data_);
     T inv_norm_sq = T(1) / norm_sq;
     return Quaternion<T>(data_[0] * inv_norm_sq, -data_[1] * inv_norm_sq,
@@ -124,7 +124,7 @@ class Quaternion {
   ///
   /// @param q Quaternion to add.
   /// @return Quaternion containing the result.
-  inline Quaternion<T> operator+(const Quaternion<T>& q) const {
+  constexpr Quaternion<T> operator+(const Quaternion<T>& q) const {
     return Quaternion<T>(data_ + q.data_);
   }
 
@@ -132,7 +132,7 @@ class Quaternion {
   ///
   /// @param q Quaternion to add.
   /// @return Quaternion containing the result.
-  inline Quaternion<T>& operator+=(const Quaternion<T>& q) {
+  constexpr Quaternion<T>& operator+=(const Quaternion<T>& q) {
     data_ += q.data_;
     return *this;
   }
@@ -141,7 +141,7 @@ class Quaternion {
   ///
   /// @param q Quaternion to compare against.
   /// @return true if the scalar and vector components are equal.
-  inline bool operator==(const Quaternion<T>& q) const {
+  constexpr bool operator==(const Quaternion<T>& q) const {
     return data_ == q.data_;
   }
 
@@ -149,7 +149,7 @@ class Quaternion {
   ///
   /// @param q Quaternion to compare against.
   /// @return true if the scalar or vector components differ.
-  inline bool operator!=(const Quaternion<T>& q) const { return !(*this == q); }
+  constexpr bool operator!=(const Quaternion<T>& q) const { return !(*this == q); }
 
   /// @brief Multiply this Quaternion with another Quaternion.
   ///
@@ -157,7 +157,7 @@ class Quaternion {
   /// <code>FromMatrix(ToMatrix() * q.ToMatrix()).</code>
   /// @param q Quaternion to multiply with.
   /// @return Quaternion containing the result.
-  inline Quaternion<T> operator*(const Quaternion<T>& q) const {
+  constexpr Quaternion<T> operator*(const Quaternion<T>& q) const {
     const Vector<T, 3> v1 = vector();
     const Vector<T, 3> v2 = q.vector();
     return Quaternion<T>(
@@ -176,7 +176,7 @@ class Quaternion {
   ///
   /// @param s1 Scalar to multiply with.
   /// @return Quaternion containing the result.
-  inline Quaternion<T> operator*(T s1) const {
+  constexpr Quaternion<T> operator*(T s1) const {
     return Quaternion<T>(data_ * s1);
   }
 
@@ -187,7 +187,7 @@ class Quaternion {
   ///
   /// @param s1 Scalar to multiply with.
   /// @return Reference to this Quaternion.
-  inline Quaternion<T>& operator*=(T s1) {
+  constexpr Quaternion<T>& operator*=(T s1) {
     data_ *= s1;
     return *this;
   }
@@ -225,7 +225,7 @@ class Quaternion {
   ///
   /// @param v1 Vector to rotate.
   /// @return Rotated Vector.
-  inline Vector<T, 3> Rotate(const Vector<T, 3>& v1) const {
+  constexpr Vector<T, 3> Rotate(const Vector<T, 3>& v1) const {
     const Vector<T, 3> v = vector();
     T ss = data_[0] + data_[0];
     return ss * Vector<T, 3>::CrossProduct(v, v1) + (ss * data_[0] - T(1)) * v1
@@ -457,7 +457,7 @@ class Quaternion {
   /// @param q1 First quaternion.
   /// @param q2 Second quaternion
   /// @return The scalar dot product of both Quaternions.
-  static inline T DotProduct(const Quaternion<T>& q1, const Quaternion<T>& q2) {
+  static constexpr T DotProduct(const Quaternion<T>& q1, const Quaternion<T>& q2) {
     return Vector<T, 4>::DotProduct(q1.data_, q2.data_);
   }
 
@@ -489,13 +489,13 @@ class Quaternion {
   ///
   /// @param i Index of the element to access.
   /// @return A reference to the accessed element.
-  inline T& operator[](const int i) { return data_[i]; }
+  constexpr T& operator[](const int i) { return data_[i]; }
 
   /// @brief Access an element of the quaternion.
   ///
   /// @param i Index of the element to access.
   /// @return A const reference to the accessed element.
-  inline const T& operator[](const int i) const { return data_[i]; }
+  constexpr const T& operator[](const int i) const { return data_[i]; }
 
   /// @brief Returns a vector that is perpendicular to the supplied vector.
   ///
@@ -503,7 +503,7 @@ class Quaternion {
   /// @return A vector perpendicular to v1.  Normally this will just be
   /// the cross product of v1, v2.  If they are parallel or opposite though,
   /// the routine will attempt to pick a vector.
-  static inline Vector<T, 3> PerpendicularVector(const Vector<T, 3>& v) {
+  static constexpr Vector<T, 3> PerpendicularVector(const Vector<T, 3>& v) {
     // We start out by taking the cross product of the vector and the x-axis to
     // find something parallel to the input vectors.  If that cross product
     // turns out to be length 0 (i. e. the vectors already lie along the x axis)
@@ -697,7 +697,7 @@ Quaternion<T> Quaternion<T>::identity = Quaternion<T>(1, 0, 0, 0);
 ///
 /// @related Quaternion
 template <class T>
-inline Quaternion<T> operator*(T s, const Quaternion<T>& q) {
+constexpr Quaternion<T> operator*(T s, const Quaternion<T>& q) {
   return q * s;
 }
 /// @}

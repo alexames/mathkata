@@ -240,7 +240,7 @@ static constexpr const char *kVersion = "2.0.0";
 /// @param upper Upper value of the range.
 /// @returns Clamped value.
 template <class T>
-T Clamp(const T &x, const T &lower, const T &upper) {
+constexpr T Clamp(const T &x, const T &lower, const T &upper) {
   return std::max<T>(lower, std::min<T>(x, upper));
 }
 
@@ -259,7 +259,7 @@ T Clamp(const T &x, const T &lower, const T &upper) {
 /// @tparam T2 Type of the value used to perform interpolation
 ///         (e.g float or double).
 template <class T, class T2>
-T Lerp(const T &range_start, const T &range_end, const T2 &percent) {
+constexpr T Lerp(const T &range_start, const T &range_end, const T2 &percent) {
   return range_start + (range_end - range_start) * percent;
 }
 
@@ -276,7 +276,7 @@ T Lerp(const T &range_start, const T &range_end, const T2 &percent) {
 ///
 /// @tparam T Type of the range to interpolate over.
 template <class T>
-T Lerp(const T &range_start, const T &range_end, const T &percent) {
+constexpr T Lerp(const T &range_start, const T &range_end, const T &percent) {
   return Lerp<T, T>(range_start, range_end, percent);
 }
 
@@ -290,7 +290,7 @@ T Lerp(const T &range_start, const T &range_end, const T &percent) {
 ///
 /// @tparam T Type of values to test.
 template <class T>
-bool InRange(T val, T range_start, T range_end) {
+constexpr bool InRange(T val, T range_start, T range_end) {
   return val >= range_start && val < range_end;
 }
 
@@ -308,7 +308,7 @@ bool InRange(T val, T range_start, T range_end) {
 /// @param x Value to round up. Must be non-negative for signed types.
 /// @returns Value rounded up to the nearest power of 2.
 template <std::integral T>
-T RoundUpToPowerOf2(T x) {
+constexpr T RoundUpToPowerOf2(T x) {
   // Use unsigned arithmetic to avoid undefined behavior with signed shifts.
   typedef typename std::make_unsigned<T>::type U;
   if (x <= 1) return x;
@@ -350,7 +350,7 @@ T RoundUpToPowerOf2(T x) {
 /// @param v Value to round up.
 /// @returns Value rounded up to the type's alignment boundary.
 template <typename T>
-size_t RoundUpToTypeBoundary(size_t v) {
+constexpr size_t RoundUpToTypeBoundary(size_t v) {
   static_assert((alignof(T) & (alignof(T) - 1)) == 0,
                 "alignof(T) must be a power of 2");
   return (v + alignof(T) - 1) & ~(alignof(T) - 1);
