@@ -1656,6 +1656,82 @@ TEST_F(VectorTests, PaddingLaneZeroed_VectorOps) {
 }
 #endif  // defined(MATHFU_COMPILE_WITH_PADDING)
 
+// Test Vector<T,2>::xy() accessor returns a copy with the correct values.
+TEST_F(VectorTests, Accessor_xy_Vector2) {
+  mathfu::Vector<float, 2> v(3.0f, 7.0f);
+  mathfu::Vector<float, 2> result = v.xy();
+  EXPECT_FLOAT_EQ(3.0f, result[0]);
+  EXPECT_FLOAT_EQ(7.0f, result[1]);
+
+  const mathfu::Vector<float, 2> cv(5.0f, 9.0f);
+  mathfu::Vector<float, 2> const_result = cv.xy();
+  EXPECT_FLOAT_EQ(5.0f, const_result[0]);
+  EXPECT_FLOAT_EQ(9.0f, const_result[1]);
+}
+
+// Test Vector<T,3>::xy() accessor returns a Vector<T,2> with the correct
+// values.
+TEST_F(VectorTests, Accessor_xy_Vector3) {
+  mathfu::Vector<float, 3> v(1.0f, 2.0f, 3.0f);
+  mathfu::Vector<float, 2> result = v.xy();
+  EXPECT_FLOAT_EQ(1.0f, result[0]);
+  EXPECT_FLOAT_EQ(2.0f, result[1]);
+
+  const mathfu::Vector<float, 3> cv(4.0f, 5.0f, 6.0f);
+  mathfu::Vector<float, 2> const_result = cv.xy();
+  EXPECT_FLOAT_EQ(4.0f, const_result[0]);
+  EXPECT_FLOAT_EQ(5.0f, const_result[1]);
+}
+
+// Test Vector<T,3>::xyz() accessor returns a copy with the correct values.
+TEST_F(VectorTests, Accessor_xyz_Vector3) {
+  mathfu::Vector<float, 3> v(1.0f, 2.0f, 3.0f);
+  mathfu::Vector<float, 3> result = v.xyz();
+  EXPECT_FLOAT_EQ(1.0f, result[0]);
+  EXPECT_FLOAT_EQ(2.0f, result[1]);
+  EXPECT_FLOAT_EQ(3.0f, result[2]);
+
+  const mathfu::Vector<float, 3> cv(4.0f, 5.0f, 6.0f);
+  mathfu::Vector<float, 3> const_result = cv.xyz();
+  EXPECT_FLOAT_EQ(4.0f, const_result[0]);
+  EXPECT_FLOAT_EQ(5.0f, const_result[1]);
+  EXPECT_FLOAT_EQ(6.0f, const_result[2]);
+}
+
+// Test Vector<T,4>::xy(), xyz(), and zw() accessors return correct values.
+TEST_F(VectorTests, Accessor_Swizzle_Vector4) {
+  mathfu::Vector<float, 4> v(1.0f, 2.0f, 3.0f, 4.0f);
+
+  mathfu::Vector<float, 2> xy = v.xy();
+  EXPECT_FLOAT_EQ(1.0f, xy[0]);
+  EXPECT_FLOAT_EQ(2.0f, xy[1]);
+
+  mathfu::Vector<float, 3> xyz = v.xyz();
+  EXPECT_FLOAT_EQ(1.0f, xyz[0]);
+  EXPECT_FLOAT_EQ(2.0f, xyz[1]);
+  EXPECT_FLOAT_EQ(3.0f, xyz[2]);
+
+  mathfu::Vector<float, 2> zw = v.zw();
+  EXPECT_FLOAT_EQ(3.0f, zw[0]);
+  EXPECT_FLOAT_EQ(4.0f, zw[1]);
+
+  // Const overloads.
+  const mathfu::Vector<float, 4> cv(5.0f, 6.0f, 7.0f, 8.0f);
+
+  mathfu::Vector<float, 2> cxy = cv.xy();
+  EXPECT_FLOAT_EQ(5.0f, cxy[0]);
+  EXPECT_FLOAT_EQ(6.0f, cxy[1]);
+
+  mathfu::Vector<float, 3> cxyz = cv.xyz();
+  EXPECT_FLOAT_EQ(5.0f, cxyz[0]);
+  EXPECT_FLOAT_EQ(6.0f, cxyz[1]);
+  EXPECT_FLOAT_EQ(7.0f, cxyz[2]);
+
+  mathfu::Vector<float, 2> czw = cv.zw();
+  EXPECT_FLOAT_EQ(7.0f, czw[0]);
+  EXPECT_FLOAT_EQ(8.0f, czw[1]);
+}
+
 // Test Reflect: 45-degree angle off a horizontal surface.
 // An incident vector coming down at 45 degrees should reflect up at 45 degrees.
 TEST_F(VectorTests, Reflect_45Degrees) {
@@ -1771,6 +1847,7 @@ TEST_F(VectorTests, Refract_2D) {
   // Perpendicular incidence with any eta should pass straight through.
   Vec2 refracted = Vec2::Refract(incident, normal, 0.5f);
   EXPECT_PRED_FORMAT3(AssertVectorNear, refracted, incident, FLOAT_PRECISION);
+}
 
 // Test named member access x(), y(), z(), w() on the generic Vector template.
 // The generic template is used for dimensions >= 5 and for non-float types

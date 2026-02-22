@@ -134,6 +134,11 @@ class Vector<float, 3> {
   inline const float& operator[](const int i) const { return data_[i]; }
 
   /// GLSL style multi-component accessors.
+  inline Vector<float, 3> xyz() { return Vector<float, 3>(x, y, z); }
+  inline const Vector<float, 3> xyz() const {
+    return Vector<float, 3>(x, y, z);
+  }
+
   inline Vector<float, 2> xy() { return Vector<float, 2>(x, y); }
   inline const Vector<float, 2> xy() const { return Vector<float, 2>(x, y); }
 
