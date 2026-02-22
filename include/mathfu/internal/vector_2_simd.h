@@ -240,6 +240,17 @@ class Vector<float, 2> {
     return AngleHelper(v1, v2);
   }
 
+  static inline Vector<float, 2> Reflect(const Vector<float, 2>& incident,
+                                         const Vector<float, 2>& normal) {
+    return ReflectHelper(incident, normal);
+  }
+
+  static inline Vector<float, 2> Refract(const Vector<float, 2>& incident,
+                                         const Vector<float, 2>& normal,
+                                         float eta) {
+    return RefractHelper(incident, normal, eta);
+  }
+
   MATHFU_DEFINE_CLASS_SIMD_AWARE_NEW_DELETE
 
 #if defined(__clang__)

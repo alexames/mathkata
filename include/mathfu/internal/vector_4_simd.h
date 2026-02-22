@@ -264,6 +264,17 @@ class Vector<float, 4> {
     return AngleHelper(v1, v2);
   }
 
+  static inline Vector<float, 4> Reflect(const Vector<float, 4>& incident,
+                                         const Vector<float, 4>& normal) {
+    return ReflectHelper(incident, normal);
+  }
+
+  static inline Vector<float, 4> Refract(const Vector<float, 4>& incident,
+                                         const Vector<float, 4>& normal,
+                                         float eta) {
+    return RefractHelper(incident, normal, eta);
+  }
+
   template <class T, int rows, int cols>
   friend class Matrix;
 

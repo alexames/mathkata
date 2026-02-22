@@ -16,6 +16,7 @@
 #include "mathfu/vector.h"
 
 #include <climits>
+#include <cmath>
 #include <cstdint>
 #include <random>
 #include <set>
@@ -120,6 +121,19 @@ template <class T, int d>
   }
 
   return ::testing::AssertionSuccess();
+}
+
+// Format a vector expression name and its value for assertion messages.
+template <class T, int d>
+std::string FormatVector(const char* expr, const mathfu::Vector<T, d>& v) {
+  std::ostringstream oss;
+  oss << expr << " (";
+  for (int i = 0; i < d; ++i) {
+    if (i > 0) oss << ", ";
+    oss << v[i];
+  }
+  oss << ")";
+  return oss.str();
 }
 
 // A predicate-formatter for asserting that compares 2 vectors are nealy equal
@@ -1553,6 +1567,122 @@ TEST_F(VectorTests, PaddingLaneZeroed_VectorOps) {
 }
 #endif  // defined(MATHFU_COMPILE_WITH_PADDING)
 
+// Test Reflect: 45-degree angle off a horizontal surface.
+// An incident vector coming down at 45 degrees should reflect up at 45 degrees.
+TEST_F(VectorTests, Reflect_45Degrees) {
+  using Vec3 = mathfu::Vector<float, 3>;
+  // Incident ray going down-right at 45 degrees.
+  Vec3 incident(1.0f, -1.0f, 0.0f);
+  incident.Normalize();
+  // Surface normal pointing straight up.
+  Vec3 normal(0.0f, 1.0f, 0.0f);
+
+  Vec3 reflected = Vec3::Reflect(incident, normal);
+  // Expected: ray going up-right at 45 degrees.
+  Vec3 expected(1.0f, 1.0f, 0.0f);
+  expected.Normalize();
+  EXPECT_PRED_FORMAT3(AssertVectorNear, reflected, expected, FLOAT_PRECISION);
+}
+
+// Test Reflect: perpendicular incidence (bounces straight back).
+TEST_F(VectorTests, Reflect_Perpendicular) {
+  using Vec3 = mathfu::Vector<float, 3>;
+  Vec3 incident(0.0f, -1.0f, 0.0f);
+  Vec3 normal(0.0f, 1.0f, 0.0f);
+
+  Vec3 reflected = Vec3::Reflect(incident, normal);
+  Vec3 expected(0.0f, 1.0f, 0.0f);
+  EXPECT_PRED_FORMAT3(AssertVectorNear, reflected, expected, FLOAT_PRECISION);
+}
+
+// Test Reflect: parallel incidence (grazing the surface, no change).
+TEST_F(VectorTests, Reflect_Parallel) {
+  using Vec3 = mathfu::Vector<float, 3>;
+  // Incident vector parallel to the surface (perpendicular to normal).
+  Vec3 incident(1.0f, 0.0f, 0.0f);
+  Vec3 normal(0.0f, 1.0f, 0.0f);
+
+  Vec3 reflected = Vec3::Reflect(incident, normal);
+  // When parallel, dot(incident, normal) == 0, so reflect returns incident.
+  EXPECT_PRED_FORMAT3(AssertVectorNear, reflected, incident, FLOAT_PRECISION);
+}
+
+// Test Reflect with 2D vectors.
+TEST_F(VectorTests, Reflect_2D) {
+  using Vec2 = mathfu::Vector<float, 2>;
+  Vec2 incident(1.0f, -1.0f);
+  incident.Normalize();
+  Vec2 normal(0.0f, 1.0f);
+
+  Vec2 reflected = Vec2::Reflect(incident, normal);
+  Vec2 expected(1.0f, 1.0f);
+  expected.Normalize();
+  EXPECT_PRED_FORMAT3(AssertVectorNear, reflected, expected, FLOAT_PRECISION);
+}
+
+// Test Refract with eta=1 (no bending, same medium).
+TEST_F(VectorTests, Refract_EtaOne) {
+  using Vec3 = mathfu::Vector<float, 3>;
+  Vec3 incident(1.0f, -1.0f, 0.0f);
+  incident.Normalize();
+  Vec3 normal(0.0f, 1.0f, 0.0f);
+
+  Vec3 refracted = Vec3::Refract(incident, normal, 1.0f);
+  // With eta=1, refracted direction should equal incident direction.
+  EXPECT_PRED_FORMAT3(AssertVectorNear, refracted, incident, FLOAT_PRECISION);
+}
+
+// Test Refract: total internal reflection returns zero vector.
+TEST_F(VectorTests, Refract_TotalInternalReflection) {
+  using Vec3 = mathfu::Vector<float, 3>;
+  // A steep angle with high eta triggers total internal reflection.
+  // Going from glass (n=1.5) to air (n=1.0), eta = 1.5.
+  // At a steep angle (nearly parallel to surface), TIR should occur.
+  Vec3 incident(1.0f, -0.1f, 0.0f);
+  incident.Normalize();
+  Vec3 normal(0.0f, 1.0f, 0.0f);
+
+  Vec3 refracted = Vec3::Refract(incident, normal, 1.5f);
+  Vec3 zero(0.0f);
+  EXPECT_PRED_FORMAT3(AssertVectorNear, refracted, zero, FLOAT_PRECISION);
+}
+
+// Test Refract: Snell's law verification.
+// sin(theta_t) = eta * sin(theta_i)
+TEST_F(VectorTests, Refract_SnellsLaw) {
+  using Vec3 = mathfu::Vector<float, 3>;
+  // Incident at 30 degrees from normal. sin(30) = 0.5.
+  // From air to glass: eta = 1.0/1.5 = 2/3.
+  // sin(theta_t) = (2/3) * 0.5 = 1/3, theta_t ~ 19.47 degrees.
+  float theta_i = mathfu::kPi / 6.0f;  // 30 degrees
+  Vec3 incident(std::sin(theta_i), -std::cos(theta_i), 0.0f);
+  Vec3 normal(0.0f, 1.0f, 0.0f);
+  float eta = 1.0f / 1.5f;
+
+  Vec3 refracted = Vec3::Refract(incident, normal, eta);
+
+  // The refracted vector should be normalized (since incident and normal are).
+  float refracted_length = refracted.Length();
+  EXPECT_NEAR(refracted_length, 1.0f, FLOAT_PRECISION);
+
+  // Verify Snell's law: sin(theta_t) = eta * sin(theta_i).
+  // sin(theta_t) is the x-component of the normalized refracted vector
+  // (since normal is along y).
+  float sin_theta_t = refracted[0];
+  float expected_sin_theta_t = eta * std::sin(theta_i);
+  EXPECT_NEAR(sin_theta_t, expected_sin_theta_t, FLOAT_PRECISION);
+}
+
+// Test Refract with 2D vectors.
+TEST_F(VectorTests, Refract_2D) {
+  using Vec2 = mathfu::Vector<float, 2>;
+  Vec2 incident(0.0f, -1.0f);
+  Vec2 normal(0.0f, 1.0f);
+
+  // Perpendicular incidence with any eta should pass straight through.
+  Vec2 refracted = Vec2::Refract(incident, normal, 0.5f);
+  EXPECT_PRED_FORMAT3(AssertVectorNear, refracted, incident, FLOAT_PRECISION);
+
 // Test named member access x(), y(), z(), w() on the generic Vector template.
 // The generic template is used for dimensions >= 5 and for non-float types
 // when SIMD specializations are not active.
@@ -1627,6 +1757,7 @@ TEST_F(VectorTests, NamedAccessors_Generic_Int) {
   EXPECT_EQ(300, v[2]);
   EXPECT_EQ(400, v[3]);
   EXPECT_EQ(50, v[4]);
+
 }
 
 int main(int argc, char** argv) {

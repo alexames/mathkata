@@ -82,6 +82,33 @@ typedef Rect<float> rectf;
 typedef Rect<double> rectd;
 /// Rect composed of type <code>int</code>.
 typedef Rect<int> recti;
+
+/// @brief Reflect incident vector off a surface with the given normal.
+///
+/// @param incident The incoming direction vector.
+/// @param normal The surface normal (must be normalized).
+/// @return The reflected direction.
+/// Matches GLSL reflect() semantics.
+template <class T, int d>
+inline Vector<T, d> reflect(const Vector<T, d>& incident,
+                            const Vector<T, d>& normal) {
+  return Vector<T, d>::Reflect(incident, normal);
+}
+
+/// @brief Compute the refracted direction using Snell's law.
+///
+/// @param incident The incoming direction vector (must be normalized).
+/// @param normal The surface normal (must be normalized).
+/// @param eta The ratio of indices of refraction (n1/n2).
+/// @return The refracted direction, or zero vector for total internal
+///         reflection.
+/// Matches GLSL refract() semantics.
+template <class T, int d>
+inline Vector<T, d> refract(const Vector<T, d>& incident,
+                            const Vector<T, d>& normal, T eta) {
+  return Vector<T, d>::Refract(incident, normal, eta);
+}
+
 /// @}
 
 }  // namespace mathfu
