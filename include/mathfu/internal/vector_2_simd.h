@@ -254,6 +254,11 @@ class Vector<float, 2> {
     return (v1 - v2).LengthSquared();
   }
 
+  static inline float CrossProduct(const Vector<float, 2>& v1,
+                                   const Vector<float, 2>& v2) {
+    return CrossProductHelper(v1, v2);
+  }
+
   static inline float Angle(const Vector<float, 2>& v1,
                             const Vector<float, 2>& v2) {
     return AngleHelper(v1, v2);

@@ -82,7 +82,6 @@ typedef Rect<float> rectf;
 typedef Rect<double> rectd;
 /// Rect composed of type <code>int</code>.
 typedef Rect<int> recti;
-
 /// @}
 
 }  // namespace mathfu

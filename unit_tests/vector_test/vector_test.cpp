@@ -463,6 +463,70 @@ void Cross_Test(const T& precision) {
 }
 TEST_SCALAR_F(Cross)
 
+// This will test that the 2D cross product of perpendicular vectors gives the
+// area of the rectangle they span.
+template <class T>
+void CrossProduct2D_Perpendicular_Test(const T& precision) {
+  mathfu::Vector<T, 2> v1(static_cast<T>(3), static_cast<T>(0));
+  mathfu::Vector<T, 2> v2(static_cast<T>(0), static_cast<T>(5));
+  T result = mathfu::Vector<T, 2>::CrossProduct(v1, v2);
+  EXPECT_NEAR(static_cast<T>(15), result, precision);
+}
+TEST_SCALAR_F(CrossProduct2D_Perpendicular)
+
+// This will test that the 2D cross product of parallel vectors is 0.
+template <class T>
+void CrossProduct2D_Parallel_Test(const T& precision) {
+  mathfu::Vector<T, 2> v1(static_cast<T>(2), static_cast<T>(3));
+  mathfu::Vector<T, 2> v2(static_cast<T>(4), static_cast<T>(6));
+  T result = mathfu::Vector<T, 2>::CrossProduct(v1, v2);
+  EXPECT_NEAR(static_cast<T>(0), result, precision);
+}
+TEST_SCALAR_F(CrossProduct2D_Parallel)
+
+// This will test that the 2D cross product of anti-parallel vectors is 0.
+template <class T>
+void CrossProduct2D_AntiParallel_Test(const T& precision) {
+  mathfu::Vector<T, 2> v1(static_cast<T>(2), static_cast<T>(3));
+  mathfu::Vector<T, 2> v2(static_cast<T>(-4), static_cast<T>(-6));
+  T result = mathfu::Vector<T, 2>::CrossProduct(v1, v2);
+  EXPECT_NEAR(static_cast<T>(0), result, precision);
+}
+TEST_SCALAR_F(CrossProduct2D_AntiParallel)
+
+// This will test that counter-clockwise winding gives a positive result.
+template <class T>
+void CrossProduct2D_CounterClockwise_Test(const T& precision) {
+  // v1 along +x, v2 along +y is counter-clockwise.
+  mathfu::Vector<T, 2> v1(static_cast<T>(1), static_cast<T>(0));
+  mathfu::Vector<T, 2> v2(static_cast<T>(0), static_cast<T>(1));
+  T result = mathfu::Vector<T, 2>::CrossProduct(v1, v2);
+  EXPECT_GT(result, static_cast<T>(0));
+  (void)precision;
+}
+TEST_SCALAR_F(CrossProduct2D_CounterClockwise)
+
+// This will test that clockwise winding gives a negative result.
+template <class T>
+void CrossProduct2D_Clockwise_Test(const T& precision) {
+  // v1 along +y, v2 along +x is clockwise.
+  mathfu::Vector<T, 2> v1(static_cast<T>(0), static_cast<T>(1));
+  mathfu::Vector<T, 2> v2(static_cast<T>(1), static_cast<T>(0));
+  T result = mathfu::Vector<T, 2>::CrossProduct(v1, v2);
+  EXPECT_LT(result, static_cast<T>(0));
+  (void)precision;
+}
+TEST_SCALAR_F(CrossProduct2D_Clockwise)
+
+// This will test that the cross product of a vector with itself is 0.
+template <class T>
+void CrossProduct2D_Self_Test(const T& precision) {
+  mathfu::Vector<T, 2> v(static_cast<T>(7), static_cast<T>(11));
+  T result = mathfu::Vector<T, 2>::CrossProduct(v, v);
+  EXPECT_NEAR(static_cast<T>(0), result, precision);
+}
+TEST_SCALAR_F(CrossProduct2D_Self)
+
 // Create a vector with random values between 0~1.
 template <class T, int d>
 mathfu::Vector<T, d> RandomVector() {

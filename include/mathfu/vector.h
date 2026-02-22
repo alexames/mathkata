@@ -495,6 +495,17 @@ class Vector {
     return CrossProductHelper(v1, v2);
   }
 
+  /// @brief Calculate the 2D pseudo cross product of two vectors.
+  ///
+  /// Also known as the "perp dot product", this returns a scalar whose sign
+  /// indicates the winding order of v1 to v2.
+  /// @param v1 First vector.
+  /// @param v2 Second vector.
+  /// @return The scalar cross product of v1 and v2.
+  static inline T CrossProduct(const Vector<T, 2>& v1, const Vector<T, 2>& v2) {
+    return CrossProductHelper(v1, v2);
+  }
+
   /// @brief Linearly interpolate two vectors.
   ///
   /// @param v1 First vector.
@@ -865,6 +876,19 @@ inline Vector<T, 3> CrossProductHelper(const Vector<T, 3>& v1,
                       v1[0] * v2[1] - v1[1] * v2[0]);
 }
 
+/// @brief Calculate the 2D pseudo cross product of two vectors.
+///
+/// Also known as the "perp dot product", this returns the z-component of
+/// the cross product if the 2D vectors were extended to 3D. The result is
+/// a scalar whose sign indicates the winding order of v1 to v2.
+/// @param v1 First vector.
+/// @param v2 Second vector.
+/// @return The scalar cross product of v1 and v2.
+template <class T>
+inline T CrossProductHelper(const Vector<T, 2>& v1, const Vector<T, 2>& v2) {
+  return v1[0] * v2[1] - v1[1] * v2[0];
+}
+
 /// @brief Calculate the squared length of a vector.
 ///
 /// @param v Vector to get the squared length of.
@@ -1087,6 +1111,16 @@ inline T dot(const Vector<T, d>& v1, const Vector<T, d>& v2) {
 template <class T>
 inline Vector<T, 3> cross(const Vector<T, 3>& v1, const Vector<T, 3>& v2) {
   return Vector<T, 3>::CrossProduct(v1, v2);
+}
+
+/// @brief Calculate the 2D pseudo cross product of two 2-dimensional Vectors.
+///
+/// @param v1 First vector.
+/// @param v2 Second vector.
+/// @return Scalar cross product result.
+template <class T>
+inline T cross(const Vector<T, 2>& v1, const Vector<T, 2>& v2) {
+  return Vector<T, 2>::CrossProduct(v1, v2);
 }
 
 /// @brief Normalize an N-dimensional Vector.
