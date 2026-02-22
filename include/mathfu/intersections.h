@@ -171,7 +171,7 @@ inline bool RayIntersectsPlane(const Ray<T, 3>& ray, const Plane<T>& plane,
 /// @param b Second AABB.
 /// @return true if the AABBs overlap (including touching boundaries).
 template <class T, int N>
-inline bool AABBIntersectsAABB(const AABB<T, N>& a, const AABB<T, N>& b) {
+constexpr bool AABBIntersectsAABB(const AABB<T, N>& a, const AABB<T, N>& b) {
   return a.Intersects(b);
 }
 
@@ -183,8 +183,8 @@ inline bool AABBIntersectsAABB(const AABB<T, N>& a, const AABB<T, N>& b) {
 /// @param b Second sphere.
 /// @return true if the spheres overlap.
 template <class T, int N>
-inline bool SphereIntersectsSphere(const Sphere<T, N>& a,
-                                   const Sphere<T, N>& b) {
+constexpr bool SphereIntersectsSphere(const Sphere<T, N>& a,
+                                      const Sphere<T, N>& b) {
   return a.Intersects(b);
 }
 
@@ -197,8 +197,8 @@ inline bool SphereIntersectsSphere(const Sphere<T, N>& a,
 /// @param aabb The AABB to test against.
 /// @return true if the sphere and AABB overlap.
 template <class T, int N>
-inline bool SphereIntersectsAABB(const Sphere<T, N>& sphere,
-                                 const AABB<T, N>& aabb) {
+constexpr bool SphereIntersectsAABB(const Sphere<T, N>& sphere,
+                                    const AABB<T, N>& aabb) {
   // Find the closest point on the AABB to the sphere center.
   Vector<T, N> closest;
   for (int i = 0; i < N; ++i) {
@@ -216,7 +216,7 @@ inline bool SphereIntersectsAABB(const Sphere<T, N>& sphere,
 /// @param aabb The AABB to test against.
 /// @return true if the point is inside or on the boundary of the AABB.
 template <class T, int N>
-inline bool PointInAABB(const Vector<T, N>& point, const AABB<T, N>& aabb) {
+constexpr bool PointInAABB(const Vector<T, N>& point, const AABB<T, N>& aabb) {
   return aabb.Contains(point);
 }
 
@@ -228,8 +228,8 @@ inline bool PointInAABB(const Vector<T, N>& point, const AABB<T, N>& aabb) {
 /// @param sphere The sphere to test against.
 /// @return true if the point is inside or on the boundary of the sphere.
 template <class T, int N>
-inline bool PointInSphere(const Vector<T, N>& point,
-                          const Sphere<T, N>& sphere) {
+constexpr bool PointInSphere(const Vector<T, N>& point,
+                             const Sphere<T, N>& sphere) {
   return sphere.Contains(point);
 }
 

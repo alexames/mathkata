@@ -115,16 +115,16 @@ enum class Handedness {
 template <class T, int Rows, int Cols = Rows>
 class Matrix;
 template <class T, int Rows, int Cols>
-inline Matrix<T, Rows, Cols> IdentityHelper();
+constexpr Matrix<T, Rows, Cols> IdentityHelper();
 template <bool check_invertible, class T, int Rows, int Cols>
 inline bool InverseHelper(const Matrix<T, Rows, Cols>& m,
                           Matrix<T, Rows, Cols>* const inverse, T det_thresh);
 template <class T, int size1, int size2, int size3>
-inline void TimesHelper(const Matrix<T, size1, size2>& m1,
-                        const Matrix<T, size2, size3>& m2,
-                        Matrix<T, size1, size3>* out_m);
+constexpr void TimesHelper(const Matrix<T, size1, size2>& m1,
+                           const Matrix<T, size2, size3>& m2,
+                           Matrix<T, size1, size3>* out_m);
 template <class T, int Rows, int Cols>
-static inline Matrix<T, Rows, Cols> OuterProductHelper(
+static constexpr Matrix<T, Rows, Cols> OuterProductHelper(
     const Vector<T, Rows>& v1, const Vector<T, Cols>& v2);
 template <class T, Handedness H>
 inline Matrix<T, 4, 4> PerspectiveHelper(T fovy, T aspect, T znear, T zfar,
@@ -206,19 +206,19 @@ class Matrix {
   /// The elements of the Matrix are left uninitialized and have indeterminate
   /// values. This is intentional for performance: use Matrix(T), Identity(),
   /// or one of the factory methods if you need specific values.
-  inline Matrix() {}
+  constexpr Matrix() {}
 
   /// @brief Construct a Matrix from another Matrix copying each element.
   ////
   /// @param m Matrix that the data will be copied from.
-  inline Matrix(const Matrix<T, Rows, Cols>& m) {
+  constexpr Matrix(const Matrix<T, Rows, Cols>& m) {
     MATHFU_MAT_OPERATION(data_[i] = m.data_[i]);
   }
 
   /// @brief Construct a Matrix from a single float.
   ///
   /// @param s Scalar value used to initialize each element of the matrix.
-  explicit inline Matrix(T s) {
+  explicit constexpr Matrix(T s) {
     MATHFU_MAT_OPERATION((data_[i] = Vector<T, Rows>(s)));
   }
 
@@ -230,7 +230,7 @@ class Matrix {
   /// @param s10 Value of the second row, first column.
   /// @param s01 Value of the first row, second column.
   /// @param s11 Value of the second row and column.
-  inline Matrix(T s00, T s10, T s01, T s11) {
+  constexpr Matrix(T s00, T s10, T s01, T s11) {
     static_assert(Rows == 2 && Cols == 2, "Rows and Cols must be 2");
     data_[0] = Vector<T, Rows>(s00, s10);
     data_[1] = Vector<T, Rows>(s01, s11);
@@ -249,7 +249,8 @@ class Matrix {
   /// @param s02 Value of the first row, third column.
   /// @param s12 Value of the second row, third column.
   /// @param s22 Value of the third row and column.
-  inline Matrix(T s00, T s10, T s20, T s01, T s11, T s21, T s02, T s12, T s22) {
+  constexpr Matrix(T s00, T s10, T s20, T s01, T s11, T s21, T s02, T s12,
+                   T s22) {
     static_assert(Rows == 3 && Cols == 3, "Rows and Cols must be 3");
     data_[0] = Vector<T, Rows>(s00, s10, s20);
     data_[1] = Vector<T, Rows>(s01, s11, s21);
@@ -273,8 +274,8 @@ class Matrix {
   /// @param s12 Value of the second row, third column.
   /// @param s22 Value of the third row and column.
   /// @param s32 Value of the fourth row, third column.
-  inline Matrix(T s00, T s10, T s20, T s30, T s01, T s11, T s21, T s31, T s02,
-                T s12, T s22, T s32) {
+  constexpr Matrix(T s00, T s10, T s20, T s30, T s01, T s11, T s21, T s31,
+                   T s02, T s12, T s22, T s32) {
     static_assert(Rows == 4 && Cols == 3, "Rows must be 4 and Cols must be 3");
     data_[0] = Vector<T, Rows>(s00, s10, s20, s30);
     data_[1] = Vector<T, Rows>(s01, s11, s21, s31);
@@ -301,8 +302,8 @@ class Matrix {
   /// @param s13 Value of the second row, fourth column.
   /// @param s23 Value of the third row, fourth column.
   /// @param s33 Value of the fourth row and column.
-  inline Matrix(T s00, T s10, T s20, T s30, T s01, T s11, T s21, T s31, T s02,
-                T s12, T s22, T s32, T s03, T s13, T s23, T s33) {
+  constexpr Matrix(T s00, T s10, T s20, T s30, T s01, T s11, T s21, T s31,
+                   T s02, T s12, T s22, T s32, T s03, T s13, T s23, T s33) {
     static_assert(Rows == 4 && Cols == 4, "Rows and Cols must be 4");
     data_[0] = Vector<T, Rows>(s00, s10, s20, s30);
     data_[1] = Vector<T, Rows>(s01, s11, s21, s31);
@@ -318,8 +319,8 @@ class Matrix {
   /// @param column1 Vector used for the second column.
   /// @param column2 Vector used for the third column.
   /// @param column3 Vector used for the fourth column.
-  inline Matrix(const Vector<T, 4>& column0, const Vector<T, 4>& column1,
-                const Vector<T, 4>& column2, const Vector<T, 4>& column3) {
+  constexpr Matrix(const Vector<T, 4>& column0, const Vector<T, 4>& column1,
+                   const Vector<T, 4>& column2, const Vector<T, 4>& column3) {
     static_assert(Rows == 4 && Cols == 4, "Rows and Cols must be 4");
     data_[0] = column0;
     data_[1] = column1;
@@ -330,7 +331,7 @@ class Matrix {
   /// @brief Create a Matrix from the first row * column elements of an array.
   ///
   /// @param a Array of values that the matrix will be iniitlized to.
-  explicit inline Matrix(const T* const a) {
+  explicit constexpr Matrix(const T* const a) {
     MATHFU_MAT_OPERATION((data_[i] = Vector<T, Rows>(&a[i * Rows])));
   }
 
@@ -338,7 +339,7 @@ class Matrix {
   /// vectors.
   ///
   /// @param vectors Array of "Cols", "Rows" element packed vectors.
-  explicit inline Matrix(const VectorPacked<T, Rows>* const vectors) {
+  explicit constexpr Matrix(const VectorPacked<T, Rows>* const vectors) {
     MATHFU_MAT_OPERATION((data_[i] = Vector<T, Rows>(vectors[i])));
   }
 
@@ -347,7 +348,7 @@ class Matrix {
   /// @param row Index of the row to access.
   /// @param column Index of the column to access.
   /// @return Const reference to the element.
-  inline const T& operator()(const int row, const int column) const {
+  constexpr const T& operator()(const int row, const int column) const {
     return data_[column][row];
   }
 
@@ -356,7 +357,7 @@ class Matrix {
   /// @param row Index of the row to access.
   /// @param column Index of the column to access.
   /// @return Reference to the data that can be modified by the caller.
-  inline T& operator()(const int row, const int column) {
+  constexpr T& operator()(const int row, const int column) {
     return data_[column][row];
   }
 
@@ -365,21 +366,21 @@ class Matrix {
   /// @param i Index of the element to access in flattened memory.  Where
   /// the column accessed is i / Rows and the row is i % Rows.
   /// @return Reference to the data that can be modified by the caller.
-  inline const T& operator()(const int i) const { return operator[](i); }
+  constexpr const T& operator()(const int i) const { return operator[](i); }
 
   /// @brief Access an element of the Matrix.
   ///
   /// @param i Index of the element to access in flattened memory.  Where
   /// the column accessed is i / Rows and the row is i % Rows.
   /// @return Reference to the data that can be modified by the caller.
-  inline T& operator()(const int i) { return operator[](i); }
+  constexpr T& operator()(const int i) { return operator[](i); }
 
   /// @brief Access an element of the Matrix.
   ///
   /// @param i Index of the element to access in flattened memory.  Where
   /// the column accessed is i / Rows and the row is i % Rows.
   /// @return Const reference to the data.
-  inline const T& operator[](const int i) const {
+  constexpr const T& operator[](const int i) const {
     const int col = i / Rows;
     const int row = i % Rows;
     return data_[col][row];
@@ -390,7 +391,7 @@ class Matrix {
   /// @param i Index of the element to access in flattened memory.  Where
   /// the column accessed is i / Rows and the row is i % Rows.
   /// @return Reference to the data that can be modified by the caller.
-  inline T& operator[](const int i) {
+  constexpr T& operator[](const int i) {
     const int col = i / Rows;
     const int row = i % Rows;
     return data_[col][row];
@@ -400,7 +401,7 @@ class Matrix {
   /// one vector per matrix column.
   ///
   /// @param vector Array of "Cols" entries to write to.
-  inline void Pack(VectorPacked<T, Rows>* const vector) const {
+  constexpr void Pack(VectorPacked<T, Rows>* const vector) const {
     MATHFU_MAT_OPERATION(GetColumn(i).Pack(&vector[i]));
   }
 
@@ -408,13 +409,13 @@ class Matrix {
   ///
   /// @param i Index of the column to access.
   /// @return Reference to the data that can be modified by the caller.
-  inline Vector<T, Rows>& GetColumn(const int i) { return data_[i]; }
+  constexpr Vector<T, Rows>& GetColumn(const int i) { return data_[i]; }
 
   /// @brief Access a column vector of the Matrix.
   ///
   /// @param i Index of the column to access.
   /// @return Const reference to the data.
-  inline const Vector<T, Rows>& GetColumn(const int i) const {
+  constexpr const Vector<T, Rows>& GetColumn(const int i) const {
     return data_[i];
   }
 
@@ -425,7 +426,7 @@ class Matrix {
   ///
   /// @param i Index of the row to access.
   /// @return Vector containing the row elements.
-  inline Vector<T, Cols> GetRow(const int i) const {
+  constexpr Vector<T, Cols> GetRow(const int i) const {
     Vector<T, Cols> result;
     for (int j = 0; j < Cols; j++) {
       result[j] = data_[j][i];
@@ -436,7 +437,7 @@ class Matrix {
   /// @brief Negate this Matrix.
   ///
   /// @return Matrix containing the result.
-  inline Matrix<T, Rows, Cols> operator-() const {
+  constexpr Matrix<T, Rows, Cols> operator-() const {
     MATHFU_MAT_OPERATOR(-data_[i]);
   }
 
@@ -444,7 +445,8 @@ class Matrix {
   ///
   /// @param m Matrix to add to this Matrix.
   /// @return Matrix containing the result.
-  inline Matrix<T, Rows, Cols> operator+(const Matrix<T, Rows, Cols>& m) const {
+  constexpr Matrix<T, Rows, Cols> operator+(
+      const Matrix<T, Rows, Cols>& m) const {
     MATHFU_MAT_OPERATOR(data_[i] + m.data_[i]);
   }
 
@@ -452,7 +454,8 @@ class Matrix {
   ///
   /// @param m Matrix to subtract from this Matrix.
   /// @return Matrix containing the result.
-  inline Matrix<T, Rows, Cols> operator-(const Matrix<T, Rows, Cols>& m) const {
+  constexpr Matrix<T, Rows, Cols> operator-(
+      const Matrix<T, Rows, Cols>& m) const {
     MATHFU_MAT_OPERATOR(data_[i] - m.data_[i]);
   }
 
@@ -460,7 +463,7 @@ class Matrix {
   ///
   /// @param s Scalar to add to this Matrix.
   /// @return Matrix containing the result.
-  inline Matrix<T, Rows, Cols> operator+(T s) const {
+  constexpr Matrix<T, Rows, Cols> operator+(T s) const {
     MATHFU_MAT_OPERATOR(data_[i] + s);
   }
 
@@ -468,7 +471,7 @@ class Matrix {
   ///
   /// @param s Scalar to subtract from this matrix.
   /// @return Matrix containing the result.
-  inline Matrix<T, Rows, Cols> operator-(T s) const {
+  constexpr Matrix<T, Rows, Cols> operator-(T s) const {
     MATHFU_MAT_OPERATOR(data_[i] - s);
   }
 
@@ -476,7 +479,7 @@ class Matrix {
   ///
   /// @param s Scalar to multiply with this Matrix.
   /// @return Matrix containing the result.
-  inline Matrix<T, Rows, Cols> operator*(T s) const {
+  constexpr Matrix<T, Rows, Cols> operator*(T s) const {
     MATHFU_MAT_OPERATOR(data_[i] * s);
   }
 
@@ -484,7 +487,7 @@ class Matrix {
   ///
   /// @param s Scalar to divide this Matrix by. Must be non-zero.
   /// @return Matrix containing the result.
-  inline Matrix<T, Rows, Cols> operator/(T s) const {
+  constexpr Matrix<T, Rows, Cols> operator/(T s) const {
     return (*this) * (T(1) / s);
   }
 
@@ -496,7 +499,8 @@ class Matrix {
   ///
   /// @param m Matrix to multiply with this Matrix.
   /// @return Matrix containing the result.
-  inline Matrix<T, Rows, Cols> operator*(const Matrix<T, Rows, Cols>& m) const {
+  constexpr Matrix<T, Rows, Cols> operator*(
+      const Matrix<T, Rows, Cols>& m) const {
     static_assert(Rows == Cols,
                   "operator* requires square matrices; use Multiply() for "
                   "non-square matrix multiplication");
@@ -509,7 +513,7 @@ class Matrix {
   ///
   /// @param m Matrix to add to this Matrix.
   /// @return Reference to this class.
-  inline Matrix<T, Rows, Cols>& operator+=(const Matrix<T, Rows, Cols>& m) {
+  constexpr Matrix<T, Rows, Cols>& operator+=(const Matrix<T, Rows, Cols>& m) {
     MATHFU_MAT_SELF_OPERATOR(data_[i] += m.data_[i]);
   }
 
@@ -517,7 +521,7 @@ class Matrix {
   ///
   /// @param m Matrix to subtract from this Matrix.
   /// @return Reference to this class.
-  inline Matrix<T, Rows, Cols>& operator-=(const Matrix<T, Rows, Cols>& m) {
+  constexpr Matrix<T, Rows, Cols>& operator-=(const Matrix<T, Rows, Cols>& m) {
     MATHFU_MAT_SELF_OPERATOR(data_[i] -= m.data_[i]);
   }
 
@@ -525,7 +529,7 @@ class Matrix {
   ///
   /// @param s Scalar to add to each element of this Matrix.
   /// @return Reference to this class.
-  inline Matrix<T, Rows, Cols>& operator+=(T s) {
+  constexpr Matrix<T, Rows, Cols>& operator+=(T s) {
     MATHFU_MAT_SELF_OPERATOR(data_[i] += s);
   }
 
@@ -533,7 +537,7 @@ class Matrix {
   ///
   /// @param s Scalar to subtract from each element of this Matrix.
   /// @return Reference to this class.
-  inline Matrix<T, Rows, Cols>& operator-=(T s) {
+  constexpr Matrix<T, Rows, Cols>& operator-=(T s) {
     MATHFU_MAT_SELF_OPERATOR(data_[i] -= s);
   }
 
@@ -541,7 +545,7 @@ class Matrix {
   ///
   /// @param s Scalar to multiply with each element of this Matrix.
   /// @return Reference to this class.
-  inline Matrix<T, Rows, Cols>& operator*=(T s) {
+  constexpr Matrix<T, Rows, Cols>& operator*=(T s) {
     MATHFU_MAT_SELF_OPERATOR(data_[i] *= s);
   }
 
@@ -549,7 +553,7 @@ class Matrix {
   ///
   /// @param s Scalar to divide this Matrix by. Must be non-zero.
   /// @return Reference to this class.
-  inline Matrix<T, Rows, Cols>& operator/=(T s) {
+  constexpr Matrix<T, Rows, Cols>& operator/=(T s) {
     return (*this) *= (T(1) / s);
   }
 
@@ -561,7 +565,7 @@ class Matrix {
   ///
   /// @param m Matrix to multiply with this Matrix.
   /// @return Reference to this class.
-  inline Matrix<T, Rows, Cols>& operator*=(const Matrix<T, Rows, Cols>& m) {
+  constexpr Matrix<T, Rows, Cols>& operator*=(const Matrix<T, Rows, Cols>& m) {
     static_assert(Rows == Cols,
                   "operator*= requires square matrices; use Multiply() for "
                   "non-square matrix multiplication");
@@ -611,7 +615,7 @@ class Matrix {
   /// @brief Calculate the transpose of this Matrix.
   ///
   /// @return The transpose of the specified Matrix.
-  inline Matrix<T, Cols, Rows> Transpose() const {
+  constexpr Matrix<T, Cols, Rows> Transpose() const {
     Matrix<T, Cols, Rows> transpose;
     MATHFU_UNROLLED_LOOP(
         i, Cols,
@@ -625,7 +629,7 @@ class Matrix {
   ///
   /// @note 2-dimensional affine transforms are represented by 3x3 matrices.
   /// @return Vector with the first two components of column 2 of this Matrix.
-  inline Vector<T, 2> TranslationVector2D() const {
+  constexpr Vector<T, 2> TranslationVector2D() const {
     static_assert(Rows == 3 && Cols == 3, "Rows and Cols must be 3");
     return Vector<T, 2>(data_[2][0], data_[2][1]);
   }
@@ -635,7 +639,7 @@ class Matrix {
   ///
   /// @note 3-dimensional affine transforms are represented by 4x4 matrices.
   /// @return Vector with the first three components of column 3.
-  inline Vector<T, 3> TranslationVector3D() const {
+  constexpr Vector<T, 3> TranslationVector3D() const {
     static_assert(Rows == 4 && Cols == 4, "Rows and Cols must be 4");
     return Vector<T, 3>(data_[3][0], data_[3][1], data_[3][2]);
   }
@@ -690,8 +694,8 @@ class Matrix {
   /// @brief Calculate the outer product of two Vectors.
   ///
   /// @return Matrix containing the result.
-  static inline Matrix<T, Rows, Cols> OuterProduct(const Vector<T, Rows>& v1,
-                                                   const Vector<T, Cols>& v2) {
+  static constexpr Matrix<T, Rows, Cols> OuterProduct(
+      const Vector<T, Rows>& v1, const Vector<T, Cols>& v2) {
     return OuterProductHelper(v1, v2);
   }
 
@@ -700,7 +704,7 @@ class Matrix {
   /// @param m1 First Matrix.
   /// @param m2 Second Matrix.
   /// @return Matrix containing the result.
-  static inline Matrix<T, Rows, Cols> HadamardProduct(
+  static constexpr Matrix<T, Rows, Cols> HadamardProduct(
       const Matrix<T, Rows, Cols>& m1, const Matrix<T, Rows, Cols>& m2) {
     MATHFU_MAT_OPERATOR(HadamardProductHelper(m1.data_[i], m2.data_[i]));
   }
@@ -708,7 +712,7 @@ class Matrix {
   /// @brief Calculate the identity Matrix.
   ///
   /// @return Matrix containing the result.
-  static inline Matrix<T, Rows, Cols> Identity() {
+  static constexpr Matrix<T, Rows, Cols> Identity() {
     return IdentityHelper<T, Rows, Cols>();
   }
 
@@ -718,7 +722,7 @@ class Matrix {
   ///
   /// @param v Vector of size 2.
   /// @return Matrix containing the result.
-  static inline Matrix<T, 3> FromTranslationVector(const Vector<T, 2>& v) {
+  static constexpr Matrix<T, 3> FromTranslationVector(const Vector<T, 2>& v) {
     return Matrix<T, 3>(1, 0, 0, 0, 1, 0, v[0], v[1], 1);
   }
 
@@ -728,7 +732,7 @@ class Matrix {
   ///
   /// @param v The vector of size 3.
   /// @return Matrix containing the result.
-  static inline Matrix<T, 4> FromTranslationVector(const Vector<T, 3>& v) {
+  static constexpr Matrix<T, 4> FromTranslationVector(const Vector<T, 3>& v) {
     return Matrix<T, 4>(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, v[0], v[1], v[2],
                         1);
   }
@@ -740,7 +744,8 @@ class Matrix {
   ///
   /// @param v Vector containing components for scaling.
   /// @return Matrix with v along the diagonal, and 1 in the bottom right.
-  static inline Matrix<T, Rows> FromScaleVector(const Vector<T, Rows - 1>& v) {
+  static constexpr Matrix<T, Rows> FromScaleVector(
+      const Vector<T, Rows - 1>& v) {
     // TODO OPT: Use a helper function in a similar way to Identity to
     // construct the matrix for the specialized cases 2, 3, 4, and only run
     // this method in the general case. This will also allow you to use the
@@ -756,7 +761,7 @@ class Matrix {
   ///
   /// @param m 3x3 rotation Matrix.
   /// @return Matrix containing the result.
-  static inline Matrix<T, 4> FromRotationMatrix(const Matrix<T, 3>& m) {
+  static constexpr Matrix<T, 4> FromRotationMatrix(const Matrix<T, 3>& m) {
     return Matrix<T, 4>(m[0], m[1], m[2], 0, m[3], m[4], m[5], 0, m[6], m[7],
                         m[8], 0, 0, 0, 0, 1);
   }
@@ -768,7 +773,7 @@ class Matrix {
   ///
   /// @param m 4x4 Matrix.
   /// @return rotation Matrix containing the result.
-  static inline Matrix<T, 3> ToRotationMatrix(const Matrix<T, 4>& m) {
+  static constexpr Matrix<T, 3> ToRotationMatrix(const Matrix<T, 4>& m) {
     return Matrix<T, 3>(m[0], m[1], m[2], m[4], m[5], m[6], m[8], m[9], m[10]);
   }
 
@@ -776,7 +781,7 @@ class Matrix {
   ///
   /// @param affine An AffineTransform reference to be used to construct
   /// a Matrix<float, 4> by adding in the 'w' row of [0, 0, 0, 1].
-  static inline Matrix<T, 4> FromAffineTransform(
+  static constexpr Matrix<T, 4> FromAffineTransform(
       const Matrix<T, 4, 3>& affine) {
     return Matrix<T, 4>(affine[0], affine[4], affine[8], static_cast<T>(0),
                         affine[1], affine[5], affine[9], static_cast<T>(0),
@@ -791,7 +796,7 @@ class Matrix {
   ///
   /// @return Returns an AffineTransform that contains the essential
   /// transformation data from the Matrix<float, 4>.
-  static inline Matrix<T, 4, 3> ToAffineTransform(const Matrix<T, 4>& m) {
+  static constexpr Matrix<T, 4, 3> ToAffineTransform(const Matrix<T, 4>& m) {
     return Matrix<T, 4, 3>(m[0], m[4], m[8], m[12], m[1], m[5], m[9], m[13],
                            m[2], m[6], m[10], m[14]);
   }
@@ -801,7 +806,7 @@ class Matrix {
   ///
   /// @param v 2D normalized directional Vector.
   /// @return Matrix containing the result.
-  static inline Matrix<T, 3> RotationX(const Vector<T, 2>& v) {
+  static constexpr Matrix<T, 3> RotationX(const Vector<T, 2>& v) {
     return Matrix<T, 3>(1, 0, 0, 0, v.x, v.y, 0, -v.y, v.x);
   }
 
@@ -810,7 +815,7 @@ class Matrix {
   ///
   /// @param v 2D normalized directional Vector.
   /// @return Matrix containing the result.
-  static inline Matrix<T, 3> RotationY(const Vector<T, 2>& v) {
+  static constexpr Matrix<T, 3> RotationY(const Vector<T, 2>& v) {
     return Matrix<T, 3>(v.x, 0, -v.y, 0, 1, 0, v.y, 0, v.x);
   }
 
@@ -819,7 +824,7 @@ class Matrix {
   ///
   /// @param v 2D normalized directional Vector.
   /// @return Matrix containing the result.
-  static inline Matrix<T, 3> RotationZ(const Vector<T, 2>& v) {
+  static constexpr Matrix<T, 3> RotationZ(const Vector<T, 2>& v) {
     return Matrix<T, 3>(v.x, v.y, 0, -v.y, v.x, 0, 0, 0, 1);
   }
 
@@ -946,8 +951,8 @@ class Matrix {
   /// @param v Vector to multiply.
   /// @param m Matrix to multiply.
   /// @return Matrix containing the result.
-  friend inline Vector<T, Cols> operator*(const Vector<T, Rows>& v,
-                                          const Matrix<T, Rows, Cols>& m) {
+  friend constexpr Vector<T, Cols> operator*(const Vector<T, Rows>& v,
+                                             const Matrix<T, Rows, Cols>& m) {
     const int Dims = Cols;
     MATHFU_VECTOR_OPERATOR((Vector<T, Rows>::DotProduct(m.data_[i], v)));
   }
@@ -963,12 +968,12 @@ class Matrix {
   /// @brief Access the underlying column data array.
   ///
   /// @return Pointer to the first column vector.
-  inline const Vector<T, Rows>* data() const { return data_; }
+  constexpr const Vector<T, Rows>* data() const { return data_; }
 
   /// @brief Access the underlying column data array.
   ///
   /// @return Pointer to the first column vector.
-  inline Vector<T, Rows>* data() { return data_; }
+  constexpr Vector<T, Rows>* data() { return data_; }
 
   MATHFU_DEFINE_CLASS_SIMD_AWARE_NEW_DELETE
 
@@ -984,8 +989,8 @@ class Matrix {
 template <int index>
 struct MathfuMatrixUnroller {
   template <class T, int Rows, int Cols>
-  inline static bool NotEqual(const Matrix<T, Rows, Cols>& lhs,
-                              const Matrix<T, Rows, Cols>& rhs) {
+  constexpr static bool NotEqual(const Matrix<T, Rows, Cols>& lhs,
+                                 const Matrix<T, Rows, Cols>& rhs) {
     return (lhs[index] != rhs[index])
            || MathfuMatrixUnroller<index - 1>::NotEqual(lhs, rhs);
   }
@@ -993,8 +998,8 @@ struct MathfuMatrixUnroller {
 template <>
 struct MathfuMatrixUnroller<0> {
   template <class T, int Rows, int Cols>
-  inline static bool NotEqual(const Matrix<T, Rows, Cols>& lhs,
-                              const Matrix<T, Rows, Cols>& rhs) {
+  constexpr static bool NotEqual(const Matrix<T, Rows, Cols>& lhs,
+                                 const Matrix<T, Rows, Cols>& rhs) {
     return lhs[0] != rhs[0];
   }
 };
@@ -1006,8 +1011,8 @@ struct MathfuMatrixUnroller<0> {
 ///
 /// @return true if the elements of 2 matrices differ, false otherwise.
 template <class T, int Rows, int Cols>
-inline bool operator!=(const Matrix<T, Rows, Cols>& lhs,
-                       const Matrix<T, Rows, Cols>& rhs) {
+constexpr bool operator!=(const Matrix<T, Rows, Cols>& lhs,
+                          const Matrix<T, Rows, Cols>& rhs) {
   return MathfuMatrixUnroller<Rows * Cols - 1>::NotEqual(lhs, rhs);
 }
 
@@ -1015,8 +1020,8 @@ inline bool operator!=(const Matrix<T, Rows, Cols>& lhs,
 ///
 /// @return true if the 2 matrices contains the same values, false otherwise.
 template <class T, int Rows, int Cols>
-inline bool operator==(const Matrix<T, Rows, Cols>& lhs,
-                       const Matrix<T, Rows, Cols>& rhs) {
+constexpr bool operator==(const Matrix<T, Rows, Cols>& lhs,
+                          const Matrix<T, Rows, Cols>& rhs) {
   return !(lhs != rhs);
 }
 
@@ -1031,7 +1036,7 @@ inline bool operator==(const Matrix<T, Rows, Cols>& lhs,
 ///
 /// @related mathfu::Matrix
 template <class T, int Rows, int Cols>
-inline Matrix<T, Rows, Cols> operator*(T s, const Matrix<T, Cols, Rows>& m) {
+constexpr Matrix<T, Rows, Cols> operator*(T s, const Matrix<T, Cols, Rows>& m) {
   return m * s;
 }
 
@@ -1047,8 +1052,8 @@ inline Matrix<T, Rows, Cols> operator*(T s, const Matrix<T, Cols, Rows>& m) {
 ///
 /// @related mathfu::Matrix
 template <class T, int Rows, int Cols>
-inline Vector<T, Rows> operator*(const Matrix<T, Rows, Cols>& m,
-                                 const Vector<T, Cols>& v) {
+constexpr Vector<T, Rows> operator*(const Matrix<T, Rows, Cols>& m,
+                                    const Vector<T, Cols>& v) {
   Vector<T, Rows> result(static_cast<T>(0));
   int offset = 0;
   for (int column = 0; column < Cols; column++) {
@@ -1062,14 +1067,16 @@ inline Vector<T, Rows> operator*(const Matrix<T, Rows, Cols>& m,
 
 /// @cond MATHFU_INTERNAL
 template <class T>
-inline Vector<T, 2> operator*(const Matrix<T, 2, 2>& m, const Vector<T, 2>& v) {
+constexpr Vector<T, 2> operator*(const Matrix<T, 2, 2>& m,
+                                 const Vector<T, 2>& v) {
   return Vector<T, 2>(m[0] * v[0] + m[2] * v[1], m[1] * v[0] + m[3] * v[1]);
 }
 /// @endcond
 
 /// @cond MATHFU_INTERNAL
 template <class T>
-inline Vector<T, 3> operator*(const Matrix<T, 3, 3>& m, const Vector<T, 3>& v) {
+constexpr Vector<T, 3> operator*(const Matrix<T, 3, 3>& m,
+                                 const Vector<T, 3>& v) {
   return Vector<T, 3>(MATHFU_MATRIX_3X3_DOT(&m.GetColumn(0).data_[0], v, 0, 3),
                       MATHFU_MATRIX_3X3_DOT(&m.GetColumn(0).data_[0], v, 1, 3),
                       MATHFU_MATRIX_3X3_DOT(&m.GetColumn(0).data_[0], v, 2, 3));
@@ -1092,7 +1099,8 @@ inline Vector<float, 3> operator*(const Matrix<float, 3, 3>& m,
 
 /// @cond MATHFU_INTERNAL
 template <class T>
-inline Vector<T, 4> operator*(const Matrix<T, 4, 4>& m, const Vector<T, 4>& v) {
+constexpr Vector<T, 4> operator*(const Matrix<T, 4, 4>& m,
+                                 const Vector<T, 4>& v) {
   return Vector<T, 4>(MATHFU_MATRIX_4X4_DOT(&m.GetColumn(0).data_[0], v, 0),
                       MATHFU_MATRIX_4X4_DOT(&m.GetColumn(0).data_[0], v, 1),
                       MATHFU_MATRIX_4X4_DOT(&m.GetColumn(0).data_[0], v, 2),
@@ -1124,7 +1132,8 @@ inline Vector<T, 4> operator*(const Matrix<T, 4, 4>& m, const Vector<T, 4>& v) {
 ///
 /// @related mathfu::Matrix
 template <class T>
-inline Vector<T, 3> operator*(const Matrix<T, 4, 4>& m, const Vector<T, 3>& v) {
+constexpr Vector<T, 3> operator*(const Matrix<T, 4, 4>& m,
+                                 const Vector<T, 3>& v) {
   Vector<T, 4> v4(v[0], v[1], v[2], T(1));
   v4 = m * v4;
   assert(v4[3] != 0);
@@ -1149,8 +1158,8 @@ inline Vector<T, 3> operator*(const Matrix<T, 4, 4>& m, const Vector<T, 3>& v) {
 ///
 /// @related mathfu::Matrix
 template <class T>
-inline Vector<T, 3> TransformPoint3D(const Matrix<T, 4, 4>& m,
-                                     const Vector<T, 3>& v) {
+constexpr Vector<T, 3> TransformPoint3D(const Matrix<T, 4, 4>& m,
+                                        const Vector<T, 3>& v) {
   Vector<T, 4> v4(v[0], v[1], v[2], 1);
   v4 = m * v4;
   return Vector<T, 3>(v4[0], v4[1], v4[2]);
@@ -1172,9 +1181,9 @@ inline Vector<T, 3> TransformPoint3D(const Matrix<T, 4, 4>& m,
 /// @tparam size2 Number of Cols in the returned Matrix and Rows in m2.
 /// @tparam size3 Number of Cols in m3.
 template <class T, int size1, int size2, int size3>
-inline void TimesHelper(const Matrix<T, size1, size2>& m1,
-                        const Matrix<T, size2, size3>& m2,
-                        Matrix<T, size1, size3>* out_m) {
+constexpr void TimesHelper(const Matrix<T, size1, size2>& m1,
+                           const Matrix<T, size2, size3>& m2,
+                           Matrix<T, size1, size3>* out_m) {
   for (int i = 0; i < size1; i++) {
     for (int j = 0; j < size3; j++) {
       Vector<T, size2> row;
@@ -1189,8 +1198,8 @@ inline void TimesHelper(const Matrix<T, size1, size2>& m1,
 
 /// @cond MATHFU_INTERNAL
 template <class T>
-inline void TimesHelper(const Matrix<T, 2, 2>& m1, const Matrix<T, 2, 2>& m2,
-                        Matrix<T, 2, 2>* out_m) {
+constexpr void TimesHelper(const Matrix<T, 2, 2>& m1, const Matrix<T, 2, 2>& m2,
+                           Matrix<T, 2, 2>* out_m) {
   Matrix<T, 2, 2>& out = *out_m;
   out[0] = m1[0] * m2[0] + m1[2] * m2[1];
   out[1] = m1[1] * m2[0] + m1[3] * m2[1];
@@ -1201,8 +1210,8 @@ inline void TimesHelper(const Matrix<T, 2, 2>& m1, const Matrix<T, 2, 2>& m2,
 
 /// @cond MATHFU_INTERNAL
 template <typename T>
-inline void TimesHelper(const Matrix<T, 3, 3>& m1, const Matrix<T, 3, 3>& m2,
-                        Matrix<T, 3, 3>* out_m) {
+constexpr void TimesHelper(const Matrix<T, 3, 3>& m1, const Matrix<T, 3, 3>& m2,
+                           Matrix<T, 3, 3>* out_m) {
   Matrix<T, 3, 3>& out = *out_m;
   {
     Vector<T, 3> row(m1[0], m1[3], m1[6]);
@@ -1227,8 +1236,8 @@ inline void TimesHelper(const Matrix<T, 3, 3>& m1, const Matrix<T, 3, 3>& m2,
 
 /// @cond MATHFU_INTERNAL
 template <class T>
-inline void TimesHelper(const Matrix<T, 4, 4>& m1, const Matrix<T, 4, 4>& m2,
-                        Matrix<T, 4, 4>* out_m) {
+constexpr void TimesHelper(const Matrix<T, 4, 4>& m1, const Matrix<T, 4, 4>& m2,
+                           Matrix<T, 4, 4>* out_m) {
   Matrix<T, 4, 4>& out = *out_m;
   {
     Vector<T, 4> row(m1[0], m1[4], m1[8], m1[12]);
@@ -1279,8 +1288,8 @@ inline void TimesHelper(const Matrix<T, 4, 4>& m1, const Matrix<T, 4, 4>& m2,
 ///
 /// @related mathfu::Matrix
 template <class T, int R1, int C1, int C2>
-inline Matrix<T, R1, C2> Multiply(const Matrix<T, R1, C1>& m1,
-                                  const Matrix<T, C1, C2>& m2) {
+constexpr Matrix<T, R1, C2> Multiply(const Matrix<T, R1, C1>& m1,
+                                     const Matrix<T, C1, C2>& m2) {
   Matrix<T, R1, C2> result;
   for (int c = 0; c < C2; ++c) {
     for (int r = 0; r < R1; ++r) {
@@ -1305,7 +1314,7 @@ inline Matrix<T, R1, C2> Multiply(const Matrix<T, R1, C1>& m1,
 /// @tparam Rows Number of Rows in the returned Matrix.
 /// @tparam Cols Number of Cols in the returned Matrix.
 template <class T, int Rows, int Cols>
-inline Matrix<T, Rows, Cols> IdentityHelper() {
+constexpr Matrix<T, Rows, Cols> IdentityHelper() {
   Matrix<T, Rows, Cols> return_matrix(T(0));
   int min_d = Rows < Cols ? Rows : Cols;
   for (int i = 0; i < min_d; ++i) return_matrix(i, i) = T(1);
@@ -1315,21 +1324,21 @@ inline Matrix<T, Rows, Cols> IdentityHelper() {
 
 /// @cond MATHFU_INTERNAL
 template <class T>
-inline Matrix<T, 2, 2> IdentityHelper() {
+constexpr Matrix<T, 2, 2> IdentityHelper() {
   return Matrix<T, 2, 2>(1, 0, 0, 1);
 }
 /// @endcond
 
 /// @cond MATHFU_INTERNAL
 template <class T>
-inline Matrix<T, 3, 3> IdentityHelper() {
+constexpr Matrix<T, 3, 3> IdentityHelper() {
   return Matrix<T, 3, 3>(1, 0, 0, 0, 1, 0, 0, 0, 1);
 }
 /// @endcond
 
 /// @cond MATHFU_INTERNAL
 template <class T>
-inline Matrix<T, 4, 4> IdentityHelper() {
+constexpr Matrix<T, 4, 4> IdentityHelper() {
   return Matrix<T, 4, 4>(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
 }
 /// @endcond
@@ -1340,7 +1349,7 @@ inline Matrix<T, 4, 4> IdentityHelper() {
 /// @note There are template specialization for 2x2, 3x3, and 4x4 matrices to
 /// increase performance.
 template <class T, int Rows, int Cols>
-static inline Matrix<T, Rows, Cols> OuterProductHelper(
+static constexpr Matrix<T, Rows, Cols> OuterProductHelper(
     const Vector<T, Rows>& v1, const Vector<T, Cols>& v2) {
   Matrix<T, Rows, Cols> result(static_cast<T>(0));
   int offset = 0;
@@ -1356,8 +1365,8 @@ static inline Matrix<T, Rows, Cols> OuterProductHelper(
 
 /// @cond MATHFU_INTERNAL
 template <class T>
-static inline Matrix<T, 2, 2> OuterProductHelper(const Vector<T, 2>& v1,
-                                                 const Vector<T, 2>& v2) {
+static constexpr Matrix<T, 2, 2> OuterProductHelper(const Vector<T, 2>& v1,
+                                                    const Vector<T, 2>& v2) {
   return Matrix<T, 2, 2>(v1[0] * v2[0], v1[1] * v2[0], v1[0] * v2[1],
                          v1[1] * v2[1]);
 }
@@ -1365,8 +1374,8 @@ static inline Matrix<T, 2, 2> OuterProductHelper(const Vector<T, 2>& v1,
 
 /// @cond MATHFU_INTERNAL
 template <class T>
-static inline Matrix<T, 3, 3> OuterProductHelper(const Vector<T, 3>& v1,
-                                                 const Vector<T, 3>& v2) {
+static constexpr Matrix<T, 3, 3> OuterProductHelper(const Vector<T, 3>& v1,
+                                                    const Vector<T, 3>& v2) {
   return Matrix<T, 3, 3>(v1[0] * v2[0], v1[1] * v2[0], v1[2] * v2[0],
                          v1[0] * v2[1], v1[1] * v2[1], v1[2] * v2[1],
                          v1[0] * v2[2], v1[1] * v2[2], v1[2] * v2[2]);
@@ -1375,8 +1384,8 @@ static inline Matrix<T, 3, 3> OuterProductHelper(const Vector<T, 3>& v1,
 
 /// @cond MATHFU_INTERNAL
 template <class T>
-static inline Matrix<T, 4, 4> OuterProductHelper(const Vector<T, 4>& v1,
-                                                 const Vector<T, 4>& v2) {
+static constexpr Matrix<T, 4, 4> OuterProductHelper(const Vector<T, 4>& v1,
+                                                    const Vector<T, 4>& v2) {
   return Matrix<T, 4, 4>(
       v1[0] * v2[0], v1[1] * v2[0], v1[2] * v2[0], v1[3] * v2[0], v1[0] * v2[1],
       v1[1] * v2[1], v1[2] * v2[1], v1[3] * v2[1], v1[0] * v2[2], v1[1] * v2[2],
@@ -1663,9 +1672,9 @@ static inline Matrix<T, 4, 4> LookAtHelper(const Vector<T, 3>& at,
 /// @cond MATHFU_INTERNAL
 /// Create a 3-dimensional transform matrix.
 template <class T>
-static inline Matrix<T, 4, 4> TransformHelper(const Vector<T, 3>& position,
-                                              const Matrix<T, 3, 3>& rotation,
-                                              const Vector<T, 3>& scale) {
+static constexpr Matrix<T, 4, 4> TransformHelper(
+    const Vector<T, 3>& position, const Matrix<T, 3, 3>& rotation,
+    const Vector<T, 3>& scale) {
   Vector<T, 4> c0(rotation(0, 0), rotation(1, 0), rotation(2, 0), 0);
   Vector<T, 4> c1(rotation(0, 1), rotation(1, 1), rotation(2, 1), 0);
   Vector<T, 4> c2(rotation(0, 2), rotation(1, 2), rotation(2, 2), 0);

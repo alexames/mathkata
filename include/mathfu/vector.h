@@ -66,17 +66,17 @@ class Vector;
 
 /// @cond MATHFU_INTERNAL
 template <class T, int Dims>
-static inline T DotProductHelper(const Vector<T, Dims>& v1,
-                                 const Vector<T, Dims>& v2);
+static constexpr T DotProductHelper(const Vector<T, Dims>& v1,
+                                    const Vector<T, Dims>& v2);
 template <class T>
-static inline T DotProductHelper(const Vector<T, 2>& v1,
-                                 const Vector<T, 2>& v2);
+static constexpr T DotProductHelper(const Vector<T, 2>& v1,
+                                    const Vector<T, 2>& v2);
 template <class T>
-static inline T DotProductHelper(const Vector<T, 3>& v1,
-                                 const Vector<T, 3>& v2);
+static constexpr T DotProductHelper(const Vector<T, 3>& v1,
+                                    const Vector<T, 3>& v2);
 template <class T>
-static inline T DotProductHelper(const Vector<T, 4>& v1,
-                                 const Vector<T, 4>& v2);
+static constexpr T DotProductHelper(const Vector<T, 4>& v1,
+                                    const Vector<T, 4>& v2);
 
 template <typename T, int Dims, typename CompatibleT>
 static inline Vector<T, Dims> FromTypeHelper(const CompatibleT& compatible);
@@ -153,8 +153,8 @@ struct VectorPacked {
 ///
 /// @return true if all elements are equal, false otherwise.
 template <class T, int Dims>
-inline bool operator==(const VectorPacked<T, Dims>& lhs,
-                       const VectorPacked<T, Dims>& rhs) {
+constexpr bool operator==(const VectorPacked<T, Dims>& lhs,
+                          const VectorPacked<T, Dims>& rhs) {
   for (int i = 0; i < Dims; ++i) {
     if (lhs.data_[i] != rhs.data_[i]) return false;
   }
@@ -165,8 +165,8 @@ inline bool operator==(const VectorPacked<T, Dims>& lhs,
 ///
 /// @return true if any elements differ, false otherwise.
 template <class T, int Dims>
-inline bool operator!=(const VectorPacked<T, Dims>& lhs,
-                       const VectorPacked<T, Dims>& rhs) {
+constexpr bool operator!=(const VectorPacked<T, Dims>& lhs,
+                          const VectorPacked<T, Dims>& rhs) {
   return !(lhs == rhs);
 }
 /// @}
@@ -194,12 +194,12 @@ class Vector {
   /// The elements of the Vector are left uninitialized and have indeterminate
   /// values. This is intentional for performance: use Vector(T) or one of the
   /// component constructors if you need specific values.
-  inline Vector() {}
+  constexpr Vector() {}
 
   /// @brief Create a vector from another vector copying each element.
   ///
   /// @param v Vector that the data will be copied from.
-  inline Vector(const Vector<T, Dims>& v) {
+  constexpr Vector(const Vector<T, Dims>& v) {
     MATHFU_VECTOR_OPERATION(data_[i] = v.data_[i]);
   }
 
@@ -211,7 +211,7 @@ class Vector {
   /// @param v Vector that the data will be copied from.
   /// @tparam U type of Vector elements to copy.
   template <typename U>
-  explicit inline Vector(const Vector<U, Dims>& v) {
+  explicit constexpr Vector(const Vector<U, Dims>& v) {
     MATHFU_VECTOR_OPERATION(data_[i] = static_cast<T>(v[i]));
   }
 
@@ -219,12 +219,12 @@ class Vector {
   ///
   /// Each elements is set to be equal to the value given.
   /// @param s Scalar value that the vector will be initialized to.
-  explicit inline Vector(T s) { MATHFU_VECTOR_OPERATION(data_[i] = s); }
+  explicit constexpr Vector(T s) { MATHFU_VECTOR_OPERATION(data_[i] = s); }
 
   /// @brief Create a vector form the first Dims elements of an array.
   ///
   /// @param a Array of values that the vector will be iniitlized to.
-  explicit inline Vector(const T* a) {
+  explicit constexpr Vector(const T* a) {
     MATHFU_VECTOR_OPERATION(data_[i] = a[i]);
   }
 
@@ -234,7 +234,7 @@ class Vector {
   ///
   /// @param s1 Scalar value for the first element of the vector.
   /// @param s2 Scalar value for the second element of the vector.
-  inline Vector(T s1, T s2) {
+  constexpr Vector(T s1, T s2) {
     static_assert(Dims == 2, "Dims must be 2");
     data_[0] = s1;
     data_[1] = s2;
@@ -247,7 +247,7 @@ class Vector {
   /// @param s1 Scalar value for the first element of the vector.
   /// @param s2 Scalar value for the second element of the vector.
   /// @param s3 Scalar value for the third element of the vector.
-  inline Vector(T s1, T s2, T s3) {
+  constexpr Vector(T s1, T s2, T s3) {
     static_assert(Dims == 3, "Dims must be 3");
     data_[0] = s1;
     data_[1] = s2;
@@ -260,7 +260,7 @@ class Vector {
   ///
   /// @param v12 Vector containing the first 2 values.
   /// @param s3 Scalar value for the third element of the vector.
-  inline Vector(const Vector<T, 2>& v12, T s3) {
+  constexpr Vector(const Vector<T, 2>& v12, T s3) {
     static_assert(Dims == 3, "Dims must be 3");
     data_[0] = v12[0];
     data_[1] = v12[1];
@@ -275,7 +275,7 @@ class Vector {
   /// @param s2 Scalar value for the second element of the vector.
   /// @param s3 Scalar value for the third element of the vector.
   /// @param s4 Scalar value for the forth element of the vector.
-  inline Vector(T s1, T s2, T s3, T s4) {
+  constexpr Vector(T s1, T s2, T s3, T s4) {
     static_assert(Dims == 4, "Dims must be 4");
     data_[0] = s1;
     data_[1] = s2;
@@ -290,7 +290,7 @@ class Vector {
   ///
   /// @param vector3 Vector used to initialize the first 3 elements.
   /// @param value Value used to set the last element of the vector.
-  inline Vector(const Vector<T, 3>& vector123, T s4) {
+  constexpr Vector(const Vector<T, 3>& vector123, T s4) {
     static_assert(Dims == 4, "Dims must be 4");
     data_[0] = vector123[0];
     data_[1] = vector123[1];
@@ -304,7 +304,7 @@ class Vector {
   ///
   /// @param v12 Vector containing the first 2 values.
   /// @param v34 Vector containing the last 2 values.
-  inline Vector(const Vector<T, 2>& v12, const Vector<T, 2>& v34) {
+  constexpr Vector(const Vector<T, 2>& v12, const Vector<T, 2>& v34) {
     static_assert(Dims == 4, "Dims must be 4");
     data_[0] = v12[0];
     data_[1] = v12[1];
@@ -315,7 +315,7 @@ class Vector {
   /// @brief Create a vector from packed vector (VectorPacked).
   ///
   /// @param vector Packed vector used to initialize an unpacked.
-  explicit inline Vector(const VectorPacked<T, Dims>& vector) {
+  explicit constexpr Vector(const VectorPacked<T, Dims>& vector) {
     MATHFU_VECTOR_OPERATION(data_[i] = vector.data_[i]);
   }
 
@@ -324,32 +324,32 @@ class Vector {
   /// @param i Index of the element to access.
   /// @return A reference to the accessed data that can be modified by the
   /// caller.
-  inline T& operator()(const int i) { return data_[i]; }
+  constexpr T& operator()(const int i) { return data_[i]; }
 
   /// @brief Access an element of the vector.
   ///
   /// @param i Index of the element to access.
   /// @return A reference to the accessed data.
-  inline const T& operator()(const int i) const { return data_[i]; }
+  constexpr const T& operator()(const int i) const { return data_[i]; }
 
   /// @brief Access an element of the vector.
   ///
   /// @param i Index of the element to access.
   /// @return A reference to the accessed data that can be modified by the
   /// caller.
-  inline T& operator[](const int i) { return data_[i]; }
+  constexpr T& operator[](const int i) { return data_[i]; }
 
   /// @brief Access an element of the vector.
   ///
   /// @param i Index of the element to access.
   /// @return A const reference to the accessed.
-  inline const T& operator[](const int i) const { return data_[i]; }
+  constexpr const T& operator[](const int i) const { return data_[i]; }
 
   /// @brief Access the first element of the vector.
   ///
   /// @note This method only works with vectors of 1 or more dimensions.
   /// @return A reference to the first element.
-  inline T& x() {
+  constexpr T& x() {
     static_assert(Dims >= 1, "x() requires >= 1D");
     return data_[0];
   }
@@ -358,7 +358,7 @@ class Vector {
   ///
   /// @note This method only works with vectors of 1 or more dimensions.
   /// @return A const reference to the first element.
-  inline const T& x() const {
+  constexpr const T& x() const {
     static_assert(Dims >= 1, "x() requires >= 1D");
     return data_[0];
   }
@@ -367,7 +367,7 @@ class Vector {
   ///
   /// @note This method only works with vectors of 2 or more dimensions.
   /// @return A reference to the second element.
-  inline T& y() {
+  constexpr T& y() {
     static_assert(Dims >= 2, "y() requires >= 2D");
     return data_[1];
   }
@@ -376,7 +376,7 @@ class Vector {
   ///
   /// @note This method only works with vectors of 2 or more dimensions.
   /// @return A const reference to the second element.
-  inline const T& y() const {
+  constexpr const T& y() const {
     static_assert(Dims >= 2, "y() requires >= 2D");
     return data_[1];
   }
@@ -385,7 +385,7 @@ class Vector {
   ///
   /// @note This method only works with vectors of 3 or more dimensions.
   /// @return A reference to the third element.
-  inline T& z() {
+  constexpr T& z() {
     static_assert(Dims >= 3, "z() requires >= 3D");
     return data_[2];
   }
@@ -394,7 +394,7 @@ class Vector {
   ///
   /// @note This method only works with vectors of 3 or more dimensions.
   /// @return A const reference to the third element.
-  inline const T& z() const {
+  constexpr const T& z() const {
     static_assert(Dims >= 3, "z() requires >= 3D");
     return data_[2];
   }
@@ -403,7 +403,7 @@ class Vector {
   ///
   /// @note This method only works with vectors of 4 or more dimensions.
   /// @return A reference to the fourth element.
-  inline T& w() {
+  constexpr T& w() {
     static_assert(Dims >= 4, "w() requires >= 4D");
     return data_[3];
   }
@@ -412,7 +412,7 @@ class Vector {
   ///
   /// @note This method only works with vectors of 4 or more dimensions.
   /// @return A const reference to the fourth element.
-  inline const T& w() const {
+  constexpr const T& w() const {
     static_assert(Dims >= 4, "w() requires >= 4D");
     return data_[3];
   }
@@ -422,7 +422,7 @@ class Vector {
   /// This only works with vectors that contain more than 3 elements.
   /// @returns A 3-dimensional Vector containing the first 3 elements of
   // this Vector.
-  inline Vector<T, 3> xyz() {
+  constexpr Vector<T, 3> xyz() {
     static_assert(Dims > 3, "Dims must be greater than 3");
     return Vector<T, 3>(data_[0], data_[1], data_[2]);
   }
@@ -432,7 +432,7 @@ class Vector {
   /// This only works with vectors that contain more than 3 elements.
   /// @returns A 3-dimensional Vector containing the first 3 elements of
   // this Vector.
-  inline const Vector<T, 3> xyz() const {
+  constexpr const Vector<T, 3> xyz() const {
     static_assert(Dims > 3, "Dims must be greater than 3");
     return Vector<T, 3>(data_[0], data_[1], data_[2]);
   }
@@ -441,7 +441,7 @@ class Vector {
   ///
   /// This only works with vectors that contain more than 2 elements.
   /// @returns A 2-dimensional Vector with the first 2 elements of this Vector.
-  inline Vector<T, 2> xy() {
+  constexpr Vector<T, 2> xy() {
     static_assert(Dims > 2, "Dims must be greater than 2");
     return Vector<T, 2>(data_[0], data_[1]);
   }
@@ -450,7 +450,7 @@ class Vector {
   ///
   /// This only works with vectors that contain more than 2 elements.
   /// @returns A 2-dimensional Vector with the first 2 elements of this Vector.
-  inline const Vector<T, 2> xy() const {
+  constexpr const Vector<T, 2> xy() const {
     static_assert(Dims > 2, "Dims must be greater than 2");
     return Vector<T, 2>(data_[0], data_[1]);
   }
@@ -459,7 +459,7 @@ class Vector {
   ///
   /// This only works with vectors that contain 4 elements.
   /// @returns A 2-dimensional Vector with the last 2 elements of this Vector.
-  inline Vector<T, 2> zw() {
+  constexpr Vector<T, 2> zw() {
     static_assert(Dims == 4, "Dims must be 4");
     return Vector<T, 2>(data_[2], data_[3]);
   }
@@ -468,7 +468,7 @@ class Vector {
   ///
   /// This only works with vectors that contain 4 elements.
   /// @returns A 2-dimensional Vector with the last 2 elements of this Vector.
-  inline const Vector<T, 2> zw() const {
+  constexpr const Vector<T, 2> zw() const {
     static_assert(Dims == 4, "Dims must be 4");
     return Vector<T, 2>(data_[2], data_[3]);
   }
@@ -476,14 +476,14 @@ class Vector {
   /// @brief Pack a Vector to a packed "Dims" element vector structure.
   ///
   /// @param vector Packed "Dims" element vector to write to.
-  inline void Pack(VectorPacked<T, Dims>* const vector) const {
+  constexpr void Pack(VectorPacked<T, Dims>* const vector) const {
     MATHFU_VECTOR_OPERATION(vector->data_[i] = data_[i]);
   }
 
   /// @brief Calculate the squared length of this vector.
   ///
   /// @return The length of this vector squared.
-  inline T LengthSquared() const { return LengthSquaredHelper(*this); }
+  constexpr T LengthSquared() const { return LengthSquaredHelper(*this); }
 
   /// @brief Calculate the length of this vector.
   ///
@@ -537,8 +537,8 @@ class Vector {
   /// @param v1 First vector.
   /// @param v2 Second vector.
   /// @return The dot product of v1 and v2.
-  static inline T DotProduct(const Vector<T, Dims>& v1,
-                             const Vector<T, Dims>& v2) {
+  static constexpr T DotProduct(const Vector<T, Dims>& v1,
+                                const Vector<T, Dims>& v2) {
     return DotProductHelper(v1, v2);
   }
 
@@ -547,8 +547,8 @@ class Vector {
   /// @param v1 First vector.
   /// @param v2 Second vector.
   /// @return The hadamard product of v1 and v2.
-  static inline Vector<T, Dims> HadamardProduct(const Vector<T, Dims>& v1,
-                                                const Vector<T, Dims>& v2) {
+  static constexpr Vector<T, Dims> HadamardProduct(const Vector<T, Dims>& v1,
+                                                   const Vector<T, Dims>& v2) {
     return HadamardProductHelper(v1, v2);
   }
 
@@ -557,8 +557,8 @@ class Vector {
   /// @param v1 First vector (numerator).
   /// @param v2 Second vector (denominator).
   /// @return The componentwise quotient of v1 and v2.
-  static inline Vector<T, Dims> HadamardDivide(const Vector<T, Dims>& v1,
-                                               const Vector<T, Dims>& v2) {
+  static constexpr Vector<T, Dims> HadamardDivide(const Vector<T, Dims>& v1,
+                                                  const Vector<T, Dims>& v2) {
     return HadamardDivideHelper(v1, v2);
   }
 
@@ -568,8 +568,8 @@ class Vector {
   /// @param v1 First vector.
   /// @param v2 Second vector.
   /// @return The cross product of v1 and v2.
-  static inline Vector<T, 3> CrossProduct(const Vector<T, 3>& v1,
-                                          const Vector<T, 3>& v2) {
+  static constexpr Vector<T, 3> CrossProduct(const Vector<T, 3>& v1,
+                                             const Vector<T, 3>& v2) {
     return CrossProductHelper(v1, v2);
   }
 
@@ -580,7 +580,8 @@ class Vector {
   /// @param v1 First vector.
   /// @param v2 Second vector.
   /// @return The scalar cross product of v1 and v2.
-  static inline T CrossProduct(const Vector<T, 2>& v1, const Vector<T, 2>& v2) {
+  static constexpr T CrossProduct(const Vector<T, 2>& v1,
+                                  const Vector<T, 2>& v2) {
     return CrossProductHelper(v1, v2);
   }
 
@@ -590,9 +591,9 @@ class Vector {
   /// @param v2 Second vector.
   /// @param percent Percentage from v1 to v2 in range 0.0...1.0.
   /// @return The hadamard product of v1 and v2.
-  static inline Vector<T, Dims> Lerp(const Vector<T, Dims>& v1,
-                                     const Vector<T, Dims>& v2,
-                                     const T percent) {
+  static constexpr Vector<T, Dims> Lerp(const Vector<T, Dims>& v1,
+                                        const Vector<T, Dims>& v2,
+                                        const T percent) {
     return LerpHelper(v1, v2, percent);
   }
 
@@ -601,8 +602,8 @@ class Vector {
   /// @param v1 First vector.
   /// @param v2 Second vector.
   /// @return Max value of v1 and v2.
-  static inline Vector<T, Dims> Max(const Vector<T, Dims>& v1,
-                                    const Vector<T, Dims>& v2) {
+  static constexpr Vector<T, Dims> Max(const Vector<T, Dims>& v1,
+                                       const Vector<T, Dims>& v2) {
     return MaxHelper(v1, v2);
   }
 
@@ -611,8 +612,8 @@ class Vector {
   /// @param v1 First vector.
   /// @param v2 Second vector.
   /// @return Min value of v1 and v2.
-  static inline Vector<T, Dims> Min(const Vector<T, Dims>& v1,
-                                    const Vector<T, Dims>& v2) {
+  static constexpr Vector<T, Dims> Min(const Vector<T, Dims>& v1,
+                                       const Vector<T, Dims>& v2) {
     return MinHelper(v1, v2);
   }
 
@@ -623,9 +624,9 @@ class Vector {
   /// @param range_start Starting point of the range (inclusive).
   /// @param range_end Ending point of the range (non-inclusive).
   /// @return Bool indicating val is in range for every component.
-  static inline bool InRange(const Vector<T, Dims>& val,
-                             const Vector<T, Dims>& range_start,
-                             const Vector<T, Dims>& range_end) {
+  static constexpr bool InRange(const Vector<T, Dims>& val,
+                                const Vector<T, Dims>& range_start,
+                                const Vector<T, Dims>& range_end) {
     return InRangeHelper(val, range_start, range_end);
   }
 
@@ -644,8 +645,8 @@ class Vector {
   /// @param v1 First vector.
   /// @param v2 Second vector.
   /// @return Squared distance between vectors v1 and v2.
-  static inline T DistanceSquared(const Vector<T, Dims>& v1,
-                                  const Vector<T, Dims>& v2) {
+  static constexpr T DistanceSquared(const Vector<T, Dims>& v1,
+                                     const Vector<T, Dims>& v2) {
     return (v1 - v2).LengthSquared();
   }
 
@@ -664,8 +665,8 @@ class Vector {
   /// @param v The vector to project.
   /// @param onto The vector to project onto. Must be non-zero.
   /// @return The vector projection of v onto onto.
-  static inline Vector<T, Dims> Project(const Vector<T, Dims>& v,
-                                        const Vector<T, Dims>& onto) {
+  static constexpr Vector<T, Dims> Project(const Vector<T, Dims>& v,
+                                           const Vector<T, Dims>& onto) {
     return ProjectHelper(v, onto);
   }
 
@@ -675,8 +676,8 @@ class Vector {
   /// @param v The vector to reject.
   /// @param from The vector to reject from. Must be non-zero.
   /// @return The vector rejection of v from from.
-  static inline Vector<T, Dims> Reject(const Vector<T, Dims>& v,
-                                       const Vector<T, Dims>& from) {
+  static constexpr Vector<T, Dims> Reject(const Vector<T, Dims>& v,
+                                          const Vector<T, Dims>& from) {
     return RejectHelper(v, from);
   }
 
@@ -686,8 +687,8 @@ class Vector {
   /// @param normal The surface normal (must be normalized).
   /// @return The reflected direction.
   /// Matches GLSL reflect() semantics.
-  static inline Vector<T, Dims> Reflect(const Vector<T, Dims>& incident,
-                                        const Vector<T, Dims>& normal) {
+  static constexpr Vector<T, Dims> Reflect(const Vector<T, Dims>& incident,
+                                           const Vector<T, Dims>& normal) {
     return ReflectHelper(incident, normal);
   }
 
@@ -723,7 +724,8 @@ class Vector {
 ///
 /// @return true if the 2 vectors contains the same value, false otherwise.
 template <class T, int Dims>
-inline bool operator==(const Vector<T, Dims>& lhs, const Vector<T, Dims>& rhs) {
+constexpr bool operator==(const Vector<T, Dims>& lhs,
+                          const Vector<T, Dims>& rhs) {
   for (int i = 0; i < Dims; ++i) {
     if (lhs[i] != rhs[i]) return false;
   }
@@ -734,7 +736,8 @@ inline bool operator==(const Vector<T, Dims>& lhs, const Vector<T, Dims>& rhs) {
 ///
 /// @return true if the elements of two vectors differ, false otherwise.
 template <class T, int Dims>
-inline bool operator!=(const Vector<T, Dims>& lhs, const Vector<T, Dims>& rhs) {
+constexpr bool operator!=(const Vector<T, Dims>& lhs,
+                          const Vector<T, Dims>& rhs) {
   return !(lhs == rhs);
 }
 
@@ -748,7 +751,8 @@ inline bool operator!=(const Vector<T, Dims>& lhs, const Vector<T, Dims>& rhs) {
 ///
 /// @return true if @p lhs is lexicographically less than @p rhs.
 template <class T, int Dims>
-inline bool operator<(const Vector<T, Dims>& lhs, const Vector<T, Dims>& rhs) {
+constexpr bool operator<(const Vector<T, Dims>& lhs,
+                         const Vector<T, Dims>& rhs) {
   for (int i = 0; i < Dims; ++i) {
     if (lhs[i] < rhs[i]) return true;
     if (rhs[i] < lhs[i]) return false;
@@ -760,7 +764,7 @@ inline bool operator<(const Vector<T, Dims>& lhs, const Vector<T, Dims>& rhs) {
 ///
 /// @return A new Vector containing the result.
 template <class T, int Dims>
-inline Vector<T, Dims> operator-(const Vector<T, Dims>& v) {
+constexpr Vector<T, Dims> operator-(const Vector<T, Dims>& v) {
   MATHFU_VECTOR_OPERATOR(-v.data_[i]);
 }
 
@@ -773,7 +777,7 @@ inline Vector<T, Dims> operator-(const Vector<T, Dims>& v) {
 /// @return Vector containing the result.
 /// @related Vector
 template <class T, int Dims>
-inline Vector<T, Dims> operator*(T s, const Vector<T, Dims>& v) {
+constexpr Vector<T, Dims> operator*(T s, const Vector<T, Dims>& v) {
   MATHFU_VECTOR_OPERATOR(v.data_[i] * s);
 }
 
@@ -786,7 +790,7 @@ inline Vector<T, Dims> operator*(T s, const Vector<T, Dims>& v) {
 /// @return Vector containing the result.
 /// @related Vector
 template <class T, int Dims>
-inline Vector<T, Dims> operator/(const Vector<T, Dims>& v, T s) {
+constexpr Vector<T, Dims> operator/(const Vector<T, Dims>& v, T s) {
   MATHFU_VECTOR_OPERATOR(v.data_[i] / s);
 }
 
@@ -799,7 +803,7 @@ inline Vector<T, Dims> operator/(const Vector<T, Dims>& v, T s) {
 /// @return Vector containing the result.
 /// @related Vector
 template <class T, int Dims>
-inline Vector<T, Dims> operator/(const T& s, const Vector<T, Dims>& v) {
+constexpr Vector<T, Dims> operator/(const T& s, const Vector<T, Dims>& v) {
   MATHFU_VECTOR_OPERATOR(s / v.data_[i]);
 }
 
@@ -810,7 +814,7 @@ inline Vector<T, Dims> operator/(const T& s, const Vector<T, Dims>& v) {
 /// @return Vector containing the result.
 /// @related Vector
 template <class T, int Dims>
-inline Vector<T, Dims> operator+(T s, const Vector<T, Dims>& v) {
+constexpr Vector<T, Dims> operator+(T s, const Vector<T, Dims>& v) {
   MATHFU_VECTOR_OPERATOR(v.data_[i] + s);
 }
 
@@ -821,7 +825,7 @@ inline Vector<T, Dims> operator+(T s, const Vector<T, Dims>& v) {
 /// @return Vector containing the result.
 /// @related Vector
 template <class T, int Dims>
-inline Vector<T, Dims> operator-(T s, const Vector<T, Dims>& v) {
+constexpr Vector<T, Dims> operator-(T s, const Vector<T, Dims>& v) {
   MATHFU_VECTOR_OPERATOR(s - v.data_[i]);
 }
 
@@ -831,8 +835,8 @@ inline Vector<T, Dims> operator-(T s, const Vector<T, Dims>& v) {
 /// @param rhs Second vector to add by.
 /// @return A new vector containing the result.
 template <class T, int Dims>
-inline Vector<T, Dims> operator+(const Vector<T, Dims>& lhs,
-                                 const Vector<T, Dims>& rhs) {
+constexpr Vector<T, Dims> operator+(const Vector<T, Dims>& lhs,
+                                    const Vector<T, Dims>& rhs) {
   MATHFU_VECTOR_OPERATOR(lhs.data_[i] + rhs[i]);
 }
 
@@ -842,8 +846,8 @@ inline Vector<T, Dims> operator+(const Vector<T, Dims>& lhs,
 /// @param rhs Second vector to subtract by.
 /// @return A new vector containing the result.
 template <class T, int Dims>
-inline Vector<T, Dims> operator-(const Vector<T, Dims>& lhs,
-                                 const Vector<T, Dims>& rhs) {
+constexpr Vector<T, Dims> operator-(const Vector<T, Dims>& lhs,
+                                    const Vector<T, Dims>& rhs) {
   MATHFU_VECTOR_OPERATOR(lhs.data_[i] - rhs[i]);
 }
 
@@ -853,7 +857,7 @@ inline Vector<T, Dims> operator-(const Vector<T, Dims>& lhs,
 /// @param s A scalar to multiply the vector with.
 /// @return A new vector containing the result.
 template <class T, int Dims>
-inline Vector<T, Dims> operator*(const Vector<T, Dims>& v, T s) {
+constexpr Vector<T, Dims> operator*(const Vector<T, Dims>& v, T s) {
   MATHFU_VECTOR_OPERATOR(v.data_[i] * s);
 }
 
@@ -863,7 +867,7 @@ inline Vector<T, Dims> operator*(const Vector<T, Dims>& v, T s) {
 /// @param s A scalar to add to the vector.
 /// @return A new vector containing the result.
 template <class T, int Dims>
-inline Vector<T, Dims> operator+(const Vector<T, Dims>& v, T s) {
+constexpr Vector<T, Dims> operator+(const Vector<T, Dims>& v, T s) {
   MATHFU_VECTOR_OPERATOR(v.data_[i] + s);
 }
 
@@ -873,7 +877,7 @@ inline Vector<T, Dims> operator+(const Vector<T, Dims>& v, T s) {
 /// @param s A scalar to subtract from a vector.
 /// @return A new vector that stores the result.
 template <class T, int Dims>
-inline Vector<T, Dims> operator-(const Vector<T, Dims>& v, T s) {
+constexpr Vector<T, Dims> operator-(const Vector<T, Dims>& v, T s) {
   MATHFU_VECTOR_OPERATOR(v.data_[i] - s);
 }
 
@@ -883,8 +887,8 @@ inline Vector<T, Dims> operator-(const Vector<T, Dims>& v, T s) {
 /// @param rhs Second vector to add.
 /// @return A reference to the input <b>v</b> vector.
 template <class T, int Dims>
-inline Vector<T, Dims>& operator+=(Vector<T, Dims>& lhs,
-                                   const Vector<T, Dims>& rhs) {
+constexpr Vector<T, Dims>& operator+=(Vector<T, Dims>& lhs,
+                                      const Vector<T, Dims>& rhs) {
   MATHFU_VECTOR_OPERATION(lhs.data_[i] += rhs[i]);
   return lhs;
 }
@@ -895,8 +899,8 @@ inline Vector<T, Dims>& operator+=(Vector<T, Dims>& lhs,
 /// @param rhs Second vector to subtract by.
 /// @return A reference to the input <b>v</b> vector.
 template <class T, int Dims>
-inline Vector<T, Dims>& operator-=(Vector<T, Dims>& lhs,
-                                   const Vector<T, Dims>& rhs) {
+constexpr Vector<T, Dims>& operator-=(Vector<T, Dims>& lhs,
+                                      const Vector<T, Dims>& rhs) {
   MATHFU_VECTOR_OPERATION(lhs.data_[i] -= rhs[i]);
   return lhs;
 }
@@ -907,7 +911,7 @@ inline Vector<T, Dims>& operator-=(Vector<T, Dims>& lhs,
 /// @param s A scalar to multiply the vector with.
 /// @return A reference to the input <b>v</b> vector.
 template <class T, int Dims>
-inline Vector<T, Dims>& operator*=(Vector<T, Dims>& v, T s) {
+constexpr Vector<T, Dims>& operator*=(Vector<T, Dims>& v, T s) {
   MATHFU_VECTOR_OPERATION(v.data_[i] *= s);
   return v;
 }
@@ -918,7 +922,7 @@ inline Vector<T, Dims>& operator*=(Vector<T, Dims>& v, T s) {
 /// @param s A scalar to divide the vector by.
 /// @return A reference to the input <b>v</b> vector.
 template <class T, int Dims>
-inline Vector<T, Dims>& operator/=(Vector<T, Dims>& v, T s) {
+constexpr Vector<T, Dims>& operator/=(Vector<T, Dims>& v, T s) {
   MATHFU_VECTOR_OPERATION(v.data_[i] /= s);
   return v;
 }
@@ -929,7 +933,7 @@ inline Vector<T, Dims>& operator/=(Vector<T, Dims>& v, T s) {
 /// @param s A scalar to add the vector to.
 /// @return A reference to the input <b>v</b> vector.
 template <class T, int Dims>
-inline Vector<T, Dims>& operator+=(Vector<T, Dims>& v, T s) {
+constexpr Vector<T, Dims>& operator+=(Vector<T, Dims>& v, T s) {
   MATHFU_VECTOR_OPERATION(v.data_[i] += s);
   return v;
 }
@@ -940,7 +944,7 @@ inline Vector<T, Dims>& operator+=(Vector<T, Dims>& v, T s) {
 /// @param s A scalar to subtract from the vector.
 /// @return A reference to the input <b>v</b> vector.
 template <class T, int Dims>
-inline Vector<T, Dims>& operator-=(Vector<T, Dims>& v, T s) {
+constexpr Vector<T, Dims>& operator-=(Vector<T, Dims>& v, T s) {
   MATHFU_VECTOR_OPERATION(v.data_[i] -= s);
   return v;
 }
@@ -951,8 +955,8 @@ inline Vector<T, Dims>& operator-=(Vector<T, Dims>& v, T s) {
 /// @param v2 Second vector.
 /// @return The hadamard product of v1 and v2.
 template <class T, int Dims>
-inline Vector<T, Dims> HadamardProductHelper(const Vector<T, Dims>& v1,
-                                             const Vector<T, Dims>& v2) {
+constexpr Vector<T, Dims> HadamardProductHelper(const Vector<T, Dims>& v1,
+                                                const Vector<T, Dims>& v2) {
   MATHFU_VECTOR_OPERATOR(v1[i] * v2[i]);
 }
 
@@ -962,8 +966,8 @@ inline Vector<T, Dims> HadamardProductHelper(const Vector<T, Dims>& v1,
 /// @param v2 Second vector (denominator).
 /// @return The componentwise quotient of v1 and v2.
 template <class T, int Dims>
-inline Vector<T, Dims> HadamardDivideHelper(const Vector<T, Dims>& v1,
-                                            const Vector<T, Dims>& v2) {
+constexpr Vector<T, Dims> HadamardDivideHelper(const Vector<T, Dims>& v1,
+                                               const Vector<T, Dims>& v2) {
   MATHFU_VECTOR_OPERATOR(v1[i] / v2[i]);
 }
 
@@ -974,8 +978,8 @@ inline Vector<T, Dims> HadamardDivideHelper(const Vector<T, Dims>& v1,
 /// @param v2 Second vector.
 /// @return The cross product of v1 and v2.
 template <class T>
-inline Vector<T, 3> CrossProductHelper(const Vector<T, 3>& v1,
-                                       const Vector<T, 3>& v2) {
+constexpr Vector<T, 3> CrossProductHelper(const Vector<T, 3>& v1,
+                                          const Vector<T, 3>& v2) {
   return Vector<T, 3>(v1[1] * v2[2] - v1[2] * v2[1],
                       v1[2] * v2[0] - v1[0] * v2[2],
                       v1[0] * v2[1] - v1[1] * v2[0]);
@@ -990,7 +994,7 @@ inline Vector<T, 3> CrossProductHelper(const Vector<T, 3>& v1,
 /// @param v2 Second vector.
 /// @return The scalar cross product of v1 and v2.
 template <class T>
-inline T CrossProductHelper(const Vector<T, 2>& v1, const Vector<T, 2>& v2) {
+constexpr T CrossProductHelper(const Vector<T, 2>& v1, const Vector<T, 2>& v2) {
   return v1[0] * v2[1] - v1[1] * v2[0];
 }
 
@@ -999,7 +1003,7 @@ inline T CrossProductHelper(const Vector<T, 2>& v1, const Vector<T, 2>& v2) {
 /// @param v Vector to get the squared length of.
 /// @return The squared length of the vector.
 template <class T, int Dims>
-inline T LengthSquaredHelper(const Vector<T, Dims>& v) {
+constexpr T LengthSquaredHelper(const Vector<T, Dims>& v) {
   return DotProductHelper(v, v);
 }
 
@@ -1045,8 +1049,9 @@ inline Vector<T, Dims> NormalizedHelper(const Vector<T, Dims>& v) {
 /// @param percent Percentage from v1 to v2, usually in the range 0.0...1.0.
 /// @return The lerped mixture of v1 and v2.
 template <class T, int Dims>
-inline Vector<T, Dims> LerpHelper(const Vector<T, Dims>& v1,
-                                  const Vector<T, Dims>& v2, const T percent) {
+constexpr Vector<T, Dims> LerpHelper(const Vector<T, Dims>& v1,
+                                     const Vector<T, Dims>& v2,
+                                     const T percent) {
   MATHFU_VECTOR_OPERATOR(v1[i] + (v2[i] - v1[i]) * percent);
 }
 
@@ -1056,8 +1061,8 @@ inline Vector<T, Dims> LerpHelper(const Vector<T, Dims>& v1,
 /// @param v2 Second vector.
 /// @return Max value of v1 and v2.
 template <class T, int Dims>
-inline Vector<T, Dims> MaxHelper(const Vector<T, Dims>& v1,
-                                 const Vector<T, Dims>& v2) {
+constexpr Vector<T, Dims> MaxHelper(const Vector<T, Dims>& v1,
+                                    const Vector<T, Dims>& v2) {
   Vector<T, Dims> result;
   MATHFU_VECTOR_OPERATION(result[i] = std::max(v1[i], v2[i]));
   return result;
@@ -1069,8 +1074,8 @@ inline Vector<T, Dims> MaxHelper(const Vector<T, Dims>& v1,
 /// @param v2 Second vector.
 /// @return Min value of v1 and v2.
 template <class T, int Dims>
-inline Vector<T, Dims> MinHelper(const Vector<T, Dims>& v1,
-                                 const Vector<T, Dims>& v2) {
+constexpr Vector<T, Dims> MinHelper(const Vector<T, Dims>& v1,
+                                    const Vector<T, Dims>& v2) {
   Vector<T, Dims> result;
   MATHFU_VECTOR_OPERATION(result[i] = std::min(v1[i], v2[i]));
   return result;
@@ -1137,8 +1142,8 @@ bool InRange(const Vector<T, Dims>& val, const Vector<T, Dims>& range_start,
 /// @param onto The vector to project onto. Must be non-zero.
 /// @return The vector projection of v onto onto.
 template <class T, int Dims>
-inline Vector<T, Dims> ProjectHelper(const Vector<T, Dims>& v,
-                                     const Vector<T, Dims>& onto) {
+constexpr Vector<T, Dims> ProjectHelper(const Vector<T, Dims>& v,
+                                        const Vector<T, Dims>& onto) {
   return onto * (DotProductHelper(v, onto) / DotProductHelper(onto, onto));
 }
 
@@ -1149,8 +1154,8 @@ inline Vector<T, Dims> ProjectHelper(const Vector<T, Dims>& v,
 /// @param from The vector to reject from. Must be non-zero.
 /// @return The vector rejection of v from from.
 template <class T, int Dims>
-inline Vector<T, Dims> RejectHelper(const Vector<T, Dims>& v,
-                                    const Vector<T, Dims>& from) {
+constexpr Vector<T, Dims> RejectHelper(const Vector<T, Dims>& v,
+                                       const Vector<T, Dims>& from) {
   return v - ProjectHelper(v, from);
 }
 
@@ -1161,8 +1166,8 @@ inline Vector<T, Dims> RejectHelper(const Vector<T, Dims>& v,
 /// @return The reflected direction.
 /// Matches GLSL reflect() semantics.
 template <class T, int Dims>
-inline Vector<T, Dims> ReflectHelper(const Vector<T, Dims>& incident,
-                                     const Vector<T, Dims>& normal) {
+constexpr Vector<T, Dims> ReflectHelper(const Vector<T, Dims>& incident,
+                                        const Vector<T, Dims>& normal) {
   return incident
          - normal * (T(2) * Vector<T, Dims>::DotProduct(incident, normal));
 }
@@ -1210,8 +1215,8 @@ bool InRange2D(const Vector<T, 2>& val, const Vector<T, 2>& range_start,
 /// @return The dot product of v1 and v2.
 /// @related Vector
 template <class T, int Dims>
-static inline T DotProductHelper(const Vector<T, Dims>& v1,
-                                 const Vector<T, Dims>& v2) {
+static constexpr T DotProductHelper(const Vector<T, Dims>& v1,
+                                    const Vector<T, Dims>& v2) {
   T result = T(0);
   MATHFU_VECTOR_OPERATION(result += v1[i] * v2[i]);
   return result;
@@ -1220,24 +1225,24 @@ static inline T DotProductHelper(const Vector<T, Dims>& v1,
 
 /// @cond MATHFU_INTERNAL
 template <class T>
-static inline T DotProductHelper(const Vector<T, 2>& v1,
-                                 const Vector<T, 2>& v2) {
+static constexpr T DotProductHelper(const Vector<T, 2>& v1,
+                                    const Vector<T, 2>& v2) {
   return v1[0] * v2[0] + v1[1] * v2[1];
 }
 /// @endcond
 
 /// @cond MATHFU_INTERNAL
 template <class T>
-static inline T DotProductHelper(const Vector<T, 3>& v1,
-                                 const Vector<T, 3>& v2) {
+static constexpr T DotProductHelper(const Vector<T, 3>& v1,
+                                    const Vector<T, 3>& v2) {
   return v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2];
 }
 /// @endcond
 
 /// @cond MATHFU_INTERNAL
 template <class T>
-static inline T DotProductHelper(const Vector<T, 4>& v1,
-                                 const Vector<T, 4>& v2) {
+static constexpr T DotProductHelper(const Vector<T, 4>& v1,
+                                    const Vector<T, 4>& v2) {
   return v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2] + v1[3] * v2[3];
 }
 /// @endcond
@@ -1283,7 +1288,7 @@ static inline CompatibleT ToTypeHelper(const Vector<T, Dims>& v) {
 /// @param v2 Vector to multiply.
 /// @return Scalar dot product result.
 template <class T, int d>
-inline T dot(const Vector<T, d>& v1, const Vector<T, d>& v2) {
+constexpr T dot(const Vector<T, d>& v1, const Vector<T, d>& v2) {
   return Vector<T, d>::DotProduct(v1, v2);
 }
 
@@ -1293,7 +1298,7 @@ inline T dot(const Vector<T, d>& v1, const Vector<T, d>& v2) {
 /// @param v2 Vector to multiply.
 /// @return 3-dimensional vector that contains the result.
 template <class T>
-inline Vector<T, 3> cross(const Vector<T, 3>& v1, const Vector<T, 3>& v2) {
+constexpr Vector<T, 3> cross(const Vector<T, 3>& v1, const Vector<T, 3>& v2) {
   return Vector<T, 3>::CrossProduct(v1, v2);
 }
 
@@ -1303,7 +1308,7 @@ inline Vector<T, 3> cross(const Vector<T, 3>& v1, const Vector<T, 3>& v2) {
 /// @param v2 Second vector.
 /// @return Scalar cross product result.
 template <class T>
-inline T cross(const Vector<T, 2>& v1, const Vector<T, 2>& v2) {
+constexpr T cross(const Vector<T, 2>& v1, const Vector<T, 2>& v2) {
   return Vector<T, 2>::CrossProduct(v1, v2);
 }
 
@@ -1323,7 +1328,7 @@ inline Vector<T, d> normalize(const Vector<T, d>& v) {
 
 /// @brief Specialized version of RoundUpToPowerOf2 for vector.
 template <typename T, int Dims>
-inline Vector<T, Dims> RoundUpToPowerOf2(const Vector<T, Dims>& v) {
+constexpr Vector<T, Dims> RoundUpToPowerOf2(const Vector<T, Dims>& v) {
   Vector<T, Dims> ret;
   MATHFU_VECTOR_OPERATION(ret(i) = RoundUpToPowerOf2(v(i)));
   return ret;
@@ -1331,9 +1336,9 @@ inline Vector<T, Dims> RoundUpToPowerOf2(const Vector<T, Dims>& v) {
 
 /// @brief Specialized version of Clamp for vector.
 template <typename T, int Dims>
-inline Vector<T, Dims> Clamp(const Vector<T, Dims>& x,
-                             const Vector<T, Dims>& lower,
-                             const Vector<T, Dims>& upper) {
+constexpr Vector<T, Dims> Clamp(const Vector<T, Dims>& x,
+                                const Vector<T, Dims>& lower,
+                                const Vector<T, Dims>& upper) {
   return Vector<T, Dims>::Max(lower, Vector<T, Dims>::Min(x, upper));
 }
 
@@ -1343,8 +1348,8 @@ inline Vector<T, Dims> Clamp(const Vector<T, Dims>& x,
 /// @param onto The vector to project onto. Must be non-zero.
 /// @return The vector projection of v onto onto.
 template <class T, int Dims>
-inline Vector<T, Dims> Project(const Vector<T, Dims>& v,
-                               const Vector<T, Dims>& onto) {
+constexpr Vector<T, Dims> Project(const Vector<T, Dims>& v,
+                                  const Vector<T, Dims>& onto) {
   return Vector<T, Dims>::Project(v, onto);
 }
 
@@ -1355,8 +1360,8 @@ inline Vector<T, Dims> Project(const Vector<T, Dims>& v,
 /// @param from The vector to reject from. Must be non-zero.
 /// @return The vector rejection of v from from.
 template <class T, int Dims>
-inline Vector<T, Dims> Reject(const Vector<T, Dims>& v,
-                              const Vector<T, Dims>& from) {
+constexpr Vector<T, Dims> Reject(const Vector<T, Dims>& v,
+                                 const Vector<T, Dims>& from) {
   return Vector<T, Dims>::Reject(v, from);
 }
 /// @}

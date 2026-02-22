@@ -67,9 +67,9 @@ struct Frustum {
   /// @param right_plane The right clipping plane.
   /// @param top_plane The top clipping plane.
   /// @param bottom_plane The bottom clipping plane.
-  inline Frustum(const Plane<T>& near_plane, const Plane<T>& far_plane,
-                 const Plane<T>& left_plane, const Plane<T>& right_plane,
-                 const Plane<T>& top_plane, const Plane<T>& bottom_plane) {
+  constexpr Frustum(const Plane<T>& near_plane, const Plane<T>& far_plane,
+                    const Plane<T>& left_plane, const Plane<T>& right_plane,
+                    const Plane<T>& top_plane, const Plane<T>& bottom_plane) {
     planes[kNear] = near_plane;
     planes[kFar] = far_plane;
     planes[kLeft] = left_plane;
@@ -133,7 +133,7 @@ struct Frustum {
   ///
   /// @param point The point to test.
   /// @return true if the point is inside or on the boundary of the frustum.
-  inline bool ContainsPoint(const Vector<T, 3>& point) const {
+  constexpr bool ContainsPoint(const Vector<T, 3>& point) const {
     for (int i = 0; i < kPlaneCount; ++i) {
       if (planes[i].SignedDistance(point) < static_cast<T>(0)) {
         return false;
@@ -151,7 +151,7 @@ struct Frustum {
   ///
   /// @param aabb The axis-aligned bounding box to test.
   /// @return true if the AABB intersects or is inside the frustum.
-  inline bool IntersectsAABB(const AABB<T, 3>& aabb) const {
+  constexpr bool IntersectsAABB(const AABB<T, 3>& aabb) const {
     for (int i = 0; i < kPlaneCount; ++i) {
       // Find the positive vertex: for each axis, pick the component of min
       // or max that is most in the direction of the plane normal.
@@ -175,7 +175,7 @@ struct Frustum {
   ///
   /// @param sphere The sphere to test.
   /// @return true if the sphere intersects or is inside the frustum.
-  inline bool IntersectsSphere(const Sphere<T, 3>& sphere) const {
+  constexpr bool IntersectsSphere(const Sphere<T, 3>& sphere) const {
     for (int i = 0; i < kPlaneCount; ++i) {
       if (planes[i].SignedDistance(sphere.center) < -sphere.radius) {
         return false;
@@ -188,7 +188,7 @@ struct Frustum {
   ///
   /// @param p The plane index to retrieve.
   /// @return Const reference to the requested plane.
-  inline const Plane<T>& GetPlane(FrustumPlane p) const { return planes[p]; }
+  constexpr const Plane<T>& GetPlane(FrustumPlane p) const { return planes[p]; }
 
  private:
   /// @brief Create a normalized Plane from raw (a, b, c, d) coefficients.
@@ -211,7 +211,7 @@ struct Frustum {
 /// @param f1 Frustum to be tested.
 /// @param f2 Other frustum to be tested.
 template <class T>
-bool operator==(const Frustum<T>& f1, const Frustum<T>& f2) {
+constexpr bool operator==(const Frustum<T>& f1, const Frustum<T>& f2) {
   for (int i = 0; i < Frustum<T>::kPlaneCount; ++i) {
     if (f1.planes[i] != f2.planes[i]) {
       return false;
@@ -225,7 +225,7 @@ bool operator==(const Frustum<T>& f1, const Frustum<T>& f2) {
 /// @param f1 Frustum to be tested.
 /// @param f2 Other frustum to be tested.
 template <class T>
-bool operator!=(const Frustum<T>& f1, const Frustum<T>& f2) {
+constexpr bool operator!=(const Frustum<T>& f1, const Frustum<T>& f2) {
   return !(f1 == f2);
 }
 

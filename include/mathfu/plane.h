@@ -45,22 +45,23 @@ struct Plane {
   ///
   /// @param normal The normal vector of the plane.
   /// @param distance The signed distance from the origin.
-  inline Plane(const Vector<T, 3>& normal, T distance)
+  constexpr Plane(const Vector<T, 3>& normal, T distance)
       : normal(normal), distance(distance) {}
 
   /// @brief Create a plane from a Vector4 (xyz = normal, w = distance).
   ///
   /// @param v Vector4 where xyz components are the normal and w is the
   ///          signed distance.
-  explicit Plane(const Vector<T, 4>& v) : normal(v.xyz()), distance(v[3]) {}
+  explicit constexpr Plane(const Vector<T, 4>& v)
+      : normal(v.xyz()), distance(v[3]) {}
 
   /// @brief Create a plane through a point with a given normal.
   ///
   /// @param point A point on the plane.
   /// @param normal The normal vector of the plane.
   /// @return A Plane passing through the given point with the given normal.
-  static inline Plane<T> FromPointNormal(const Vector<T, 3>& point,
-                                         const Vector<T, 3>& normal) {
+  static constexpr Plane<T> FromPointNormal(const Vector<T, 3>& point,
+                                            const Vector<T, 3>& normal) {
     return Plane<T>(normal, -Vector<T, 3>::DotProduct(normal, point));
   }
 
@@ -89,7 +90,7 @@ struct Plane {
   ///
   /// @param point The point to compute the distance for.
   /// @return The signed distance from the point to the plane.
-  inline T SignedDistance(const Vector<T, 3>& point) const {
+  constexpr T SignedDistance(const Vector<T, 3>& point) const {
     return Vector<T, 3>::DotProduct(normal, point) + distance;
   }
 
@@ -97,7 +98,7 @@ struct Plane {
   ///
   /// @param point The point to project.
   /// @return The closest point on the plane to the given point.
-  inline Vector<T, 3> ProjectPoint(const Vector<T, 3>& point) const {
+  constexpr Vector<T, 3> ProjectPoint(const Vector<T, 3>& point) const {
     return point - normal * SignedDistance(point);
   }
 
@@ -107,7 +108,7 @@ struct Plane {
   /// opposite facing direction.
   ///
   /// @return A new Plane with negated normal and distance.
-  inline Plane<T> Flipped() const { return Plane<T>(-normal, -distance); }
+  constexpr Plane<T> Flipped() const { return Plane<T>(-normal, -distance); }
 };
 /// @}
 
@@ -116,7 +117,7 @@ struct Plane {
 /// @param p1 Plane to be tested.
 /// @param p2 Other plane to be tested.
 template <class T>
-bool operator==(const Plane<T>& p1, const Plane<T>& p2) {
+constexpr bool operator==(const Plane<T>& p1, const Plane<T>& p2) {
   return (p1.normal == p2.normal && p1.distance == p2.distance);
 }
 
@@ -125,7 +126,7 @@ bool operator==(const Plane<T>& p1, const Plane<T>& p2) {
 /// @param p1 Plane to be tested.
 /// @param p2 Other plane to be tested.
 template <class T>
-bool operator!=(const Plane<T>& p1, const Plane<T>& p2) {
+constexpr bool operator!=(const Plane<T>& p1, const Plane<T>& p2) {
   return !(p1 == p2);
 }
 

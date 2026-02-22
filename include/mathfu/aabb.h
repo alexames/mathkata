@@ -48,7 +48,7 @@ struct AABB {
   ///
   /// @param min Minimum corner of the bounding box.
   /// @param max Maximum corner of the bounding box.
-  inline AABB(const Vector<T, N>& min, const Vector<T, N>& max)
+  constexpr AABB(const Vector<T, N>& min, const Vector<T, N>& max)
       : min(min), max(max) {}
 
   /// @brief Create an AABB from a center point and half-extents.
@@ -57,8 +57,8 @@ struct AABB {
   /// @param extents Half-size vector from center to max corner.
   /// @param tag Unused tag parameter to disambiguate from min/max constructor.
   struct FromCenterExtentsTag {};
-  inline AABB(const Vector<T, N>& center, const Vector<T, N>& extents,
-              FromCenterExtentsTag)
+  constexpr AABB(const Vector<T, N>& center, const Vector<T, N>& extents,
+                 FromCenterExtentsTag)
       : min(center - extents), max(center + extents) {}
 
   /// @brief Create an AABB from a center point and half-extents.
@@ -67,36 +67,36 @@ struct AABB {
   /// @param center Center point of the bounding box.
   /// @param extents Half-size vector from center to max corner.
   /// @return A new AABB constructed from center and extents.
-  static inline AABB<T, N> FromCenterExtents(const Vector<T, N>& center,
-                                             const Vector<T, N>& extents) {
+  static constexpr AABB<T, N> FromCenterExtents(const Vector<T, N>& center,
+                                                const Vector<T, N>& extents) {
     return AABB<T, N>(center - extents, center + extents);
   }
 
   /// @brief Calculate the center point of the bounding box.
   ///
   /// @return The center point as a Vector.
-  inline Vector<T, N> Center() const {
+  constexpr Vector<T, N> Center() const {
     return (min + max) * static_cast<T>(0.5);
   }
 
   /// @brief Calculate the half-size (extents) of the bounding box.
   ///
   /// @return The half-size vector from center to max corner.
-  inline Vector<T, N> Extents() const {
+  constexpr Vector<T, N> Extents() const {
     return (max - min) * static_cast<T>(0.5);
   }
 
   /// @brief Calculate the full size of the bounding box.
   ///
   /// @return The size vector (max - min).
-  inline Vector<T, N> Size() const { return max - min; }
+  constexpr Vector<T, N> Size() const { return max - min; }
 
   /// @brief Test whether a point is contained within the AABB.
   ///
   /// The test is inclusive on all boundaries.
   /// @param point The point to test.
   /// @return true if the point is inside or on the boundary of the AABB.
-  inline bool Contains(const Vector<T, N>& point) const {
+  constexpr bool Contains(const Vector<T, N>& point) const {
     for (int i = 0; i < N; ++i) {
       if (point[i] < min[i] || point[i] > max[i]) {
         return false;
@@ -109,7 +109,7 @@ struct AABB {
   ///
   /// @param other The AABB to test.
   /// @return true if other is entirely inside or on the boundary of this AABB.
-  inline bool Contains(const AABB<T, N>& other) const {
+  constexpr bool Contains(const AABB<T, N>& other) const {
     for (int i = 0; i < N; ++i) {
       if (other.min[i] < min[i] || other.max[i] > max[i]) {
         return false;
@@ -122,7 +122,7 @@ struct AABB {
   ///
   /// @param other The AABB to test for overlap.
   /// @return true if the two AABBs overlap (including touching boundaries).
-  inline bool Intersects(const AABB<T, N>& other) const {
+  constexpr bool Intersects(const AABB<T, N>& other) const {
     for (int i = 0; i < N; ++i) {
       if (other.max[i] < min[i] || other.min[i] > max[i]) {
         return false;
@@ -137,7 +137,7 @@ struct AABB {
   /// in one or more dimensions).
   /// @param other The AABB to intersect with.
   /// @return The intersection AABB.
-  inline AABB<T, N> Intersection(const AABB<T, N>& other) const {
+  constexpr AABB<T, N> Intersection(const AABB<T, N>& other) const {
     return AABB<T, N>(Vector<T, N>::Max(min, other.min),
                       Vector<T, N>::Min(max, other.max));
   }
@@ -146,7 +146,7 @@ struct AABB {
   ///
   /// @param other The AABB to union with.
   /// @return The smallest AABB that contains both this and other.
-  inline AABB<T, N> Union(const AABB<T, N>& other) const {
+  constexpr AABB<T, N> Union(const AABB<T, N>& other) const {
     return AABB<T, N>(Vector<T, N>::Min(min, other.min),
                       Vector<T, N>::Max(max, other.max));
   }
@@ -154,7 +154,7 @@ struct AABB {
   /// @brief Expand this AABB to include a point.
   ///
   /// @param point The point to include.
-  inline void Expand(const Vector<T, N>& point) {
+  constexpr void Expand(const Vector<T, N>& point) {
     min = Vector<T, N>::Min(min, point);
     max = Vector<T, N>::Max(max, point);
   }
@@ -162,7 +162,7 @@ struct AABB {
   /// @brief Expand this AABB to include another AABB.
   ///
   /// @param other The AABB to include.
-  inline void Expand(const AABB<T, N>& other) {
+  constexpr void Expand(const AABB<T, N>& other) {
     min = Vector<T, N>::Min(min, other.min);
     max = Vector<T, N>::Max(max, other.max);
   }
@@ -175,7 +175,7 @@ struct AABB {
 /// @param b Second AABB to compare.
 /// @return true if both min and max corners are equal.
 template <class T, int N>
-inline bool operator==(const AABB<T, N>& a, const AABB<T, N>& b) {
+constexpr bool operator==(const AABB<T, N>& a, const AABB<T, N>& b) {
   return (a.min == b.min && a.max == b.max);
 }
 
@@ -185,7 +185,7 @@ inline bool operator==(const AABB<T, N>& a, const AABB<T, N>& b) {
 /// @param b Second AABB to compare.
 /// @return true if the AABBs differ.
 template <class T, int N>
-inline bool operator!=(const AABB<T, N>& a, const AABB<T, N>& b) {
+constexpr bool operator!=(const AABB<T, N>& a, const AABB<T, N>& b) {
   return !(a == b);
 }
 
