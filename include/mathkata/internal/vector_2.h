@@ -24,12 +24,14 @@ template <class T>
 class Vector<T, 2> {
  public:
   typedef T Scalar;
-  static const int Dims = 2;
-  static const int kDims = 2;
+  static constexpr int Dims = 2;
+  static constexpr int kDims = 2;
 
   constexpr Vector() {}
 
   constexpr Vector(const Vector<T, 2>& v) : x(v.x), y(v.y) {}
+
+  constexpr Vector<T, 2>& operator=(const Vector<T, 2>& v) = default;
 
   explicit constexpr Vector(const VectorPacked<T, 2>& v) : x(v.x), y(v.y) {}
 

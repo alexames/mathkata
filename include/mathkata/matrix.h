@@ -215,6 +215,9 @@ class Matrix {
     MATHKATA_MAT_OPERATION(data_[i] = m.data_[i]);
   }
 
+  constexpr Matrix<T, Rows, Cols>& operator=(const Matrix<T, Rows, Cols>& m) =
+      default;
+
   /// @brief Construct a Matrix from a single float.
   ///
   /// @param s Scalar value used to initialize each element of the matrix.
@@ -959,11 +962,11 @@ class Matrix {
 
   // Dimensions of the matrix.
   /// Number of Rows in the matrix.
-  static const int kRows = Rows;
+  static constexpr int kRows = Rows;
   /// Number of Cols in the matrix.
-  static const int kColumns = Cols;
+  static constexpr int kColumns = Cols;
   /// Total number of elements in the matrix.
-  static const int kElements = Rows * Cols;
+  static constexpr int kElements = Rows * Cols;
 
   /// @brief Access the underlying column data array.
   ///
@@ -1737,7 +1740,7 @@ static inline Matrix<T, Rows, Cols> FromTypeHelper(
   VectorPacked<T, Rows> packed[Cols];
   static_assert(sizeof(compatible) == sizeof(packed),
                 "Conversion size mismatch.");
-  std::memcpy(packed, &compatible, sizeof(packed));
+  std::memcpy(static_cast<void*>(packed), &compatible, sizeof(packed));
   return Matrix<T, Rows, Cols>(packed);
 }
 /// @endcond
@@ -1753,7 +1756,7 @@ static inline CompatibleT ToTypeHelper(const Matrix<T, Rows, Cols>& m) {
                 "Conversion size mismatch.");
   m.Pack(packed);
   CompatibleT compatible;
-  std::memcpy(&compatible, packed, sizeof(packed));
+  std::memcpy(&compatible, static_cast<const void*>(packed), sizeof(packed));
   return compatible;
 }
 /// @endcond

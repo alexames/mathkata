@@ -38,7 +38,7 @@ template <>
 class Vector<float, 4> {
  public:
   typedef float Scalar;
-  static const int kDims = 4;
+  static constexpr int kDims = 4;
 
   /// @brief Create an uninitialized Vector.
   ///
@@ -48,6 +48,11 @@ class Vector<float, 4> {
   inline Vector() {}
 
   inline Vector(const Vector<float, 4>& v) { simd4 = v.simd4; }
+
+  inline Vector<float, 4>& operator=(const Vector<float, 4>& v) {
+    simd4 = v.simd4;
+    return *this;
+  }
 
   explicit inline Vector(const Vector<int, 4>& v) {
     data_[0] = static_cast<float>(v[0]);

@@ -72,7 +72,7 @@ template <>
 class Vector<float, 3> {
  public:
   typedef float Scalar;
-  static const int kDims = 3;
+  static constexpr int kDims = 3;
 
   /// @brief Create an uninitialized Vector.
   ///
@@ -87,6 +87,15 @@ class Vector<float, 3> {
 #else
     MATHKATA_VECTOR3_INIT3(*this, v[0], v[1], v[2])
 #endif  // MATHKATA_COMPILE_WITH_PADDING
+  }
+
+  inline Vector<float, 3>& operator=(const Vector<float, 3>& v) {
+#ifdef MATHKATA_COMPILE_WITH_PADDING
+    simd3 = v.simd3;
+#else
+    MATHKATA_VECTOR3_INIT3(*this, v[0], v[1], v[2])
+#endif  // MATHKATA_COMPILE_WITH_PADDING
+    return *this;
   }
 
   explicit inline Vector(const Vector<int, 3>& v) {

@@ -187,7 +187,7 @@ class Vector {
   /// @brief Element type to enable reference by other classes.
   typedef T Scalar;
   /// @brief The number of dimensions in this Vector.
-  static const int kDims = Dims;
+  static constexpr int kDims = Dims;
 
   /// @brief Create an uninitialized Vector.
   ///
@@ -202,6 +202,8 @@ class Vector {
   constexpr Vector(const Vector<T, Dims>& v) {
     MATHKATA_VECTOR_OPERATION(data_[i] = v.data_[i]);
   }
+
+  constexpr Vector<T, Dims>& operator=(const Vector<T, Dims>& v) = default;
 
   /// @brief Create a vector from another vector of a different type.
   ///
@@ -1256,7 +1258,7 @@ static inline Vector<T, Dims> FromTypeHelper(const CompatibleT& compatible) {
   VectorPacked<T, Dims> packed;
   static_assert(sizeof(compatible) == sizeof(packed),
                 "Conversion size mismatch.");
-  std::memcpy(&packed, &compatible, sizeof(packed));
+  std::memcpy(static_cast<void*>(&packed), &compatible, sizeof(packed));
   return Vector<T, Dims>(packed);
 }
 /// @endcond
@@ -1272,7 +1274,7 @@ static inline CompatibleT ToTypeHelper(const Vector<T, Dims>& v) {
                 "Conversion size mismatch.");
   v.Pack(&packed);
   CompatibleT compatible;
-  std::memcpy(&compatible, &packed, sizeof(packed));
+  std::memcpy(&compatible, static_cast<const void*>(&packed), sizeof(packed));
   return compatible;
 }
 /// @endcond

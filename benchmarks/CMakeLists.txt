@@ -23,7 +23,7 @@ function(benchmark_executable benchmark_executable_name benchmark_source)
   target_include_directories(${benchmark_executable_name}
     PRIVATE ${CMAKE_CURRENT_LIST_DIR})
   if(UNIX AND NOT APPLE)
-    target_link_libraries(${benchmark_executable_name} rt)
+    target_link_libraries(${benchmark_executable_name} PRIVATE rt)
   endif(UNIX AND NOT APPLE)
 endfunction()
 
