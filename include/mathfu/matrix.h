@@ -16,8 +16,7 @@
 #ifndef MATHFU_MATRIX_H_
 #define MATHFU_MATRIX_H_
 
-#include <assert.h>
-
+#include <cassert>
 #include <cmath>
 #include <cstring>
 
@@ -44,10 +43,8 @@
 #pragma warning(disable : 4127)  // conditional expression is constant
 #pragma warning(disable : 4100)  // unreferenced formal parameter
 #pragma warning(disable : 4789)  // buffer overrun
-#if _MSC_VER >= 1900             // MSVC 2015
 #pragma warning(disable : 4456)  // allow shadowing in unrolled loops
 #pragma warning(disable : 4723)  // suppress "potential divide by 0" warning
-#endif                           // _MSC_VER >= 1900
 #endif                           // _MSC_VER
 
 /// @cond MATHFU_INTERNAL

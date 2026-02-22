@@ -17,6 +17,7 @@
 
 #include <cmath>
 #include <cstdio>
+#include <numbers>
 
 #include "gtest/gtest.h"
 #include "mathfu/constants.h"
@@ -133,8 +134,8 @@ TEST_FRUSTUM_F(FromViewProjectionOrtho)
 // Test: FromViewProjection with a perspective matrix.
 template <class T>
 void FromViewProjectionPerspective_Test(T precision) {
-  const T fovy = static_cast<T>(M_PI) / static_cast<T>(2);  // 90 degrees
-  const T aspect = static_cast<T>(1);                       // Square viewport
+  const T fovy = std::numbers::pi_v<T> / static_cast<T>(2);  // 90 degrees
+  const T aspect = static_cast<T>(1);                        // Square viewport
   const T near_val = static_cast<T>(1);
   const T far_val = static_cast<T>(100);
 
@@ -394,7 +395,7 @@ TEST_FRUSTUM_F(GetPlane)
 template <class T>
 void PerspectiveCulling_Test(T /*precision*/) {
   // 90-degree FOV, aspect 16:9, near=0.1, far=1000
-  const T fovy = static_cast<T>(M_PI) / static_cast<T>(2);
+  const T fovy = std::numbers::pi_v<T> / static_cast<T>(2);
   const T aspect = static_cast<T>(16) / static_cast<T>(9);
   const T near_val = static_cast<T>(0.1);
   const T far_val = static_cast<T>(1000);

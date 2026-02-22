@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <math.h>
-#include <stdio.h>
-
+#include <cmath>
+#include <cstdio>
 #include <random>
 
 #include "benchmark_common.h"

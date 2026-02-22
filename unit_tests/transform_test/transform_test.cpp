@@ -16,13 +16,10 @@
 #include "mathfu/transform.h"
 
 #include <cmath>
+#include <numbers>
 
 #include "gtest/gtest.h"
 #include "precision.h"
-
-#ifndef M_PI
-#define M_PI 3.14159265358979323846
-#endif
 
 namespace {
 
@@ -97,7 +94,7 @@ template <class T>
 void PositionRotationConstruction_Test(T precision) {
   mathfu::Vector<T, 3> pos(T(4), T(5), T(6));
   mathfu::Quaternion<T> rot = mathfu::Quaternion<T>::FromAngleAxis(
-      static_cast<T>(M_PI / 4), mathfu::Vector<T, 3>(T(0), T(1), T(0)));
+      std::numbers::pi_v<T> / 4, mathfu::Vector<T, 3>(T(0), T(1), T(0)));
   mathfu::Transform<T> t(pos, rot);
   EXPECT_TRUE(NearVector(t.position, pos, precision));
   EXPECT_EQ(t.rotation, rot);
@@ -111,7 +108,7 @@ template <class T>
 void FullConstruction_Test(T precision) {
   mathfu::Vector<T, 3> pos(T(1), T(2), T(3));
   mathfu::Quaternion<T> rot = mathfu::Quaternion<T>::FromAngleAxis(
-      static_cast<T>(M_PI / 2), mathfu::Vector<T, 3>(T(0), T(0), T(1)));
+      std::numbers::pi_v<T> / 2, mathfu::Vector<T, 3>(T(0), T(0), T(1)));
   mathfu::Vector<T, 3> scl(T(2), T(3), T(4));
   mathfu::Transform<T> t(pos, rot, scl);
   EXPECT_TRUE(NearVector(t.position, pos, precision));
@@ -125,7 +122,7 @@ template <class T>
 void ToMatrix_Test(T precision) {
   mathfu::Vector<T, 3> pos(T(10), T(20), T(30));
   mathfu::Quaternion<T> rot = mathfu::Quaternion<T>::FromAngleAxis(
-      static_cast<T>(M_PI / 2), mathfu::Vector<T, 3>(T(0), T(1), T(0)));
+      std::numbers::pi_v<T> / 2, mathfu::Vector<T, 3>(T(0), T(1), T(0)));
   mathfu::Vector<T, 3> scl(T(2), T(3), T(4));
   mathfu::Transform<T> t(pos, rot, scl);
 
@@ -144,7 +141,7 @@ void TransformPoint_Test(T precision) {
   // and translates by (10, 0, 0).
   mathfu::Vector<T, 3> pos(T(10), T(0), T(0));
   mathfu::Quaternion<T> rot = mathfu::Quaternion<T>::FromAngleAxis(
-      static_cast<T>(M_PI / 2), mathfu::Vector<T, 3>(T(0), T(0), T(1)));
+      std::numbers::pi_v<T> / 2, mathfu::Vector<T, 3>(T(0), T(0), T(1)));
   mathfu::Vector<T, 3> scl(T(2), T(1), T(1));
   mathfu::Transform<T> t(pos, rot, scl);
 
@@ -165,7 +162,7 @@ template <class T>
 void TransformDirection_Test(T precision) {
   mathfu::Vector<T, 3> pos(T(100), T(200), T(300));
   mathfu::Quaternion<T> rot = mathfu::Quaternion<T>::FromAngleAxis(
-      static_cast<T>(M_PI / 2), mathfu::Vector<T, 3>(T(0), T(0), T(1)));
+      std::numbers::pi_v<T> / 2, mathfu::Vector<T, 3>(T(0), T(0), T(1)));
   mathfu::Vector<T, 3> scl(T(2), T(1), T(1));
   mathfu::Transform<T> t(pos, rot, scl);
 
@@ -186,7 +183,7 @@ template <class T>
 void Inverse_Test(T precision) {
   mathfu::Vector<T, 3> pos(T(3), T(-1), T(7));
   mathfu::Quaternion<T> rot = mathfu::Quaternion<T>::FromAngleAxis(
-      static_cast<T>(M_PI / 3), mathfu::Vector<T, 3>(T(0), T(1), T(0)));
+      std::numbers::pi_v<T> / 3, mathfu::Vector<T, 3>(T(0), T(1), T(0)));
   mathfu::Vector<T, 3> scl(T(2), T(2), T(2));
   mathfu::Transform<T> t(pos, rot, scl);
 
@@ -219,7 +216,7 @@ template <class T>
 void InversePointRoundTrip_Test(T precision) {
   mathfu::Vector<T, 3> pos(T(5), T(-2), T(8));
   mathfu::Quaternion<T> rot = mathfu::Quaternion<T>::FromAngleAxis(
-      static_cast<T>(M_PI / 6), mathfu::Vector<T, 3>(T(1), T(0), T(0)));
+      std::numbers::pi_v<T> / 6, mathfu::Vector<T, 3>(T(1), T(0), T(0)));
   mathfu::Vector<T, 3> scl(T(3), T(3), T(3));
   mathfu::Transform<T> t(pos, rot, scl);
   mathfu::Transform<T> inv = t.Inverse();
@@ -239,7 +236,7 @@ template <class T>
 void InverseUnitScale_Test(T precision) {
   mathfu::Vector<T, 3> pos(T(10), T(-5), T(3));
   mathfu::Quaternion<T> rot = mathfu::Quaternion<T>::FromAngleAxis(
-      static_cast<T>(M_PI / 4),
+      std::numbers::pi_v<T> / 4,
       mathfu::Vector<T, 3>(T(1), T(1), T(0)).Normalized());
   mathfu::Transform<T> t(pos, rot);
   mathfu::Transform<T> inv = t.Inverse();
@@ -260,7 +257,7 @@ void Composition_Test(T precision) {
   // Create two transforms and compose them.
   mathfu::Vector<T, 3> pos1(T(1), T(0), T(0));
   mathfu::Quaternion<T> rot1 = mathfu::Quaternion<T>::FromAngleAxis(
-      static_cast<T>(M_PI / 2), mathfu::Vector<T, 3>(T(0), T(0), T(1)));
+      std::numbers::pi_v<T> / 2, mathfu::Vector<T, 3>(T(0), T(0), T(1)));
   mathfu::Transform<T> t1(pos1, rot1);
 
   mathfu::Vector<T, 3> pos2(T(0), T(1), T(0));
@@ -290,13 +287,13 @@ template <class T>
 void CompositionMatchesMatrix_Test(T precision) {
   mathfu::Vector<T, 3> pos1(T(2), T(-1), T(3));
   mathfu::Quaternion<T> rot1 = mathfu::Quaternion<T>::FromAngleAxis(
-      static_cast<T>(M_PI / 4), mathfu::Vector<T, 3>(T(0), T(1), T(0)));
+      std::numbers::pi_v<T> / 4, mathfu::Vector<T, 3>(T(0), T(1), T(0)));
   mathfu::Vector<T, 3> scl1(T(2), T(2), T(2));
   mathfu::Transform<T> t1(pos1, rot1, scl1);
 
   mathfu::Vector<T, 3> pos2(T(-1), T(0), T(5));
   mathfu::Quaternion<T> rot2 = mathfu::Quaternion<T>::FromAngleAxis(
-      static_cast<T>(M_PI / 6), mathfu::Vector<T, 3>(T(1), T(0), T(0)));
+      std::numbers::pi_v<T> / 6, mathfu::Vector<T, 3>(T(1), T(0), T(0)));
   mathfu::Vector<T, 3> scl2(T(3), T(3), T(3));
   mathfu::Transform<T> t2(pos2, rot2, scl2);
 
@@ -331,7 +328,7 @@ void Equality_Test(T precision) {
   (void)precision;
   mathfu::Vector<T, 3> pos(T(1), T(2), T(3));
   mathfu::Quaternion<T> rot = mathfu::Quaternion<T>::FromAngleAxis(
-      static_cast<T>(M_PI / 4), mathfu::Vector<T, 3>(T(0), T(1), T(0)));
+      std::numbers::pi_v<T> / 4, mathfu::Vector<T, 3>(T(0), T(1), T(0)));
   mathfu::Vector<T, 3> scl(T(2), T(3), T(4));
 
   mathfu::Transform<T> t1(pos, rot, scl);

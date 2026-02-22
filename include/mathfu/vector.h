@@ -16,8 +16,6 @@
 #ifndef MATHFU_VECTOR_H_
 #define MATHFU_VECTOR_H_
 
-#include <math.h>
-
 #include <cmath>
 #include <cstring>
 
@@ -32,9 +30,7 @@
 #pragma warning(push)
 #pragma warning(disable : 4127)  // conditional expression is constant
 #pragma warning(disable : 4100)  // unreferenced formal parameter
-#if _MSC_VER >= 1900             // MSVC 2015
 #pragma warning(disable : 4456)  // allow shadowing in unrolled loops
-#endif                           // _MSC_VER >= 1900
 #endif
 #if defined(__clang__)
 #pragma clang diagnostic push

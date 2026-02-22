@@ -16,13 +16,13 @@
 #ifndef MATHFU_UTILITIES_H_
 #define MATHFU_UTILITIES_H_
 
-#include <assert.h>
-#include <math.h>
-#include <stdint.h>
-#include <stdlib.h>
-
 #include <algorithm>
+#include <cassert>
 #include <climits>
+#include <cmath>
+#include <concepts>
+#include <cstdint>
+#include <cstdlib>
 #include <memory>
 #include <type_traits>
 
@@ -307,9 +307,8 @@ bool InRange(T val, T range_start, T range_end) {
 ///
 /// @param x Value to round up. Must be non-negative for signed types.
 /// @returns Value rounded up to the nearest power of 2.
-template <class T>
-typename std::enable_if<std::is_integral<T>::value, T>::type RoundUpToPowerOf2(
-    T x) {
+template <std::integral T>
+T RoundUpToPowerOf2(T x) {
   // Use unsigned arithmetic to avoid undefined behavior with signed shifts.
   typedef typename std::make_unsigned<T>::type U;
   if (x <= 1) return x;
@@ -335,9 +334,8 @@ typename std::enable_if<std::is_integral<T>::value, T>::type RoundUpToPowerOf2(
 ///
 /// @param x Value to round up. Must be non-negative.
 /// @returns Value rounded up to the nearest power of 2.
-template <class T>
-typename std::enable_if<std::is_floating_point<T>::value, T>::type
-RoundUpToPowerOf2(T x) {
+template <std::floating_point T>
+T RoundUpToPowerOf2(T x) {
   if (x <= 0) return x;
   return static_cast<T>(
       pow(static_cast<T>(2), ceil(log(x) / log(static_cast<T>(2)))));
@@ -389,27 +387,14 @@ size_t RoundUpToTypeBoundary(size_t v) {
 /// bytes.
 ///
 /// @param n Size of memory to allocate.
-/// @return Pointer to aligned block of allocated memory or NULL if
+/// @return Pointer to aligned block of allocated memory or nullptr if
 /// allocation failed.
 inline void *AllocateAligned(size_t n) {
-#if defined(_MSC_VER) && _MSC_VER >= 1900  // MSVC 2015
+#if defined(_MSC_VER)
   return _aligned_malloc(n, MATHFU_ALIGNMENT);
 #else
-  // We need to allocate extra bytes to guarantee alignment,
-  // and to store the pointer to the original buffer.
-  uint8_t *buf = reinterpret_cast<uint8_t *>(malloc(n + MATHFU_ALIGNMENT));
-  if (!buf) return NULL;
-  // Align to next higher multiple of MATHFU_ALIGNMENT.
-  uint8_t *aligned_buf = reinterpret_cast<uint8_t *>(
-      (reinterpret_cast<size_t>(buf) + MATHFU_ALIGNMENT)
-      & ~(MATHFU_ALIGNMENT - 1));
-  // Write out original buffer pointer before aligned buffer.
-  // The assert will fail if the allocator granularity is less than the pointer
-  // size, or if MATHFU_ALIGNMENT doesn't fit two pointers.
-  assert(static_cast<size_t>(aligned_buf - buf) >= sizeof(void *));
-  *(reinterpret_cast<uint8_t **>(aligned_buf) - 1) = buf;
-  return aligned_buf;
-#endif  // defined(_MSC_VER) && _MSC_VER >= 1900 // MSVC 2015
+  return std::aligned_alloc(MATHFU_ALIGNMENT, n);
+#endif
 }
 
 /// @brief Deallocate a block of memory allocated with AllocateAligned().
@@ -417,12 +402,11 @@ inline void *AllocateAligned(size_t n) {
 ///
 /// @param p Pointer to memory to deallocate.
 inline void FreeAligned(void *p) {
-#if defined(_MSC_VER) && _MSC_VER >= 1900  // MSVC 2015
+#if defined(_MSC_VER)
   _aligned_free(p);
 #else
-  if (p == NULL) return;
-  free(*(reinterpret_cast<uint8_t **>(p) - 1));
-#endif  // defined(_MSC_VER) && _MSC_VER >= 1900 // MSVC 2015
+  std::free(p);
+#endif
 }
 
 /// @brief SIMD-safe memory allocator, for use with STL types like std::vector.
