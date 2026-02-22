@@ -1,0 +1,5 @@
+{
+  "name": "mathfu",
+  "version": "2.0.0",
+  "dependencies": ["gtest"]
+}
