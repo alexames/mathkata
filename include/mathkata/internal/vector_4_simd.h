@@ -38,7 +38,7 @@ template <>
 class Vector<float, 4> {
  public:
   typedef float Scalar;
-  static const int kDims = 4;
+  static constexpr int kDims = 4;
 
   /// @brief Create an uninitialized Vector.
   ///

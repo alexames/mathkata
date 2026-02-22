@@ -962,11 +962,11 @@ class Matrix {
 
   // Dimensions of the matrix.
   /// Number of Rows in the matrix.
-  static const int kRows = Rows;
+  static constexpr int kRows = Rows;
   /// Number of Cols in the matrix.
-  static const int kColumns = Cols;
+  static constexpr int kColumns = Cols;
   /// Total number of elements in the matrix.
-  static const int kElements = Rows * Cols;
+  static constexpr int kElements = Rows * Cols;
 
   /// @brief Access the underlying column data array.
   ///

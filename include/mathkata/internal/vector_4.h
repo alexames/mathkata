@@ -25,8 +25,8 @@ template <class T>
 class Vector<T, 4> {
  public:
   typedef T Scalar;
-  static const int Dims = 4;
-  static const int kDims = 4;
+  static constexpr int Dims = 4;
+  static constexpr int kDims = 4;
 
   constexpr Vector() {}
 
