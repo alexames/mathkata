@@ -140,6 +140,38 @@ void ConstAccessor_Test(const T& precision) {
 }
 TEST_ALL_F(ConstAccessor)
 
+// Test reading and writing elements via operator[].
+// Index 0 maps to the scalar (s_), indices 1-3 map to the vector (v_[0-2]).
+template <class T>
+void MutableAccessor_Test(const T& precision) {
+  (void)precision;
+  mathfu::Quaternion<T> quaternion(static_cast<T>(0.50), static_cast<T>(0.76),
+                                   static_cast<T>(0.38), static_cast<T>(0.19));
+
+  // Verify reading via operator[] matches the scalar and vector accessors.
+  EXPECT_EQ(quaternion.scalar(), quaternion[0]);
+  EXPECT_EQ(quaternion.vector()[0], quaternion[1]);
+  EXPECT_EQ(quaternion.vector()[1], quaternion[2]);
+  EXPECT_EQ(quaternion.vector()[2], quaternion[3]);
+
+  // Modify the scalar component via operator[].
+  quaternion[0] = static_cast<T>(1.0);
+  EXPECT_EQ(static_cast<T>(1.0), quaternion[0]);
+  EXPECT_EQ(static_cast<T>(1.0), quaternion.scalar());
+
+  // Modify vector components via operator[].
+  quaternion[1] = static_cast<T>(2.0);
+  quaternion[2] = static_cast<T>(3.0);
+  quaternion[3] = static_cast<T>(4.0);
+  EXPECT_EQ(static_cast<T>(2.0), quaternion[1]);
+  EXPECT_EQ(static_cast<T>(3.0), quaternion[2]);
+  EXPECT_EQ(static_cast<T>(4.0), quaternion[3]);
+  EXPECT_EQ(static_cast<T>(2.0), quaternion.vector()[0]);
+  EXPECT_EQ(static_cast<T>(3.0), quaternion.vector()[1]);
+  EXPECT_EQ(static_cast<T>(4.0), quaternion.vector()[2]);
+}
+TEST_ALL_F(MutableAccessor)
+
 // Test equality operator for quaternions.
 template <class T>
 void Equality_Test(const T& precision) {
@@ -372,13 +404,13 @@ void Mult_Test(const T& precision) {
   // of the rotations.
   (qaa1 * qaa2).ToAngleAxis(&convertedAngle, &convertedAxis);
   EXPECT_NEAR(angle1 + angle2, convertedAngle, precision);
-  // This will verify that scaling a quaternion's angle corresponds to scaling
-  // the rotation.
+  // This will verify that ScaleAngle on a quaternion corresponds
+  // to scaling the rotation.
   qaa1.ScaleAngle(2).ToAngleAxis(&convertedAngle, &convertedAxis);
   EXPECT_NEAR(angle1 * 2, convertedAngle, precision);
   mathfu::Vector<T, 3> v(3.5f, 6.4f, 7.0f);
   mathfu::Vector<T, 4> v4(3.5f, 6.4f, 7.0f, 0.0f);
-  // This will verify that rotating a vector corresponds to applying
+  // This will verify that multiplying by a vector corresponds to applying
   // the rotation to that vector.
   mathfu::Vector<T, 3> quatRotatedV(qaa1.Rotate(v));
   mathfu::Vector<T, 3> matRotatedV(qaa1.ToMatrix() * v);
@@ -404,40 +436,82 @@ void Mult_Test(const T& precision) {
 }
 TEST_ALL_F(Mult)
 
-// This tests that ScaleAngle changes the direction of the quat to keep it
-// in the "small" hemisphere, before doing the scaling.  This makes
-// scalar factors < 1 act intuitively, at the cost of sometimes making
-// the operation non-associative for scale factors > 1.
+// This tests that quat * scalar performs component-wise scaling, and is
+// therefore associative and commutative with respect to real-number
+// multiplication.
 template <class T>
-void ScaleAngleFlipsQuat_Test(const T& precision) {
+void MultQuatScalarComponentWise_Test(const T& precision) {
+  (void)precision;
+  using Quaternion = mathfu::Quaternion<T>;
+  const double epsilon = 1e-5;
+
+  const Quaternion q(static_cast<T>(1), static_cast<T>(2), static_cast<T>(3),
+                     static_cast<T>(4));
+
+  // Component-wise scaling.
+  const Quaternion expected(static_cast<T>(3), static_cast<T>(6),
+                            static_cast<T>(9), static_cast<T>(12));
+  EXPECT_NEAR_QUAT(expected, q * static_cast<T>(3), epsilon);
+
+  // Commutativity: q * s == s * q.
+  EXPECT_NEAR_QUAT(q * static_cast<T>(3), static_cast<T>(3) * q, epsilon);
+
+  // Associativity: (q * a) * b == q * (a * b).
+  EXPECT_NEAR_QUAT((q * static_cast<T>(2)) * static_cast<T>(3),
+                   q * static_cast<T>(6), epsilon);
+
+  // operator*= consistency.
+  Quaternion q_mut = q;
+  q_mut *= static_cast<T>(3);
+  EXPECT_NEAR_QUAT(expected, q_mut, epsilon);
+}
+TEST_ALL_F(MultQuatScalarComponentWise)
+
+// This tests that ScaleAngle preserves the old angle-scaling behavior.
+template <class T>
+void ScaleAngle_Test(const T& precision) {
   (void)precision;
   using Quaternion = mathfu::Quaternion<T>;
   using Vector3 = mathfu::Vector<T, 3>;
-  const Vector3 up(0, 1, 0);
   const double epsilon = 1e-5;
+  const Vector3 up(0, 1, 0);
 
-  // Test the flipping behavior directly.
+  // ScaleAngle(1) on a big quaternion should condition it to the short path.
   const Quaternion bigQuat =
       Quaternion::FromAngleAxis(static_cast<T>(mathfu::kPi * 1.5), up);
   EXPECT_NEAR_QUAT(Quaternion(-bigQuat.scalar(), -bigQuat.vector()),
                    bigQuat.ScaleAngle(1), epsilon);
 
-  // Test the claim made in the documentation:
-  // "For example, you are not guaranteed that
-  //  q.ScaleAngle(2).ScaleAngle(.5) and q.ScaleAngle(2 * .5) are the same
-  //  orientation, let alone the same quaternion."
+  // ScaleAngle is not associative for factors > 1.
   const Quaternion base =
       Quaternion::FromAngleAxis(static_cast<T>(mathfu::kPi * .75), up);
-  const Quaternion q1 = base.ScaleAngle(2).ScaleAngle(.5f);
-  const Quaternion q2 = base.ScaleAngle(2 * .5f);
-  EXPECT_NEAR_QUAT(
-      q1, Quaternion::FromAngleAxis(static_cast<T>(mathfu::kPi * -.25), up),
-      epsilon);
-  EXPECT_NEAR_QUAT(q2, base, epsilon);
+  const Quaternion q1 = base.ScaleAngle(2).ScaleAngle(static_cast<T>(.5));
+  const Quaternion q2 = base.ScaleAngle(static_cast<T>(2 * .5));
   EXPECT_FALSE(IsNearOrientation(q1, q2, epsilon));
-  EXPECT_FALSE(IsNearQuat(q1, q2, epsilon));
+
+  // ScaleAngle(0) should give identity.
+  const Quaternion rot = Quaternion::FromAngleAxis(static_cast<T>(1.2), up);
+  EXPECT_NEAR_QUAT(Quaternion::identity, rot.ScaleAngle(0), epsilon);
 }
-TEST_ALL_F(ScaleAngleFlipsQuat)
+TEST_ALL_F(ScaleAngle)
+
+// This tests that scalar multiplication distributes over quaternion addition.
+template <class T>
+void ScalarMultDistributesOverAdd_Test(const T& precision) {
+  (void)precision;
+  using Quaternion = mathfu::Quaternion<T>;
+  const double epsilon = 1e-5;
+
+  const Quaternion q1(static_cast<T>(1), static_cast<T>(2), static_cast<T>(3),
+                      static_cast<T>(4));
+  const Quaternion q2(static_cast<T>(5), static_cast<T>(6), static_cast<T>(7),
+                      static_cast<T>(8));
+  const T s = static_cast<T>(2.5);
+
+  // s * (q1 + q2) == s * q1 + s * q2
+  EXPECT_NEAR_QUAT((q1 + q2) * s, q1 * s + q2 * s, epsilon);
+}
+TEST_ALL_F(ScalarMultDistributesOverAdd)
 
 // This will test the dot product of quaternions.
 template <class T>
@@ -561,7 +635,7 @@ void RotateFromTo_Test(const T& precision) {
       mathfu::Quaternion<T>::RotateFromTo(z_axis, x_axis);
 
   // Check some axis rotations:
-  // By definition, rotateFromTo(v1, v2).Rotate(v1) should always equal v2.
+  // By definition, rotateFromTo(v1, v2) * v2 should always equal v2.
   // if v1 and v2 are 90 degrees apart (as they are in the case of axes)
   // then applying the same rotation twice should invert the vector.
   mathfu::Vector<T, 3> x_to_y_result = x_to_y.Rotate(x_axis);
@@ -588,8 +662,7 @@ void RotateFromTo_Test(const T& precision) {
   mathfu::Quaternion<T> arbitrary_to_arbitrary =
       mathfu::Quaternion<T>::RotateFromTo(arbitrary_1, arbitrary_2);
 
-  mathfu::Vector<T, 3> arbitrary_1_to_2 =
-      arbitrary_to_arbitrary.Rotate(arbitrary_1);
+  mathfu::Vector<T, 3> arbitrary_1_to_2 = arbitrary_to_arbitrary.Rotate(arbitrary_1);
   arbitrary_1_to_2.Normalize();
   mathfu::Vector<T, 3> arbitrary_2_normalized = arbitrary_2.Normalized();
 
@@ -660,29 +733,123 @@ TEST_ALL_F(OutputStream)
 
 template <class T>
 void LookAt_Test(const T& precision) {
+  using Quaternion = mathfu::Quaternion<T>;
+  using Vector3 = mathfu::Vector<T, 3>;
   const T one = static_cast<T>(1);
+  const T neg_one = static_cast<T>(-1);
   const T zero = static_cast<T>(0);
-  // Default (right-handed): looking along +z with up +y produces a 180-degree
-  // rotation around the y-axis.
-  EXPECT_NEAR_QUAT(
-      mathfu::Quaternion<T>(zero, zero, one, zero),
-      mathfu::Quaternion<T>::LookAt(mathfu::Vector<T, 3>(zero, zero, one),
-                                    mathfu::Vector<T, 3>(zero, one, zero)),
-      precision);
-  // Explicit right-handed should match the default.
-  EXPECT_NEAR_QUAT(
-      mathfu::Quaternion<T>::LookAt(mathfu::Vector<T, 3>(zero, zero, one),
-                                    mathfu::Vector<T, 3>(zero, one, zero)),
-      mathfu::Quaternion<T>::LookAt(mathfu::Vector<T, 3>(zero, zero, one),
-                                    mathfu::Vector<T, 3>(zero, one, zero), one),
-      precision);
-  // Explicit left-handed: looking along +z with up +y produces identity.
-  EXPECT_NEAR_QUAT(
-      mathfu::Quaternion<T>::identity,
-      mathfu::Quaternion<T>::LookAt(mathfu::Vector<T, 3>(zero, zero, one),
-                                    mathfu::Vector<T, 3>(zero, one, zero),
-                                    static_cast<T>(-1)),
-      precision);
+  const double epsilon = static_cast<double>(precision) * 10;
+  const Vector3 up(zero, one, zero);
+
+  // The default forward direction for right-handed coordinates is -Z,
+  // and for left-handed coordinates is +Z.
+
+  // ---- Right-handed (default handedness = 1) ----
+
+  // Looking along -Z (RH default forward) should give identity.
+  {
+    const Quaternion q =
+        Quaternion::LookAt(Vector3(zero, zero, neg_one), up, one);
+    EXPECT_NEAR_ORIENTATION(Quaternion::identity, q, epsilon);
+  }
+
+  // Looking along +Z (opposite of RH default forward) should give a
+  // 180-degree rotation around the Y axis.
+  {
+    const Quaternion q = Quaternion::LookAt(Vector3(zero, zero, one), up, one);
+    const Quaternion expected =
+        Quaternion::FromAngleAxis(static_cast<T>(M_PI), up);
+    EXPECT_NEAR_ORIENTATION(expected, q, epsilon);
+  }
+
+  // Looking along +X should give a 90-degree rotation around Y (turning
+  // from -Z forward to +X).
+  {
+    const Quaternion q = Quaternion::LookAt(Vector3(one, zero, zero), up, one);
+    const Quaternion expected =
+        Quaternion::FromAngleAxis(static_cast<T>(-M_PI / 2), up);
+    EXPECT_NEAR_ORIENTATION(expected, q, epsilon);
+  }
+
+  // Explicit right-handed should match the default (no handedness argument).
+  {
+    const Quaternion q_default =
+        Quaternion::LookAt(Vector3(one, zero, zero), up);
+    const Quaternion q_explicit =
+        Quaternion::LookAt(Vector3(one, zero, zero), up, one);
+    EXPECT_NEAR_QUAT(q_default, q_explicit, epsilon);
+  }
+
+  // ---- Left-handed (handedness = -1) ----
+
+  // Looking along +Z (LH default forward) should give identity.
+  {
+    const Quaternion q =
+        Quaternion::LookAt(Vector3(zero, zero, one), up, neg_one);
+    EXPECT_NEAR_ORIENTATION(Quaternion::identity, q, epsilon);
+  }
+
+  // Looking along -Z (opposite of LH default forward) should give a
+  // 180-degree rotation around the Y axis.
+  {
+    const Quaternion q =
+        Quaternion::LookAt(Vector3(zero, zero, neg_one), up, neg_one);
+    const Quaternion expected =
+        Quaternion::FromAngleAxis(static_cast<T>(M_PI), up);
+    EXPECT_NEAR_ORIENTATION(expected, q, epsilon);
+  }
+
+  // Looking along +X (LH) should give a 90-degree rotation around Y (turning
+  // from +Z forward to +X).
+  {
+    const Quaternion q =
+        Quaternion::LookAt(Vector3(one, zero, zero), up, neg_one);
+    const Quaternion expected =
+        Quaternion::FromAngleAxis(static_cast<T>(M_PI / 2), up);
+    EXPECT_NEAR_ORIENTATION(expected, q, epsilon);
+  }
+
+  // ---- Functional tests: applying the quaternion to the default forward
+  //      direction should yield the target forward direction ----
+
+  // RH default forward is -Z.
+  {
+    const Vector3 rh_forward(zero, zero, neg_one);
+    const Vector3 target(one, zero, zero);
+    const Quaternion q = Quaternion::LookAt(target, up, one);
+    const Vector3 result = q.Rotate(rh_forward);
+    EXPECT_NEAR_VEC3(target, result, epsilon);
+  }
+
+  // LH default forward is +Z.
+  {
+    const Vector3 lh_forward(zero, zero, one);
+    const Vector3 target(one, zero, zero);
+    const Quaternion q = Quaternion::LookAt(target, up, neg_one);
+    const Vector3 result = q.Rotate(lh_forward);
+    EXPECT_NEAR_VEC3(target, result, epsilon);
+  }
+
+  // ---- Unit length: the result should always be a unit quaternion ----
+  {
+    const Vector3 directions[] = {
+        Vector3(one, zero, zero),
+        Vector3(zero, zero, one),
+        Vector3(zero, zero, neg_one),
+        Vector3(neg_one, zero, zero),
+        Vector3(one, one, zero).Normalized(),
+        Vector3(one, zero, one).Normalized(),
+    };
+    for (const auto& dir : directions) {
+      const Quaternion q_rh = Quaternion::LookAt(dir, up, one);
+      T length_rh = Quaternion::DotProduct(q_rh, q_rh);
+      EXPECT_NEAR(static_cast<T>(1), length_rh, epsilon);
+
+      const Quaternion q_lh = Quaternion::LookAt(dir, up, neg_one);
+      T length_lh = Quaternion::DotProduct(q_lh, q_lh);
+      EXPECT_NEAR(static_cast<T>(1), length_lh, epsilon);
+    }
+  }
 }
 TEST_ALL_F(LookAt)
 
@@ -738,9 +905,9 @@ void SlerpResultIsUnit_Test(const T& precision) {
     EXPECT_NEAR(1.0f, slerp_length, kLengthEpsilon) << " for angle " << angle;
 
     // Alternate spelling for Slerp
-    Quaternion mul_result = q2.ScaleAngle(.5f);
-    const T mul_length = mul_result.Normalize();
-    EXPECT_NEAR(1.0f, mul_length, kLengthEpsilon) << " for angle " << angle;
+    Quaternion scale_result = q2.ScaleAngle(static_cast<T>(.5));
+    const T scale_length = scale_result.Normalize();
+    EXPECT_NEAR(1.0f, scale_length, kLengthEpsilon) << " for angle " << angle;
   }
 }
 TEST_ALL_F(SlerpResultIsUnit)
@@ -778,12 +945,12 @@ void CheckSlerp(float angle, float t, float expected_angle) {
   EXPECT_NEAR_ORIENTATION(expected, slerp_backwards_result, epsilon)
       << " for angle " << angle << " and t " << t;
 
-  Quaternion mul_result = original.ScaleAngle(t);
-  EXPECT_NEAR_ORIENTATION(expected, mul_result, epsilon)
+  Quaternion scale_result = original.ScaleAngle(t);
+  EXPECT_NEAR_ORIENTATION(expected, scale_result, epsilon)
       << " for angle " << angle << " and t " << t;
 }
 
-// This doubles as a test of both Slerp() and ScaleAngle(),
+// This doubles as a test of both Slerp() and operator*(quat, float),
 // since the two are pretty much the same operation with different spelling.
 template <class T>
 void Slerp_Test(const T& precision) {
