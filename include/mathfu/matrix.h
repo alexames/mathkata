@@ -484,9 +484,16 @@ class Matrix {
 
   /// @brief Multiply this Matrix with another Matrix.
   ///
+  /// @note This operator requires square matrices (Rows == Cols).
+  /// For non-square matrix multiplication, use the free function
+  /// mathfu::Multiply() instead.
+  ///
   /// @param m Matrix to multiply with this Matrix.
   /// @return Matrix containing the result.
   inline Matrix<T, Rows, Cols> operator*(const Matrix<T, Rows, Cols>& m) const {
+    static_assert(Rows == Cols,
+                  "operator* requires square matrices; use Multiply() for "
+                  "non-square matrix multiplication");
     Matrix<T, Rows, Cols> result;
     TimesHelper(*this, m, &result);
     return result;
@@ -542,9 +549,16 @@ class Matrix {
 
   /// @brief Multiply this Matrix with another Matrix (in-place).
   ///
+  /// @note This operator requires square matrices (Rows == Cols).
+  /// For non-square matrix multiplication, use the free function
+  /// mathfu::Multiply() instead.
+  ///
   /// @param m Matrix to multiply with this Matrix.
   /// @return Reference to this class.
   inline Matrix<T, Rows, Cols>& operator*=(const Matrix<T, Rows, Cols>& m) {
+    static_assert(Rows == Cols,
+                  "operator*= requires square matrices; use Multiply() for "
+                  "non-square matrix multiplication");
     const Matrix<T, Rows, Cols> copy_of_this(*this);
     TimesHelper(copy_of_this, m, this);
     return *this;
@@ -1225,6 +1239,39 @@ inline void TimesHelper(const Matrix<T, 4, 4>& m1, const Matrix<T, 4, 4>& m2,
   }
 }
 /// @endcond
+
+/// @brief Multiply two matrices of arbitrary compatible dimensions.
+///
+/// Computes the matrix product m1 * m2 where m1 is an R1 x C1 matrix and m2
+/// is a C1 x C2 matrix, producing an R1 x C2 result.  This function works
+/// for both square and non-square matrices, unlike operator* which requires
+/// square matrices.
+///
+/// @param m1 Matrix with R1 rows and C1 columns.
+/// @param m2 Matrix with C1 rows and C2 columns.
+/// @return Matrix with R1 rows and C2 columns containing the result.
+///
+/// @tparam T Type of each element in the matrices.
+/// @tparam R1 Number of rows in m1 and the result.
+/// @tparam C1 Number of columns in m1 / rows in m2.
+/// @tparam C2 Number of columns in m2 and the result.
+///
+/// @related mathfu::Matrix
+template <class T, int R1, int C1, int C2>
+inline Matrix<T, R1, C2> Multiply(const Matrix<T, R1, C1>& m1,
+                                  const Matrix<T, C1, C2>& m2) {
+  Matrix<T, R1, C2> result;
+  for (int c = 0; c < C2; ++c) {
+    for (int r = 0; r < R1; ++r) {
+      T sum = T(0);
+      for (int k = 0; k < C1; ++k) {
+        sum += m1(r, k) * m2(k, c);
+      }
+      result(r, c) = sum;
+    }
+  }
+  return result;
+}
 
 /// @cond MATHFU_INTERNAL
 /// @brief Compute the identity matrix.
