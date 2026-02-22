@@ -88,14 +88,6 @@ class Vector<float, 2> {
     return Vector<float, 2>(simd2f_sub(simd2f_zero(), simd2));
   }
 
-  inline Vector<float, 2> operator*(const Vector<float, 2>& v) const {
-    return Vector<float, 2>(simd2f_mul(simd2, v.simd2));
-  }
-
-  inline Vector<float, 2> operator/(const Vector<float, 2>& v) const {
-    return Vector<float, 2>(simd2f_div(simd2, v.simd2));
-  }
-
   inline Vector<float, 2> operator+(const Vector<float, 2>& v) const {
     return Vector<float, 2>(simd2f_add(simd2, v.simd2));
   }
@@ -118,16 +110,6 @@ class Vector<float, 2> {
 
   inline Vector<float, 2> operator-(const float& s) const {
     return Vector<float, 2>(simd2f_sub(simd2, simd2f_splat(s)));
-  }
-
-  inline Vector<float, 2>& operator*=(const Vector<float, 2>& v) {
-    simd2 = simd2f_mul(simd2, v.simd2);
-    return *this;
-  }
-
-  inline Vector<float, 2>& operator/=(const Vector<float, 2>& v) {
-    simd2 = simd2f_div(simd2, v.simd2);
-    return *this;
   }
 
   inline Vector<float, 2>& operator+=(const Vector<float, 2>& v) {
@@ -219,23 +201,17 @@ class Vector<float, 2> {
     return Vector<float, 2>(simd2f_mul(v1.simd2, v2.simd2));
   }
 
+  static inline Vector<float, 2> HadamardDivide(const Vector<float, 2>& v1,
+                                                const Vector<float, 2>& v2) {
+    return Vector<float, 2>(simd2f_div(v1.simd2, v2.simd2));
+  }
+
   static inline Vector<float, 2> Lerp(const Vector<float, 2>& v1,
                                       const Vector<float, 2>& v2,
                                       float percent) {
-    const Vector<float, 2> percentv(percent);
-    const Vector<float, 2> one_minus_percent(
-        simd2f_sub(simd2f_splat(1.0f), percentv.simd2));
-    return Vector<float, 2>(
-        simd2f_add(simd2f_mul(one_minus_percent.simd2, v1.simd2),
-                   simd2f_mul(percentv.simd2, v2.simd2)));
-  }
-
-  /// Generates a random vector, where the range for each component is
-  /// bounded by min and max.
-  static inline Vector<float, 2> RandomInRange(const Vector<float, 2>& min,
-                                               const Vector<float, 2>& max) {
-    return Vector<float, 2>(mathfu::RandomInRange<float>(min[0], max[0]),
-                            mathfu::RandomInRange<float>(min[1], max[1]));
+    const simd2f percentv = simd2f_splat(percent);
+    return Vector<float, 2>(simd2f_add(
+        v1.simd2, simd2f_mul(simd2f_sub(v2.simd2, v1.simd2), percentv)));
   }
 
   static inline Vector<float, 2> Max(const Vector<float, 2>& v1,
@@ -256,6 +232,11 @@ class Vector<float, 2> {
   static inline float DistanceSquared(const Vector<float, 2>& v1,
                                       const Vector<float, 2>& v2) {
     return (v1 - v2).LengthSquared();
+  }
+
+  static inline float CrossProduct(const Vector<float, 2>& v1,
+                                   const Vector<float, 2>& v2) {
+    return CrossProductHelper(v1, v2);
   }
 
   static inline float Angle(const Vector<float, 2>& v1,

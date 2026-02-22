@@ -10,7 +10,6 @@ need to build [MathFu][] for Android:
    * [Android Developer Tools][] ([ADT][]): 20140702
       - NDK plugn for Eclipse (bundled with [ADT][]) if using Eclipse to build.
    * [Android NDK][]: android-ndk-r10e
-   * [fplutil][]: 1.0 or above, if using [fplutil][] to build, install and run.
 
 # Prerequisites    {#mathfu_guide_building_android_prerequisites}
 
@@ -18,8 +17,6 @@ Prior to building:
 
    * Install the [Android SDK][].
    * Install the [Android NDK][].
-   * Install [fplutil prerequisites][] if using [fplutil][] to build, install
-     and run.
 
 # Building    {#mathfu_guide_building_android_building}
 
@@ -58,21 +55,6 @@ without generating an [apk][]:
     ndk-build
 ~~~
 
-## Building with fplutil    {#mathfu_guide_building_android_building_fplutil}
-
-To build all [Android NDK][] projects, install and run them on a device:
-
-   * Open a command line window.
-   * Go to the [MathFu][] project directory.
-   * Execute `dependencies/fplutil/bin/build_all_android.py`
-
-For example:
-
-~~~{.sh}
-    cd mathfu
-    ./dependencies/fplutil/bin/build_all_android.py
-~~~
-
 # Installing and Running Applications {#mathfu_guide_building_android_running}
 
 ## Using Eclipse {#mathfu_guide_building_android_eclipse}
@@ -97,36 +79,6 @@ the [NDK Eclipse plugin][].
    * None of the applications have a visual component so their output is
      visible via the log ([adb][] logcat).
 
-## Using fplutil {#mathfu_guide_building_android_fplutil}
-
-To install and run a single application:
-
-   * Open a command line window.
-   * Go to the directory containing the project to install and run.
-   * Execute `dependencies/fplutil/bin/build_all_android.py` with the `-i`
-     and `-r` options.
-
-For example:
-
-~~~{.sh}
-    cd mathfu/unit_tests/matrix_test/default
-    ./dependencies/fplutil/bin/build_all_android.py -i -r
-~~~
-
-To install and run all applications:
-
-   * Open a command line window.
-   * Go to the [MathFu][] project directory.
-   * Execute `dependencies/fplutil/bin/build_all_android.py` with the `-i`
-     and `-r` options.
-
-For example:
-
-~~~{.sh}
-    cd mathfu
-    ./dependencies/fplutil/bin/build_all_android.py -i -r
-~~~
-
 # Code Generation    {#mathfu_guide_building_android_code_generation}
 
 By default, code is generated for devices that support the `armeabi-v7a`
@@ -139,11 +91,6 @@ Using `ndk-build`:
     ndk-build APP_ABI=all
 ~~~
 
-Using `fplutil`:
-~~~{.sh}
-    ./dependencies/fplutil/bin/build_all_android.py -f APP_ABI=all
-~~~
-
 <br>
 
   [MathFu]: @ref mathfu_overview
@@ -154,6 +101,4 @@ Using `fplutil`:
   [Android SDK]: http://developer.android.com/sdk/index.html
   [NDK Eclipse plugin]: http://developer.android.com/sdk/index.html
   [apk]: http://en.wikipedia.org/wiki/Android_application_package
-  [fplutil]: http://google.github.io/fplutil
-  [fplutil prerequisites]: http://google.github.io/fplutil/fplutil_prerequisites.html
   [managing avds]: http://developer.android.com/tools/devices/managing-avds.html
