@@ -59,9 +59,9 @@ function(mathfu_configure_flags target)
 
   # If the SIMD build option is enabled.
   if(enable_simd)
-    # Add vectorial headers (SIMD abstraction layer).
-    target_include_directories(${target}
-      PRIVATE ${mathfu_dir}/dependencies/vectorial/include)
+    # Add xsimd headers (SIMD abstraction layer).
+    find_package(xsimd REQUIRED)
+    target_link_libraries(${target} PRIVATE xsimd)
     # Enable SIMD flags when building with GCC / Clang.
     if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR
         CMAKE_CXX_COMPILER_ID MATCHES "Clang")

@@ -28,7 +28,7 @@
 
 #ifdef MATHFU_COMPILE_WITH_SIMD
 
-#include "vectorial/simd4f.h"
+#include "mathfu/internal/simd_helpers.h"
 
 namespace mathfu {
 
