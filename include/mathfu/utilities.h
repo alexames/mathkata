@@ -156,29 +156,6 @@
 /// @endcond
 #endif  // MATHFU_COMPILE_WITH_SIMD
 
-/// @addtogroup mathfu_version
-/// @{
-
-/// @def MATHFU_VERSION_MAJOR
-/// @brief Major version number of the library.
-/// @see kMathFuVersionString
-#define MATHFU_VERSION_MAJOR 1
-/// @def MATHFU_VERSION_MINOR
-/// @brief Minor version number of the library.
-/// @see kMathFuVersionString
-#define MATHFU_VERSION_MINOR 1
-/// @def MATHFU_VERSION_REVISION
-/// @brief Revision number of the library.
-/// @see kMathFuVersionString
-#define MATHFU_VERSION_REVISION 0
-
-/// @}
-
-/// @cond MATHFU_INTERNAL
-#define MATHFU_STRING_EXPAND(X) #X
-#define MATHFU_STRING(X) MATHFU_STRING_EXPAND(X)
-/// @endcond
-
 /// @cond MATHFU_INTERNAL
 // Generate string which contains build options for the library.
 #if defined(MATHFU_COMPILE_WITH_SIMD)
@@ -200,34 +177,6 @@
 #define MATHFU_BUILD_OPTIONS_STRING \
   (MATHFU_BUILD_OPTIONS_SIMD " " MATHFU_BUILD_OPTIONS_PADDING)
 /// @}
-
-// Weak linkage is culled by VS & doesn't work on cygwin.
-#if !defined(_WIN32) && !defined(__CYGWIN__)
-
-extern volatile __attribute__((weak)) const char *kMathFuVersionString;
-/// @addtogroup mathfu_version
-/// @{
-
-/// @var kMathFuVersionString
-/// @brief String which identifies the current version of MathFu.
-///
-/// @ref kMathFuVersionString is used by Google developers to identify which
-/// applications uploaded to Google Play are using this library.  This allows
-/// the development team at Google to determine the popularity of the library.
-/// How it works: Applications that are uploaded to the Google Play Store are
-/// scanned for this version string.  We track which applications are using it
-/// to measure popularity.  You are free to remove it (of course) but we would
-/// appreciate if you left it in.
-///
-/// @see MATHFU_VERSION_MAJOR
-/// @see MATHFU_VERSION_MINOR
-/// @see MATHFU_VERSION_REVISION
-volatile __attribute__((weak)) const char *kMathFuVersionString =
-    "MathFu " MATHFU_STRING(MATHFU_VERSION_MAJOR) "." MATHFU_STRING(
-        MATHFU_VERSION_MINOR) "." MATHFU_STRING(MATHFU_VERSION_REVISION);
-/// @}
-
-#endif  // !defined(_WIN32) && !defined(__CYGWIN__)
 
 /// @cond MATHFU_INTERNAL
 template <bool>
@@ -287,6 +236,15 @@ struct static_assert_util<true> {};
 /// @endcond
 
 namespace mathfu {
+
+/// @addtogroup mathfu_version
+/// @{
+
+/// @var kVersion
+/// @brief String which identifies the current version of MathFu.
+static constexpr const char *kVersion = "2.0.0";
+
+/// @}
 
 /// @addtogroup mathfu_utilities
 /// @{

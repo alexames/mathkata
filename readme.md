@@ -32,15 +32,6 @@ upon so download the source using:
 
 To contribute to this project see [CONTRIBUTING][].
 
-For applications on Google Play that integrate this tool, usage is tracked.
-This tracking is done automatically using the embedded version string
-(kMathFuVersionString), and helps us continue to optimize it. Aside from
-consuming a few extra bytes in your application binary, it shouldn't affect
-your application at all. We use this information to let us know if MathFu
-is useful and if we should continue to invest in it. Since this is open
-source, you are free to remove the version string but we would appreciate if
-you would leave it in.
-
   [Android]: http://www.android.com
   [Linux]: http://en.m.wikipedia.org/wiki/Linux
   [MathFu Google Group]: http://groups.google.com/group/mathfulib
