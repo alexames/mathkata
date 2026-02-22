@@ -16,6 +16,7 @@
 #include "mathfu/matrix.h"
 
 #include <cmath>
+#include <random>
 #include <sstream>
 #include <string>
 
@@ -25,6 +26,25 @@
 #include "mathfu/utilities.h"
 #include "mathfu/vector.h"
 #include "precision.h"
+
+// Thread-local random engine seeded deterministically for reproducible tests.
+static std::mt19937& TestRng() {
+  static std::mt19937 rng(42);
+  return rng;
+}
+
+// Generate a random value in [0, 1) for floating point types.
+template <class T>
+T TestRandom01() {
+  std::uniform_real_distribution<T> dist(static_cast<T>(0), static_cast<T>(1));
+  return dist(TestRng());
+}
+
+// Generate a random value in [-range, +range] for floating point types.
+template <class T>
+T TestRandomRange(T range) {
+  return (TestRandom01<T>() * range * static_cast<T>(2)) - range;
+}
 static const float kUnProjectFloatPrecision = 0.0012f;
 static const double kLookAtDoublePrecision = 1e-8;
 class MatrixTests : public ::testing::Test {
@@ -91,7 +111,7 @@ void Initialize_Test(const T& precision) {
   // values.
   T x[d * d];
   for (int i = 0; i < d * d; ++i) {
-    x[i] = rand() / static_cast<T>(RAND_MAX) * 100.f;
+    x[i] = TestRandom01<T>() * static_cast<T>(100);
   }
   mathfu::Matrix<T, d> matrix_arr(x);
   for (int i = 0; i < d; ++i) {
@@ -210,10 +230,10 @@ template <class T, int d>
 void AddSub_Test(const T& precision) {
   T x1[d * d], x2[d * d];
   for (int i = 0; i < d * d; ++i) {
-    x1[i] = rand() / static_cast<T>(RAND_MAX) * 100.f;
+    x1[i] = TestRandom01<T>() * static_cast<T>(100);
   }
   for (int i = 0; i < d * d; ++i) {
-    x2[i] = rand() / static_cast<T>(RAND_MAX) * 100.f;
+    x2[i] = TestRandom01<T>() * static_cast<T>(100);
   }
   mathfu::Matrix<T, d> matrix1(x1), matrix2(x2);
   // This will test the negation of a matrix and verify that each element
@@ -249,8 +269,8 @@ TEST_ALL_F(AddSub, FLOAT_PRECISION, DOUBLE_PRECISION)
 template <class T, int d>
 void Mult_Test(const T& precision) {
   T x1[d * d], x2[d * d];
-  for (int i = 0; i < d * d; ++i) x1[i] = rand() / static_cast<T>(RAND_MAX);
-  for (int i = 0; i < d * d; ++i) x2[i] = rand() / static_cast<T>(RAND_MAX);
+  for (int i = 0; i < d * d; ++i) x1[i] = TestRandom01<T>();
+  for (int i = 0; i < d * d; ++i) x2[i] = TestRandom01<T>();
   mathfu::Matrix<T, d> matrix1(x1), matrix2(x2);
   // This will test scalar matrix multiplication and verify that each element
   // is equal to multiplication by the scalar.
@@ -261,7 +281,7 @@ void Mult_Test(const T& precision) {
     }
   }
   T v[d];
-  for (int i = 0; i < d; ++i) v[i] = rand() / static_cast<T>(RAND_MAX);
+  for (int i = 0; i < d; ++i) v[i] = TestRandom01<T>();
   mathfu::Vector<T, d> vector(v);
   // This will test matrix vector multiplication and verify that the resulting
   // vector is mathematically correct.
@@ -296,8 +316,8 @@ TEST_F(MatrixTests, Mult_double_5) { Mult_Test<double, 5>(DOUBLE_PRECISION); }
 template <class T, int d>
 void OuterProduct_Test(const T& precision) {
   T x1[d], x2[d];
-  for (int i = 0; i < d; ++i) x1[i] = rand() / static_cast<T>(RAND_MAX);
-  for (int i = 0; i < d; ++i) x2[i] = rand() / static_cast<T>(RAND_MAX);
+  for (int i = 0; i < d; ++i) x1[i] = TestRandom01<T>();
+  for (int i = 0; i < d; ++i) x2[i] = TestRandom01<T>();
   mathfu::Vector<T, d> vector1(x1), vector2(x2);
   mathfu::Matrix<T, d> matrix(
       mathfu::Matrix<T, d>::OuterProduct(vector1, vector2));
@@ -445,7 +465,7 @@ void Inverse_Test(const T& precision) {
     // noninvertible.  This does mean that this test can be flakey by
     // occasionally generating noninvertible matrices.
     for (int i = 0; i < mathfu::Matrix<T, d>::kElements; ++i) {
-      x[i] = mathfu::RandomRange<T>(1);
+      x[i] = TestRandomRange<T>(1);
     }
     mathfu::Matrix<T, d> matrix(x);
     std::string error_string = MatrixToString(matrix);

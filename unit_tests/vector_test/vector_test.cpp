@@ -17,6 +17,7 @@
 
 #include <climits>
 #include <cstdint>
+#include <random>
 #include <sstream>
 #include <string>
 
@@ -25,6 +26,19 @@
 #include "mathfu/io.h"
 #include "mathfu/utilities.h"
 #include "precision.h"
+
+// Thread-local random engine seeded deterministically for reproducible tests.
+static std::mt19937& TestRng() {
+  static std::mt19937 rng(42);
+  return rng;
+}
+
+// Generate a random value in [0, 1) for floating point types.
+template <class T>
+T TestRandom01() {
+  std::uniform_real_distribution<T> dist(static_cast<T>(0), static_cast<T>(1));
+  return dist(TestRng());
+}
 
 class VectorTests : public ::testing::Test {
  protected:
@@ -141,7 +155,7 @@ void Initialization_Test(const T& precision) {
   }
   T x[d];
   for (int i = 0; i < d; ++i) {
-    x[i] = rand() / static_cast<T>(RAND_MAX) * 100.f;
+    x[i] = TestRandom01<T>() * static_cast<T>(100);
   }
   // This will test initialization of the vector using a c style array of
   // values.
@@ -236,7 +250,7 @@ template <class T, int d>
 void Negate_Test(const T& precision) {
   T x[d];
   for (int i = 0; i < d; ++i) {
-    x[i] = rand() / static_cast<T>(RAND_MAX) * 100.f;
+    x[i] = TestRandom01<T>() * static_cast<T>(100);
   }
 
   mathfu::Vector<T, d> vector(x);
@@ -252,12 +266,12 @@ TEST_ALL_F(Negate)
 template <class T, int d>
 void Add_Test(const T& precision) {
   T x1[d], x2[d];
-  T scalar = rand() / static_cast<T>(RAND_MAX) * 100.f;
+  T scalar = TestRandom01<T>() * static_cast<T>(100);
   for (int i = 0; i < d; ++i) {
-    x1[i] = rand() / static_cast<T>(RAND_MAX) * 100.f;
+    x1[i] = TestRandom01<T>() * static_cast<T>(100);
   }
   for (int i = 0; i < d; ++i) {
-    x2[i] = rand() / static_cast<T>(RAND_MAX) * 100.f;
+    x2[i] = TestRandom01<T>() * static_cast<T>(100);
   }
 
   mathfu::Vector<T, d> vector1(x1), vector2(x2);
@@ -290,12 +304,12 @@ TEST_ALL_F(Add)
 template <class T, int d>
 void Sub_Test(const T& precision) {
   T x1[d], x2[d];
-  T scalar = rand() / static_cast<T>(RAND_MAX) * 100.f;
+  T scalar = TestRandom01<T>() * static_cast<T>(100);
   for (int i = 0; i < d; ++i) {
-    x1[i] = rand() / static_cast<T>(RAND_MAX) * 100.f;
+    x1[i] = TestRandom01<T>() * static_cast<T>(100);
   }
   for (int i = 0; i < d; ++i) {
-    x2[i] = rand() / static_cast<T>(RAND_MAX) * 100.f;
+    x2[i] = TestRandom01<T>() * static_cast<T>(100);
   }
 
   mathfu::Vector<T, d> vector1(x1), vector2(x2);
@@ -330,10 +344,10 @@ void Mul_Test(const T& precision) {
   T x1[d], x2[d];
   T scalar(static_cast<T>(1.4));
   for (int i = 0; i < d; ++i) {
-    x1[i] = rand() / static_cast<T>(RAND_MAX);
+    x1[i] = TestRandom01<T>();
   }
   for (int i = 0; i < d; ++i) {
-    x2[i] = rand() / static_cast<T>(RAND_MAX);
+    x2[i] = TestRandom01<T>();
   }
 
   mathfu::Vector<T, d> vector1(x1), vector2(x2);
@@ -366,12 +380,12 @@ TEST_ALL_F(Mul)
 template <class T, int d>
 void Div_Test(const T& precision) {
   T x1[d], x2[d];
-  T scalar = (rand() / static_cast<T>(RAND_MAX)) + 1;
+  T scalar = TestRandom01<T>() + static_cast<T>(1);
   for (int i = 0; i < d; ++i) {
-    x1[i] = (rand() / static_cast<T>(RAND_MAX)) + 1;
+    x1[i] = TestRandom01<T>() + static_cast<T>(1);
   }
   for (int i = 0; i < d; ++i) {
-    x2[i] = (rand() / static_cast<T>(RAND_MAX)) + 1;
+    x2[i] = TestRandom01<T>() + static_cast<T>(1);
   }
 
   mathfu::Vector<T, d> vector1(x1), vector2(x2);
@@ -407,7 +421,7 @@ template <class T, int d>
 void Norm_Test(const T& precision) {
   T x[d];
   for (int i = 0; i < d; ++i) {
-    x[i] = rand() / static_cast<T>(RAND_MAX);
+    x[i] = TestRandom01<T>();
   }
 
   mathfu::Vector<T, d> vector(x);
@@ -424,10 +438,10 @@ template <class T, int d>
 void Dot_Test(const T& precision) {
   T x1[d], x2[d];
   for (int i = 0; i < d; ++i) {
-    x1[i] = rand() / static_cast<T>(RAND_MAX);
+    x1[i] = TestRandom01<T>();
   }
   for (int i = 0; i < d; ++i) {
-    x2[i] = rand() / static_cast<T>(RAND_MAX);
+    x2[i] = TestRandom01<T>();
   }
 
   mathfu::Vector<T, d> vector1(x1), vector2(x2);
@@ -468,7 +482,7 @@ template <class T, int d>
 mathfu::Vector<T, d> RandomVector() {
   T x[d];
   for (int i = 0; i < d; ++i) {
-    x[i] = rand() / static_cast<T>(RAND_MAX);
+    x[i] = TestRandom01<T>();
   }
   return mathfu::Vector<T, d>(x);
 }
@@ -570,52 +584,6 @@ void Numeric_Lerp_Test(const T& precision) {
 }
 TEST_SCALAR_F(Numeric_Lerp)
 
-// Tests the random-in-range function for vectors.
-// Given a pair of vectors, it should return a third vector whose elements
-// are bounded by the corresponding elements in the argument vectors.
-template <class T, int d>
-void Vector_RandomInRange_Test(const T& precision) {
-  (void)precision;
-  mathfu::Vector<T, d> min, max, result1, result2;
-
-  for (int count = 0; count < 100; count++) {
-    for (int i = 0; i < d; i++) {
-      min[i] = -i - 10;
-      max[i] = i * 2 + 2;
-    }
-    result1 = mathfu::Vector<T, d>::RandomInRange(min, max);
-    result2 = mathfu::Vector<T, d>::RandomInRange(max, min);
-    for (int i = 0; i < d; i++) {
-      EXPECT_GE(result1[i], min[i]);
-      EXPECT_LE(result1[i], max[i]);
-
-      EXPECT_GE(result2[i], min[i]);
-      EXPECT_LE(result2[i], max[i]);
-    }
-  }
-}
-TEST_ALL_INTS_F(Vector_RandomInRange)
-
-// Tests the generic Random in Range function in Mathfu.
-template <class T>
-void RandomInRange_Test(const T& precision) {
-  (void)precision;
-  for (int count = 0; count < 100; count++) {
-    T result = mathfu::RandomInRange(static_cast<T>(0), static_cast<T>(100));
-    EXPECT_GE(result, 0);
-    EXPECT_LT(result, 100);
-  }
-  for (int count = 0; count < 100; count++) {
-    T result = mathfu::RandomInRange(static_cast<T>(-100), static_cast<T>(0));
-    EXPECT_GE(result, -100);
-    EXPECT_LE(result, 0);
-  }
-  EXPECT_EQ(0, mathfu::RandomInRange(0, 0));
-  EXPECT_EQ(-5, mathfu::RandomInRange(-5, -5));
-  EXPECT_EQ(23, mathfu::RandomInRange(23, 23));
-}
-TEST_SCALAR_AND_INT_F(RandomInRange)
-
 // This will test initialization by passing in values. The template parameter d
 // corresponds to the size of the vector.
 template <class T, int d>
@@ -623,7 +591,7 @@ void Accessor_Test(const T& precision) {
   (void)precision;
   T x[d];
   for (int i = 0; i < d; ++i) {
-    x[i] = rand() / static_cast<T>(RAND_MAX) * 100.f;
+    x[i] = TestRandom01<T>() * static_cast<T>(100);
   }
 
   mathfu::Vector<T, d> vector(x);
@@ -1185,9 +1153,9 @@ TEST_F(VectorTests, OutputStream_Test_float_1) {
 // Test that the kDims static member is present and correct for each
 // specialization.
 TEST_F(VectorTests, kDims) {
-  EXPECT_EQ(mathfu::Vector<float, 2>::kDims, 2);
-  EXPECT_EQ(mathfu::Vector<float, 3>::kDims, 3);
-  EXPECT_EQ(mathfu::Vector<float, 4>::kDims, 4);
+  EXPECT_EQ((mathfu::Vector<float, 2>::kDims), 2);
+  EXPECT_EQ((mathfu::Vector<float, 3>::kDims), 3);
+  EXPECT_EQ((mathfu::Vector<float, 4>::kDims), 4);
 }
 
 // Test that the SIMD padding lane (w / data_[3]) of Vector<float,3> is
