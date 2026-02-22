@@ -333,13 +333,11 @@ class Vector<float, 3> {
   static inline Vector<float, 3> Lerp(const Vector<float, 3>& v1,
                                       const Vector<float, 3>& v2,
                                       float percent) {
-    const Vector<float, 3> percentv(percent);
-    const Vector<float, 3> one(1.0f);
-    const Vector<float, 3> one_minus_percent = one - percentv;
-    return Vector<float, 3>(simd4f_add(
-        simd4f_mul(MATHFU_VECTOR3_LOAD3(one_minus_percent),
-                   MATHFU_VECTOR3_LOAD3(v1)),
-        simd4f_mul(MATHFU_VECTOR3_LOAD3(percentv), MATHFU_VECTOR3_LOAD3(v2))));
+    const simd4f percentv = simd4f_splat(percent);
+    const simd4f v1s = MATHFU_VECTOR3_LOAD3(v1);
+    const simd4f v2s = MATHFU_VECTOR3_LOAD3(v2);
+    return Vector<float, 3>(
+        simd4f_add(v1s, simd4f_mul(simd4f_sub(v2s, v1s), percentv)));
   }
 
   /// Generates a random vector, where the range for each component is
