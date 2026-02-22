@@ -270,6 +270,16 @@ class Vector<float, 4> {
     return AngleHelper(v1, v2);
   }
 
+  static inline Vector<float, 4> Project(const Vector<float, 4>& v,
+                                         const Vector<float, 4>& onto) {
+    return ProjectHelper(v, onto);
+  }
+
+  static inline Vector<float, 4> Reject(const Vector<float, 4>& v,
+                                        const Vector<float, 4>& from) {
+    return RejectHelper(v, from);
+  }
+
   static inline Vector<float, 4> Reflect(const Vector<float, 4>& incident,
                                          const Vector<float, 4>& normal) {
     return ReflectHelper(incident, normal);
@@ -280,9 +290,6 @@ class Vector<float, 4> {
                                          float eta) {
     return RefractHelper(incident, normal, eta);
   }
-
-  template <class T, int rows, int cols>
-  friend class Matrix;
 
   MATHFU_DEFINE_CLASS_SIMD_AWARE_NEW_DELETE
 

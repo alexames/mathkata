@@ -148,6 +148,16 @@ class Vector<T, 4> {
     return AngleHelper(v1, v2);
   }
 
+  static inline Vector<T, 4> Project(const Vector<T, 4>& v,
+                                     const Vector<T, 4>& onto) {
+    return ProjectHelper(v, onto);
+  }
+
+  static inline Vector<T, 4> Reject(const Vector<T, 4>& v,
+                                    const Vector<T, 4>& from) {
+    return RejectHelper(v, from);
+  }
+
   static inline Vector<T, 4> Reflect(const Vector<T, 4>& incident,
                                      const Vector<T, 4>& normal) {
     return ReflectHelper(incident, normal);

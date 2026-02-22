@@ -134,6 +134,11 @@ class Vector<float, 3> {
   inline const float& operator[](const int i) const { return data_[i]; }
 
   /// GLSL style multi-component accessors.
+  inline Vector<float, 3> xyz() { return Vector<float, 3>(x, y, z); }
+  inline const Vector<float, 3> xyz() const {
+    return Vector<float, 3>(x, y, z);
+  }
+
   inline Vector<float, 2> xy() { return Vector<float, 2>(x, y); }
   inline const Vector<float, 2> xy() const { return Vector<float, 2>(x, y); }
 
@@ -365,6 +370,16 @@ class Vector<float, 3> {
   static inline float Angle(const Vector<float, 3>& v1,
                             const Vector<float, 3>& v2) {
     return AngleHelper(v1, v2);
+  }
+
+  static inline Vector<float, 3> Project(const Vector<float, 3>& v,
+                                         const Vector<float, 3>& onto) {
+    return ProjectHelper(v, onto);
+  }
+
+  static inline Vector<float, 3> Reject(const Vector<float, 3>& v,
+                                        const Vector<float, 3>& from) {
+    return RejectHelper(v, from);
   }
 
   static inline Vector<float, 3> Reflect(const Vector<float, 3>& incident,

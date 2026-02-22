@@ -76,6 +76,10 @@ class Vector<float, 2> {
 
   inline const float& operator[](const int i) const { return data_[i]; }
 
+  /// GLSL style multi-component accessors.
+  inline Vector<float, 2> xy() { return Vector<float, 2>(x, y); }
+  inline const Vector<float, 2> xy() const { return Vector<float, 2>(x, y); }
+
   inline void Pack(VectorPacked<float, 2>* const vector) const {
     simd2f_ustore2(simd2, vector->data_);
   }
@@ -244,6 +248,16 @@ class Vector<float, 2> {
   static inline float Angle(const Vector<float, 2>& v1,
                             const Vector<float, 2>& v2) {
     return AngleHelper(v1, v2);
+  }
+
+  static inline Vector<float, 2> Project(const Vector<float, 2>& v,
+                                         const Vector<float, 2>& onto) {
+    return ProjectHelper(v, onto);
+  }
+
+  static inline Vector<float, 2> Reject(const Vector<float, 2>& v,
+                                        const Vector<float, 2>& from) {
+    return RejectHelper(v, from);
   }
 
   static inline Vector<float, 2> Reflect(const Vector<float, 2>& incident,
