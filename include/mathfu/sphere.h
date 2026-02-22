@@ -1,0 +1,134 @@
+/*
+ * Copyright 2024 Google Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+#ifndef MATHFU_SPHERE_H_
+#define MATHFU_SPHERE_H_
+
+#define _USE_MATH_DEFINES  // For M_PI.
+#include <cmath>
+
+#include "mathfu/vector.h"
+
+/// @file mathfu/sphere.h Sphere
+/// @brief Sphere/Circle class and functions.
+/// @addtogroup mathfu_sphere
+
+namespace mathfu {
+
+/// @addtogroup mathfu_sphere
+/// @{
+/// @class Sphere "mathfu/sphere.h"
+/// @brief Sphere (or Circle) of type T in N dimensions.
+///
+/// Sphere stores a center point as a <b>Vector<T, N></b> and a radius of type
+/// <b>T</b>. When N=2, this represents a circle. When N=3, this represents a
+/// sphere.
+///
+/// @tparam T type of Sphere elements.
+/// @tparam N number of dimensions (2 for circle, 3 for sphere).
+template <class T, int N>
+struct Sphere {
+  /// @brief The center of the sphere.
+  Vector<T, N> center;
+  /// @brief The radius of the sphere.
+  T radius;
+
+  /// @brief Create an uninitialized Sphere.
+  ///
+  /// The elements of the Sphere are left uninitialized and have indeterminate
+  /// values. This is intentional for performance: use Sphere(center, radius) if
+  /// you need specific values.
+  Sphere() {}
+
+  /// @brief Create a sphere from a center point and radius.
+  ///
+  /// @param center The center point of the sphere.
+  /// @param radius The radius of the sphere.
+  inline Sphere(const Vector<T, N>& center, T radius)
+      : center(center), radius(radius) {}
+
+  /// @brief Check whether a point is inside (or on the boundary of) the sphere.
+  ///
+  /// @param point The point to test.
+  /// @return true if the point is inside the sphere, false otherwise.
+  inline bool Contains(const Vector<T, N>& point) const {
+    return Vector<T, N>::DistanceSquared(center, point) <= radius * radius;
+  }
+
+  /// @brief Check whether another sphere is fully contained within this sphere.
+  ///
+  /// @param other The sphere to test.
+  /// @return true if the other sphere is fully inside this sphere, false
+  ///     otherwise.
+  inline bool Contains(const Sphere<T, N>& other) const {
+    T dist = Vector<T, N>::Distance(center, other.center);
+    return dist + other.radius <= radius;
+  }
+
+  /// @brief Check whether another sphere intersects (overlaps) this sphere.
+  ///
+  /// @param other The sphere to test for intersection.
+  /// @return true if the spheres overlap, false otherwise.
+  inline bool Intersects(const Sphere<T, N>& other) const {
+    T sum_radii = radius + other.radius;
+    return Vector<T, N>::DistanceSquared(center, other.center)
+           <= sum_radii * sum_radii;
+  }
+
+  /// @brief Calculate the area of a 2D circle (N=2).
+  ///
+  /// @return The area of the circle (pi * r^2).
+  inline T Area() const {
+    static_assert(N == 2, "Area() is only defined for 2D circles (N=2).");
+    return static_cast<T>(M_PI) * radius * radius;
+  }
+
+  /// @brief Calculate the volume of a 3D sphere (N=3).
+  ///
+  /// @return The volume of the sphere (4/3 * pi * r^3).
+  inline T Volume() const {
+    static_assert(N == 3, "Volume() is only defined for 3D spheres (N=3).");
+    return (static_cast<T>(4) / static_cast<T>(3)) * static_cast<T>(M_PI)
+           * radius * radius * radius;
+  }
+
+  /// @brief Calculate the diameter of the sphere.
+  ///
+  /// @return The diameter (2 * radius).
+  inline T Diameter() const { return static_cast<T>(2) * radius; }
+};
+/// @}
+
+/// @brief Check if two spheres are identical.
+///
+/// @param s1 Sphere to be tested.
+/// @param s2 Other sphere to be tested.
+template <class T, int N>
+bool operator==(const Sphere<T, N>& s1, const Sphere<T, N>& s2) {
+  return (s1.center == s2.center && s1.radius == s2.radius);
+}
+
+/// @brief Check if two spheres are <b>not</b> identical.
+///
+/// @param s1 Sphere to be tested.
+/// @param s2 Other sphere to be tested.
+template <class T, int N>
+bool operator!=(const Sphere<T, N>& s1, const Sphere<T, N>& s2) {
+  return !(s1 == s2);
+}
+
+}  // namespace mathfu
+
+#endif  // MATHFU_SPHERE_H_
