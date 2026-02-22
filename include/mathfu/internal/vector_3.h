@@ -142,6 +142,16 @@ class Vector<T, 3> {
     return AngleHelper(v1, v2);
   }
 
+  static inline Vector<T, 3> Reflect(const Vector<T, 3>& incident,
+                                     const Vector<T, 3>& normal) {
+    return ReflectHelper(incident, normal);
+  }
+
+  static inline Vector<T, 3> Refract(const Vector<T, 3>& incident,
+                                     const Vector<T, 3>& normal, T eta) {
+    return RefractHelper(incident, normal, eta);
+  }
+
   MATHFU_DEFINE_CLASS_SIMD_AWARE_NEW_DELETE
 
 #include "mathfu/internal/disable_warnings_begin.h"

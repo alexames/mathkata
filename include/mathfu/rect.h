@@ -189,6 +189,21 @@ bool operator!=(const Rect<T>& r1, const Rect<T>& r2) {
   return !(r1 == r2);
 }
 
+/// @brief Lexicographic less-than comparison for two Rects.
+///
+/// Compares by position first, then by size.  This provides a strict weak
+/// ordering suitable for use in sorted containers such as std::set and
+/// std::map.
+///
+/// @param r1 Rect to be tested.
+/// @param r2 Other rect to be tested.
+/// @return true if @p r1 is lexicographically less than @p r2.
+template <class T>
+bool operator<(const Rect<T>& r1, const Rect<T>& r2) {
+  if (r1.pos != r2.pos) return r1.pos < r2.pos;
+  return r1.size < r2.size;
+}
+
 }  // namespace mathfu
 
 #endif  // MATHFU_RECT_H_
