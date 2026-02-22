@@ -179,25 +179,6 @@
 /// @}
 
 /// @cond MATHFU_INTERNAL
-template <bool>
-struct static_assert_util;
-template <>
-struct static_assert_util<true> {};
-/// @endcond
-
-/// @addtogroup mathfu_utilities
-/// @{
-/// @def MATHFU_STATIC_ASSERT
-/// @brief Compile time assert for pre-C++11 compilers.
-///
-/// For example:
-/// <blockquote><code>
-/// MATHFU_STATIC_ASSERT(0 == 1);
-/// </code></blockquote> will result in a compile error.
-#define MATHFU_STATIC_ASSERT(x) static_assert_util<(x)>()
-/// @}
-
-/// @cond MATHFU_INTERNAL
 /// Unroll an loop up to 4 iterations, where iterator is the identifier
 /// used in each operation (e.g "i"), number_of_iterations is a constant which
 /// specifies the number of times to perform the operation and "operation" is
@@ -574,14 +555,6 @@ class simd_allocator : public std::allocator<T> {
   /// @param p Pointer to memory to deallocate.
   void deallocate(pointer p, size_type) { FreeAligned(p); }
 };
-
-#if defined(_MSC_VER)
-#if _MSC_VER <= 1800  // MSVC 2013
-#if !defined(noexcept)
-#define noexcept
-#endif  // !defined(noexcept)
-#endif  // _MSC_VER <= 1800
-#endif  //  defined(_MSC_VER)
 
 /// @def MATHFU_DEFINE_GLOBAL_SIMD_AWARE_NEW_DELETE
 /// @brief Macro which overrides the default new and delete allocators.

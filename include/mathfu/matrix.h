@@ -225,7 +225,7 @@ class Matrix {
   /// @param s01 Value of the first row, second column.
   /// @param s11 Value of the second row and column.
   inline Matrix(T s00, T s10, T s01, T s11) {
-    MATHFU_STATIC_ASSERT(Rows == 2 && Cols == 2);
+    static_assert(Rows == 2 && Cols == 2, "Rows and Cols must be 2");
     data_[0] = Vector<T, Rows>(s00, s10);
     data_[1] = Vector<T, Rows>(s01, s11);
   }
@@ -244,7 +244,7 @@ class Matrix {
   /// @param s12 Value of the second row, third column.
   /// @param s22 Value of the third row and column.
   inline Matrix(T s00, T s10, T s20, T s01, T s11, T s21, T s02, T s12, T s22) {
-    MATHFU_STATIC_ASSERT(Rows == 3 && Cols == 3);
+    static_assert(Rows == 3 && Cols == 3, "Rows and Cols must be 3");
     data_[0] = Vector<T, Rows>(s00, s10, s20);
     data_[1] = Vector<T, Rows>(s01, s11, s21);
     data_[2] = Vector<T, Rows>(s02, s12, s22);
@@ -269,7 +269,7 @@ class Matrix {
   /// @param s32 Value of the fourth row, third column.
   inline Matrix(T s00, T s10, T s20, T s30, T s01, T s11, T s21, T s31, T s02,
                 T s12, T s22, T s32) {
-    MATHFU_STATIC_ASSERT(Rows == 4 && Cols == 3);
+    static_assert(Rows == 4 && Cols == 3, "Rows must be 4 and Cols must be 3");
     data_[0] = Vector<T, Rows>(s00, s10, s20, s30);
     data_[1] = Vector<T, Rows>(s01, s11, s21, s31);
     data_[2] = Vector<T, Rows>(s02, s12, s22, s32);
@@ -297,7 +297,7 @@ class Matrix {
   /// @param s33 Value of the fourth row and column.
   inline Matrix(T s00, T s10, T s20, T s30, T s01, T s11, T s21, T s31, T s02,
                 T s12, T s22, T s32, T s03, T s13, T s23, T s33) {
-    MATHFU_STATIC_ASSERT(Rows == 4 && Cols == 4);
+    static_assert(Rows == 4 && Cols == 4, "Rows and Cols must be 4");
     data_[0] = Vector<T, Rows>(s00, s10, s20, s30);
     data_[1] = Vector<T, Rows>(s01, s11, s21, s31);
     data_[2] = Vector<T, Rows>(s02, s12, s22, s32);
@@ -314,7 +314,7 @@ class Matrix {
   /// @param column3 Vector used for the fourth column.
   inline Matrix(const Vector<T, 4>& column0, const Vector<T, 4>& column1,
                 const Vector<T, 4>& column2, const Vector<T, 4>& column3) {
-    MATHFU_STATIC_ASSERT(Rows == 4 && Cols == 4);
+    static_assert(Rows == 4 && Cols == 4, "Rows and Cols must be 4");
     data_[0] = column0;
     data_[1] = column1;
     data_[2] = column2;
@@ -600,7 +600,7 @@ class Matrix {
   /// @note 2-dimensional affine transforms are represented by 3x3 matrices.
   /// @return Vector with the first two components of column 2 of this Matrix.
   inline Vector<T, 2> TranslationVector2D() const {
-    MATHFU_STATIC_ASSERT(Rows == 3 && Cols == 3);
+    static_assert(Rows == 3 && Cols == 3, "Rows and Cols must be 3");
     return Vector<T, 2>(data_[2][0], data_[2][1]);
   }
 
@@ -610,7 +610,7 @@ class Matrix {
   /// @note 3-dimensional affine transforms are represented by 4x4 matrices.
   /// @return Vector with the first three components of column 3.
   inline Vector<T, 3> TranslationVector3D() const {
-    MATHFU_STATIC_ASSERT(Rows == 4 && Cols == 4);
+    static_assert(Rows == 4 && Cols == 4, "Rows and Cols must be 4");
     return Vector<T, 3>(data_[3][0], data_[3][1], data_[3][2]);
   }
 
@@ -618,7 +618,7 @@ class Matrix {
   ///
   /// @return Vector with the scale along each local axis.
   inline Vector<T, 3> ScaleVector3D() const {
-    MATHFU_STATIC_ASSERT(Rows >= 3 && Cols >= 3);
+    static_assert(Rows >= 3 && Cols >= 3, "Rows and Cols must be at least 3");
     return Vector<T, 3>(data_[0].xyz().Length(), data_[1].xyz().Length(),
                         data_[2].xyz().Length());
   }

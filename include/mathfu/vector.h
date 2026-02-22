@@ -239,7 +239,7 @@ class Vector {
   /// @param s1 Scalar value for the first element of the vector.
   /// @param s2 Scalar value for the second element of the vector.
   inline Vector(T s1, T s2) {
-    MATHFU_STATIC_ASSERT(Dims == 2);
+    static_assert(Dims == 2, "Dims must be 2");
     data_[0] = s1;
     data_[1] = s2;
   }
@@ -252,7 +252,7 @@ class Vector {
   /// @param s2 Scalar value for the second element of the vector.
   /// @param s3 Scalar value for the third element of the vector.
   inline Vector(T s1, T s2, T s3) {
-    MATHFU_STATIC_ASSERT(Dims == 3);
+    static_assert(Dims == 3, "Dims must be 3");
     data_[0] = s1;
     data_[1] = s2;
     data_[2] = s3;
@@ -265,7 +265,7 @@ class Vector {
   /// @param v12 Vector containing the first 2 values.
   /// @param s3 Scalar value for the third element of the vector.
   inline Vector(const Vector<T, 2>& v12, T s3) {
-    MATHFU_STATIC_ASSERT(Dims == 3);
+    static_assert(Dims == 3, "Dims must be 3");
     data_[0] = v12[0];
     data_[1] = v12[1];
     data_[2] = s3;
@@ -280,7 +280,7 @@ class Vector {
   /// @param s3 Scalar value for the third element of the vector.
   /// @param s4 Scalar value for the forth element of the vector.
   inline Vector(T s1, T s2, T s3, T s4) {
-    MATHFU_STATIC_ASSERT(Dims == 4);
+    static_assert(Dims == 4, "Dims must be 4");
     data_[0] = s1;
     data_[1] = s2;
     data_[2] = s3;
@@ -295,7 +295,7 @@ class Vector {
   /// @param vector3 Vector used to initialize the first 3 elements.
   /// @param value Value used to set the last element of the vector.
   inline Vector(const Vector<T, 3>& vector123, T s4) {
-    MATHFU_STATIC_ASSERT(Dims == 4);
+    static_assert(Dims == 4, "Dims must be 4");
     data_[0] = vector123[0];
     data_[1] = vector123[1];
     data_[2] = vector123[2];
@@ -309,7 +309,7 @@ class Vector {
   /// @param v12 Vector containing the first 2 values.
   /// @param v34 Vector containing the last 2 values.
   inline Vector(const Vector<T, 2>& v12, const Vector<T, 2>& v34) {
-    MATHFU_STATIC_ASSERT(Dims == 4);
+    static_assert(Dims == 4, "Dims must be 4");
     data_[0] = v12[0];
     data_[1] = v12[1];
     data_[2] = v34[0];
@@ -355,7 +355,7 @@ class Vector {
   /// @returns A 3-dimensional Vector containing the first 3 elements of
   // this Vector.
   inline Vector<T, 3> xyz() {
-    MATHFU_STATIC_ASSERT(Dims > 3);
+    static_assert(Dims > 3, "Dims must be greater than 3");
     return Vector<T, 3>(data_[0], data_[1], data_[2]);
   }
 
@@ -365,7 +365,7 @@ class Vector {
   /// @returns A 3-dimensional Vector containing the first 3 elements of
   // this Vector.
   inline const Vector<T, 3> xyz() const {
-    MATHFU_STATIC_ASSERT(Dims > 3);
+    static_assert(Dims > 3, "Dims must be greater than 3");
     return Vector<T, 3>(data_[0], data_[1], data_[2]);
   }
 
@@ -374,7 +374,7 @@ class Vector {
   /// This only works with vectors that contain more than 2 elements.
   /// @returns A 2-dimensional Vector with the first 2 elements of this Vector.
   inline Vector<T, 2> xy() {
-    MATHFU_STATIC_ASSERT(Dims > 2);
+    static_assert(Dims > 2, "Dims must be greater than 2");
     return Vector<T, 2>(data_[0], data_[1]);
   }
 
@@ -383,7 +383,7 @@ class Vector {
   /// This only works with vectors that contain more than 2 elements.
   /// @returns A 2-dimensional Vector with the first 2 elements of this Vector.
   inline const Vector<T, 2> xy() const {
-    MATHFU_STATIC_ASSERT(Dims > 2);
+    static_assert(Dims > 2, "Dims must be greater than 2");
     return Vector<T, 2>(data_[0], data_[1]);
   }
 
@@ -392,7 +392,7 @@ class Vector {
   /// This only works with vectors that contain 4 elements.
   /// @returns A 2-dimensional Vector with the last 2 elements of this Vector.
   inline Vector<T, 2> zw() {
-    MATHFU_STATIC_ASSERT(Dims == 4);
+    static_assert(Dims == 4, "Dims must be 4");
     return Vector<T, 2>(data_[2], data_[3]);
   }
 
@@ -401,7 +401,7 @@ class Vector {
   /// This only works with vectors that contain 4 elements.
   /// @returns A 2-dimensional Vector with the last 2 elements of this Vector.
   inline const Vector<T, 2> zw() const {
-    MATHFU_STATIC_ASSERT(Dims == 4);
+    static_assert(Dims == 4, "Dims must be 4");
     return Vector<T, 2>(data_[2], data_[3]);
   }
 
