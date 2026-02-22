@@ -18,6 +18,7 @@
 
 #include <ostream>
 
+#include "mathkata/affine_transform_2d.h"
 #include "mathkata/color.h"
 #include "mathkata/matrix.h"
 #include "mathkata/quaternion.h"
@@ -62,6 +63,18 @@ inline std::ostream& operator<<(std::ostream& os, const Color& c) {
   return os << "(" << static_cast<int>(c.r) << ", " << static_cast<int>(c.g)
             << ", " << static_cast<int>(c.b) << ", " << static_cast<int>(c.a)
             << ")";
+}
+
+/// @brief Print the 2D affine transform contents to the output stream.
+///
+/// Prints the 3x3 affine portion in row-major order.
+template <typename T>
+inline std::ostream& operator<<(std::ostream& os,
+                                const AffineTransform2D<T>& t) {
+  const T* m = t.GetMatrix();
+  return os << "((" << m[0] << ", " << m[4] << ", " << m[12] << "), (" << m[1]
+            << ", " << m[5] << ", " << m[13] << "), (" << m[3] << ", " << m[7]
+            << ", " << m[15] << "))";
 }
 
 }  // namespace mathkata
