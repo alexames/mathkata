@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef MATHFU_INTERNAL_VECTOR_3_H_
-#define MATHFU_INTERNAL_VECTOR_3_H_
+#ifndef MATHKATA_INTERNAL_VECTOR_3_H_
+#define MATHKATA_INTERNAL_VECTOR_3_H_
 
-#include "mathfu/vector.h"
+#include "mathkata/vector.h"
 
-namespace mathfu {
+namespace mathkata {
 
 template <class T>
 class Vector<T, 3> {
@@ -162,9 +162,9 @@ class Vector<T, 3> {
     return RefractHelper(incident, normal, eta);
   }
 
-  MATHFU_DEFINE_CLASS_SIMD_AWARE_NEW_DELETE
+  MATHKATA_DEFINE_CLASS_SIMD_AWARE_NEW_DELETE
 
-#include "mathfu/internal/disable_warnings_begin.h"
+#include "mathkata/internal/disable_warnings_begin.h"
   union {
     T data_[3];
     struct {
@@ -173,7 +173,7 @@ class Vector<T, 3> {
       T z;
     };
   };
-#include "mathfu/internal/disable_warnings_end.h"
+#include "mathkata/internal/disable_warnings_end.h"
 };
 
 template <class T>
@@ -197,7 +197,7 @@ struct VectorPacked<T, 3> {
     return *this;
   }
 
-#include "mathfu/internal/disable_warnings_begin.h"
+#include "mathkata/internal/disable_warnings_begin.h"
   /// Elements of the packed vector one per dimension.
   union {
     T data_[3];
@@ -207,9 +207,9 @@ struct VectorPacked<T, 3> {
       T z;
     };
   };
-#include "mathfu/internal/disable_warnings_end.h"
+#include "mathkata/internal/disable_warnings_end.h"
 };
 
-}  //  namespace mathfu
+}  //  namespace mathkata
 
-#endif  // MATHFU_INTERNAL_VECTOR_3_H_
+#endif  // MATHKATA_INTERNAL_VECTOR_3_H_

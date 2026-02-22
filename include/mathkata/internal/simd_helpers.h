@@ -13,20 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef MATHFU_INTERNAL_SIMD_HELPERS_H_
-#define MATHFU_INTERNAL_SIMD_HELPERS_H_
+#ifndef MATHKATA_INTERNAL_SIMD_HELPERS_H_
+#define MATHKATA_INTERNAL_SIMD_HELPERS_H_
 
-/// @file mathfu/internal/simd_helpers.h
+/// @file mathkata/internal/simd_helpers.h
 /// @brief SIMD helper functions and types using xsimd.
 ///
 /// Provides a compatibility layer with the same function signatures as the
 /// former vectorial dependency, implemented using xsimd.
 
-#ifdef MATHFU_COMPILE_WITH_SIMD
+#ifdef MATHKATA_COMPILE_WITH_SIMD
 
 #include <xsimd/xsimd.hpp>
 
-namespace mathfu {
+namespace mathkata {
 
 /// @brief The xsimd architecture to use for 128-bit SIMD operations.
 #if defined(__SSE2__) || defined(_M_X64) || defined(_M_AMD64) \
@@ -183,8 +183,8 @@ inline simd4f simd4f_zero_w(simd4f v) {
   return batch4f(b.get(0), b.get(1), b.get(2), 0.0f);
 }
 
-}  // namespace mathfu
+}  // namespace mathkata
 
-#endif  // MATHFU_COMPILE_WITH_SIMD
+#endif  // MATHKATA_COMPILE_WITH_SIMD
 
-#endif  // MATHFU_INTERNAL_SIMD_HELPERS_H_
+#endif  // MATHKATA_INTERNAL_SIMD_HELPERS_H_

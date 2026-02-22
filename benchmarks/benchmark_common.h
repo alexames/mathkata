@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef MATHFU_BENCHMARKS_BENCHMARKCOMMON_H_
-#define MATHFU_BENCHMARKS_BENCHMARKCOMMON_H_
+#ifndef MATHKATA_BENCHMARKS_BENCHMARKCOMMON_H_
+#define MATHKATA_BENCHMARKS_BENCHMARKCOMMON_H_
 
 #if defined(_WIN32)
 #define WIN32_LEAN_AND_MEAN
@@ -99,4 +99,4 @@ class Timer {
 };
 double Timer::tick_period_ = 0;
 
-#endif  // MATHFU_BENCHMARKS_BENCHMARKCOMMON_H_
+#endif  // MATHKATA_BENCHMARKS_BENCHMARKCOMMON_H_

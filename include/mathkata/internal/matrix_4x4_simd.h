@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef MATHFU_MATRIX_4X4_SIMD_H_
-#define MATHFU_MATRIX_4X4_SIMD_H_
+#ifndef MATHKATA_MATRIX_4X4_SIMD_H_
+#define MATHKATA_MATRIX_4X4_SIMD_H_
 
-#include "mathfu/matrix.h"
+#include "mathkata/matrix.h"
 
-/// @file mathfu/internal/matrix_4x4_simd.h
+/// @file mathkata/internal/matrix_4x4_simd.h
 /// @brief SIMD-optimized 4x4 float matrix operations.
 ///
 /// This file provides SIMD specializations for Matrix<float, 4, 4> multiply
@@ -26,13 +26,13 @@
 /// already uses simd4f when SIMD is enabled, so no full class specialization
 /// is needed -- only the performance-critical free functions are replaced.
 
-#ifdef MATHFU_COMPILE_WITH_SIMD
+#ifdef MATHKATA_COMPILE_WITH_SIMD
 
-#include "mathfu/internal/simd_helpers.h"
+#include "mathkata/internal/simd_helpers.h"
 
-namespace mathfu {
+namespace mathkata {
 
-/// @cond MATHFU_INTERNAL
+/// @cond MATHKATA_INTERNAL
 /// @brief SIMD-optimized 4x4 float matrix multiplication.
 ///
 /// Each output column is computed as:
@@ -60,7 +60,7 @@ inline void TimesHelper(const Matrix<float, 4, 4>& m1,
 }
 /// @endcond
 
-/// @cond MATHFU_INTERNAL
+/// @cond MATHKATA_INTERNAL
 /// @brief SIMD-optimized 4x4 float matrix * 4-element vector multiply.
 ///
 /// result = col0 * splat(v.x) + col1 * splat(v.y)
@@ -82,8 +82,8 @@ inline Vector<float, 4> operator*(const Matrix<float, 4, 4>& m,
 }
 /// @endcond
 
-}  // namespace mathfu
+}  // namespace mathkata
 
-#endif  // MATHFU_COMPILE_WITH_SIMD
+#endif  // MATHKATA_COMPILE_WITH_SIMD
 
-#endif  // MATHFU_MATRIX_4X4_SIMD_H_
+#endif  // MATHKATA_MATRIX_4X4_SIMD_H_

@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "mathfu/plane.h"
+#include "mathkata/plane.h"
 
 #include <cmath>
 #include <cstdio>
 
 #include "gtest/gtest.h"
-#include "mathfu/utilities.h"
+#include "mathkata/utilities.h"
 #include "precision.h"
 
 class PlaneTests : public ::testing::Test {
@@ -39,17 +39,17 @@ class PlaneTests : public ::testing::Test {
 
 // Convenience typedef to avoid commas in macro arguments.
 template <class T>
-using Vec3 = mathfu::Vector<T, 3>;
+using Vec3 = mathkata::Vector<T, 3>;
 
 template <class T>
-using Vec4 = mathfu::Vector<T, 4>;
+using Vec4 = mathkata::Vector<T, 4>;
 
 // Test construction from normal and distance.
 template <class T>
 void ConstructNormalDistance_Test(T /*precision*/) {
   const Vec3<T> normal(0, 1, 0);
   const T distance = static_cast<T>(5);
-  const mathfu::Plane<T> plane(normal, distance);
+  const mathkata::Plane<T> plane(normal, distance);
   EXPECT_EQ(plane.normal, normal);
   EXPECT_EQ(plane.distance, distance);
 }
@@ -59,7 +59,7 @@ TEST_PLANE_F(ConstructNormalDistance)
 template <class T>
 void ConstructVector4_Test(T /*precision*/) {
   const Vec4<T> v(0, 1, 0, 5);
-  const mathfu::Plane<T> plane(v);
+  const mathkata::Plane<T> plane(v);
   const Vec3<T> expected_normal(0, 1, 0);
   EXPECT_EQ(plane.normal, expected_normal);
   EXPECT_EQ(plane.distance, static_cast<T>(5));
@@ -72,8 +72,8 @@ void FromPointNormal_Test(T precision) {
   // A plane at y=3 with normal pointing up.
   const Vec3<T> point(0, 3, 0);
   const Vec3<T> normal(0, 1, 0);
-  const mathfu::Plane<T> plane =
-      mathfu::Plane<T>::FromPointNormal(point, normal);
+  const mathkata::Plane<T> plane =
+      mathkata::Plane<T>::FromPointNormal(point, normal);
   EXPECT_EQ(plane.normal, normal);
   // distance should be -dot(normal, point) = -3
   EXPECT_NEAR(plane.distance, static_cast<T>(-3), precision);
@@ -89,7 +89,7 @@ void FromPoints_Test(T precision) {
   const Vec3<T> a(0, 0, 0);
   const Vec3<T> b(1, 0, 0);
   const Vec3<T> c(0, 0, 1);
-  const mathfu::Plane<T> plane = mathfu::Plane<T>::FromPoints(a, b, c);
+  const mathkata::Plane<T> plane = mathkata::Plane<T>::FromPoints(a, b, c);
   // The normal should point in the +Y or -Y direction.
   // Cross product of (b-a)=(1,0,0) and (c-a)=(0,0,1) is (0,-1,0).
   // Normalized: (0,-1,0).
@@ -110,8 +110,8 @@ void SignedDistance_Test(T precision) {
   // Plane: y = 2 (normal=(0,1,0), distance=-2)
   const Vec3<T> plane_point(0, 2, 0);
   const Vec3<T> plane_normal(0, 1, 0);
-  const mathfu::Plane<T> plane =
-      mathfu::Plane<T>::FromPointNormal(plane_point, plane_normal);
+  const mathkata::Plane<T> plane =
+      mathkata::Plane<T>::FromPointNormal(plane_point, plane_normal);
   // Point on the plane.
   const Vec3<T> on_plane(5, 2, 3);
   EXPECT_NEAR(plane.SignedDistance(on_plane), static_cast<T>(0), precision);
@@ -130,8 +130,8 @@ void ProjectPoint_Test(T precision) {
   // Plane: y = 2 (normal=(0,1,0), distance=-2)
   const Vec3<T> plane_point(0, 2, 0);
   const Vec3<T> plane_normal(0, 1, 0);
-  const mathfu::Plane<T> plane =
-      mathfu::Plane<T>::FromPointNormal(plane_point, plane_normal);
+  const mathkata::Plane<T> plane =
+      mathkata::Plane<T>::FromPointNormal(plane_point, plane_normal);
   // Project a point above the plane.
   const Vec3<T> point_above(3, 7, 4);
   const Vec3<T> projected = plane.ProjectPoint(point_above);
@@ -152,8 +152,8 @@ template <class T>
 void Flipped_Test(T /*precision*/) {
   const Vec3<T> normal(0, 1, 0);
   const T distance = static_cast<T>(-3);
-  const mathfu::Plane<T> plane(normal, distance);
-  const mathfu::Plane<T> flipped = plane.Flipped();
+  const mathkata::Plane<T> plane(normal, distance);
+  const mathkata::Plane<T> flipped = plane.Flipped();
   const Vec3<T> neg_normal = -normal;
   EXPECT_EQ(flipped.normal, neg_normal);
   EXPECT_EQ(flipped.distance, -distance);
@@ -165,10 +165,10 @@ template <class T>
 void Equality_Test(T /*precision*/) {
   const Vec3<T> n1(0, 1, 0);
   const Vec3<T> n2(1, 0, 0);
-  const mathfu::Plane<T> p1(n1, static_cast<T>(5));
-  const mathfu::Plane<T> p2(n1, static_cast<T>(5));
-  const mathfu::Plane<T> p3(n2, static_cast<T>(5));
-  const mathfu::Plane<T> p4(n1, static_cast<T>(3));
+  const mathkata::Plane<T> p1(n1, static_cast<T>(5));
+  const mathkata::Plane<T> p2(n1, static_cast<T>(5));
+  const mathkata::Plane<T> p3(n2, static_cast<T>(5));
+  const mathkata::Plane<T> p4(n1, static_cast<T>(3));
   EXPECT_TRUE(p1 == p2);
   EXPECT_FALSE(p1 != p2);
   EXPECT_TRUE(p1 != p3);
@@ -180,6 +180,6 @@ TEST_PLANE_F(Equality)
 
 int main(int argc, char** argv) {
   ::testing::InitGoogleTest(&argc, argv);
-  printf("%s (%s)\n", argv[0], MATHFU_BUILD_OPTIONS_STRING);
+  printf("%s (%s)\n", argv[0], MATHKATA_BUILD_OPTIONS_STRING);
   return RUN_ALL_TESTS();
 }

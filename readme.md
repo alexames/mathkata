@@ -1,7 +1,7 @@
-MathFu Version 1.1.0    {#mathfu_readme}
+MathKata Version 1.1.0    {#mathkata_readme}
 ====================
 
-MathFu is a C++ math library developed primarily for games focused on
+MathKata is a C++ math library developed primarily for games focused on
 simplicity and efficiency.
 
 It provides a suite of [vector][], [matrix][] and [quaternion][] classes
@@ -19,31 +19,31 @@ has been tested on the following platforms:
 
 Go to our [landing page][] to browse our documentation and see some examples.
 
-   * Discuss MathFu with other developers and users on the
-     [MathFu Google Group][].
-   * File issues on the [MathFu Issues Tracker][]
+   * Discuss MathKata with other developers and users on the
+     [MathKata Google Group][].
+   * File issues on the [MathKata Issues Tracker][]
    * Post your questions to [stackoverflow.com][] with a mention of
-     **mathfu**.
+     **mathkata**.
 
-**Important**: MathFu uses submodules to reference other components it depends
+**Important**: MathKata uses submodules to reference other components it depends
 upon so download the source using:
 
-    git clone --recursive https://github.com/google/mathfu.git
+    git clone --recursive https://github.com/google/mathkata.git
 
 To contribute to this project see [CONTRIBUTING][].
 
   [Android]: http://www.android.com
   [Linux]: http://en.m.wikipedia.org/wiki/Linux
-  [MathFu Google Group]: http://groups.google.com/group/mathfulib
-  [MathFu Issues Tracker]: http://github.com/google/mathfu/issues
+  [MathKata Google Group]: http://groups.google.com/group/mathkatalib
+  [MathKata Issues Tracker]: http://github.com/google/mathkata/issues
   [OS X]: http://www.apple.com/osx/
   [OpenGL]: http://www.opengl.org/
   [SIMD]: http://en.wikipedia.org/wiki/SIMD
   [Windows]: http://windows.microsoft.com/
   [geometry]: http://en.wikipedia.org/wiki/Geometry
-  [landing page]: http://google.github.io/mathfu
+  [landing page]: http://google.github.io/mathkata
   [matrix]: http://en.wikipedia.org/wiki/Matrix_(mathematics)
   [quaternion]: http://en.wikipedia.org/wiki/Quaternion
-  [stackoverflow.com]: http://stackoverflow.com/search?q=mathfu
+  [stackoverflow.com]: http://stackoverflow.com/search?q=mathkata
   [vector]: http://en.wikipedia.org/wiki/Euclidean_vector
-  [CONTRIBUTING]: http://github.com/google/mathfu/blob/master/CONTRIBUTING
+  [CONTRIBUTING]: http://github.com/google/mathkata/blob/master/CONTRIBUTING

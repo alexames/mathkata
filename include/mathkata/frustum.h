@@ -13,21 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef MATHFU_FRUSTUM_H_
-#define MATHFU_FRUSTUM_H_
+#ifndef MATHKATA_FRUSTUM_H_
+#define MATHKATA_FRUSTUM_H_
 
 #include <cmath>
 
-#include "mathfu/aabb.h"
-#include "mathfu/matrix.h"
-#include "mathfu/plane.h"
-#include "mathfu/sphere.h"
+#include "mathkata/aabb.h"
+#include "mathkata/matrix.h"
+#include "mathkata/plane.h"
+#include "mathkata/sphere.h"
 
-namespace mathfu {
+namespace mathkata {
 
-/// @addtogroup mathfu_frustum
+/// @addtogroup mathkata_frustum
 /// @{
-/// @class Frustum "mathfu/frustum.h"
+/// @class Frustum "mathkata/frustum.h"
 /// @brief View frustum of type T represented as 6 planes.
 ///
 /// Frustum stores 6 planes (near, far, left, right, top, bottom) that define
@@ -89,7 +89,7 @@ struct Frustum {
   static inline Frustum<T> FromViewProjection(const Matrix<T, 4, 4>& vp) {
     Frustum<T> frustum;
 
-    // Extract rows of the matrix. In mathfu, operator()(row, col) accesses
+    // Extract rows of the matrix. In mathkata, operator()(row, col) accesses
     // the element at the given row and column.
     // Row i = (vp(i,0), vp(i,1), vp(i,2), vp(i,3))
 
@@ -229,6 +229,6 @@ constexpr bool operator!=(const Frustum<T>& f1, const Frustum<T>& f2) {
   return !(f1 == f2);
 }
 
-}  // namespace mathfu
+}  // namespace mathkata
 
-#endif  // MATHFU_FRUSTUM_H_
+#endif  // MATHKATA_FRUSTUM_H_

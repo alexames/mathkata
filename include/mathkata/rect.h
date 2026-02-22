@@ -13,18 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef MATHFU_RECT_H_
-#define MATHFU_RECT_H_
+#ifndef MATHKATA_RECT_H_
+#define MATHKATA_RECT_H_
 
 #include <algorithm>
 
-#include "mathfu/vector.h"
+#include "mathkata/vector.h"
 
-namespace mathfu {
+namespace mathkata {
 
-/// @addtogroup mathfu_rect
+/// @addtogroup mathkata_rect
 /// @{
-/// @class Rect "mathfu/rect.h"
+/// @class Rect "mathkata/rect.h"
 /// @brief Rect of type T containing position (pos) and width.
 ///
 /// Rect contains two 2D <b>Vector</b>s of type <b>T</b> representing position
@@ -207,6 +207,6 @@ constexpr bool operator<(const Rect<T>& r1, const Rect<T>& r2) {
   return r1.size < r2.size;
 }
 
-}  // namespace mathfu
+}  // namespace mathkata
 
-#endif  // MATHFU_RECT_H_
+#endif  // MATHKATA_RECT_H_

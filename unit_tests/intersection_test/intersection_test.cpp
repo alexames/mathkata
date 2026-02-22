@@ -17,8 +17,8 @@
 #include <cstdio>
 
 #include "gtest/gtest.h"
-#include "mathfu/intersections.h"
-#include "mathfu/utilities.h"
+#include "mathkata/intersections.h"
+#include "mathkata/utilities.h"
 #include "precision.h"
 
 class IntersectionTests : public ::testing::Test {
@@ -59,17 +59,17 @@ class IntersectionTests : public ::testing::Test {
 template <class T, int N>
 void RayIntersectsSphere_Hit_Test(T precision) {
   // Ray pointing at a sphere centered at the origin.
-  mathfu::Vector<T, N> origin(static_cast<T>(0));
+  mathkata::Vector<T, N> origin(static_cast<T>(0));
   origin[0] = static_cast<T>(-5);
-  mathfu::Vector<T, N> direction(static_cast<T>(0));
+  mathkata::Vector<T, N> direction(static_cast<T>(0));
   direction[0] = static_cast<T>(1);
-  mathfu::Ray<T, N> ray(origin, direction);
+  mathkata::Ray<T, N> ray(origin, direction);
 
-  mathfu::Vector<T, N> center(static_cast<T>(0));
-  mathfu::Sphere<T, N> sphere(center, static_cast<T>(1));
+  mathkata::Vector<T, N> center(static_cast<T>(0));
+  mathkata::Sphere<T, N> sphere(center, static_cast<T>(1));
 
   T t = static_cast<T>(0);
-  EXPECT_TRUE(mathfu::RayIntersectsSphere(ray, sphere, &t));
+  EXPECT_TRUE(mathkata::RayIntersectsSphere(ray, sphere, &t));
   EXPECT_NEAR(t, static_cast<T>(4), precision);
 }
 TEST_ALL_DIMS_F(RayIntersectsSphere_Hit)
@@ -78,32 +78,32 @@ template <class T, int N>
 void RayIntersectsSphere_Miss_Test(T precision) {
   (void)precision;
   // Ray pointing away from the sphere.
-  mathfu::Vector<T, N> origin(static_cast<T>(0));
+  mathkata::Vector<T, N> origin(static_cast<T>(0));
   origin[0] = static_cast<T>(-5);
-  mathfu::Vector<T, N> direction(static_cast<T>(0));
+  mathkata::Vector<T, N> direction(static_cast<T>(0));
   direction[0] = static_cast<T>(-1);
-  mathfu::Ray<T, N> ray(origin, direction);
+  mathkata::Ray<T, N> ray(origin, direction);
 
-  mathfu::Vector<T, N> center(static_cast<T>(0));
-  mathfu::Sphere<T, N> sphere(center, static_cast<T>(1));
+  mathkata::Vector<T, N> center(static_cast<T>(0));
+  mathkata::Sphere<T, N> sphere(center, static_cast<T>(1));
 
-  EXPECT_FALSE(mathfu::RayIntersectsSphere(ray, sphere));
+  EXPECT_FALSE(mathkata::RayIntersectsSphere(ray, sphere));
 }
 TEST_ALL_DIMS_F(RayIntersectsSphere_Miss)
 
 template <class T, int N>
 void RayIntersectsSphere_FromInside_Test(T precision) {
   // Ray origin inside the sphere.
-  mathfu::Vector<T, N> origin(static_cast<T>(0));
-  mathfu::Vector<T, N> direction(static_cast<T>(0));
+  mathkata::Vector<T, N> origin(static_cast<T>(0));
+  mathkata::Vector<T, N> direction(static_cast<T>(0));
   direction[0] = static_cast<T>(1);
-  mathfu::Ray<T, N> ray(origin, direction);
+  mathkata::Ray<T, N> ray(origin, direction);
 
-  mathfu::Vector<T, N> center(static_cast<T>(0));
-  mathfu::Sphere<T, N> sphere(center, static_cast<T>(2));
+  mathkata::Vector<T, N> center(static_cast<T>(0));
+  mathkata::Sphere<T, N> sphere(center, static_cast<T>(2));
 
   T t = static_cast<T>(0);
-  EXPECT_TRUE(mathfu::RayIntersectsSphere(ray, sphere, &t));
+  EXPECT_TRUE(mathkata::RayIntersectsSphere(ray, sphere, &t));
   // The first intersection should be at t=2 (exit point).
   EXPECT_NEAR(t, static_cast<T>(2), precision);
 }
@@ -112,20 +112,20 @@ TEST_ALL_DIMS_F(RayIntersectsSphere_FromInside)
 template <class T, int N>
 void RayIntersectsSphere_Tangent_Test(T precision) {
   // Ray tangent to the sphere (just barely touching).
-  mathfu::Vector<T, N> origin(static_cast<T>(0));
+  mathkata::Vector<T, N> origin(static_cast<T>(0));
   origin[0] = static_cast<T>(-5);
   if (N >= 2) {
     origin[1] = static_cast<T>(1);  // Offset by exactly the radius.
   }
-  mathfu::Vector<T, N> direction(static_cast<T>(0));
+  mathkata::Vector<T, N> direction(static_cast<T>(0));
   direction[0] = static_cast<T>(1);
-  mathfu::Ray<T, N> ray(origin, direction);
+  mathkata::Ray<T, N> ray(origin, direction);
 
-  mathfu::Vector<T, N> center(static_cast<T>(0));
-  mathfu::Sphere<T, N> sphere(center, static_cast<T>(1));
+  mathkata::Vector<T, N> center(static_cast<T>(0));
+  mathkata::Sphere<T, N> sphere(center, static_cast<T>(1));
 
   T t = static_cast<T>(0);
-  EXPECT_TRUE(mathfu::RayIntersectsSphere(ray, sphere, &t));
+  EXPECT_TRUE(mathkata::RayIntersectsSphere(ray, sphere, &t));
   EXPECT_NEAR(t, static_cast<T>(5), precision);
 }
 TEST_ALL_DIMS_F(RayIntersectsSphere_Tangent)
@@ -134,19 +134,19 @@ template <class T, int N>
 void RayIntersectsSphere_MissOffset_Test(T precision) {
   (void)precision;
   // Ray offset past the sphere so it misses.
-  mathfu::Vector<T, N> origin(static_cast<T>(0));
+  mathkata::Vector<T, N> origin(static_cast<T>(0));
   origin[0] = static_cast<T>(-5);
   if (N >= 2) {
     origin[1] = static_cast<T>(2);  // Offset past the radius.
   }
-  mathfu::Vector<T, N> direction(static_cast<T>(0));
+  mathkata::Vector<T, N> direction(static_cast<T>(0));
   direction[0] = static_cast<T>(1);
-  mathfu::Ray<T, N> ray(origin, direction);
+  mathkata::Ray<T, N> ray(origin, direction);
 
-  mathfu::Vector<T, N> center(static_cast<T>(0));
-  mathfu::Sphere<T, N> sphere(center, static_cast<T>(1));
+  mathkata::Vector<T, N> center(static_cast<T>(0));
+  mathkata::Sphere<T, N> sphere(center, static_cast<T>(1));
 
-  EXPECT_FALSE(mathfu::RayIntersectsSphere(ray, sphere));
+  EXPECT_FALSE(mathkata::RayIntersectsSphere(ray, sphere));
 }
 TEST_ALL_DIMS_F(RayIntersectsSphere_MissOffset)
 
@@ -157,18 +157,18 @@ TEST_ALL_DIMS_F(RayIntersectsSphere_MissOffset)
 template <class T, int N>
 void RayIntersectsAABB_Hit_Test(T precision) {
   // Ray pointing at an AABB.
-  mathfu::Vector<T, N> origin(static_cast<T>(0));
+  mathkata::Vector<T, N> origin(static_cast<T>(0));
   origin[0] = static_cast<T>(-5);
-  mathfu::Vector<T, N> direction(static_cast<T>(0));
+  mathkata::Vector<T, N> direction(static_cast<T>(0));
   direction[0] = static_cast<T>(1);
-  mathfu::Ray<T, N> ray(origin, direction);
+  mathkata::Ray<T, N> ray(origin, direction);
 
-  mathfu::Vector<T, N> box_min(static_cast<T>(-1));
-  mathfu::Vector<T, N> box_max(static_cast<T>(1));
-  mathfu::AABB<T, N> aabb(box_min, box_max);
+  mathkata::Vector<T, N> box_min(static_cast<T>(-1));
+  mathkata::Vector<T, N> box_max(static_cast<T>(1));
+  mathkata::AABB<T, N> aabb(box_min, box_max);
 
   T t = static_cast<T>(0);
-  EXPECT_TRUE(mathfu::RayIntersectsAABB(ray, aabb, &t));
+  EXPECT_TRUE(mathkata::RayIntersectsAABB(ray, aabb, &t));
   EXPECT_NEAR(t, static_cast<T>(4), precision);
 }
 TEST_ALL_DIMS_F(RayIntersectsAABB_Hit)
@@ -177,34 +177,34 @@ template <class T, int N>
 void RayIntersectsAABB_Miss_Test(T precision) {
   (void)precision;
   // Ray pointing away from the AABB.
-  mathfu::Vector<T, N> origin(static_cast<T>(0));
+  mathkata::Vector<T, N> origin(static_cast<T>(0));
   origin[0] = static_cast<T>(-5);
-  mathfu::Vector<T, N> direction(static_cast<T>(0));
+  mathkata::Vector<T, N> direction(static_cast<T>(0));
   direction[0] = static_cast<T>(-1);
-  mathfu::Ray<T, N> ray(origin, direction);
+  mathkata::Ray<T, N> ray(origin, direction);
 
-  mathfu::Vector<T, N> box_min(static_cast<T>(-1));
-  mathfu::Vector<T, N> box_max(static_cast<T>(1));
-  mathfu::AABB<T, N> aabb(box_min, box_max);
+  mathkata::Vector<T, N> box_min(static_cast<T>(-1));
+  mathkata::Vector<T, N> box_max(static_cast<T>(1));
+  mathkata::AABB<T, N> aabb(box_min, box_max);
 
-  EXPECT_FALSE(mathfu::RayIntersectsAABB(ray, aabb));
+  EXPECT_FALSE(mathkata::RayIntersectsAABB(ray, aabb));
 }
 TEST_ALL_DIMS_F(RayIntersectsAABB_Miss)
 
 template <class T, int N>
 void RayIntersectsAABB_FromInside_Test(T precision) {
   // Ray origin inside the AABB.
-  mathfu::Vector<T, N> origin(static_cast<T>(0));
-  mathfu::Vector<T, N> direction(static_cast<T>(0));
+  mathkata::Vector<T, N> origin(static_cast<T>(0));
+  mathkata::Vector<T, N> direction(static_cast<T>(0));
   direction[0] = static_cast<T>(1);
-  mathfu::Ray<T, N> ray(origin, direction);
+  mathkata::Ray<T, N> ray(origin, direction);
 
-  mathfu::Vector<T, N> box_min(static_cast<T>(-2));
-  mathfu::Vector<T, N> box_max(static_cast<T>(2));
-  mathfu::AABB<T, N> aabb(box_min, box_max);
+  mathkata::Vector<T, N> box_min(static_cast<T>(-2));
+  mathkata::Vector<T, N> box_max(static_cast<T>(2));
+  mathkata::AABB<T, N> aabb(box_min, box_max);
 
   T t = static_cast<T>(0);
-  EXPECT_TRUE(mathfu::RayIntersectsAABB(ray, aabb, &t));
+  EXPECT_TRUE(mathkata::RayIntersectsAABB(ray, aabb, &t));
   EXPECT_NEAR(t, static_cast<T>(0), precision);
 }
 TEST_ALL_DIMS_F(RayIntersectsAABB_FromInside)
@@ -212,22 +212,22 @@ TEST_ALL_DIMS_F(RayIntersectsAABB_FromInside)
 template <class T, int N>
 void RayIntersectsAABB_AlongEdge_Test(T precision) {
   // Ray along the edge of the AABB (origin at a face).
-  mathfu::Vector<T, N> origin(static_cast<T>(0));
+  mathkata::Vector<T, N> origin(static_cast<T>(0));
   origin[0] = static_cast<T>(-5);
   if (N >= 2) {
     origin[1] = static_cast<T>(1);  // On the boundary.
   }
-  mathfu::Vector<T, N> direction(static_cast<T>(0));
+  mathkata::Vector<T, N> direction(static_cast<T>(0));
   direction[0] = static_cast<T>(1);
-  mathfu::Ray<T, N> ray(origin, direction);
+  mathkata::Ray<T, N> ray(origin, direction);
 
-  mathfu::Vector<T, N> box_min(static_cast<T>(-1));
-  mathfu::Vector<T, N> box_max(static_cast<T>(1));
-  mathfu::AABB<T, N> aabb(box_min, box_max);
+  mathkata::Vector<T, N> box_min(static_cast<T>(-1));
+  mathkata::Vector<T, N> box_max(static_cast<T>(1));
+  mathkata::AABB<T, N> aabb(box_min, box_max);
 
   T t = static_cast<T>(0);
   // Ray should still hit the AABB on the boundary.
-  EXPECT_TRUE(mathfu::RayIntersectsAABB(ray, aabb, &t));
+  EXPECT_TRUE(mathkata::RayIntersectsAABB(ray, aabb, &t));
   EXPECT_NEAR(t, static_cast<T>(4), precision);
 }
 TEST_ALL_DIMS_F(RayIntersectsAABB_AlongEdge)
@@ -236,21 +236,21 @@ template <class T, int N>
 void RayIntersectsAABB_Parallel_Test(T precision) {
   (void)precision;
   // Ray parallel to a slab but outside the AABB.
-  mathfu::Vector<T, N> origin(static_cast<T>(0));
+  mathkata::Vector<T, N> origin(static_cast<T>(0));
   origin[0] = static_cast<T>(-5);
   if (N >= 2) {
     origin[1] = static_cast<T>(3);  // Outside the AABB.
   }
-  mathfu::Vector<T, N> direction(static_cast<T>(0));
+  mathkata::Vector<T, N> direction(static_cast<T>(0));
   direction[0] = static_cast<T>(1);
-  mathfu::Ray<T, N> ray(origin, direction);
+  mathkata::Ray<T, N> ray(origin, direction);
 
-  mathfu::Vector<T, N> box_min(static_cast<T>(-1));
-  mathfu::Vector<T, N> box_max(static_cast<T>(1));
-  mathfu::AABB<T, N> aabb(box_min, box_max);
+  mathkata::Vector<T, N> box_min(static_cast<T>(-1));
+  mathkata::Vector<T, N> box_max(static_cast<T>(1));
+  mathkata::AABB<T, N> aabb(box_min, box_max);
 
   if (N >= 2) {
-    EXPECT_FALSE(mathfu::RayIntersectsAABB(ray, aabb));
+    EXPECT_FALSE(mathkata::RayIntersectsAABB(ray, aabb));
   }
 }
 TEST_ALL_DIMS_F(RayIntersectsAABB_Parallel)
@@ -262,18 +262,18 @@ TEST_ALL_DIMS_F(RayIntersectsAABB_Parallel)
 template <class T>
 void RayIntersectsPlane_Hit_Test(T precision) {
   // Ray pointing toward a plane at z=5.
-  mathfu::Ray<T, 3> ray(
-      mathfu::Vector<T, 3>(static_cast<T>(0), static_cast<T>(0),
-                           static_cast<T>(0)),
-      mathfu::Vector<T, 3>(static_cast<T>(0), static_cast<T>(0),
-                           static_cast<T>(1)));
-  mathfu::Plane<T> plane(
-      mathfu::Vector<T, 3>(static_cast<T>(0), static_cast<T>(0),
-                           static_cast<T>(1)),
+  mathkata::Ray<T, 3> ray(
+      mathkata::Vector<T, 3>(static_cast<T>(0), static_cast<T>(0),
+                             static_cast<T>(0)),
+      mathkata::Vector<T, 3>(static_cast<T>(0), static_cast<T>(0),
+                             static_cast<T>(1)));
+  mathkata::Plane<T> plane(
+      mathkata::Vector<T, 3>(static_cast<T>(0), static_cast<T>(0),
+                             static_cast<T>(1)),
       static_cast<T>(-5));
 
   T t = static_cast<T>(0);
-  EXPECT_TRUE(mathfu::RayIntersectsPlane(ray, plane, &t));
+  EXPECT_TRUE(mathkata::RayIntersectsPlane(ray, plane, &t));
   EXPECT_NEAR(t, static_cast<T>(5), precision);
 }
 TEST_3D_F(RayIntersectsPlane_Hit)
@@ -282,17 +282,17 @@ template <class T>
 void RayIntersectsPlane_Parallel_Test(T precision) {
   (void)precision;
   // Ray parallel to the plane.
-  mathfu::Ray<T, 3> ray(
-      mathfu::Vector<T, 3>(static_cast<T>(0), static_cast<T>(0),
-                           static_cast<T>(0)),
-      mathfu::Vector<T, 3>(static_cast<T>(1), static_cast<T>(0),
-                           static_cast<T>(0)));
-  mathfu::Plane<T> plane(
-      mathfu::Vector<T, 3>(static_cast<T>(0), static_cast<T>(0),
-                           static_cast<T>(1)),
+  mathkata::Ray<T, 3> ray(
+      mathkata::Vector<T, 3>(static_cast<T>(0), static_cast<T>(0),
+                             static_cast<T>(0)),
+      mathkata::Vector<T, 3>(static_cast<T>(1), static_cast<T>(0),
+                             static_cast<T>(0)));
+  mathkata::Plane<T> plane(
+      mathkata::Vector<T, 3>(static_cast<T>(0), static_cast<T>(0),
+                             static_cast<T>(1)),
       static_cast<T>(-5));
 
-  EXPECT_FALSE(mathfu::RayIntersectsPlane(ray, plane));
+  EXPECT_FALSE(mathkata::RayIntersectsPlane(ray, plane));
 }
 TEST_3D_F(RayIntersectsPlane_Parallel)
 
@@ -300,17 +300,17 @@ template <class T>
 void RayIntersectsPlane_FromBehind_Test(T precision) {
   (void)precision;
   // Ray pointing away from the plane.
-  mathfu::Ray<T, 3> ray(
-      mathfu::Vector<T, 3>(static_cast<T>(0), static_cast<T>(0),
-                           static_cast<T>(0)),
-      mathfu::Vector<T, 3>(static_cast<T>(0), static_cast<T>(0),
-                           static_cast<T>(-1)));
-  mathfu::Plane<T> plane(
-      mathfu::Vector<T, 3>(static_cast<T>(0), static_cast<T>(0),
-                           static_cast<T>(1)),
+  mathkata::Ray<T, 3> ray(
+      mathkata::Vector<T, 3>(static_cast<T>(0), static_cast<T>(0),
+                             static_cast<T>(0)),
+      mathkata::Vector<T, 3>(static_cast<T>(0), static_cast<T>(0),
+                             static_cast<T>(-1)));
+  mathkata::Plane<T> plane(
+      mathkata::Vector<T, 3>(static_cast<T>(0), static_cast<T>(0),
+                             static_cast<T>(1)),
       static_cast<T>(-5));
 
-  EXPECT_FALSE(mathfu::RayIntersectsPlane(ray, plane));
+  EXPECT_FALSE(mathkata::RayIntersectsPlane(ray, plane));
 }
 TEST_3D_F(RayIntersectsPlane_FromBehind)
 
@@ -321,33 +321,33 @@ TEST_3D_F(RayIntersectsPlane_FromBehind)
 template <class T, int N>
 void AABBIntersectsAABB_Overlap_Test(T precision) {
   (void)precision;
-  mathfu::AABB<T, N> a(mathfu::Vector<T, N>(static_cast<T>(0)),
-                       mathfu::Vector<T, N>(static_cast<T>(3)));
-  mathfu::AABB<T, N> b(mathfu::Vector<T, N>(static_cast<T>(2)),
-                       mathfu::Vector<T, N>(static_cast<T>(5)));
-  EXPECT_TRUE(mathfu::AABBIntersectsAABB(a, b));
+  mathkata::AABB<T, N> a(mathkata::Vector<T, N>(static_cast<T>(0)),
+                         mathkata::Vector<T, N>(static_cast<T>(3)));
+  mathkata::AABB<T, N> b(mathkata::Vector<T, N>(static_cast<T>(2)),
+                         mathkata::Vector<T, N>(static_cast<T>(5)));
+  EXPECT_TRUE(mathkata::AABBIntersectsAABB(a, b));
 }
 TEST_ALL_DIMS_F(AABBIntersectsAABB_Overlap)
 
 template <class T, int N>
 void AABBIntersectsAABB_Touching_Test(T precision) {
   (void)precision;
-  mathfu::AABB<T, N> a(mathfu::Vector<T, N>(static_cast<T>(0)),
-                       mathfu::Vector<T, N>(static_cast<T>(2)));
-  mathfu::AABB<T, N> b(mathfu::Vector<T, N>(static_cast<T>(2)),
-                       mathfu::Vector<T, N>(static_cast<T>(4)));
-  EXPECT_TRUE(mathfu::AABBIntersectsAABB(a, b));
+  mathkata::AABB<T, N> a(mathkata::Vector<T, N>(static_cast<T>(0)),
+                         mathkata::Vector<T, N>(static_cast<T>(2)));
+  mathkata::AABB<T, N> b(mathkata::Vector<T, N>(static_cast<T>(2)),
+                         mathkata::Vector<T, N>(static_cast<T>(4)));
+  EXPECT_TRUE(mathkata::AABBIntersectsAABB(a, b));
 }
 TEST_ALL_DIMS_F(AABBIntersectsAABB_Touching)
 
 template <class T, int N>
 void AABBIntersectsAABB_Separate_Test(T precision) {
   (void)precision;
-  mathfu::AABB<T, N> a(mathfu::Vector<T, N>(static_cast<T>(0)),
-                       mathfu::Vector<T, N>(static_cast<T>(1)));
-  mathfu::AABB<T, N> b(mathfu::Vector<T, N>(static_cast<T>(3)),
-                       mathfu::Vector<T, N>(static_cast<T>(5)));
-  EXPECT_FALSE(mathfu::AABBIntersectsAABB(a, b));
+  mathkata::AABB<T, N> a(mathkata::Vector<T, N>(static_cast<T>(0)),
+                         mathkata::Vector<T, N>(static_cast<T>(1)));
+  mathkata::AABB<T, N> b(mathkata::Vector<T, N>(static_cast<T>(3)),
+                         mathkata::Vector<T, N>(static_cast<T>(5)));
+  EXPECT_FALSE(mathkata::AABBIntersectsAABB(a, b));
 }
 TEST_ALL_DIMS_F(AABBIntersectsAABB_Separate)
 
@@ -358,36 +358,36 @@ TEST_ALL_DIMS_F(AABBIntersectsAABB_Separate)
 template <class T, int N>
 void SphereIntersectsSphere_Overlap_Test(T precision) {
   (void)precision;
-  mathfu::Vector<T, N> c1(static_cast<T>(0));
-  mathfu::Vector<T, N> c2(static_cast<T>(0));
+  mathkata::Vector<T, N> c1(static_cast<T>(0));
+  mathkata::Vector<T, N> c2(static_cast<T>(0));
   c2[0] = static_cast<T>(1);
-  mathfu::Sphere<T, N> s1(c1, static_cast<T>(2));
-  mathfu::Sphere<T, N> s2(c2, static_cast<T>(2));
-  EXPECT_TRUE(mathfu::SphereIntersectsSphere(s1, s2));
+  mathkata::Sphere<T, N> s1(c1, static_cast<T>(2));
+  mathkata::Sphere<T, N> s2(c2, static_cast<T>(2));
+  EXPECT_TRUE(mathkata::SphereIntersectsSphere(s1, s2));
 }
 TEST_ALL_DIMS_F(SphereIntersectsSphere_Overlap)
 
 template <class T, int N>
 void SphereIntersectsSphere_Touching_Test(T precision) {
   (void)precision;
-  mathfu::Vector<T, N> c1(static_cast<T>(0));
-  mathfu::Vector<T, N> c2(static_cast<T>(0));
+  mathkata::Vector<T, N> c1(static_cast<T>(0));
+  mathkata::Vector<T, N> c2(static_cast<T>(0));
   c2[0] = static_cast<T>(4);
-  mathfu::Sphere<T, N> s1(c1, static_cast<T>(2));
-  mathfu::Sphere<T, N> s2(c2, static_cast<T>(2));
-  EXPECT_TRUE(mathfu::SphereIntersectsSphere(s1, s2));
+  mathkata::Sphere<T, N> s1(c1, static_cast<T>(2));
+  mathkata::Sphere<T, N> s2(c2, static_cast<T>(2));
+  EXPECT_TRUE(mathkata::SphereIntersectsSphere(s1, s2));
 }
 TEST_ALL_DIMS_F(SphereIntersectsSphere_Touching)
 
 template <class T, int N>
 void SphereIntersectsSphere_Separate_Test(T precision) {
   (void)precision;
-  mathfu::Vector<T, N> c1(static_cast<T>(0));
-  mathfu::Vector<T, N> c2(static_cast<T>(0));
+  mathkata::Vector<T, N> c1(static_cast<T>(0));
+  mathkata::Vector<T, N> c2(static_cast<T>(0));
   c2[0] = static_cast<T>(10);
-  mathfu::Sphere<T, N> s1(c1, static_cast<T>(2));
-  mathfu::Sphere<T, N> s2(c2, static_cast<T>(2));
-  EXPECT_FALSE(mathfu::SphereIntersectsSphere(s1, s2));
+  mathkata::Sphere<T, N> s1(c1, static_cast<T>(2));
+  mathkata::Sphere<T, N> s2(c2, static_cast<T>(2));
+  EXPECT_FALSE(mathkata::SphereIntersectsSphere(s1, s2));
 }
 TEST_ALL_DIMS_F(SphereIntersectsSphere_Separate)
 
@@ -398,38 +398,38 @@ TEST_ALL_DIMS_F(SphereIntersectsSphere_Separate)
 template <class T, int N>
 void SphereIntersectsAABB_Overlap_Test(T precision) {
   (void)precision;
-  mathfu::Vector<T, N> center(static_cast<T>(0));
+  mathkata::Vector<T, N> center(static_cast<T>(0));
   center[0] = static_cast<T>(2);
-  mathfu::Sphere<T, N> sphere(center, static_cast<T>(2));
+  mathkata::Sphere<T, N> sphere(center, static_cast<T>(2));
 
-  mathfu::AABB<T, N> aabb(mathfu::Vector<T, N>(static_cast<T>(-1)),
-                          mathfu::Vector<T, N>(static_cast<T>(1)));
-  EXPECT_TRUE(mathfu::SphereIntersectsAABB(sphere, aabb));
+  mathkata::AABB<T, N> aabb(mathkata::Vector<T, N>(static_cast<T>(-1)),
+                            mathkata::Vector<T, N>(static_cast<T>(1)));
+  EXPECT_TRUE(mathkata::SphereIntersectsAABB(sphere, aabb));
 }
 TEST_ALL_DIMS_F(SphereIntersectsAABB_Overlap)
 
 template <class T, int N>
 void SphereIntersectsAABB_Separate_Test(T precision) {
   (void)precision;
-  mathfu::Vector<T, N> center(static_cast<T>(0));
+  mathkata::Vector<T, N> center(static_cast<T>(0));
   center[0] = static_cast<T>(10);
-  mathfu::Sphere<T, N> sphere(center, static_cast<T>(1));
+  mathkata::Sphere<T, N> sphere(center, static_cast<T>(1));
 
-  mathfu::AABB<T, N> aabb(mathfu::Vector<T, N>(static_cast<T>(-1)),
-                          mathfu::Vector<T, N>(static_cast<T>(1)));
-  EXPECT_FALSE(mathfu::SphereIntersectsAABB(sphere, aabb));
+  mathkata::AABB<T, N> aabb(mathkata::Vector<T, N>(static_cast<T>(-1)),
+                            mathkata::Vector<T, N>(static_cast<T>(1)));
+  EXPECT_FALSE(mathkata::SphereIntersectsAABB(sphere, aabb));
 }
 TEST_ALL_DIMS_F(SphereIntersectsAABB_Separate)
 
 template <class T, int N>
 void SphereIntersectsAABB_SphereInsideAABB_Test(T precision) {
   (void)precision;
-  mathfu::Vector<T, N> center(static_cast<T>(0));
-  mathfu::Sphere<T, N> sphere(center, static_cast<T>(0.5));
+  mathkata::Vector<T, N> center(static_cast<T>(0));
+  mathkata::Sphere<T, N> sphere(center, static_cast<T>(0.5));
 
-  mathfu::AABB<T, N> aabb(mathfu::Vector<T, N>(static_cast<T>(-5)),
-                          mathfu::Vector<T, N>(static_cast<T>(5)));
-  EXPECT_TRUE(mathfu::SphereIntersectsAABB(sphere, aabb));
+  mathkata::AABB<T, N> aabb(mathkata::Vector<T, N>(static_cast<T>(-5)),
+                            mathkata::Vector<T, N>(static_cast<T>(5)));
+  EXPECT_TRUE(mathkata::SphereIntersectsAABB(sphere, aabb));
 }
 TEST_ALL_DIMS_F(SphereIntersectsAABB_SphereInsideAABB)
 
@@ -440,30 +440,30 @@ TEST_ALL_DIMS_F(SphereIntersectsAABB_SphereInsideAABB)
 template <class T, int N>
 void PointInAABB_Inside_Test(T precision) {
   (void)precision;
-  mathfu::Vector<T, N> point(static_cast<T>(0));
-  mathfu::AABB<T, N> aabb(mathfu::Vector<T, N>(static_cast<T>(-1)),
-                          mathfu::Vector<T, N>(static_cast<T>(1)));
-  EXPECT_TRUE(mathfu::PointInAABB(point, aabb));
+  mathkata::Vector<T, N> point(static_cast<T>(0));
+  mathkata::AABB<T, N> aabb(mathkata::Vector<T, N>(static_cast<T>(-1)),
+                            mathkata::Vector<T, N>(static_cast<T>(1)));
+  EXPECT_TRUE(mathkata::PointInAABB(point, aabb));
 }
 TEST_ALL_DIMS_F(PointInAABB_Inside)
 
 template <class T, int N>
 void PointInAABB_Outside_Test(T precision) {
   (void)precision;
-  mathfu::Vector<T, N> point(static_cast<T>(5));
-  mathfu::AABB<T, N> aabb(mathfu::Vector<T, N>(static_cast<T>(-1)),
-                          mathfu::Vector<T, N>(static_cast<T>(1)));
-  EXPECT_FALSE(mathfu::PointInAABB(point, aabb));
+  mathkata::Vector<T, N> point(static_cast<T>(5));
+  mathkata::AABB<T, N> aabb(mathkata::Vector<T, N>(static_cast<T>(-1)),
+                            mathkata::Vector<T, N>(static_cast<T>(1)));
+  EXPECT_FALSE(mathkata::PointInAABB(point, aabb));
 }
 TEST_ALL_DIMS_F(PointInAABB_Outside)
 
 template <class T, int N>
 void PointInAABB_OnBoundary_Test(T precision) {
   (void)precision;
-  mathfu::Vector<T, N> point(static_cast<T>(1));
-  mathfu::AABB<T, N> aabb(mathfu::Vector<T, N>(static_cast<T>(-1)),
-                          mathfu::Vector<T, N>(static_cast<T>(1)));
-  EXPECT_TRUE(mathfu::PointInAABB(point, aabb));
+  mathkata::Vector<T, N> point(static_cast<T>(1));
+  mathkata::AABB<T, N> aabb(mathkata::Vector<T, N>(static_cast<T>(-1)),
+                            mathkata::Vector<T, N>(static_cast<T>(1)));
+  EXPECT_TRUE(mathkata::PointInAABB(point, aabb));
 }
 TEST_ALL_DIMS_F(PointInAABB_OnBoundary)
 
@@ -474,31 +474,31 @@ TEST_ALL_DIMS_F(PointInAABB_OnBoundary)
 template <class T, int N>
 void PointInSphere_Inside_Test(T precision) {
   (void)precision;
-  mathfu::Vector<T, N> point(static_cast<T>(0));
-  mathfu::Vector<T, N> center(static_cast<T>(0));
-  mathfu::Sphere<T, N> sphere(center, static_cast<T>(5));
-  EXPECT_TRUE(mathfu::PointInSphere(point, sphere));
+  mathkata::Vector<T, N> point(static_cast<T>(0));
+  mathkata::Vector<T, N> center(static_cast<T>(0));
+  mathkata::Sphere<T, N> sphere(center, static_cast<T>(5));
+  EXPECT_TRUE(mathkata::PointInSphere(point, sphere));
 }
 TEST_ALL_DIMS_F(PointInSphere_Inside)
 
 template <class T, int N>
 void PointInSphere_Outside_Test(T precision) {
   (void)precision;
-  mathfu::Vector<T, N> point(static_cast<T>(10));
-  mathfu::Vector<T, N> center(static_cast<T>(0));
-  mathfu::Sphere<T, N> sphere(center, static_cast<T>(1));
-  EXPECT_FALSE(mathfu::PointInSphere(point, sphere));
+  mathkata::Vector<T, N> point(static_cast<T>(10));
+  mathkata::Vector<T, N> center(static_cast<T>(0));
+  mathkata::Sphere<T, N> sphere(center, static_cast<T>(1));
+  EXPECT_FALSE(mathkata::PointInSphere(point, sphere));
 }
 TEST_ALL_DIMS_F(PointInSphere_Outside)
 
 template <class T, int N>
 void PointInSphere_OnBoundary_Test(T precision) {
   (void)precision;
-  mathfu::Vector<T, N> point(static_cast<T>(0));
+  mathkata::Vector<T, N> point(static_cast<T>(0));
   point[0] = static_cast<T>(3);
-  mathfu::Vector<T, N> center(static_cast<T>(0));
-  mathfu::Sphere<T, N> sphere(center, static_cast<T>(3));
-  EXPECT_TRUE(mathfu::PointInSphere(point, sphere));
+  mathkata::Vector<T, N> center(static_cast<T>(0));
+  mathkata::Sphere<T, N> sphere(center, static_cast<T>(3));
+  EXPECT_TRUE(mathkata::PointInSphere(point, sphere));
 }
 TEST_ALL_DIMS_F(PointInSphere_OnBoundary)
 
@@ -508,46 +508,46 @@ TEST_ALL_DIMS_F(PointInSphere_OnBoundary)
 
 template <class T>
 void PointOnPlane_OnPlane_Test(T precision) {
-  mathfu::Plane<T> plane(
-      mathfu::Vector<T, 3>(static_cast<T>(0), static_cast<T>(1),
-                           static_cast<T>(0)),
+  mathkata::Plane<T> plane(
+      mathkata::Vector<T, 3>(static_cast<T>(0), static_cast<T>(1),
+                             static_cast<T>(0)),
       static_cast<T>(-3));
   // Point at y=3 should be on the plane y=3.
-  mathfu::Vector<T, 3> point(static_cast<T>(1), static_cast<T>(3),
-                             static_cast<T>(2));
-  EXPECT_TRUE(mathfu::PointOnPlane(point, plane, precision));
+  mathkata::Vector<T, 3> point(static_cast<T>(1), static_cast<T>(3),
+                               static_cast<T>(2));
+  EXPECT_TRUE(mathkata::PointOnPlane(point, plane, precision));
 }
 TEST_3D_F(PointOnPlane_OnPlane)
 
 template <class T>
 void PointOnPlane_OffPlane_Test(T precision) {
-  mathfu::Plane<T> plane(
-      mathfu::Vector<T, 3>(static_cast<T>(0), static_cast<T>(1),
-                           static_cast<T>(0)),
+  mathkata::Plane<T> plane(
+      mathkata::Vector<T, 3>(static_cast<T>(0), static_cast<T>(1),
+                             static_cast<T>(0)),
       static_cast<T>(-3));
   // Point at y=5 should NOT be on the plane y=3.
-  mathfu::Vector<T, 3> point(static_cast<T>(1), static_cast<T>(5),
-                             static_cast<T>(2));
-  EXPECT_FALSE(mathfu::PointOnPlane(point, plane, precision));
+  mathkata::Vector<T, 3> point(static_cast<T>(1), static_cast<T>(5),
+                               static_cast<T>(2));
+  EXPECT_FALSE(mathkata::PointOnPlane(point, plane, precision));
 }
 TEST_3D_F(PointOnPlane_OffPlane)
 
 template <class T>
 void PointOnPlane_NearPlane_Test(T precision) {
-  mathfu::Plane<T> plane(
-      mathfu::Vector<T, 3>(static_cast<T>(0), static_cast<T>(0),
-                           static_cast<T>(1)),
+  mathkata::Plane<T> plane(
+      mathkata::Vector<T, 3>(static_cast<T>(0), static_cast<T>(0),
+                             static_cast<T>(1)),
       static_cast<T>(0));
   // Point very close to the z=0 plane.
-  mathfu::Vector<T, 3> point(static_cast<T>(1), static_cast<T>(2),
-                             precision * static_cast<T>(0.5));
+  mathkata::Vector<T, 3> point(static_cast<T>(1), static_cast<T>(2),
+                               precision * static_cast<T>(0.5));
   EXPECT_TRUE(
-      mathfu::PointOnPlane(point, plane, precision * static_cast<T>(2)));
+      mathkata::PointOnPlane(point, plane, precision * static_cast<T>(2)));
 }
 TEST_3D_F(PointOnPlane_NearPlane)
 
 int main(int argc, char** argv) {
   ::testing::InitGoogleTest(&argc, argv);
-  printf("%s (%s)\n", argv[0], MATHFU_BUILD_OPTIONS_STRING);
+  printf("%s (%s)\n", argv[0], MATHKATA_BUILD_OPTIONS_STRING);
   return RUN_ALL_TESTS();
 }

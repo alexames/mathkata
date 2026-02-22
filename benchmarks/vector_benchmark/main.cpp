@@ -18,15 +18,15 @@
 #include <random>
 
 #include "benchmark_common.h"
-#include "mathfu/utilities.h"
-#include "mathfu/vector.h"
+#include "mathkata/utilities.h"
+#include "mathkata/vector.h"
 
 // Number of elements to iterate over.
 static const size_t kVectorSize = 1000;
 // Number of iterations of each operation.
 static const size_t kIterations = 100;
 
-using mathfu::Vector;
+using mathkata::Vector;
 
 static std::mt19937& BenchRng() {
   static std::mt19937 rng(42);
@@ -57,7 +57,7 @@ int main(int argc, char** argv) {
     }
     vectors[i] = vec;
   }
-  printf("Running vector benchmark (%s)...\n", MATHFU_BUILD_OPTIONS_STRING);
+  printf("Running vector benchmark (%s)...\n", MATHKATA_BUILD_OPTIONS_STRING);
   // Start vector performance code. Run a number of loops for more accurate
   // numbers.
   Timer timer;

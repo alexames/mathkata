@@ -13,31 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef MATHFU_INTERSECTIONS_H_
-#define MATHFU_INTERSECTIONS_H_
+#ifndef MATHKATA_INTERSECTIONS_H_
+#define MATHKATA_INTERSECTIONS_H_
 
 #include <algorithm>
 #include <cmath>
 #include <limits>
 
-#include "mathfu/aabb.h"
-#include "mathfu/plane.h"
-#include "mathfu/ray.h"
-#include "mathfu/sphere.h"
-#include "mathfu/vector.h"
+#include "mathkata/aabb.h"
+#include "mathkata/plane.h"
+#include "mathkata/ray.h"
+#include "mathkata/sphere.h"
+#include "mathkata/vector.h"
 
-/// @file mathfu/intersections.h Intersections
+/// @file mathkata/intersections.h Intersections
 /// @brief Intersection test free functions for geometric primitives.
-/// @addtogroup mathfu_intersections
+/// @addtogroup mathkata_intersections
 
 #if defined(_MSC_VER)
 #pragma warning(push)
 #pragma warning(disable : 4723)  // suppress "potential divide by 0" warning
 #endif
 
-namespace mathfu {
+namespace mathkata {
 
-/// @addtogroup mathfu_intersections
+/// @addtogroup mathkata_intersections
 /// @{
 
 /// @brief Test whether a ray intersects a sphere.
@@ -252,10 +252,10 @@ inline bool PointOnPlane(const Vector<T, 3>& point, const Plane<T>& plane,
 
 /// @}
 
-}  // namespace mathfu
+}  // namespace mathkata
 
 #if defined(_MSC_VER)
 #pragma warning(pop)
 #endif
 
-#endif  // MATHFU_INTERSECTIONS_H_
+#endif  // MATHKATA_INTERSECTIONS_H_

@@ -13,19 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef MATHFU_VECTOR_2_SIMD_H_
-#define MATHFU_VECTOR_2_SIMD_H_
+#ifndef MATHKATA_VECTOR_2_SIMD_H_
+#define MATHKATA_VECTOR_2_SIMD_H_
 
-#include "mathfu/internal/vector_2.h"
-#include "mathfu/utilities.h"
+#include "mathkata/internal/vector_2.h"
+#include "mathkata/utilities.h"
 
-/// @file mathfu/internal/vector_2_simd.h MathFu Vector<T, 2> Specialization
-/// @brief 2-dimensional specialization of mathfu::Vector for SIMD optimized
+/// @file mathkata/internal/vector_2_simd.h MathKata Vector<T, 2> Specialization
+/// @brief 2-dimensional specialization of mathkata::Vector for SIMD optimized
 /// builds.
-/// @see mathfu::Vector
+/// @see mathkata::Vector
 ///
 /// No SIMD specialization is provided for 2D vectors. The generic template
 /// from vector_2.h is used for all types including float. The former NEON-only
 /// specialization was removed when vectorial was replaced by xsimd.
 
-#endif  // MATHFU_VECTOR_2_SIMD_H_
+#endif  // MATHKATA_VECTOR_2_SIMD_H_

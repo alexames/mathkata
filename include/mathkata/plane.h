@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef MATHFU_PLANE_H_
-#define MATHFU_PLANE_H_
+#ifndef MATHKATA_PLANE_H_
+#define MATHKATA_PLANE_H_
 
-#include "mathfu/vector.h"
+#include "mathkata/vector.h"
 
-namespace mathfu {
+namespace mathkata {
 
-/// @addtogroup mathfu_plane
+/// @addtogroup mathkata_plane
 /// @{
-/// @class Plane "mathfu/plane.h"
+/// @class Plane "mathkata/plane.h"
 /// @brief Plane of type T in 3D space using normal + distance representation.
 ///
 /// Plane stores a 3D normal vector and a signed distance from the origin,
@@ -130,6 +130,6 @@ constexpr bool operator!=(const Plane<T>& p1, const Plane<T>& p2) {
   return !(p1 == p2);
 }
 
-}  // namespace mathfu
+}  // namespace mathkata
 
-#endif  // MATHFU_PLANE_H_
+#endif  // MATHKATA_PLANE_H_

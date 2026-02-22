@@ -1,9 +1,9 @@
-MathFu    {#mathfu_index}
+MathKata    {#mathkata_index}
 ======
 
-# Overview    {#mathfu_overview}
+# Overview    {#mathkata_overview}
 
-[MathFu][] is a C++ math library developed primarily for games focused on
+[MathKata][] is a C++ math library developed primarily for games focused on
 simplicity and efficiency.
 
 It provides a suite of [vector][], [matrix][] and [quaternion][] classes
@@ -11,14 +11,14 @@ to perform basic [geometry][] suitable for game developers.  This functionality
 can be used to construct geometry for graphics libraries like [OpenGL][] or
 perform calculations for animation or physics systems.
 
-[MathFu] can be downloaded from [GitHub](http://github.com/google/mathfu) or
-the [releases page](http://github.com/google/mathfu/releases).
+[MathKata] can be downloaded from [GitHub](http://github.com/google/mathkata) or
+the [releases page](http://github.com/google/mathkata/releases).
 
-**Important**: MathFu uses submodules to reference other components it depends
+**Important**: MathKata uses submodules to reference other components it depends
 upon so download the source using:
 
 ~~~{.sh}
-    git clone --recursive https://github.com/google/mathfu.git
+    git clone --recursive https://github.com/google/mathkata.git
 ~~~
 
 # Functionality
@@ -30,15 +30,15 @@ cross product, inverse, slerp).
 
 # Optimization
 
-[MathFu][] is optimized using [SIMD][] instructions (including [NEON][] for
+[MathKata][] is optimized using [SIMD][] instructions (including [NEON][] for
 [ARM][] and [SSE][] for [x86][] architectures).  [SIMD][] optimization is
 enabled by default based upon the target platform and compiler options used
-to build a project.  In addition, [MathFu][] provides compile time options to
+to build a project.  In addition, [MathKata][] provides compile time options to
 modify code generation, see [Build Configurations][] for more details.
 
 # Supported Platforms
 
-[MathFu][] has been tested on the following platforms:
+[MathKata][] has been tested on the following platforms:
 
    * [Android][]
    * [Linux][] (x86_64)
@@ -52,18 +52,18 @@ modification on any platform that has a C++ compiler.
 
 # Feedback and Reporting Bugs
 
-   * Discuss MathFu with other developers and users on the
-     [MathFu Google Group][].
-   * File issues on the [MathFu Issues Tracker][].
-   * Post your questions to [stackoverflow.com][] with a mention of **mathfu**.
+   * Discuss MathKata with other developers and users on the
+     [MathKata Google Group][].
+   * File issues on the [MathKata Issues Tracker][].
+   * Post your questions to [stackoverflow.com][] with a mention of **mathkata**.
 
   [Android]: http://www.android.com
   [ARM]: http://en.wikipedia.org/wiki/ARM_architecture
-  [Build Configurations]: @ref mathfu_build_config
+  [Build Configurations]: @ref mathkata_build_config
   [Linux]: http://en.m.wikipedia.org/wiki/Linux
-  [MathFu Google Group]: http://groups.google.com/group/mathfulib
-  [MathFu Issues Tracker]: http://github.com/google/mathfu/issues
-  [MathFu]: @ref mathfu_overview
+  [MathKata Google Group]: http://groups.google.com/group/mathkatalib
+  [MathKata Issues Tracker]: http://github.com/google/mathkata/issues
+  [MathKata]: @ref mathkata_overview
   [NEON]: http://www.arm.com/products/processors/technologies/neon.php
   [OS X]: http://www.apple.com/osx/
   [OpenGL]: http://www.opengl.org/
@@ -74,6 +74,6 @@ modification on any platform that has a C++ compiler.
   [linear algebra]: http://en.wikipedia.org/wiki/Linear_algebra
   [matrix]: http://en.wikipedia.org/wiki/Matrix_(mathematics)
   [quaternion]: http://en.wikipedia.org/wiki/Quaternion
-  [stackoverflow.com]: http://stackoverflow.com/search?q=mathfu
+  [stackoverflow.com]: http://stackoverflow.com/search?q=mathkata
   [vector]: http://en.wikipedia.org/wiki/Euclidean_vector
   [x86]: http://en.wikipedia.org/wiki/X86

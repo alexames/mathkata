@@ -13,22 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef MATHFU_TRANSFORM_H_
-#define MATHFU_TRANSFORM_H_
+#ifndef MATHKATA_TRANSFORM_H_
+#define MATHKATA_TRANSFORM_H_
 
-#include "mathfu/matrix.h"
-#include "mathfu/quaternion.h"
-#include "mathfu/vector.h"
+#include "mathkata/matrix.h"
+#include "mathkata/quaternion.h"
+#include "mathkata/vector.h"
 
-/// @file mathfu/transform.h Transform
+/// @file mathkata/transform.h Transform
 /// @brief Transform class and functions.
-/// @addtogroup mathfu_transform
+/// @addtogroup mathkata_transform
 
-namespace mathfu {
+namespace mathkata {
 
-/// @addtogroup mathfu_transform
+/// @addtogroup mathkata_transform
 /// @{
-/// @class Transform "mathfu/transform.h"
+/// @class Transform "mathkata/transform.h"
 /// @brief Represents a 3D rigid body transform as position, rotation
 /// (quaternion), and scale.
 ///
@@ -198,6 +198,6 @@ constexpr bool operator!=(const Transform<T>& t1, const Transform<T>& t2) {
 }
 /// @}
 
-}  // namespace mathfu
+}  // namespace mathkata
 
-#endif  // MATHFU_TRANSFORM_H_
+#endif  // MATHKATA_TRANSFORM_H_

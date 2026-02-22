@@ -13,20 +13,20 @@
 # limitations under the License.
 cmake_minimum_required(VERSION 3.14)
 
-project(MathFu LANGUAGES CXX)
+project(MathKata LANGUAGES CXX)
 
 # Options that control the build configuration.
-# To configure MathFu flags per build target, see the
-# mathfu_configure_flags() function.
-option(mathfu_enable_simd "Use SIMD implementations when available." ON)
-option(mathfu_build_benchmarks "Build MathFu benchmarks." ON)
-option(mathfu_build_tests "Build MathFu unit tests." ON)
+# To configure MathKata flags per build target, see the
+# mathkata_configure_flags() function.
+option(mathkata_enable_simd "Use SIMD implementations when available." ON)
+option(mathkata_build_benchmarks "Build MathKata benchmarks." ON)
+option(mathkata_build_tests "Build MathKata unit tests." ON)
 
-# Save the mathfu directory, store this in the cache so that it's globally
-# accessible from mathfu_configure_flags().
-set(mathfu_dir ${CMAKE_CURRENT_LIST_DIR} CACHE INTERNAL "mathfu directory")
+# Save the mathkata directory, store this in the cache so that it's globally
+# accessible from mathkata_configure_flags().
+set(mathkata_dir ${CMAKE_CURRENT_LIST_DIR} CACHE INTERNAL "mathkata directory")
 
-# Set build options for ${target} that are required to build with MathFu.
+# Set build options for ${target} that are required to build with MathKata.
 # This takes the optional arguments "enable_simd force_padding".
 #
 # If enable_simd is specified it configures whether the project should be
@@ -34,18 +34,18 @@ set(mathfu_dir ${CMAKE_CURRENT_LIST_DIR} CACHE INTERNAL "mathfu directory")
 # SIMD is enabled, some data structures are padded to work more efficiently
 # with SIMD instructions.
 #
-# If enable_simd is not specified, the mathfu_enable_simd option is used.
+# If enable_simd is not specified, the mathkata_enable_simd option is used.
 # If force_padding isn't specified padding is enabled based upon the
 # best general configuration for the target architecture.
-function(mathfu_configure_flags target)
-  set(enable_simd ${mathfu_enable_simd})
+function(mathkata_configure_flags target)
+  set(enable_simd ${mathkata_enable_simd})
 
   # Require C++20 for concepts and std::numbers.
   target_compile_features(${target} PRIVATE cxx_std_20)
 
   # Add required includes to the target.
   target_include_directories(${target}
-    PRIVATE ${mathfu_dir}/include)
+    PRIVATE ${mathkata_dir}/include)
 
   # Parse optional arguments.
   set(additional_args ${ARGN})
@@ -82,20 +82,20 @@ function(mathfu_configure_flags target)
     if(DEFINED force_padding)
       if(force_padding)
         target_compile_definitions(${target} PRIVATE
-          MATHFU_COMPILE_FORCE_PADDING=1)
+          MATHKATA_COMPILE_FORCE_PADDING=1)
       else()
         target_compile_definitions(${target} PRIVATE
-          MATHFU_COMPILE_FORCE_PADDING=0)
+          MATHKATA_COMPILE_FORCE_PADDING=0)
       endif()
     endif()
   else()
     target_compile_definitions(${target} PRIVATE
-      MATHFU_COMPILE_WITHOUT_SIMD_SUPPORT)
+      MATHKATA_COMPILE_WITHOUT_SIMD_SUPPORT)
   endif()
 endfunction()
 
 # Enable a high warning level for the target.
-function(mathfu_enable_warnings target)
+function(mathkata_enable_warnings target)
   if(MSVC)
     # C4127: conditional expression is constant
     # C4577: 'noexcept' used with no exception handling mode specified.
@@ -107,12 +107,12 @@ function(mathfu_enable_warnings target)
   endif()
 endfunction()
 
-file(GLOB_RECURSE MATHFU_HEADERS ${CMAKE_CURRENT_LIST_DIR}/include/mathfu/*.h)
+file(GLOB_RECURSE MATHKATA_HEADERS ${CMAKE_CURRENT_LIST_DIR}/include/mathkata/*.h)
 
-if(mathfu_build_benchmarks)
+if(mathkata_build_benchmarks)
   add_subdirectory(benchmarks)
 endif()
-if(mathfu_build_tests)
+if(mathkata_build_tests)
   enable_testing()
   add_subdirectory(unit_tests)
 endif()
