@@ -25,9 +25,6 @@ LOCAL_MODULE_TAGS:=optional
 LOCAL_SRC_FILES:=$(notdir $(abspath $(TEST_DIR))).cpp
 LOCAL_C_INCLUDES:=$(MATHFU_DIR)/unit_tests
 LOCAL_LDLIBS:=-llog -landroid
-LOCAL_WHOLE_STATIC_LIBRARIES:=\
-	libfplutil_main \
-	libfplutil_print
 # MATHFU_LIB (by default libmathfu) is used to select the build configuration
 # for the target using mathfu.
 LOCAL_STATIC_LIBRARIES:=\
@@ -39,11 +36,9 @@ LOCAL_ARM_MODE:=arm
 include $(BUILD_SHARED_LIBRARY)
 
 $(call import-add-path,$(abspath $(MATHFU_DIR)/..))
-$(call import-add-path,$(abspath $(DEPENDENCIES_FPLUTIL_DIR)))
-$(call import-add-path,$(abspath $(DEPENDENCIES_GTEST_JNI_DIR)/..))
+$(call import-add-path,$(abspath $(DEPENDENCIES_GTEST_DIR)))
 
 $(call import-module,$(MATHFU_DIR_BASENAME)/jni)
-$(call import-module,libfplutil/jni)
 $(call import-module,googletest)
 $(call import-module,android/native_app_glue)
 
