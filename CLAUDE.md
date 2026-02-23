@@ -81,7 +81,8 @@ cd Build && ctest --output-on-failure -C Release
 
 ### Never Commit Directly to Main
 
-All changes go through feature/bugfix branches with PRs.
+All changes go through feature/bugfix branches with PRs. The main branch
+should consist entirely of merge commits.
 
 ### Branch Naming
 
@@ -123,6 +124,18 @@ This produces 5347 total test cases across 13 test modules.
 
 Test files are in `unit_tests/<type>_test/<type>_test.cpp` with a shared
 `unit_tests/precision.h` header for floating-point comparison tolerances.
+
+---
+
+## Naming Conventions
+
+- **Function names**: Use `camelCase` for all public free functions and member
+  functions (e.g., `crossProduct`, `normalize`, `dotProduct`). Do not use
+  PascalCase or snake_case for function names.
+- **Type names**: Use `PascalCase` for types and classes (e.g., `Vector`,
+  `Matrix`, `Quaternion`).
+- **Macro names**: Use `MATHKATA_` prefix with `UPPER_SNAKE_CASE`.
+- **Namespace**: `mathkata` (lowercase).
 
 ---
 
