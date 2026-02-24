@@ -350,6 +350,17 @@ constexpr AffineTransform2D<T> operator*(const AffineTransform2D<T>& lhs,
   return result;
 }
 
+/// @brief Compose two 2D affine transforms in-place.
+///
+/// @param lhs Left-hand side transform, modified in-place.
+/// @param rhs Right-hand side transform (applied first).
+/// @return Reference to the modified left-hand side transform.
+template <class T>
+constexpr AffineTransform2D<T>& operator*=(AffineTransform2D<T>& lhs,
+                                           const AffineTransform2D<T>& rhs) {
+  return lhs.Combine(rhs);
+}
+
 }  // namespace mathkata
 
 #endif  // MATHKATA_AFFINE_TRANSFORM_2D_H_
