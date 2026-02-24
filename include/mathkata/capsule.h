@@ -56,7 +56,7 @@ struct Capsule {
   /// The center is the midpoint of the start and end endpoints.
   ///
   /// @return The center point of the capsule.
-  constexpr Vector<T, N> Center() const {
+  constexpr Vector<T, N> center() const {
     return (start + end) * static_cast<T>(0.5);
   }
 
@@ -65,7 +65,7 @@ struct Capsule {
   /// This is the distance from start to end, not including the radius caps.
   ///
   /// @return The length of the line segment.
-  inline T Length() const { return Vector<T, N>::Distance(start, end); }
+  inline T length() const { return Vector<T, N>::distance(start, end); }
 
   /// @brief Test whether a point is inside the capsule.
   ///
@@ -74,9 +74,9 @@ struct Capsule {
   ///
   /// @param point The point to test.
   /// @return true if the point is inside the capsule, false otherwise.
-  constexpr bool Contains(const Vector<T, N>& point) const {
-    const Vector<T, N> closest = ClosestPointOnSegment(point, start, end);
-    return Vector<T, N>::DistanceSquared(point, closest) <= radius * radius;
+  constexpr bool contains(const Vector<T, N>& point) const {
+    const Vector<T, N> closest = closestPointOnSegment(point, start, end);
+    return Vector<T, N>::distanceSquared(point, closest) <= radius * radius;
   }
 
  private:
@@ -86,15 +86,15 @@ struct Capsule {
   /// @param seg_start The start of the line segment.
   /// @param seg_end The end of the line segment.
   /// @return The closest point on the segment to the query point.
-  static constexpr Vector<T, N> ClosestPointOnSegment(
+  static constexpr Vector<T, N> closestPointOnSegment(
       const Vector<T, N>& point, const Vector<T, N>& seg_start,
       const Vector<T, N>& seg_end) {
     const Vector<T, N> segment = seg_end - seg_start;
-    const T segment_length_squared = Vector<T, N>::DotProduct(segment, segment);
+    const T segment_length_squared = Vector<T, N>::dotProduct(segment, segment);
     if (segment_length_squared == static_cast<T>(0)) {
       return seg_start;
     }
-    const T t = Clamp(Vector<T, N>::DotProduct(point - seg_start, segment)
+    const T t = clamp(Vector<T, N>::dotProduct(point - seg_start, segment)
                           / segment_length_squared,
                       static_cast<T>(0), static_cast<T>(1));
     return seg_start + segment * t;

@@ -70,34 +70,34 @@ void Construction_Test(T precision) {
 }
 TEST_ALL_F(Construction)
 
-// --- Center ---
+// --- center ---
 
 template <class T>
-void Center_Test(T precision) {
+void center_Test(T precision) {
   mathkata::Rect<T> r(static_cast<T>(2), static_cast<T>(4), static_cast<T>(10),
                       static_cast<T>(6));
-  mathkata::Vector<T, 2> center = r.Center();
+  mathkata::Vector<T, 2> center = r.center();
   EXPECT_NEAR(center.x, static_cast<T>(7), precision);
   EXPECT_NEAR(center.y, static_cast<T>(7), precision);
 
   // Rect at origin.
   mathkata::Rect<T> r2(static_cast<T>(0), static_cast<T>(0), static_cast<T>(4),
                        static_cast<T>(8));
-  mathkata::Vector<T, 2> center2 = r2.Center();
+  mathkata::Vector<T, 2> center2 = r2.center();
   EXPECT_NEAR(center2.x, static_cast<T>(2), precision);
   EXPECT_NEAR(center2.y, static_cast<T>(4), precision);
 }
-TEST_ALL_F(Center)
+TEST_ALL_F(center)
 
-// --- Min and Max ---
+// --- min and max ---
 
 template <class T>
 void MinMax_Test(T precision) {
   (void)precision;
   mathkata::Rect<T> r(static_cast<T>(3), static_cast<T>(5), static_cast<T>(10),
                       static_cast<T>(20));
-  mathkata::Vector<T, 2> min_corner = r.Min();
-  mathkata::Vector<T, 2> max_corner = r.Max();
+  mathkata::Vector<T, 2> min_corner = r.min();
+  mathkata::Vector<T, 2> max_corner = r.max();
 
   EXPECT_EQ(min_corner.x, static_cast<T>(3));
   EXPECT_EQ(min_corner.y, static_cast<T>(5));
@@ -106,63 +106,63 @@ void MinMax_Test(T precision) {
 }
 TEST_ALL_F(MinMax)
 
-// --- Area ---
+// --- area ---
 
 template <class T>
-void Area_Test(T precision) {
+void area_Test(T precision) {
   (void)precision;
   mathkata::Rect<T> r(static_cast<T>(0), static_cast<T>(0), static_cast<T>(5),
                       static_cast<T>(3));
-  EXPECT_EQ(r.Area(), static_cast<T>(15));
+  EXPECT_EQ(r.area(), static_cast<T>(15));
 
   // Zero-size rect.
   mathkata::Rect<T> r2;
-  EXPECT_EQ(r2.Area(), static_cast<T>(0));
+  EXPECT_EQ(r2.area(), static_cast<T>(0));
 
   // Single-dimension zero.
   mathkata::Rect<T> r3(static_cast<T>(0), static_cast<T>(0), static_cast<T>(5),
                        static_cast<T>(0));
-  EXPECT_EQ(r3.Area(), static_cast<T>(0));
+  EXPECT_EQ(r3.area(), static_cast<T>(0));
 }
-TEST_ALL_F(Area)
+TEST_ALL_F(area)
 
-// --- Contains (point) ---
+// --- contains (point) ---
 
 template <class T>
-void ContainsPoint_Test(T precision) {
+void containsPoint_Test(T precision) {
   (void)precision;
   mathkata::Rect<T> r(static_cast<T>(0), static_cast<T>(0), static_cast<T>(10),
                       static_cast<T>(10));
 
   // Inside.
   EXPECT_TRUE(
-      r.Contains(mathkata::Vector<T, 2>(static_cast<T>(5), static_cast<T>(5))));
+      r.contains(mathkata::Vector<T, 2>(static_cast<T>(5), static_cast<T>(5))));
 
   // On boundary (corners).
   EXPECT_TRUE(
-      r.Contains(mathkata::Vector<T, 2>(static_cast<T>(0), static_cast<T>(0))));
-  EXPECT_TRUE(r.Contains(
+      r.contains(mathkata::Vector<T, 2>(static_cast<T>(0), static_cast<T>(0))));
+  EXPECT_TRUE(r.contains(
       mathkata::Vector<T, 2>(static_cast<T>(10), static_cast<T>(10))));
 
   // On boundary (edges).
   EXPECT_TRUE(
-      r.Contains(mathkata::Vector<T, 2>(static_cast<T>(5), static_cast<T>(0))));
+      r.contains(mathkata::Vector<T, 2>(static_cast<T>(5), static_cast<T>(0))));
   EXPECT_TRUE(
-      r.Contains(mathkata::Vector<T, 2>(static_cast<T>(0), static_cast<T>(5))));
+      r.contains(mathkata::Vector<T, 2>(static_cast<T>(0), static_cast<T>(5))));
 
   // Outside.
-  EXPECT_FALSE(r.Contains(
+  EXPECT_FALSE(r.contains(
       mathkata::Vector<T, 2>(static_cast<T>(11), static_cast<T>(5))));
-  EXPECT_FALSE(r.Contains(
+  EXPECT_FALSE(r.contains(
       mathkata::Vector<T, 2>(static_cast<T>(5), static_cast<T>(11))));
-  EXPECT_FALSE(r.Contains(
+  EXPECT_FALSE(r.contains(
       mathkata::Vector<T, 2>(static_cast<T>(-1), static_cast<T>(5))));
-  EXPECT_FALSE(r.Contains(
+  EXPECT_FALSE(r.contains(
       mathkata::Vector<T, 2>(static_cast<T>(5), static_cast<T>(-1))));
 }
-TEST_ALL_F(ContainsPoint)
+TEST_ALL_F(containsPoint)
 
-// --- Contains (rect) ---
+// --- contains (rect) ---
 
 template <class T>
 void ContainsRect_Test(T precision) {
@@ -173,27 +173,27 @@ void ContainsRect_Test(T precision) {
   // Inner rect fully contained.
   mathkata::Rect<T> inner(static_cast<T>(2), static_cast<T>(2),
                           static_cast<T>(3), static_cast<T>(3));
-  EXPECT_TRUE(outer.Contains(inner));
+  EXPECT_TRUE(outer.contains(inner));
 
   // Same rect.
-  EXPECT_TRUE(outer.Contains(outer));
+  EXPECT_TRUE(outer.contains(outer));
 
   // Partially overlapping.
   mathkata::Rect<T> partial(static_cast<T>(5), static_cast<T>(5),
                             static_cast<T>(10), static_cast<T>(10));
-  EXPECT_FALSE(outer.Contains(partial));
+  EXPECT_FALSE(outer.contains(partial));
 
   // Completely outside.
   mathkata::Rect<T> outside(static_cast<T>(20), static_cast<T>(20),
                             static_cast<T>(5), static_cast<T>(5));
-  EXPECT_FALSE(outer.Contains(outside));
+  EXPECT_FALSE(outer.contains(outside));
 }
 TEST_ALL_F(ContainsRect)
 
-// --- Intersects ---
+// --- intersects ---
 
 template <class T>
-void Intersects_Test(T precision) {
+void intersects_Test(T precision) {
   (void)precision;
   mathkata::Rect<T> r(static_cast<T>(0), static_cast<T>(0), static_cast<T>(10),
                       static_cast<T>(10));
@@ -201,46 +201,46 @@ void Intersects_Test(T precision) {
   // Overlapping.
   mathkata::Rect<T> overlap(static_cast<T>(5), static_cast<T>(5),
                             static_cast<T>(10), static_cast<T>(10));
-  EXPECT_TRUE(r.Intersects(overlap));
-  EXPECT_TRUE(overlap.Intersects(r));
+  EXPECT_TRUE(r.intersects(overlap));
+  EXPECT_TRUE(overlap.intersects(r));
 
   // Contained.
   mathkata::Rect<T> inner(static_cast<T>(2), static_cast<T>(2),
                           static_cast<T>(3), static_cast<T>(3));
-  EXPECT_TRUE(r.Intersects(inner));
-  EXPECT_TRUE(inner.Intersects(r));
+  EXPECT_TRUE(r.intersects(inner));
+  EXPECT_TRUE(inner.intersects(r));
 
   // Not overlapping (separated horizontally).
   mathkata::Rect<T> right(static_cast<T>(20), static_cast<T>(0),
                           static_cast<T>(5), static_cast<T>(5));
-  EXPECT_FALSE(r.Intersects(right));
-  EXPECT_FALSE(right.Intersects(r));
+  EXPECT_FALSE(r.intersects(right));
+  EXPECT_FALSE(right.intersects(r));
 
   // Touching edges (not overlapping with strict inequality).
   mathkata::Rect<T> touching(static_cast<T>(10), static_cast<T>(0),
                              static_cast<T>(5), static_cast<T>(5));
-  EXPECT_FALSE(r.Intersects(touching));
-  EXPECT_FALSE(touching.Intersects(r));
+  EXPECT_FALSE(r.intersects(touching));
+  EXPECT_FALSE(touching.intersects(r));
 
   // Not overlapping (separated vertically).
   mathkata::Rect<T> below(static_cast<T>(0), static_cast<T>(20),
                           static_cast<T>(5), static_cast<T>(5));
-  EXPECT_FALSE(r.Intersects(below));
-  EXPECT_FALSE(below.Intersects(r));
+  EXPECT_FALSE(r.intersects(below));
+  EXPECT_FALSE(below.intersects(r));
 }
-TEST_ALL_F(Intersects)
+TEST_ALL_F(intersects)
 
-// --- Intersection ---
+// --- intersection ---
 
 template <class T>
-void Intersection_Test(T precision) {
+void intersection_Test(T precision) {
   (void)precision;
   mathkata::Rect<T> r1(static_cast<T>(0), static_cast<T>(0), static_cast<T>(10),
                        static_cast<T>(10));
   mathkata::Rect<T> r2(static_cast<T>(5), static_cast<T>(5), static_cast<T>(10),
                        static_cast<T>(10));
 
-  mathkata::Rect<T> result = r1.Intersection(r2);
+  mathkata::Rect<T> result = r1.intersection(r2);
   EXPECT_EQ(result.pos.x, static_cast<T>(5));
   EXPECT_EQ(result.pos.y, static_cast<T>(5));
   EXPECT_EQ(result.size.x, static_cast<T>(5));
@@ -249,59 +249,59 @@ void Intersection_Test(T precision) {
   // No overlap returns zero rect.
   mathkata::Rect<T> r3(static_cast<T>(20), static_cast<T>(20),
                        static_cast<T>(5), static_cast<T>(5));
-  mathkata::Rect<T> empty_result = r1.Intersection(r3);
+  mathkata::Rect<T> empty_result = r1.intersection(r3);
   EXPECT_EQ(empty_result, mathkata::Rect<T>());
 
   // Contained rect intersection returns inner rect.
   mathkata::Rect<T> inner(static_cast<T>(2), static_cast<T>(3),
                           static_cast<T>(4), static_cast<T>(5));
-  mathkata::Rect<T> inner_result = r1.Intersection(inner);
+  mathkata::Rect<T> inner_result = r1.intersection(inner);
   EXPECT_EQ(inner_result, inner);
 
   // Self intersection returns self.
-  mathkata::Rect<T> self_result = r1.Intersection(r1);
+  mathkata::Rect<T> self_result = r1.intersection(r1);
   EXPECT_EQ(self_result, r1);
 }
-TEST_ALL_F(Intersection)
+TEST_ALL_F(intersection)
 
-// --- Union ---
+// --- merge ---
 
 template <class T>
-void Union_Test(T precision) {
+void merge_Test(T precision) {
   (void)precision;
   mathkata::Rect<T> r1(static_cast<T>(0), static_cast<T>(0), static_cast<T>(5),
                        static_cast<T>(5));
   mathkata::Rect<T> r2(static_cast<T>(10), static_cast<T>(10),
                        static_cast<T>(5), static_cast<T>(5));
 
-  mathkata::Rect<T> result = r1.Union(r2);
+  mathkata::Rect<T> result = r1.merge(r2);
   EXPECT_EQ(result.pos.x, static_cast<T>(0));
   EXPECT_EQ(result.pos.y, static_cast<T>(0));
   EXPECT_EQ(result.size.x, static_cast<T>(15));
   EXPECT_EQ(result.size.y, static_cast<T>(15));
 
-  // Union with overlapping rect.
+  // merge with overlapping rect.
   mathkata::Rect<T> r3(static_cast<T>(3), static_cast<T>(3), static_cast<T>(5),
                        static_cast<T>(5));
-  mathkata::Rect<T> overlap_result = r1.Union(r3);
+  mathkata::Rect<T> overlap_result = r1.merge(r3);
   EXPECT_EQ(overlap_result.pos.x, static_cast<T>(0));
   EXPECT_EQ(overlap_result.pos.y, static_cast<T>(0));
   EXPECT_EQ(overlap_result.size.x, static_cast<T>(8));
   EXPECT_EQ(overlap_result.size.y, static_cast<T>(8));
 
-  // Union with self returns self.
-  mathkata::Rect<T> self_result = r1.Union(r1);
+  // merge with self returns self.
+  mathkata::Rect<T> self_result = r1.merge(r1);
   EXPECT_EQ(self_result, r1);
 
-  // Union with contained rect returns outer rect.
+  // merge with contained rect returns outer rect.
   mathkata::Rect<T> outer(static_cast<T>(0), static_cast<T>(0),
                           static_cast<T>(20), static_cast<T>(20));
-  mathkata::Rect<T> contained_result = outer.Union(r1);
+  mathkata::Rect<T> contained_result = outer.merge(r1);
   EXPECT_EQ(contained_result, outer);
 }
-TEST_ALL_F(Union)
+TEST_ALL_F(merge)
 
-// --- Expand (point) ---
+// --- expand (point) ---
 
 template <class T>
 void ExpandPoint_Test(T precision) {
@@ -311,12 +311,12 @@ void ExpandPoint_Test(T precision) {
 
   // Point already inside - no change.
   mathkata::Rect<T> same =
-      r.Expand(mathkata::Vector<T, 2>(static_cast<T>(5), static_cast<T>(5)));
+      r.expand(mathkata::Vector<T, 2>(static_cast<T>(5), static_cast<T>(5)));
   EXPECT_EQ(same, r);
 
   // Point outside to the right and below.
   mathkata::Rect<T> expanded =
-      r.Expand(mathkata::Vector<T, 2>(static_cast<T>(20), static_cast<T>(20)));
+      r.expand(mathkata::Vector<T, 2>(static_cast<T>(20), static_cast<T>(20)));
   EXPECT_EQ(expanded.pos.x, static_cast<T>(2));
   EXPECT_EQ(expanded.pos.y, static_cast<T>(2));
   EXPECT_EQ(expanded.size.x, static_cast<T>(18));
@@ -324,7 +324,7 @@ void ExpandPoint_Test(T precision) {
 
   // Point outside to the left and above.
   mathkata::Rect<T> expanded2 =
-      r.Expand(mathkata::Vector<T, 2>(static_cast<T>(-5), static_cast<T>(-3)));
+      r.expand(mathkata::Vector<T, 2>(static_cast<T>(-5), static_cast<T>(-3)));
   EXPECT_EQ(expanded2.pos.x, static_cast<T>(-5));
   EXPECT_EQ(expanded2.pos.y, static_cast<T>(-3));
   EXPECT_EQ(expanded2.size.x, static_cast<T>(13));
@@ -332,12 +332,12 @@ void ExpandPoint_Test(T precision) {
 
   // Point on boundary - no change.
   mathkata::Rect<T> boundary =
-      r.Expand(mathkata::Vector<T, 2>(static_cast<T>(8), static_cast<T>(8)));
+      r.expand(mathkata::Vector<T, 2>(static_cast<T>(8), static_cast<T>(8)));
   EXPECT_EQ(boundary, r);
 }
 TEST_ALL_F(ExpandPoint)
 
-// --- Expand (amount) ---
+// --- expand (amount) ---
 
 template <class T>
 void ExpandAmount_Test(T precision) {
@@ -345,18 +345,18 @@ void ExpandAmount_Test(T precision) {
   mathkata::Rect<T> r(static_cast<T>(5), static_cast<T>(5), static_cast<T>(10),
                       static_cast<T>(10));
 
-  mathkata::Rect<T> expanded = r.Expand(static_cast<T>(2));
+  mathkata::Rect<T> expanded = r.expand(static_cast<T>(2));
   EXPECT_EQ(expanded.pos.x, static_cast<T>(3));
   EXPECT_EQ(expanded.pos.y, static_cast<T>(3));
   EXPECT_EQ(expanded.size.x, static_cast<T>(14));
   EXPECT_EQ(expanded.size.y, static_cast<T>(14));
 
-  // Expand by zero - no change.
-  mathkata::Rect<T> same = r.Expand(static_cast<T>(0));
+  // expand by zero - no change.
+  mathkata::Rect<T> same = r.expand(static_cast<T>(0));
   EXPECT_EQ(same, r);
 
   // Shrink (negative amount).
-  mathkata::Rect<T> shrunk = r.Expand(static_cast<T>(-1));
+  mathkata::Rect<T> shrunk = r.expand(static_cast<T>(-1));
   EXPECT_EQ(shrunk.pos.x, static_cast<T>(6));
   EXPECT_EQ(shrunk.pos.y, static_cast<T>(6));
   EXPECT_EQ(shrunk.size.x, static_cast<T>(8));
@@ -369,7 +369,7 @@ TEST_ALL_F(ExpandAmount)
 template <class T>
 void IntegerArea_Test() {
   mathkata::Rect<T> r(0, 0, 7, 3);
-  EXPECT_EQ(r.Area(), 21);
+  EXPECT_EQ(r.area(), 21);
 }
 TEST_ALL_INT(IntegerArea)
 
@@ -377,7 +377,7 @@ template <class T>
 void IntegerCenter_Test() {
   // Integer division truncates: (0 + 10/2, 0 + 10/2) = (5, 5).
   mathkata::Rect<T> r(0, 0, 10, 10);
-  mathkata::Vector<T, 2> center = r.Center();
+  mathkata::Vector<T, 2> center = r.center();
   EXPECT_EQ(center.x, 5);
   EXPECT_EQ(center.y, 5);
 }

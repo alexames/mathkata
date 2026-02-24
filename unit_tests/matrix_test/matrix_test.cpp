@@ -135,7 +135,7 @@ void Initialize_Test(const T& precision) {
   matrix_copy = matrix_copy - mathkata::Matrix<T, d>(1);
   EXPECT_NE(matrix_copy(0, 0), matrix_arr(0, 0));
   // This will test creation of the identity matrix.
-  mathkata::Matrix<T, d> identity(mathkata::Matrix<T, d>::Identity());
+  mathkata::Matrix<T, d> identity(mathkata::Matrix<T, d>::identity());
   for (int i = 0; i < d; ++i) {
     for (int j = 0; j < d; ++j) {
       EXPECT_NEAR(i == j ? 1 : 0, identity(i, j), precision);
@@ -219,7 +219,7 @@ void PackedSerialization_Test(const T& precision) {
     matrix[i] = static_cast<T>(i);
   }
   mathkata::VectorPacked<T, d> packed[d];
-  matrix.Pack(packed);
+  matrix.pack(packed);
   for (int i = 0; i < d * d; ++i) {
     EXPECT_NEAR(matrix[i], packed[i / d].data_[i % d], static_cast<T>(0))
         << "Element " << i;
@@ -293,7 +293,7 @@ void Mult_Test(const T& precision) {
     T v1[d];
     for (int k = 0; k < d; ++k) v1[k] = matrix1(i, k);
     mathkata::Vector<T, d> vec1(v1);
-    T dot = mathkata::Vector<T, d>::DotProduct(vec1, vector);
+    T dot = mathkata::Vector<T, d>::dotProduct(vec1, vector);
     EXPECT_NEAR(dot, vector_multv[i], precision);
   }
   // This will test matrix multiplication and verify that the resulting
@@ -305,7 +305,7 @@ void Mult_Test(const T& precision) {
       for (int k = 0; k < d; ++k) v1[k] = matrix1(i, k);
       for (int k = 0; k < d; ++k) v2[k] = matrix2(k, j);
       mathkata::Vector<T, d> vec1(v1), vec2(v2);
-      T dot = mathkata::Vector<T, d>::DotProduct(vec1, vec2);
+      T dot = mathkata::Vector<T, d>::dotProduct(vec1, vec2);
       EXPECT_NEAR(dot, matrix_multm(i, j), precision);
     }
   }
@@ -317,13 +317,13 @@ TEST_F(MatrixTests, Mult_double_5) { Mult_Test<double, 5>(DOUBLE_PRECISION); }
 // This will test the outer product of two vectors. The template parameter d
 // corresponds to the number of rows and columns.
 template <class T, int d>
-void OuterProduct_Test(const T& precision) {
+void outerProduct_Test(const T& precision) {
   T x1[d], x2[d];
   for (int i = 0; i < d; ++i) x1[i] = TestRandom01<T>();
   for (int i = 0; i < d; ++i) x2[i] = TestRandom01<T>();
   mathkata::Vector<T, d> vector1(x1), vector2(x2);
   mathkata::Matrix<T, d> matrix(
-      mathkata::Matrix<T, d>::OuterProduct(vector1, vector2));
+      mathkata::Matrix<T, d>::outerProduct(vector1, vector2));
   // This will verify that each element is mathematically correct.
   for (int i = 0; i < d; ++i) {
     for (int j = 0; j < d; ++j) {
@@ -331,7 +331,7 @@ void OuterProduct_Test(const T& precision) {
     }
   }
 }
-TEST_ALL_F(OuterProduct, FLOAT_PRECISION, DOUBLE_PRECISION)
+TEST_ALL_F(outerProduct, FLOAT_PRECISION, DOUBLE_PRECISION)
 
 // Print the specified matrix to output_string in the form.
 template <class T, int rows, int columns>
@@ -355,7 +355,7 @@ void InverseNonInvertible_Test(const T& precision) {
   T m[d * d];
   const size_t matrix_size = sizeof(m) / sizeof(m[0]);
   static const T kDeterminantThreshold =
-      mathkata::Constants<T>::GetDeterminantThreshold();
+      mathkata::Constants<T>::getDeterminantThreshold();
   static const T kDeterminantThresholdSmall = kDeterminantThreshold / 100;
   static const T kDeterminantThresholdLarge = kDeterminantThreshold * 100;
   static const T kDeterminantThresholdInverse = 1 / kDeterminantThreshold;
@@ -369,10 +369,10 @@ void InverseNonInvertible_Test(const T& precision) {
   {
     mathkata::Matrix<T, d> matrix(m);
     mathkata::Matrix<T, d> inverse_matrix;
-    EXPECT_FALSE(matrix.InverseWithDeterminantCheck(&inverse_matrix));
-    EXPECT_FALSE(matrix.InverseWithDeterminantCheck(
+    EXPECT_FALSE(matrix.inverseWithDeterminantCheck(&inverse_matrix));
+    EXPECT_FALSE(matrix.inverseWithDeterminantCheck(
         &inverse_matrix, kDeterminantThresholdSmall));
-    EXPECT_FALSE(matrix.InverseWithDeterminantCheck(
+    EXPECT_FALSE(matrix.inverseWithDeterminantCheck(
         &inverse_matrix, kDeterminantThresholdLarge));
   }
   // Check a matrix with all elements at the determinant threshold.
@@ -380,10 +380,10 @@ void InverseNonInvertible_Test(const T& precision) {
   {
     mathkata::Matrix<T, d> matrix(m);
     mathkata::Matrix<T, d> inverse_matrix;
-    EXPECT_FALSE(matrix.InverseWithDeterminantCheck(&inverse_matrix));
-    EXPECT_FALSE(matrix.InverseWithDeterminantCheck(
+    EXPECT_FALSE(matrix.inverseWithDeterminantCheck(&inverse_matrix));
+    EXPECT_FALSE(matrix.inverseWithDeterminantCheck(
         &inverse_matrix, kDeterminantThresholdSmall));
-    EXPECT_FALSE(matrix.InverseWithDeterminantCheck(
+    EXPECT_FALSE(matrix.inverseWithDeterminantCheck(
         &inverse_matrix, kDeterminantThresholdLarge));
   }
   // Check a matrix with all very large elements.
@@ -403,10 +403,10 @@ void InverseNonInvertible_Test(const T& precision) {
     {
       mathkata::Matrix<T, d> matrix(m);
       mathkata::Matrix<T, d> inverse_matrix;
-      EXPECT_FALSE(matrix.InverseWithDeterminantCheck(&inverse_matrix));
-      EXPECT_FALSE(matrix.InverseWithDeterminantCheck(
+      EXPECT_FALSE(matrix.inverseWithDeterminantCheck(&inverse_matrix));
+      EXPECT_FALSE(matrix.inverseWithDeterminantCheck(
           &inverse_matrix, kDeterminantThresholdSmall));
-      EXPECT_FALSE(matrix.InverseWithDeterminantCheck(
+      EXPECT_FALSE(matrix.inverseWithDeterminantCheck(
           &inverse_matrix, kDeterminantThresholdLarge));
     }
   }
@@ -423,7 +423,7 @@ template <class T, int d>
 void InverseSmallScale_Test(const T& precision) {
   (void)precision;
   static const T kDeterminantThreshold =
-      mathkata::Constants<T>::GetDeterminantThreshold();
+      mathkata::Constants<T>::getDeterminantThreshold();
   static const T kDeterminantThresholdSmall = kDeterminantThreshold / 100;
   static const T kDeterminantThresholdLarge = kDeterminantThreshold * 100;
 
@@ -432,26 +432,26 @@ void InverseSmallScale_Test(const T& precision) {
   static const T kDeterminantPower = static_cast<T>(1) / (d == 2 ? 2 : 3);
   static const T kScaleMin = pow(kDeterminantThreshold, kDeterminantPower);
 
-  mathkata::Matrix<T, d> matrix = mathkata::Matrix<T, d>::Identity();
+  mathkata::Matrix<T, d> matrix = mathkata::Matrix<T, d>::identity();
   mathkata::Matrix<T, d> inverse_matrix;
 
-  // Scale too small - non-invertible.
+  // scale too small - non-invertible.
   {
     for (int i = 0; i != d; ++i) matrix(i, i) = kScaleMin / 2;
-    EXPECT_FALSE(matrix.InverseWithDeterminantCheck(&inverse_matrix));
-    EXPECT_TRUE(matrix.InverseWithDeterminantCheck(&inverse_matrix,
+    EXPECT_FALSE(matrix.inverseWithDeterminantCheck(&inverse_matrix));
+    EXPECT_TRUE(matrix.inverseWithDeterminantCheck(&inverse_matrix,
                                                    kDeterminantThresholdSmall));
-    EXPECT_FALSE(matrix.InverseWithDeterminantCheck(
+    EXPECT_FALSE(matrix.inverseWithDeterminantCheck(
         &inverse_matrix, kDeterminantThresholdLarge));
   }
 
-  // Scale large enough - invertible.
+  // scale large enough - invertible.
   {
     for (int i = 0; i != d; ++i) matrix(i, i) = kScaleMin * 2;
-    EXPECT_TRUE(matrix.InverseWithDeterminantCheck(&inverse_matrix));
-    EXPECT_TRUE(matrix.InverseWithDeterminantCheck(&inverse_matrix,
+    EXPECT_TRUE(matrix.inverseWithDeterminantCheck(&inverse_matrix));
+    EXPECT_TRUE(matrix.inverseWithDeterminantCheck(&inverse_matrix,
                                                    kDeterminantThresholdSmall));
-    EXPECT_FALSE(matrix.InverseWithDeterminantCheck(
+    EXPECT_FALSE(matrix.inverseWithDeterminantCheck(
         &inverse_matrix, kDeterminantThresholdLarge));
   }
 }
@@ -460,7 +460,7 @@ TEST_ALL_F(InverseSmallScale, FLOAT_PRECISION, DOUBLE_PRECISION)
 // This will test calculating the inverse of a matrix. The template parameter d
 // corresponds to the number of rows and columns.
 template <class T, int d>
-void Inverse_Test(const T& precision) {
+void inverse_Test(const T& precision) {
   T x[d * d];
   for (int iterations = 0; iterations < 1000; ++iterations) {
     // NOTE: This assumes that matrices generated here are invertible since
@@ -473,7 +473,7 @@ void Inverse_Test(const T& precision) {
     mathkata::Matrix<T, d> matrix(x);
     std::string error_string = MatrixToString(matrix);
     error_string += "\n";
-    mathkata::Matrix<T, d> inverse_matrix(matrix.Inverse());
+    mathkata::Matrix<T, d> inverse_matrix(matrix.inverse());
     mathkata::Matrix<T, d> identity_matrix(matrix * inverse_matrix);
 
     error_string += MatrixToString(inverse_matrix);
@@ -492,46 +492,46 @@ void Inverse_Test(const T& precision) {
 // Due to the number of operations involved and the random numbers used to
 // generate the test matrices, the precision the inverse matrix is calculated
 // to is relatively low.
-TEST_ALL_F(Inverse, 1e-4f, 1e-8)
+TEST_ALL_F(inverse, 1e-4f, 1e-8)
 
 // This will test converting from a translation into a matrix and back again.
 template <class T>
-void TranslationVector3D_Test(const T& precision) {
+void translationVector3D_Test(const T& precision) {
   (void)precision;
   const mathkata::Vector<T, 3> trans(
       static_cast<T>(-100.0), static_cast<T>(0.0), static_cast<T>(0.00003));
   const mathkata::Matrix<T, 4> trans_matrix =
-      mathkata::Matrix<T, 4>::FromTranslationVector(trans);
-  const mathkata::Vector<T, 3> trans_back = trans_matrix.TranslationVector3D();
+      mathkata::Matrix<T, 4>::fromTranslationVector(trans);
+  const mathkata::Vector<T, 3> trans_back = trans_matrix.translationVector3D();
 
   // This will verify that the translation vector has not changed.
   for (int i = 0; i < 3; ++i) {
     EXPECT_EQ(trans[i], trans_back[i]);
   }
 }
-TEST_SCALAR_F(TranslationVector3D, FLOAT_PRECISION, DOUBLE_PRECISION)
+TEST_SCALAR_F(translationVector3D, FLOAT_PRECISION, DOUBLE_PRECISION)
 
 // This will test converting from a translation into a matrix and back again.
 template <class T>
-void TranslationVector2D_Test(const T& precision) {
+void translationVector2D_Test(const T& precision) {
   (void)precision;
   const mathkata::Vector<T, 2> trans(static_cast<T>(-100.0),
                                      static_cast<T>(0.00003));
   const mathkata::Matrix<T, 3> trans_matrix =
-      mathkata::Matrix<T, 3>::FromTranslationVector(trans);
-  const mathkata::Vector<T, 2> trans_back = trans_matrix.TranslationVector2D();
+      mathkata::Matrix<T, 3>::fromTranslationVector(trans);
+  const mathkata::Vector<T, 2> trans_back = trans_matrix.translationVector2D();
 
   // This will verify that the translation vector has not changed.
   for (int i = 0; i < 2; ++i) {
     EXPECT_EQ(trans[i], trans_back[i]);
   }
 }
-TEST_SCALAR_F(TranslationVector2D, FLOAT_PRECISION, DOUBLE_PRECISION)
+TEST_SCALAR_F(translationVector2D, FLOAT_PRECISION, DOUBLE_PRECISION)
 
 // This will test converting from a scale into a matrix, then multiply by
 // a vector of 1's, which should produce the original scale again.
 template <class T, int d>
-void FromScaleVector_Test(const T& precision) {
+void fromScaleVector_Test(const T& precision) {
   mathkata::Vector<T, d> ones(static_cast<T>(1));
   mathkata::Vector<T, d - 1> v;
 
@@ -539,7 +539,7 @@ void FromScaleVector_Test(const T& precision) {
   for (int i = 0; i < d - 1; ++i) {
     v[i] = static_cast<T>(i + 10);
   }
-  mathkata::Matrix<T, d> m = mathkata::Matrix<T, d>::FromScaleVector(v);
+  mathkata::Matrix<T, d> m = mathkata::Matrix<T, d>::fromScaleVector(v);
 
   // Ensure that the v is on the diagonal.
   for (int i = 0; i < d - 1; ++i) {
@@ -558,7 +558,7 @@ void FromScaleVector_Test(const T& precision) {
   }
 }
 // Precision is zero. Results must be perfect for this test.
-TEST_ALL_F(FromScaleVector, 0.0f, 0.0)
+TEST_ALL_F(fromScaleVector, 0.0f, 0.0)
 
 // Compare a set of Matrix<T, rows, columns> with expected values.
 template <class T, int rows, int columns>
@@ -581,7 +581,7 @@ void VerifyMatrixExpectations(
 
 // Test perspective matrix calculation.
 template <class T>
-void Perspective_Test(const T& precision) {
+void perspective_Test(const T& precision) {
   using RH = std::integral_constant<mathkata::Handedness,
                                     mathkata::Handedness::kRightHanded>;
   using LH = std::integral_constant<mathkata::Handedness,
@@ -590,7 +590,7 @@ void Perspective_Test(const T& precision) {
   const MatrixExpectation<T, 4, 4> kTestCasesRH[] = {
     {
       "normalized right-handed",
-      mathkata::Matrix<T, 4>::template Perspective<RH::value>(
+      mathkata::Matrix<T, 4>::template perspective<RH::value>(
           atan(static_cast<T>(1)) * 2, 1, 0, 1),
       mathkata::Matrix<T, 4>(1, 0, 0, 0,
                            0, 1, 0, 0,
@@ -599,7 +599,7 @@ void Perspective_Test(const T& precision) {
     },
     {
       "widefov",
-      mathkata::Matrix<T, 4>::Perspective(
+      mathkata::Matrix<T, 4>::perspective(
           atan(static_cast<T>(2)) * 2, 1, 0, 1),
       mathkata::Matrix<T, 4>(0.5, 0, 0, 0,
                            0, 0.5, 0, 0,
@@ -608,7 +608,7 @@ void Perspective_Test(const T& precision) {
     },
     {
       "narrowfov",
-      mathkata::Matrix<T, 4>::Perspective(
+      mathkata::Matrix<T, 4>::perspective(
           atan(static_cast<T>(0.1)) * 2, 1, 0, 1),
       mathkata::Matrix<T, 4>(10, 0, 0, 0,
                            0, 10, 0, 0,
@@ -617,7 +617,7 @@ void Perspective_Test(const T& precision) {
     },
     {
       "2:1 aspect ratio",
-      mathkata::Matrix<T, 4>::Perspective(
+      mathkata::Matrix<T, 4>::perspective(
           atan(static_cast<T>(1)) * 2, 0.5, 0, 1),
       mathkata::Matrix<T, 4>(2, 0, 0, 0,
                            0, 1, 0, 0,
@@ -626,7 +626,7 @@ void Perspective_Test(const T& precision) {
     },
     {
       "deeper view frustrum",
-      mathkata::Matrix<T, 4>::Perspective(
+      mathkata::Matrix<T, 4>::perspective(
           atan(static_cast<T>(1)) * 2, 1, -2, 2),
       mathkata::Matrix<T, 4>(1, 0, 0, 0,
                            0, 1, 0, 0,
@@ -637,7 +637,7 @@ void Perspective_Test(const T& precision) {
   const MatrixExpectation<T, 4, 4> kTestCasesLH[] = {
     {
       "normalized left-handed",
-      mathkata::Matrix<T, 4>::template Perspective<LH::value>(
+      mathkata::Matrix<T, 4>::template perspective<LH::value>(
           atan(static_cast<T>(1)) * 2, 1, 0, 1),
       mathkata::Matrix<T, 4>(1, 0, 0, 0,
                            0, 1, 0, 0,
@@ -651,7 +651,7 @@ void Perspective_Test(const T& precision) {
   VerifyMatrixExpectations(
       kTestCasesLH, sizeof(kTestCasesLH) / sizeof(kTestCasesLH[0]), precision);
 }
-TEST_SCALAR_F(Perspective, FLOAT_PRECISION, DOUBLE_PRECISION * 10)
+TEST_SCALAR_F(perspective, FLOAT_PRECISION, DOUBLE_PRECISION * 10)
 
 // Test that the OpenGL perspective matrix maps the near plane to z = -1
 // and the far plane to z = 1.
@@ -662,16 +662,16 @@ void PerspectiveOpenGLDepth_Test(const T& precision) {
   const T znear = static_cast<T>(0.1);
   const T zfar = static_cast<T>(100.0);
 
-  mathkata::Matrix<T, 4> proj = mathkata::Matrix<T, 4>::Perspective(
+  mathkata::Matrix<T, 4> proj = mathkata::Matrix<T, 4>::perspective(
       fovy, aspect, znear, zfar, mathkata::DepthRange::kOpenGL);
 
-  // Transform a point on the near plane (z = -znear in view space for RH).
+  // transform a point on the near plane (z = -znear in view space for RH).
   mathkata::Vector<T, 4> near_point(0, 0, -znear, 1);
   mathkata::Vector<T, 4> near_clip = proj * near_point;
   T near_ndc_z = near_clip.z / near_clip.w;
   EXPECT_NEAR(near_ndc_z, static_cast<T>(-1), precision);
 
-  // Transform a point on the far plane (z = -zfar in view space for RH).
+  // transform a point on the far plane (z = -zfar in view space for RH).
   mathkata::Vector<T, 4> far_point(0, 0, -zfar, 1);
   mathkata::Vector<T, 4> far_clip = proj * far_point;
   T far_ndc_z = far_clip.z / far_clip.w;
@@ -688,16 +688,16 @@ void PerspectiveDirectXDepth_Test(const T& precision) {
   const T znear = static_cast<T>(0.1);
   const T zfar = static_cast<T>(100.0);
 
-  mathkata::Matrix<T, 4> proj = mathkata::Matrix<T, 4>::Perspective(
+  mathkata::Matrix<T, 4> proj = mathkata::Matrix<T, 4>::perspective(
       fovy, aspect, znear, zfar, mathkata::DepthRange::kDirectX);
 
-  // Transform a point on the near plane (z = -znear in view space for RH).
+  // transform a point on the near plane (z = -znear in view space for RH).
   mathkata::Vector<T, 4> near_point(0, 0, -znear, 1);
   mathkata::Vector<T, 4> near_clip = proj * near_point;
   T near_ndc_z = near_clip.z / near_clip.w;
   EXPECT_NEAR(near_ndc_z, static_cast<T>(0), precision);
 
-  // Transform a point on the far plane (z = -zfar in view space for RH).
+  // transform a point on the far plane (z = -zfar in view space for RH).
   mathkata::Vector<T, 4> far_point(0, 0, -zfar, 1);
   mathkata::Vector<T, 4> far_clip = proj * far_point;
   T far_ndc_z = far_clip.z / far_clip.w;
@@ -705,7 +705,7 @@ void PerspectiveDirectXDepth_Test(const T& precision) {
 }
 TEST_SCALAR_F(PerspectiveDirectXDepth, 1e-5f, 1e-10)
 
-// Test that the default Perspective (no DepthRange argument) uses OpenGL
+// Test that the default perspective (no DepthRange argument) uses OpenGL
 // convention, matching the explicit OpenGL call.
 template <class T>
 void PerspectiveDefaultIsOpenGL_Test(const T& precision) {
@@ -715,8 +715,8 @@ void PerspectiveDefaultIsOpenGL_Test(const T& precision) {
   const T zfar = static_cast<T>(500.0);
 
   mathkata::Matrix<T, 4> default_proj =
-      mathkata::Matrix<T, 4>::Perspective(fovy, aspect, znear, zfar);
-  mathkata::Matrix<T, 4> opengl_proj = mathkata::Matrix<T, 4>::Perspective(
+      mathkata::Matrix<T, 4>::perspective(fovy, aspect, znear, zfar);
+  mathkata::Matrix<T, 4> opengl_proj = mathkata::Matrix<T, 4>::perspective(
       fovy, aspect, znear, zfar, mathkata::DepthRange::kOpenGL);
 
   for (int i = 0; i < 16; ++i) {
@@ -727,14 +727,14 @@ TEST_SCALAR_F(PerspectiveDefaultIsOpenGL, FLOAT_PRECISION, DOUBLE_PRECISION)
 
 // Test orthographic matrix calculation.
 template <class T>
-void Ortho_Test(const T& precision) {
+void ortho_Test(const T& precision) {
   using LH = std::integral_constant<mathkata::Handedness,
                                     mathkata::Handedness::kLeftHanded>;
   // clang-format off
   const MatrixExpectation<T, 4, 4> kTestCasesRH[] = {
     {
       "normalized",
-      mathkata::Matrix<T, 4, 4>::Ortho(0, 2, 0, 2, 2, 0),
+      mathkata::Matrix<T, 4, 4>::ortho(0, 2, 0, 2, 2, 0),
       mathkata::Matrix<T, 4, 4>(1, 0, 0, 0,
                               0, 1, 0, 0,
                               0, 0, 1, 0,
@@ -742,7 +742,7 @@ void Ortho_Test(const T& precision) {
     },
     {
       "normalized RH",
-      mathkata::Matrix<T, 4, 4>::Ortho(0, 2, 0, 2, 2, 0),
+      mathkata::Matrix<T, 4, 4>::ortho(0, 2, 0, 2, 2, 0),
       mathkata::Matrix<T, 4, 4>(1, 0, 0, 0,
                               0, 1, 0, 0,
                               0, 0, 1, 0,
@@ -750,7 +750,7 @@ void Ortho_Test(const T& precision) {
     },
     {
       "narrow RH",
-      mathkata::Matrix<T, 4, 4>::Ortho(1, 3, 0, 2, 2, 0),
+      mathkata::Matrix<T, 4, 4>::ortho(1, 3, 0, 2, 2, 0),
       mathkata::Matrix<T, 4, 4>(1, 0, 0, 0,
                               0, 1, 0, 0,
                               0, 0, 1, 0,
@@ -759,7 +759,7 @@ void Ortho_Test(const T& precision) {
     },
     {
       "squat RH",
-      mathkata::Matrix<T, 4, 4>::Ortho(0, 2, 1, 3, 2, 0),
+      mathkata::Matrix<T, 4, 4>::ortho(0, 2, 1, 3, 2, 0),
       mathkata::Matrix<T, 4, 4>(1, 0, 0, 0,
                               0, 1, 0, 0,
                               0, 0, 1, 0,
@@ -768,7 +768,7 @@ void Ortho_Test(const T& precision) {
     },
     {
       "deep RH",
-      mathkata::Matrix<T, 4, 4>::Ortho(0, 2, 0, 2, 3, 1),
+      mathkata::Matrix<T, 4, 4>::ortho(0, 2, 0, 2, 3, 1),
       mathkata::Matrix<T, 4, 4>(1, 0, 0, 0,
                               0, 1, 0, 0,
                               0, 0, 1, 0,
@@ -779,7 +779,7 @@ void Ortho_Test(const T& precision) {
   const MatrixExpectation<T, 4, 4> kTestCasesLH[] = {
     {
       "normalized LH",
-      mathkata::Matrix<T, 4, 4>::template Ortho<LH::value>(0, 2, 0, 2, 2, 0),
+      mathkata::Matrix<T, 4, 4>::template ortho<LH::value>(0, 2, 0, 2, 2, 0),
       mathkata::Matrix<T, 4, 4>(1, 0, 0, 0,
                               0, 1, 0, 0,
                               0, 0, -1, 0,
@@ -787,7 +787,7 @@ void Ortho_Test(const T& precision) {
     },
     {
       "Canonical LH",
-      mathkata::Matrix<T, 4, 4>::template Ortho<LH::value>(1, 3, 1, 3, 1, 3),
+      mathkata::Matrix<T, 4, 4>::template ortho<LH::value>(1, 3, 1, 3, 1, 3),
       mathkata::Matrix<T, 4, 4>(1, 0, 0, 0,
                               0, 1, 0, 0,
                               0, 0, 1, 0,
@@ -801,7 +801,7 @@ void Ortho_Test(const T& precision) {
   VerifyMatrixExpectations(
       kTestCasesLH, sizeof(kTestCasesLH) / sizeof(kTestCasesLH[0]), precision);
 }
-TEST_SCALAR_F(Ortho, FLOAT_PRECISION, DOUBLE_PRECISION)
+TEST_SCALAR_F(ortho, FLOAT_PRECISION, DOUBLE_PRECISION)
 
 // Test that the OpenGL orthographic matrix maps the near plane to z = -1
 // and the far plane to z = 1.
@@ -814,16 +814,16 @@ void OrthoOpenGLDepth_Test(const T& precision) {
   const T znear = static_cast<T>(1);
   const T zfar = static_cast<T>(100);
 
-  mathkata::Matrix<T, 4> proj = mathkata::Matrix<T, 4>::Ortho(
+  mathkata::Matrix<T, 4> proj = mathkata::Matrix<T, 4>::ortho(
       left, right, bottom, top, znear, zfar, mathkata::DepthRange::kOpenGL);
 
-  // Transform a point on the near plane (z = -znear in view space for RH).
+  // transform a point on the near plane (z = -znear in view space for RH).
   mathkata::Vector<T, 4> near_point(0, 0, -znear, 1);
   mathkata::Vector<T, 4> near_clip = proj * near_point;
   T near_ndc_z = near_clip.z / near_clip.w;
   EXPECT_NEAR(near_ndc_z, static_cast<T>(-1), precision);
 
-  // Transform a point on the far plane (z = -zfar in view space for RH).
+  // transform a point on the far plane (z = -zfar in view space for RH).
   mathkata::Vector<T, 4> far_point(0, 0, -zfar, 1);
   mathkata::Vector<T, 4> far_clip = proj * far_point;
   T far_ndc_z = far_clip.z / far_clip.w;
@@ -842,16 +842,16 @@ void OrthoDirectXDepth_Test(const T& precision) {
   const T znear = static_cast<T>(1);
   const T zfar = static_cast<T>(100);
 
-  mathkata::Matrix<T, 4> proj = mathkata::Matrix<T, 4>::Ortho(
+  mathkata::Matrix<T, 4> proj = mathkata::Matrix<T, 4>::ortho(
       left, right, bottom, top, znear, zfar, mathkata::DepthRange::kDirectX);
 
-  // Transform a point on the near plane (z = -znear in view space for RH).
+  // transform a point on the near plane (z = -znear in view space for RH).
   mathkata::Vector<T, 4> near_point(0, 0, -znear, 1);
   mathkata::Vector<T, 4> near_clip = proj * near_point;
   T near_ndc_z = near_clip.z / near_clip.w;
   EXPECT_NEAR(near_ndc_z, static_cast<T>(0), precision);
 
-  // Transform a point on the far plane (z = -zfar in view space for RH).
+  // transform a point on the far plane (z = -zfar in view space for RH).
   mathkata::Vector<T, 4> far_point(0, 0, -zfar, 1);
   mathkata::Vector<T, 4> far_clip = proj * far_point;
   T far_ndc_z = far_clip.z / far_clip.w;
@@ -859,7 +859,7 @@ void OrthoDirectXDepth_Test(const T& precision) {
 }
 TEST_SCALAR_F(OrthoDirectXDepth, 1e-5f, 1e-10)
 
-// Test that the default Ortho (no DepthRange argument) uses OpenGL convention,
+// Test that the default ortho (no DepthRange argument) uses OpenGL convention,
 // matching the explicit OpenGL call.
 template <class T>
 void OrthoDefaultIsOpenGL_Test(const T& precision) {
@@ -871,8 +871,8 @@ void OrthoDefaultIsOpenGL_Test(const T& precision) {
   const T zfar = static_cast<T>(200);
 
   mathkata::Matrix<T, 4> default_proj =
-      mathkata::Matrix<T, 4>::Ortho(left, right, bottom, top, znear, zfar);
-  mathkata::Matrix<T, 4> opengl_proj = mathkata::Matrix<T, 4>::Ortho(
+      mathkata::Matrix<T, 4>::ortho(left, right, bottom, top, znear, zfar);
+  mathkata::Matrix<T, 4> opengl_proj = mathkata::Matrix<T, 4>::ortho(
       left, right, bottom, top, znear, zfar, mathkata::DepthRange::kOpenGL);
 
   for (int i = 0; i < 16; ++i) {
@@ -883,7 +883,7 @@ TEST_SCALAR_F(OrthoDefaultIsOpenGL, FLOAT_PRECISION, DOUBLE_PRECISION)
 
 // Test look-at matrix calculation.
 template <class T>
-void LookAt_Test(const T& precision) {
+void lookAt_Test(const T& precision) {
   using RH = std::integral_constant<mathkata::Handedness,
                                     mathkata::Handedness::kRightHanded>;
   using LH = std::integral_constant<mathkata::Handedness,
@@ -892,7 +892,7 @@ void LookAt_Test(const T& precision) {
   const MatrixExpectation<T, 4, 4> kTestCasesRH[] = {
     {
       "default RH origin along z",
-      mathkata::Matrix<T, 4, 4>::LookAt(
+      mathkata::Matrix<T, 4, 4>::lookAt(
           mathkata::Vector<T, 3>(0, 0, 1), mathkata::Vector<T, 3>(0, 0, 0),
           mathkata::Vector<T, 3>(0, 1, 0)),
       mathkata::Matrix<T, 4, 4>(-1, 0, 0, 0,
@@ -902,7 +902,7 @@ void LookAt_Test(const T& precision) {
     },
     {
       "right-handed diagonal along diagonal",
-      mathkata::Matrix<T, 4, 4>::template LookAt<RH::value>(
+      mathkata::Matrix<T, 4, 4>::template lookAt<RH::value>(
           mathkata::Vector<T, 3>(0, 0, 0), mathkata::Vector<T, 3>(1, 1, 1),
           mathkata::Vector<T, 3>(0, 1, 0)),
       mathkata::Matrix<T, 4, 4>(
@@ -915,7 +915,7 @@ void LookAt_Test(const T& precision) {
     },
     {
       "right-handed origin along z",
-      mathkata::Matrix<T, 4, 4>::template LookAt<RH::value>(
+      mathkata::Matrix<T, 4, 4>::template lookAt<RH::value>(
           mathkata::Vector<T, 3>(0, 0, 1), mathkata::Vector<T, 3>(0, 0, 0),
           mathkata::Vector<T, 3>(0, 1, 0)),
       mathkata::Matrix<T, 4, 4>(-1, 0, 0, 0,
@@ -925,7 +925,7 @@ void LookAt_Test(const T& precision) {
     },
     {
       "right-handed origin along x",
-      mathkata::Matrix<T, 4, 4>::template LookAt<RH::value>(
+      mathkata::Matrix<T, 4, 4>::template lookAt<RH::value>(
           mathkata::Vector<T, 3>(1, 0, 0), mathkata::Vector<T, 3>(0, 0, 0),
           mathkata::Vector<T, 3>(0, 1, 0)),
       mathkata::Matrix<T, 4, 4>(0, 0, -1, 0,
@@ -935,7 +935,7 @@ void LookAt_Test(const T& precision) {
     },
     {
       "right-handed origin along y",
-      mathkata::Matrix<T, 4, 4>::template LookAt<RH::value>(
+      mathkata::Matrix<T, 4, 4>::template lookAt<RH::value>(
           mathkata::Vector<T, 3>(0, 1, 0), mathkata::Vector<T, 3>(0, 0, 0),
           mathkata::Vector<T, 3>(1, 0, 0)),
       mathkata::Matrix<T, 4, 4>(0, 1, 0, 0,
@@ -945,7 +945,7 @@ void LookAt_Test(const T& precision) {
     },
     {
       "right-handed translated eye along x",
-      mathkata::Matrix<T, 4, 4>::template LookAt<RH::value>(
+      mathkata::Matrix<T, 4, 4>::template lookAt<RH::value>(
           mathkata::Vector<T, 3>(2, 1, 1), mathkata::Vector<T, 3>(1, 1, 1),
           mathkata::Vector<T, 3>(0, 1, 0)),
       mathkata::Matrix<T, 4, 4>(0, 0, -1, 0,
@@ -957,7 +957,7 @@ void LookAt_Test(const T& precision) {
   const MatrixExpectation<T, 4, 4> kTestCasesLH[] = {
     {
       "left-handed origin along z",
-      mathkata::Matrix<T, 4, 4>::template LookAt<LH::value>(
+      mathkata::Matrix<T, 4, 4>::template lookAt<LH::value>(
           mathkata::Vector<T, 3>(0, 0, 1), mathkata::Vector<T, 3>(0, 0, 0),
           mathkata::Vector<T, 3>(0, 1, 0)),
       mathkata::Matrix<T, 4, 4>(1, 0, 0, 0,
@@ -967,7 +967,7 @@ void LookAt_Test(const T& precision) {
     },
     {
       "origin along diagonal",
-      mathkata::Matrix<T, 4, 4>::template LookAt<LH::value>(
+      mathkata::Matrix<T, 4, 4>::template lookAt<LH::value>(
           mathkata::Vector<T, 3>(0, 0, 0), mathkata::Vector<T, 3>(1, 1, 1),
           mathkata::Vector<T, 3>(0, 1, 0)),
       mathkata::Matrix<T, 4, 4>(
@@ -980,7 +980,7 @@ void LookAt_Test(const T& precision) {
     },
     {
       "origin along z",
-      mathkata::Matrix<T, 4, 4>::template LookAt<LH::value>(
+      mathkata::Matrix<T, 4, 4>::template lookAt<LH::value>(
           mathkata::Vector<T, 3>(0, 0, 2), mathkata::Vector<T, 3>(0, 0, 0),
           mathkata::Vector<T, 3>(0, 1, 0)),
       mathkata::Matrix<T, 4, 4>(1, 0, 0, 0,
@@ -990,7 +990,7 @@ void LookAt_Test(const T& precision) {
     },
     {
       "origin along x",
-      mathkata::Matrix<T, 4, 4>::template LookAt<LH::value>(
+      mathkata::Matrix<T, 4, 4>::template lookAt<LH::value>(
           mathkata::Vector<T, 3>(1, 0, 0), mathkata::Vector<T, 3>(0, 0, 0),
           mathkata::Vector<T, 3>(0, 1, 0)),
       mathkata::Matrix<T, 4, 4>(0, 0, 1, 0,
@@ -1000,7 +1000,7 @@ void LookAt_Test(const T& precision) {
     },
     {
       "origin along y",
-      mathkata::Matrix<T, 4, 4>::template LookAt<LH::value>(
+      mathkata::Matrix<T, 4, 4>::template lookAt<LH::value>(
           mathkata::Vector<T, 3>(0, 1, 0), mathkata::Vector<T, 3>(0, 0, 0),
           mathkata::Vector<T, 3>(1, 0, 0)),
       mathkata::Matrix<T, 4, 4>(0, 1, 0, 0,
@@ -1010,7 +1010,7 @@ void LookAt_Test(const T& precision) {
     },
     {
       "translated eye, looking along z",
-      mathkata::Matrix<T, 4, 4>::template LookAt<LH::value>(
+      mathkata::Matrix<T, 4, 4>::template lookAt<LH::value>(
           mathkata::Vector<T, 3>(1, 1, 2), mathkata::Vector<T, 3>(1, 1, 1),
           mathkata::Vector<T, 3>(0, 1, 0)),
       mathkata::Matrix<T, 4, 4>(1, 0, 0, 0,
@@ -1025,11 +1025,11 @@ void LookAt_Test(const T& precision) {
   VerifyMatrixExpectations(
       kTestCasesLH, sizeof(kTestCasesLH) / sizeof(kTestCasesLH[0]), precision);
 }
-TEST_SCALAR_F(LookAt, FLOAT_PRECISION, kLookAtDoublePrecision)
+TEST_SCALAR_F(lookAt, FLOAT_PRECISION, kLookAtDoublePrecision)
 
-// Test UnProject calculation.
+// Test unProject calculation.
 template <class T>
-void UnProject_Test(const T& precision) {
+void unProject_Test(const T& precision) {
   // clang-format off
   mathkata::Matrix<T, 4, 4> modelView =
       mathkata::Matrix<T, 4, 4>(-1, 0,                   0, 0,
@@ -1044,7 +1044,7 @@ void UnProject_Test(const T& precision) {
                         0,          0,  static_cast<T>(-0.200001985),  0);
   // clang-format on
   mathkata::Vector<T, 3> result;
-  bool success = mathkata::Matrix<T, 4, 4>::UnProject(
+  bool success = mathkata::Matrix<T, 4, 4>::unProject(
       mathkata::Vector<T, 3>(754, 1049, 1), modelView, projection, 1600, 1200,
       &result);
   EXPECT_TRUE(success);
@@ -1052,24 +1052,24 @@ void UnProject_Test(const T& precision) {
   EXPECT_NEAR(result.y, 3113.7409399625253, 3000.0 * precision);
   EXPECT_NEAR(result.z, 10035.303114023569, 10000.0 * precision);
 }
-TEST_SCALAR_F(UnProject, kUnProjectFloatPrecision, DOUBLE_PRECISION)
+TEST_SCALAR_F(unProject, kUnProjectFloatPrecision, DOUBLE_PRECISION)
 
-// Test UnProject returns false for a singular (all-zero) matrix.
+// Test unProject returns false for a singular (all-zero) matrix.
 template <class T>
 void UnProject_SingularMatrix_Test(const T& precision) {
   (void)precision;
   // A zero matrix is singular and cannot be inverted.
   mathkata::Matrix<T, 4, 4> singular =
       mathkata::Matrix<T, 4, 4>(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-  mathkata::Matrix<T, 4, 4> identity = mathkata::Matrix<T, 4, 4>::Identity();
+  mathkata::Matrix<T, 4, 4> identity = mathkata::Matrix<T, 4, 4>::identity();
   mathkata::Vector<T, 3> window_coord(400, 300, static_cast<T>(0.5));
   mathkata::Vector<T, 3> result;
   // Singular model-view matrix.
-  bool success_mv = mathkata::Matrix<T, 4, 4>::UnProject(
+  bool success_mv = mathkata::Matrix<T, 4, 4>::unProject(
       window_coord, singular, identity, 800, 600, &result);
   EXPECT_FALSE(success_mv);
   // Singular projection matrix.
-  bool success_proj = mathkata::Matrix<T, 4, 4>::UnProject(
+  bool success_proj = mathkata::Matrix<T, 4, 4>::unProject(
       window_coord, identity, singular, 800, 600, &result);
   EXPECT_FALSE(success_proj);
 }
@@ -1077,13 +1077,13 @@ TEST_SCALAR_F(UnProject_SingularMatrix, FLOAT_PRECISION, DOUBLE_PRECISION)
 
 // Test matrix transposition.
 template <class T, int d>
-void Transpose_Test(const T& precision) {
+void transpose_Test(const T& precision) {
   (void)precision;
   mathkata::Matrix<T, d> matrix;
   for (int i = 0; i < d * d; ++i) {
     matrix[i] = static_cast<T>(i);
   }
-  mathkata::Matrix<T, d> transpose = matrix.Transpose();
+  mathkata::Matrix<T, d> transpose = matrix.transpose();
   for (int i = 0; i < d; ++i) {
     for (int j = 0; j < d; ++j) {
       EXPECT_NEAR(matrix(i, j), transpose(j, i), static_cast<T>(0));
@@ -1091,27 +1091,27 @@ void Transpose_Test(const T& precision) {
   }
 }
 
-TEST_ALL_F(Transpose, FLOAT_PRECISION, DOUBLE_PRECISION)
+TEST_ALL_F(transpose, FLOAT_PRECISION, DOUBLE_PRECISION)
 
-// Test GetColumn returns the correct column vector from the matrix.
+// Test getColumn returns the correct column vector from the matrix.
 template <class T, int d>
-void GetColumn_Test(const T& precision) {
+void getColumn_Test(const T& precision) {
   (void)precision;
   mathkata::Matrix<T, d> matrix;
   for (int i = 0; i < d * d; ++i) {
     matrix[i] = static_cast<T>(i);
   }
   for (int col = 0; col < d; ++col) {
-    mathkata::Vector<T, d> column = matrix.GetColumn(col);
+    mathkata::Vector<T, d> column = matrix.getColumn(col);
     for (int row = 0; row < d; ++row) {
       EXPECT_EQ(matrix(row, col), column[row])
           << "col=" << col << " row=" << row;
     }
   }
 }
-TEST_ALL_F(GetColumn, FLOAT_PRECISION, DOUBLE_PRECISION)
+TEST_ALL_F(getColumn, FLOAT_PRECISION, DOUBLE_PRECISION)
 
-// Test that GetColumn returns a mutable reference that can modify the matrix.
+// Test that getColumn returns a mutable reference that can modify the matrix.
 template <class T, int d>
 void GetColumnMutable_Test(const T& precision) {
   (void)precision;
@@ -1121,7 +1121,7 @@ void GetColumnMutable_Test(const T& precision) {
     for (int row = 0; row < d; ++row) {
       new_col[row] = static_cast<T>(col * d + row + 1);
     }
-    matrix.GetColumn(col) = new_col;
+    matrix.getColumn(col) = new_col;
   }
   for (int col = 0; col < d; ++col) {
     for (int row = 0; row < d; ++row) {
@@ -1132,26 +1132,26 @@ void GetColumnMutable_Test(const T& precision) {
 }
 TEST_ALL_F(GetColumnMutable, FLOAT_PRECISION, DOUBLE_PRECISION)
 
-// Test GetRow returns the correct row vector from the matrix.
+// Test getRow returns the correct row vector from the matrix.
 template <class T, int d>
-void GetRow_Test(const T& precision) {
+void getRow_Test(const T& precision) {
   (void)precision;
   mathkata::Matrix<T, d> matrix;
   for (int i = 0; i < d * d; ++i) {
     matrix[i] = static_cast<T>(i);
   }
   for (int row = 0; row < d; ++row) {
-    mathkata::Vector<T, d> r = matrix.GetRow(row);
+    mathkata::Vector<T, d> r = matrix.getRow(row);
     for (int col = 0; col < d; ++col) {
       EXPECT_EQ(matrix(row, col), r[col]) << "row=" << row << " col=" << col;
     }
   }
 }
-TEST_ALL_F(GetRow, FLOAT_PRECISION, DOUBLE_PRECISION)
+TEST_ALL_F(getRow, FLOAT_PRECISION, DOUBLE_PRECISION)
 
-// Test that GetRow and GetColumn are consistent with each other and with
-// element access. The i-th element of GetRow(r) should equal the r-th
-// element of GetColumn(i).
+// Test that getRow and getColumn are consistent with each other and with
+// element access. The i-th element of getRow(r) should equal the r-th
+// element of getColumn(i).
 template <class T, int d>
 void GetRowColumnConsistency_Test(const T& precision) {
   (void)precision;
@@ -1160,9 +1160,9 @@ void GetRowColumnConsistency_Test(const T& precision) {
     matrix[i] = static_cast<T>(i * 3 + 1);
   }
   for (int row = 0; row < d; ++row) {
-    mathkata::Vector<T, d> r = matrix.GetRow(row);
+    mathkata::Vector<T, d> r = matrix.getRow(row);
     for (int col = 0; col < d; ++col) {
-      mathkata::Vector<T, d> c = matrix.GetColumn(col);
+      mathkata::Vector<T, d> c = matrix.getColumn(col);
       EXPECT_EQ(r[col], c[row]) << "row=" << row << " col=" << col;
       EXPECT_EQ(r[col], matrix(row, col)) << "row=" << row << " col=" << col;
     }
@@ -1200,7 +1200,7 @@ static T WellSpacedNumber(int i, int prime, T width, T offset) {
 // further the get from identity.
 template <class T, int d>
 static mathkata::Matrix<T, d> InvertableMatrix() {
-  mathkata::Matrix<T, d> invertable = mathkata::Matrix<T, d>::Identity();
+  mathkata::Matrix<T, d> invertable = mathkata::Matrix<T, d>::identity();
 
   for (int i = 0; i < d; ++i) {
     // The width and offset constants are arbitrary. We do want to keep the
@@ -1230,13 +1230,13 @@ static void ExpectEqualMatrices(const mathkata::Matrix<T, d>& a,
 template <class T, int d>
 void MultiplyOperatorInverse_Test(const T& precision) {
   typedef typename mathkata::Matrix<T, d> Mat;
-  const Mat identity = Mat::Identity();
+  const Mat identity = Mat::identity();
   const Mat invertable = InvertableMatrix<T, d>();
 
   // Use operator*() to go way from the identity and then get back to it.
   Mat product = identity;
   product *= invertable;
-  product *= invertable.Inverse();
+  product *= invertable.inverse();
 
   // Test that operator*() gets is back to where we need to go.
   ExpectEqualMatrices(product, identity, precision);
@@ -1249,13 +1249,13 @@ TEST_ALL_F(MultiplyOperatorInverse, FLOAT_PRECISION, DOUBLE_PRECISION)
 template <class T, int d>
 void ExternalMultiplyOperatorInverse_Test(const T& precision) {
   typedef typename mathkata::Matrix<T, d> Mat;
-  const Mat identity = Mat::Identity();
+  const Mat identity = Mat::identity();
   const Mat invertable = InvertableMatrix<T, d>();
 
   // Use operator*() to go way from the identity and then get back to it.
   Mat product = identity;
   product = product * invertable;
-  product = product * invertable.Inverse();
+  product = product * invertable.inverse();
 
   // Test that operator*() gets is back to where we need to go.
   ExpectEqualMatrices(product, identity, precision);
@@ -1268,7 +1268,7 @@ TEST_ALL_F(ExternalMultiplyOperatorInverse, FLOAT_PRECISION, DOUBLE_PRECISION)
 template <class T, int d>
 void MultiplyOperatorIdentity_Test(const T& precision) {
   typedef typename mathkata::Matrix<T, d> Mat;
-  const Mat identity = Mat::Identity();
+  const Mat identity = Mat::identity();
   const Mat invertable = InvertableMatrix<T, d>();
 
   // Use operator*() to multipy by the identity.
@@ -1286,7 +1286,7 @@ TEST_ALL_F(MultiplyOperatorIdentity, FLOAT_PRECISION, DOUBLE_PRECISION)
 template <class T, int d>
 void ExternalMultiplyOperatorIdentity_Test(const T& precision) {
   typedef typename mathkata::Matrix<T, d> Mat;
-  const Mat identity = Mat::Identity();
+  const Mat identity = Mat::identity();
   const Mat invertable = InvertableMatrix<T, d>();
 
   // Use operator*() to multipy by the identity.
@@ -1333,7 +1333,7 @@ void ExternalMultiplyOperatorZero_Test(const T& precision) {
 
 TEST_ALL_F(ExternalMultiplyOperatorZero, FLOAT_PRECISION, DOUBLE_PRECISION)
 
-// Test Matrix<>::ToAffineTransform().
+// Test Matrix<>::toAffineTransform().
 template <class T>
 void Mat4ToAffine_Test(const T&) {
   typedef typename mathkata::Matrix<T, 4> Mat4;
@@ -1341,7 +1341,7 @@ void Mat4ToAffine_Test(const T&) {
   const Mat4 indices4(0, 1, 2, 0, 4, 5, 6, 0, 8, 9, 10, 0, 12, 13, 14, 1);
   const Affine indices_affine(0, 4, 8, 12, 1, 5, 9, 13, 2, 6, 10, 14);
 
-  const Affine to_affine = Mat4::ToAffineTransform(indices4);
+  const Affine to_affine = Mat4::toAffineTransform(indices4);
   for (int i = 0; i < 4; i++) {
     for (int j = 0; j < 3; j++) {
       EXPECT_EQ(to_affine(i, j), indices_affine(i, j));
@@ -1351,7 +1351,7 @@ void Mat4ToAffine_Test(const T&) {
 
 TEST_SCALAR_F(Mat4ToAffine, FLOAT_PRECISION, DOUBLE_PRECISION)
 
-// Test Matrix<>::FromAffineTransform().
+// Test Matrix<>::fromAffineTransform().
 template <class T>
 void Mat4FromAffine_Test(const T&) {
   typedef typename mathkata::Matrix<T, 4> Mat4;
@@ -1359,13 +1359,13 @@ void Mat4FromAffine_Test(const T&) {
   const Mat4 indices4(0, 1, 2, 0, 4, 5, 6, 0, 8, 9, 10, 0, 12, 13, 14, 1);
   const Affine indices_affine(0, 4, 8, 12, 1, 5, 9, 13, 2, 6, 10, 14);
 
-  const Mat4 to_mat4 = Mat4::FromAffineTransform(indices_affine);
+  const Mat4 to_mat4 = Mat4::fromAffineTransform(indices_affine);
   ExpectEqualMatrices(to_mat4, indices4, static_cast<T>(0));
 }
 
 TEST_SCALAR_F(Mat4FromAffine, FLOAT_PRECISION, DOUBLE_PRECISION)
 
-// Test converting back and forth via Matrix<>::To/FromAffineTransform().
+// Test converting back and forth via Matrix<>::To/fromAffineTransform().
 template <class T>
 void Mat4ToAndFromAffine_Test(const T&) {
   typedef typename mathkata::Matrix<T, 4> Mat4;
@@ -1376,7 +1376,7 @@ void Mat4ToAndFromAffine_Test(const T&) {
   // Convert to/from AffineTransform and check to ensure the result is the same
   // as the original.
   const Mat4 converted =
-      Mat4::FromAffineTransform(Mat4::ToAffineTransform(indices4));
+      Mat4::fromAffineTransform(Mat4::toAffineTransform(indices4));
 
   ExpectEqualMatrices(indices4, converted, static_cast<T>(0));
 
@@ -1384,10 +1384,10 @@ void Mat4ToAndFromAffine_Test(const T&) {
   // multiplications involving conversions.
   const Mat4 mat4_multiplication = indices4 * indices4;
   const Mat4 affine_multiplication =
-      Mat4::FromAffineTransform(indices_affine)
-      * Mat4::FromAffineTransform(indices_affine);
+      Mat4::fromAffineTransform(indices_affine)
+      * Mat4::fromAffineTransform(indices_affine);
   const Mat4 affine_and_mat4_multiplication =
-      indices4 * Mat4::FromAffineTransform(indices_affine);
+      indices4 * Mat4::fromAffineTransform(indices_affine);
 
   ExpectEqualMatrices(mat4_multiplication, affine_multiplication,
                       static_cast<T>(0));
@@ -1398,7 +1398,7 @@ void Mat4ToAndFromAffine_Test(const T&) {
   // AffineTransform result.
   const Affine expected_result(20, 68, 116, 176, 23, 83, 143, 216, 26, 98, 170,
                                256);
-  const Affine affine_result = Mat4::ToAffineTransform(affine_multiplication);
+  const Affine affine_result = Mat4::toAffineTransform(affine_multiplication);
 
   for (int i = 0; i < 4; i++) {
     for (int j = 0; j < 3; j++) {
@@ -1442,7 +1442,7 @@ void Mat4ToRotationMatrix_Test(const T&) {
   typedef typename mathkata::Matrix<T, 3> Mat3;
   const Mat4 input(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
   const Mat3 expect(1, 2, 3, 5, 6, 7, 9, 10, 11);
-  Mat3 result = input.ToRotationMatrix(input);
+  Mat3 result = input.toRotationMatrix(input);
   for (int i = 0; i < 9; i++) {
     EXPECT_EQ(expect[i], result[i]);
   }
@@ -1450,7 +1450,7 @@ void Mat4ToRotationMatrix_Test(const T&) {
 
 TEST_SCALAR_F(Mat4ToRotationMatrix, FLOAT_PRECISION, DOUBLE_PRECISION)
 
-// Test that RotationX/Y/Z produce correct results with double precision.
+// Test that rotationX/Y/Z produce correct results with double precision.
 // This verifies that the trig functions use std::cos/std::sin (which handle
 // double) rather than cosf/sinf (which truncate to float).
 template <class T>
@@ -1460,21 +1460,21 @@ void RotationPrecision_Test(const T& precision) {
   const T c = std::cos(angle);
   const T s = std::sin(angle);
 
-  Mat3 rx = Mat3::RotationX(angle);
+  Mat3 rx = Mat3::rotationX(angle);
   EXPECT_NEAR(rx(0, 0), T(1), precision);
   EXPECT_NEAR(rx(1, 1), c, precision);
   EXPECT_NEAR(rx(2, 1), s, precision);
   EXPECT_NEAR(rx(1, 2), -s, precision);
   EXPECT_NEAR(rx(2, 2), c, precision);
 
-  Mat3 ry = Mat3::RotationY(angle);
+  Mat3 ry = Mat3::rotationY(angle);
   EXPECT_NEAR(ry(0, 0), c, precision);
   EXPECT_NEAR(ry(2, 0), -s, precision);
   EXPECT_NEAR(ry(1, 1), T(1), precision);
   EXPECT_NEAR(ry(0, 2), s, precision);
   EXPECT_NEAR(ry(2, 2), c, precision);
 
-  Mat3 rz = Mat3::RotationZ(angle);
+  Mat3 rz = Mat3::rotationZ(angle);
   EXPECT_NEAR(rz(0, 0), c, precision);
   EXPECT_NEAR(rz(1, 0), s, precision);
   EXPECT_NEAR(rz(0, 1), -s, precision);
@@ -1483,9 +1483,9 @@ void RotationPrecision_Test(const T& precision) {
 }
 
 TEST_SCALAR_F(RotationPrecision, FLOAT_PRECISION, DOUBLE_PRECISION)
-// Test HadamardProduct (component-wise multiplication).
+// Test hadamardProduct (component-wise multiplication).
 template <class T, int d>
-void HadamardProduct_Test(const T& precision) {
+void hadamardProduct_Test(const T& precision) {
   mathkata::Matrix<T, d> m1;
   mathkata::Matrix<T, d> m2;
   for (int i = 0; i < d * d; ++i) {
@@ -1493,13 +1493,13 @@ void HadamardProduct_Test(const T& precision) {
     m2[i] = static_cast<T>(d * d - i);
   }
   mathkata::Matrix<T, d> result =
-      mathkata::Matrix<T, d>::HadamardProduct(m1, m2);
+      mathkata::Matrix<T, d>::hadamardProduct(m1, m2);
   for (int i = 0; i < d * d; ++i) {
     EXPECT_NEAR(result[i], m1[i] * m2[i], precision);
   }
 }
 
-TEST_ALL_F(HadamardProduct, FLOAT_PRECISION, DOUBLE_PRECISION)
+TEST_ALL_F(hadamardProduct, FLOAT_PRECISION, DOUBLE_PRECISION)
 
 // This will test converting from a translation into a matrix and back again.
 // Test the compilation of basic matrix operations given in the sample file.
@@ -1511,10 +1511,10 @@ TEST_F(MatrixTests, MatrixSample) {
   Vector<float, 3> rotation(0.4f, 1.4f, 0.33f);
   Vector<float, 3> vector(4.f, 8.f, 1.f);
 
-  Quaternion<float> rotQuat = Quaternion<float>::FromEulerAngles(rotation);
-  Matrix<float, 3> rotMatrix = rotQuat.ToMatrix();
-  Matrix<float, 4> transMatrix = Matrix<float, 4>::FromTranslationVector(trans);
-  Matrix<float, 4> rotHMatrix = Matrix<float, 4>::FromRotationMatrix(rotMatrix);
+  Quaternion<float> rotQuat = Quaternion<float>::fromEulerAngles(rotation);
+  Matrix<float, 3> rotMatrix = rotQuat.toMatrix();
+  Matrix<float, 4> transMatrix = Matrix<float, 4>::fromTranslationVector(trans);
+  Matrix<float, 4> rotHMatrix = Matrix<float, 4>::fromRotationMatrix(rotMatrix);
 
   Matrix<float, 4> matrix = transMatrix * rotHMatrix;
   Vector<float, 3> rotatedVector = matrix * vector;
@@ -1588,15 +1588,15 @@ TEST_ALL_F(EqualityPerElement, FLOAT_PRECISION, DOUBLE_PRECISION)
 
 // Simple class that represents a possible compatible type for a vector.
 // That is, it's just an array of T of length d, so can be loaded and
-// stored from mathkata::Vector<T,d> using ToType() and FromType().
+// stored from mathkata::Vector<T,d> using toType() and fromType().
 template <class T, int d>
 struct SimpleMatrix {
   T values[d * d];
 };
 
-// This will test the FromType() conversion functions.
+// This will test the fromType() conversion functions.
 template <class T, int d>
-void FromType_Test(const T& precision) {
+void fromType_Test(const T& precision) {
   typedef SimpleMatrix<T, d> CompatibleT;
   typedef mathkata::Matrix<T, d> MatrixT;
 
@@ -1614,17 +1614,17 @@ void FromType_Test(const T& precision) {
   }
 #endif  // MATHKATA_COMPILE_WITH_PADDING
 
-  const MatrixT matrix = MatrixT::FromType(compatible);
+  const MatrixT matrix = MatrixT::fromType(compatible);
 
   for (int i = 0; i < d * d; ++i) {
     EXPECT_EQ(compatible.values[i], matrix[i]);
   }
 }
-TEST_ALL_F(FromType, 0.0f, 0.0)
+TEST_ALL_F(fromType, 0.0f, 0.0)
 
-// This will test the ToType() conversion functions.
+// This will test the toType() conversion functions.
 template <class T, int d>
-void ToType_Test(const T& precision) {
+void toType_Test(const T& precision) {
   typedef SimpleMatrix<T, d> CompatibleT;
   typedef mathkata::Matrix<T, d> MatrixT;
 
@@ -1642,15 +1642,15 @@ void ToType_Test(const T& precision) {
   }
 #endif  // MATHKATA_COMPILE_WITH_PADDING
 
-  const CompatibleT compatible = MatrixT::template ToType<CompatibleT>(matrix);
+  const CompatibleT compatible = MatrixT::template toType<CompatibleT>(matrix);
 
   for (int i = 0; i < d * d; ++i) {
     EXPECT_EQ(compatible.values[i], matrix[i]);
   }
 }
-TEST_ALL_F(ToType, 0.0f, 0.0)
+TEST_ALL_F(toType, 0.0f, 0.0)
 
-// This will test a roundtrip through FromType() and ToType().
+// This will test a roundtrip through fromType() and toType().
 // Converts SimpleMatrix -> Matrix -> SimpleMatrix and verifies the values
 // are preserved. This exercises the memcpy-based type-punning path.
 template <class T, int d>
@@ -1673,9 +1673,9 @@ void FromTypeToTypeRoundtrip_Test(const T& precision) {
 #endif  // MATHKATA_COMPILE_WITH_PADDING
 
   // SimpleMatrix -> Matrix -> SimpleMatrix
-  const MatrixT matrix = MatrixT::FromType(original);
+  const MatrixT matrix = MatrixT::fromType(original);
   const CompatibleT roundtripped =
-      MatrixT::template ToType<CompatibleT>(matrix);
+      MatrixT::template toType<CompatibleT>(matrix);
 
   for (int i = 0; i < d * d; ++i) {
     EXPECT_EQ(original.values[i], roundtripped.values[i]);
@@ -1715,7 +1715,7 @@ TEST_F(MatrixTests, OutputStream_Test_float_1) {
   OutputStream_Test<float, 1>(0.0f);
 }
 
-// Test non-square matrix multiplication via mathkata::Multiply().
+// Test non-square matrix multiplication via mathkata::multiply().
 // Multiplies a 2x3 matrix by a 3x4 matrix and verifies the 2x4 result.
 template <class T>
 void MultiplyNonSquare_2x3_times_3x4_Test(const T& precision) {
@@ -1734,7 +1734,7 @@ void MultiplyNonSquare_2x3_times_3x4_Test(const T& precision) {
                      T(9), T(13), T(17), T(10), T(14), T(18)};
   mathkata::Matrix<T, 3, 4> m2(data2);
 
-  mathkata::Matrix<T, 2, 4> result = mathkata::Multiply(m1, m2);
+  mathkata::Matrix<T, 2, 4> result = mathkata::multiply(m1, m2);
 
   // Expected result (2x4):
   //   row0: 1*7+2*11+3*15=74   1*8+2*12+3*16=80   1*9+2*13+3*17=86
@@ -1757,7 +1757,7 @@ TEST_F(MatrixTests, MultiplyNonSquare_2x3_times_3x4_double) {
   MultiplyNonSquare_2x3_times_3x4_Test<double>(DOUBLE_PRECISION);
 }
 
-// Test that Multiply() also works correctly for square matrices and matches
+// Test that multiply() also works correctly for square matrices and matches
 // operator*.
 template <class T, int d>
 void MultiplySquareMatchesOperator_Test(const T& precision) {
@@ -1767,7 +1767,7 @@ void MultiplySquareMatchesOperator_Test(const T& precision) {
   mathkata::Matrix<T, d> m1(x1), m2(x2);
 
   mathkata::Matrix<T, d> via_operator = m1 * m2;
-  mathkata::Matrix<T, d> via_multiply = mathkata::Multiply(m1, m2);
+  mathkata::Matrix<T, d> via_multiply = mathkata::multiply(m1, m2);
 
   for (int i = 0; i < d; ++i) {
     for (int j = 0; j < d; ++j) {
@@ -1777,7 +1777,7 @@ void MultiplySquareMatchesOperator_Test(const T& precision) {
 }
 TEST_ALL_F(MultiplySquareMatchesOperator, FLOAT_PRECISION, DOUBLE_PRECISION)
 
-// Test Multiply() with a 4x3 times 3x2 producing a 4x2 result.
+// Test multiply() with a 4x3 times 3x2 producing a 4x2 result.
 template <class T>
 void MultiplyNonSquare_4x3_times_3x2_Test(const T& precision) {
   // m1 is 4 rows x 3 cols.
@@ -1796,7 +1796,7 @@ void MultiplyNonSquare_4x3_times_3x2_Test(const T& precision) {
   const T data2[] = {T(2), T(0), T(4), T(1), T(3), T(2)};
   mathkata::Matrix<T, 3, 2> m2(data2);
 
-  mathkata::Matrix<T, 4, 2> result = mathkata::Multiply(m1, m2);
+  mathkata::Matrix<T, 4, 2> result = mathkata::multiply(m1, m2);
 
   // Expected result (4x2):
   //   row0: 1*2+2*0+3*4=14   1*1+2*3+3*2=13
@@ -1820,7 +1820,7 @@ TEST_F(MatrixTests, MultiplyNonSquare_4x3_times_3x2_double) {
   MultiplyNonSquare_4x3_times_3x2_Test<double>(DOUBLE_PRECISION);
 }
 
-// Test Multiply() with a 1x3 row vector times a 3x1 column vector (dot
+// Test multiply() with a 1x3 row vector times a 3x1 column vector (dot
 // product).
 template <class T>
 void MultiplyNonSquare_1x3_times_3x1_Test(const T& precision) {
@@ -1830,7 +1830,7 @@ void MultiplyNonSquare_1x3_times_3x1_Test(const T& precision) {
   const T data2[] = {T(5), T(6), T(7)};
   mathkata::Matrix<T, 3, 1> m2(data2);
 
-  mathkata::Matrix<T, 1, 1> result = mathkata::Multiply(m1, m2);
+  mathkata::Matrix<T, 1, 1> result = mathkata::multiply(m1, m2);
 
   // Expected: 2*5 + 3*6 + 4*7 = 10 + 18 + 28 = 56
   EXPECT_NEAR(result(0, 0), T(56), precision);

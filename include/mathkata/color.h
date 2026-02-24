@@ -54,7 +54,7 @@ struct Color {
   /// Each component is divided by 255 to produce a value in [0, 1].
   ///
   /// @return A Vector<float, 4> with normalized RGBA values.
-  inline Vector<float, 4> ToNormalized() const {
+  inline Vector<float, 4> toNormalized() const {
     return Vector<float, 4>(
         static_cast<float>(r) / 255.0f, static_cast<float>(g) / 255.0f,
         static_cast<float>(b) / 255.0f, static_cast<float>(a) / 255.0f);
@@ -66,7 +66,7 @@ struct Color {
   ///
   /// @param v A Vector<float, 4> with RGBA values in [0, 1].
   /// @return The corresponding Color.
-  static inline Color FromNormalized(const Vector<float, 4>& v) {
+  static inline Color fromNormalized(const Vector<float, 4>& v) {
     return Color(
         static_cast<uint8_t>(std::clamp(v[0], 0.0f, 1.0f) * 255.0f + 0.5f),
         static_cast<uint8_t>(std::clamp(v[1], 0.0f, 1.0f) * 255.0f + 0.5f),

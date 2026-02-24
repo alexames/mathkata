@@ -203,71 +203,71 @@ void InequalityRadius_Test(T precision) {
 }
 TEST_ALL_F(InequalityRadius)
 
-// Test: Diameter calculation.
+// Test: diameter calculation.
 template <class T, int N>
-void Diameter_Test(T precision) {
+void diameter_Test(T precision) {
   (void)precision;
   mathkata::Vector<T, N> center = MakeZeroVector<T, N>();
   mathkata::Sphere<T, N> sphere(center, static_cast<T>(5));
-  EXPECT_EQ(sphere.Diameter(), static_cast<T>(10));
+  EXPECT_EQ(sphere.diameter(), static_cast<T>(10));
 }
-TEST_ALL_F(Diameter)
+TEST_ALL_F(diameter)
 
-// Test: Contains point - point at center.
+// Test: contains point - point at center.
 template <class T, int N>
 void ContainsPointCenter_Test(T precision) {
   (void)precision;
   mathkata::Vector<T, N> center = MakeZeroVector<T, N>();
   mathkata::Sphere<T, N> sphere(center, static_cast<T>(5));
-  EXPECT_TRUE(sphere.Contains(center));
+  EXPECT_TRUE(sphere.contains(center));
 }
 TEST_ALL_F(ContainsPointCenter)
 
-// Test: Contains point - point inside sphere.
+// Test: contains point - point inside sphere.
 template <class T, int N>
 void ContainsPointInside_Test(T precision) {
   (void)precision;
   mathkata::Vector<T, N> center = MakeZeroVector<T, N>();
   mathkata::Sphere<T, N> sphere(center, static_cast<T>(5));
   mathkata::Vector<T, N> point = MakeAxisVector<T, N>(static_cast<T>(3));
-  EXPECT_TRUE(sphere.Contains(point));
+  EXPECT_TRUE(sphere.contains(point));
 }
 TEST_ALL_F(ContainsPointInside)
 
-// Test: Contains point - point on boundary.
+// Test: contains point - point on boundary.
 template <class T, int N>
 void ContainsPointBoundary_Test(T precision) {
   (void)precision;
   mathkata::Vector<T, N> center = MakeZeroVector<T, N>();
   mathkata::Sphere<T, N> sphere(center, static_cast<T>(5));
   mathkata::Vector<T, N> point = MakeAxisVector<T, N>(static_cast<T>(5));
-  EXPECT_TRUE(sphere.Contains(point));
+  EXPECT_TRUE(sphere.contains(point));
 }
 TEST_ALL_F(ContainsPointBoundary)
 
-// Test: Contains point - point outside sphere.
+// Test: contains point - point outside sphere.
 template <class T, int N>
 void ContainsPointOutside_Test(T precision) {
   (void)precision;
   mathkata::Vector<T, N> center = MakeZeroVector<T, N>();
   mathkata::Sphere<T, N> sphere(center, static_cast<T>(5));
   mathkata::Vector<T, N> point = MakeAxisVector<T, N>(static_cast<T>(6));
-  EXPECT_FALSE(sphere.Contains(point));
+  EXPECT_FALSE(sphere.contains(point));
 }
 TEST_ALL_F(ContainsPointOutside)
 
-// Test: Contains sphere - smaller sphere fully inside.
+// Test: contains sphere - smaller sphere fully inside.
 template <class T, int N>
 void ContainsSphereInside_Test(T precision) {
   (void)precision;
   mathkata::Vector<T, N> center = MakeZeroVector<T, N>();
   mathkata::Sphere<T, N> outer(center, static_cast<T>(10));
   mathkata::Sphere<T, N> inner(center, static_cast<T>(5));
-  EXPECT_TRUE(outer.Contains(inner));
+  EXPECT_TRUE(outer.contains(inner));
 }
 TEST_ALL_F(ContainsSphereInside)
 
-// Test: Contains sphere - offset inner sphere still fully inside.
+// Test: contains sphere - offset inner sphere still fully inside.
 template <class T, int N>
 void ContainsSphereOffset_Test(T precision) {
   (void)precision;
@@ -275,12 +275,12 @@ void ContainsSphereOffset_Test(T precision) {
   mathkata::Sphere<T, N> outer(center, static_cast<T>(10));
   mathkata::Vector<T, N> inner_center = MakeAxisVector<T, N>(static_cast<T>(3));
   mathkata::Sphere<T, N> inner(inner_center, static_cast<T>(5));
-  // Distance between centers is 3, inner radius is 5, so 3 + 5 = 8 <= 10.
-  EXPECT_TRUE(outer.Contains(inner));
+  // distance between centers is 3, inner radius is 5, so 3 + 5 = 8 <= 10.
+  EXPECT_TRUE(outer.contains(inner));
 }
 TEST_ALL_F(ContainsSphereOffset)
 
-// Test: Contains sphere - sphere partially outside.
+// Test: contains sphere - sphere partially outside.
 template <class T, int N>
 void ContainsSpherePartiallyOutside_Test(T precision) {
   (void)precision;
@@ -288,23 +288,23 @@ void ContainsSpherePartiallyOutside_Test(T precision) {
   mathkata::Sphere<T, N> outer(center, static_cast<T>(10));
   mathkata::Vector<T, N> inner_center = MakeAxisVector<T, N>(static_cast<T>(7));
   mathkata::Sphere<T, N> inner(inner_center, static_cast<T>(5));
-  // Distance between centers is 7, inner radius is 5, so 7 + 5 = 12 > 10.
-  EXPECT_FALSE(outer.Contains(inner));
+  // distance between centers is 7, inner radius is 5, so 7 + 5 = 12 > 10.
+  EXPECT_FALSE(outer.contains(inner));
 }
 TEST_ALL_F(ContainsSpherePartiallyOutside)
 
-// Test: Contains sphere - same sphere.
+// Test: contains sphere - same sphere.
 template <class T, int N>
 void ContainsSphereSame_Test(T precision) {
   (void)precision;
   mathkata::Vector<T, N> center = MakeZeroVector<T, N>();
   mathkata::Sphere<T, N> sphere(center, static_cast<T>(5));
   // A sphere should contain itself (dist=0, 0 + 5 <= 5).
-  EXPECT_TRUE(sphere.Contains(sphere));
+  EXPECT_TRUE(sphere.contains(sphere));
 }
 TEST_ALL_F(ContainsSphereSame)
 
-// Test: Intersects - overlapping spheres.
+// Test: intersects - overlapping spheres.
 template <class T, int N>
 void IntersectsOverlapping_Test(T precision) {
   (void)precision;
@@ -312,14 +312,14 @@ void IntersectsOverlapping_Test(T precision) {
   mathkata::Vector<T, N> c2 = MakeAxisVector<T, N>(static_cast<T>(5));
   mathkata::Sphere<T, N> s1(c1, static_cast<T>(4));
   mathkata::Sphere<T, N> s2(c2, static_cast<T>(4));
-  // Distance between centers is 5, sum of radii is 8. 5 <= 8 so they
+  // distance between centers is 5, sum of radii is 8. 5 <= 8 so they
   // intersect.
-  EXPECT_TRUE(s1.Intersects(s2));
-  EXPECT_TRUE(s2.Intersects(s1));
+  EXPECT_TRUE(s1.intersects(s2));
+  EXPECT_TRUE(s2.intersects(s1));
 }
 TEST_ALL_F(IntersectsOverlapping)
 
-// Test: Intersects - touching spheres (boundary contact).
+// Test: intersects - touching spheres (boundary contact).
 template <class T, int N>
 void IntersectsTouching_Test(T precision) {
   (void)precision;
@@ -327,13 +327,13 @@ void IntersectsTouching_Test(T precision) {
   mathkata::Vector<T, N> c2 = MakeAxisVector<T, N>(static_cast<T>(10));
   mathkata::Sphere<T, N> s1(c1, static_cast<T>(5));
   mathkata::Sphere<T, N> s2(c2, static_cast<T>(5));
-  // Distance between centers is 10, sum of radii is 10. 10 <= 10 so they
+  // distance between centers is 10, sum of radii is 10. 10 <= 10 so they
   // intersect at the boundary.
-  EXPECT_TRUE(s1.Intersects(s2));
+  EXPECT_TRUE(s1.intersects(s2));
 }
 TEST_ALL_F(IntersectsTouching)
 
-// Test: Intersects - non-overlapping spheres.
+// Test: intersects - non-overlapping spheres.
 template <class T, int N>
 void IntersectsNonOverlapping_Test(T precision) {
   (void)precision;
@@ -341,64 +341,64 @@ void IntersectsNonOverlapping_Test(T precision) {
   mathkata::Vector<T, N> c2 = MakeAxisVector<T, N>(static_cast<T>(20));
   mathkata::Sphere<T, N> s1(c1, static_cast<T>(5));
   mathkata::Sphere<T, N> s2(c2, static_cast<T>(5));
-  // Distance between centers is 20, sum of radii is 10. 20 > 10 so they don't
+  // distance between centers is 20, sum of radii is 10. 20 > 10 so they don't
   // intersect.
-  EXPECT_FALSE(s1.Intersects(s2));
-  EXPECT_FALSE(s2.Intersects(s1));
+  EXPECT_FALSE(s1.intersects(s2));
+  EXPECT_FALSE(s2.intersects(s1));
 }
 TEST_ALL_F(IntersectsNonOverlapping)
 
-// Test: Intersects - concentric spheres.
+// Test: intersects - concentric spheres.
 template <class T, int N>
 void IntersectsConcentric_Test(T precision) {
   (void)precision;
   mathkata::Vector<T, N> center = MakeZeroVector<T, N>();
   mathkata::Sphere<T, N> s1(center, static_cast<T>(5));
   mathkata::Sphere<T, N> s2(center, static_cast<T>(3));
-  EXPECT_TRUE(s1.Intersects(s2));
-  EXPECT_TRUE(s2.Intersects(s1));
+  EXPECT_TRUE(s1.intersects(s2));
+  EXPECT_TRUE(s2.intersects(s1));
 }
 TEST_ALL_F(IntersectsConcentric)
 
-// Test: Area (2D circle only).
+// Test: area (2D circle only).
 template <class T>
-void Area_Test(T precision) {
+void area_Test(T precision) {
   mathkata::Vector<T, 2> center(static_cast<T>(0), static_cast<T>(0));
   T radius = static_cast<T>(5);
   mathkata::Sphere<T, 2> circle(center, radius);
   T expected = std::numbers::pi_v<T> * static_cast<T>(25);
-  EXPECT_NEAR(static_cast<double>(circle.Area()), static_cast<double>(expected),
+  EXPECT_NEAR(static_cast<double>(circle.area()), static_cast<double>(expected),
               static_cast<double>(precision));
 }
-TEST_2D_F(Area)
+TEST_2D_F(area)
 
-// Test: Area with unit circle.
+// Test: area with unit circle.
 template <class T>
 void AreaUnit_Test(T precision) {
   mathkata::Vector<T, 2> center(static_cast<T>(0), static_cast<T>(0));
   T radius = static_cast<T>(1);
   mathkata::Sphere<T, 2> circle(center, radius);
-  EXPECT_NEAR(static_cast<double>(circle.Area()),
+  EXPECT_NEAR(static_cast<double>(circle.area()),
               static_cast<double>(std::numbers::pi_v<T>),
               static_cast<double>(precision));
 }
 TEST_2D_F(AreaUnit)
 
-// Test: Volume (3D sphere only).
+// Test: volume (3D sphere only).
 template <class T>
-void Volume_Test(T precision) {
+void volume_Test(T precision) {
   mathkata::Vector<T, 3> center(static_cast<T>(0), static_cast<T>(0),
                                 static_cast<T>(0));
   T radius = static_cast<T>(5);
   mathkata::Sphere<T, 3> sphere(center, radius);
   T expected = (static_cast<T>(4) / static_cast<T>(3)) * std::numbers::pi_v<T>
                * radius * radius * radius;
-  EXPECT_NEAR(static_cast<double>(sphere.Volume()),
+  EXPECT_NEAR(static_cast<double>(sphere.volume()),
               static_cast<double>(expected), static_cast<double>(precision));
 }
-TEST_3D_F(Volume)
+TEST_3D_F(volume)
 
-// Test: Volume with unit sphere.
+// Test: volume with unit sphere.
 template <class T>
 void VolumeUnit_Test(T precision) {
   mathkata::Vector<T, 3> center(static_cast<T>(0), static_cast<T>(0),
@@ -406,36 +406,36 @@ void VolumeUnit_Test(T precision) {
   T radius = static_cast<T>(1);
   mathkata::Sphere<T, 3> sphere(center, radius);
   T expected = (static_cast<T>(4) / static_cast<T>(3)) * std::numbers::pi_v<T>;
-  EXPECT_NEAR(static_cast<double>(sphere.Volume()),
+  EXPECT_NEAR(static_cast<double>(sphere.volume()),
               static_cast<double>(expected), static_cast<double>(precision));
 }
 TEST_3D_F(VolumeUnit)
 
-// Test: Contains point with non-origin center.
+// Test: contains point with non-origin center.
 template <class T, int N>
 void ContainsPointNonOrigin_Test(T precision) {
   (void)precision;
   mathkata::Vector<T, N> center = MakeAxisVector<T, N>(static_cast<T>(10));
   mathkata::Sphere<T, N> sphere(center, static_cast<T>(3));
   // Point at the center.
-  EXPECT_TRUE(sphere.Contains(center));
+  EXPECT_TRUE(sphere.contains(center));
   // Point within radius along second axis from center.
   mathkata::Vector<T, N> nearby = center;
   nearby[1] = static_cast<T>(2);
-  EXPECT_TRUE(sphere.Contains(nearby));
+  EXPECT_TRUE(sphere.contains(nearby));
   // Point far away.
   mathkata::Vector<T, N> far_away = MakeZeroVector<T, N>();
-  EXPECT_FALSE(sphere.Contains(far_away));
+  EXPECT_FALSE(sphere.contains(far_away));
 }
 TEST_ALL_F(ContainsPointNonOrigin)
 
-// Test: Diameter with zero radius.
+// Test: diameter with zero radius.
 template <class T, int N>
 void DiameterZero_Test(T precision) {
   (void)precision;
   mathkata::Vector<T, N> center = MakeZeroVector<T, N>();
   mathkata::Sphere<T, N> sphere(center, static_cast<T>(0));
-  EXPECT_EQ(sphere.Diameter(), static_cast<T>(0));
+  EXPECT_EQ(sphere.diameter(), static_cast<T>(0));
 }
 TEST_ALL_F(DiameterZero)
 

@@ -110,7 +110,7 @@ AssertionResult IsNearOrientation(mathkata::Quaternion<T> q1,
                                   mathkata::Quaternion<T> q2,
                                   double abs_error) {
   // Put them both into the same hemisphere.
-  if (mathkata::Quaternion<T>::DotProduct(q1, q2) < 0) {
+  if (mathkata::Quaternion<T>::dotProduct(q1, q2) < 0) {
     q2 = mathkata::Quaternion<T>(-q2.scalar(), -q2.vector());
   }
   return IsNearQuat(q1, q2, abs_error);
@@ -126,7 +126,7 @@ void TestHelpers_Test(const T& precision) {
   EXPECT_NEAR_QUAT(Quaternion(1, 0, 0, 1e-6f), Quaternion::identity, epsilon);
 
   // Test that opposing quats are !IsNearQuat and IsNearOrientation.
-  const Quaternion q2 = Quaternion(3, 4, 5, 6).Normalized();
+  const Quaternion q2 = Quaternion(3, 4, 5, 6).normalized();
   const Quaternion q2_negated(-q2.scalar(), -q2.vector());
   EXPECT_FALSE(IsNearQuat(q2, q2_negated, epsilon));
   EXPECT_TRUE(IsNearOrientation(q2, q2_negated, epsilon));
@@ -221,7 +221,7 @@ void Inequality_Test(const T& precision) {
   EXPECT_FALSE(q1 == q2);
   EXPECT_FALSE(q1 == q3);
   EXPECT_FALSE(q1 == q4);
-  // Identity should equal itself.
+  // identity should equal itself.
   EXPECT_TRUE(mathkata::Quaternion<T>::identity
               == mathkata::Quaternion<T>::identity);
   EXPECT_FALSE(mathkata::Quaternion<T>::identity
@@ -304,7 +304,7 @@ void VectorMutator_Test(const T& precision) {
 }
 TEST_ALL_F(VectorMutator)
 
-// This will test converting a Quaternion to and from Angle/Axis,
+// This will test converting a Quaternion to and from angle/Axis,
 // Euler Angles, and Matrices
 template <class T>
 void Conversion_Test(const T& precision) {
@@ -312,22 +312,22 @@ void Conversion_Test(const T& precision) {
                                 static_cast<T>(0.6));
   // This will create a Quaternion from Euler Angles, convert back to
   // Euler Angles, and verify that they match
-  mathkata::Quaternion<T> qea(mathkata::Quaternion<T>::FromEulerAngles(angles));
-  mathkata::Vector<T, 3> convertedAngles(qea.ToEulerAngles());
+  mathkata::Quaternion<T> qea(mathkata::Quaternion<T>::fromEulerAngles(angles));
+  mathkata::Vector<T, 3> convertedAngles(qea.toEulerAngles());
   EXPECT_NEAR(angles[0], std::numbers::pi_v<T> + convertedAngles[0], precision);
   EXPECT_NEAR(angles[1], std::numbers::pi_v<T> - convertedAngles[1], precision);
   EXPECT_NEAR(angles[2], std::numbers::pi_v<T> + convertedAngles[2], precision);
-  // This will create a Quaternion from Axis Angle, convert back to
-  // Axis Angle, and verify that they match.
+  // This will create a Quaternion from Axis angle, convert back to
+  // Axis angle, and verify that they match.
   mathkata::Vector<T, 3> axis(static_cast<T>(4.3), static_cast<T>(7.6),
                               static_cast<T>(1.2));
-  axis.Normalize();
+  axis.normalize();
   T angle = static_cast<T>(1.2);
   mathkata::Quaternion<T> qaa(
-      mathkata::Quaternion<T>::FromAngleAxis(angle, axis));
+      mathkata::Quaternion<T>::fromAngleAxis(angle, axis));
   mathkata::Vector<T, 3> convertedAxis;
   T convertedAngle;
-  qaa.ToAngleAxis(&convertedAngle, &convertedAxis);
+  qaa.toAngleAxis(&convertedAngle, &convertedAxis);
   EXPECT_NEAR(angle, convertedAngle, precision);
   EXPECT_NEAR(axis[0], convertedAxis[0], precision);
   EXPECT_NEAR(axis[1], convertedAxis[1], precision);
@@ -341,15 +341,15 @@ void Conversion_Test(const T& precision) {
   mathkata::Matrix<T, 3> rz(cos(angles[2]), sin(angles[2]), 0, -sin(angles[2]),
                             cos(angles[2]), 0, 0, 0, 1);
   mathkata::Matrix<T, 3> m(rz * ry * rx);
-  mathkata::Quaternion<T> qm(mathkata::Quaternion<T>::FromMatrix(m));
-  mathkata::Matrix<T, 3> convertedM(qm.ToMatrix());
+  mathkata::Quaternion<T> qm(mathkata::Quaternion<T>::fromMatrix(m));
+  mathkata::Matrix<T, 3> convertedM(qm.toMatrix());
   for (int i = 0; i < 9; ++i) EXPECT_NEAR(m[i], convertedM[i], precision);
   // This will create a Quaternion from a 4x4 Matrix, convert back to a Matrix,
   // and verify that they match.
   // Recycling the 3x3 matrix from before.
-  mathkata::Matrix<T, 4> m4 = mathkata::Matrix<T, 4>::FromRotationMatrix(m);
-  mathkata::Quaternion<T> qm4(mathkata::Quaternion<T>::FromMatrix(m4));
-  mathkata::Matrix<T, 4> convertedM4(qm4.ToMatrix4());
+  mathkata::Matrix<T, 4> m4 = mathkata::Matrix<T, 4>::fromRotationMatrix(m);
+  mathkata::Quaternion<T> qm4(mathkata::Quaternion<T>::fromMatrix(m4));
+  mathkata::Matrix<T, 4> convertedM4(qm4.toMatrix4());
   for (int i = 0; i < 15; ++i) EXPECT_NEAR(m4[i], convertedM4[i], precision);
 }
 TEST_ALL_F(Conversion)
@@ -357,76 +357,76 @@ TEST_ALL_F(Conversion)
 // This will test the conjugate of a quaternion and verify that it negates the
 // vector part while preserving the scalar part.
 template <class T>
-void Conjugate_Test(const T& precision) {
+void conjugate_Test(const T& precision) {
   (void)precision;
   mathkata::Quaternion<T> q(static_cast<T>(1.4), static_cast<T>(6.3),
                             static_cast<T>(8.5), static_cast<T>(5.9));
-  mathkata::Quaternion<T> conj = q.Conjugate();
+  mathkata::Quaternion<T> conj = q.conjugate();
   EXPECT_EQ(q.scalar(), conj.scalar());
   EXPECT_EQ(-q.vector()[0], conj.vector()[0]);
   EXPECT_EQ(-q.vector()[1], conj.vector()[1]);
   EXPECT_EQ(-q.vector()[2], conj.vector()[2]);
 }
-TEST_ALL_F(Conjugate)
+TEST_ALL_F(conjugate)
 
-// This will test inverting a quaternion and verify that q * q.Inverse() yields
+// This will test inverting a quaternion and verify that q * q.inverse() yields
 // the identity quaternion for both unit and non-unit quaternions.
 template <class T>
-void Inverse_Test(const T& precision) {
+void inverse_Test(const T& precision) {
   const double epsilon = static_cast<double>(precision) * 10;
 
   // Test with a non-unit quaternion.
   mathkata::Quaternion<T> q1(static_cast<T>(1.4), static_cast<T>(6.3),
                              static_cast<T>(8.5), static_cast<T>(5.9));
-  mathkata::Quaternion<T> product1 = q1 * q1.Inverse();
+  mathkata::Quaternion<T> product1 = q1 * q1.inverse();
   EXPECT_NEAR_QUAT(mathkata::Quaternion<T>::identity, product1, epsilon);
 
-  // Also test q.Inverse() * q.
-  mathkata::Quaternion<T> product2 = q1.Inverse() * q1;
+  // Also test q.inverse() * q.
+  mathkata::Quaternion<T> product2 = q1.inverse() * q1;
   EXPECT_NEAR_QUAT(mathkata::Quaternion<T>::identity, product2, epsilon);
 
   // Test with a unit quaternion.
   mathkata::Vector<T, 3> axis(static_cast<T>(4.3), static_cast<T>(7.6),
                               static_cast<T>(1.2));
-  axis.Normalize();
+  axis.normalize();
   mathkata::Quaternion<T> q2 =
-      mathkata::Quaternion<T>::FromAngleAxis(static_cast<T>(1.2), axis);
-  mathkata::Quaternion<T> product3 = q2 * q2.Inverse();
+      mathkata::Quaternion<T>::fromAngleAxis(static_cast<T>(1.2), axis);
+  mathkata::Quaternion<T> product3 = q2 * q2.inverse();
   EXPECT_NEAR_QUAT(mathkata::Quaternion<T>::identity, product3, epsilon);
 }
-TEST_ALL_F(Inverse)
+TEST_ALL_F(inverse)
 
 // This will test the multiplication of quaternions.
 template <class T>
 void Mult_Test(const T& precision) {
   mathkata::Vector<T, 3> axis(static_cast<T>(4.3), static_cast<T>(7.6),
                               static_cast<T>(1.2));
-  axis.Normalize();
+  axis.normalize();
   T angle1 = static_cast<T>(1.2), angle2 = static_cast<T>(0.7),
     angle3 = angle2 + precision * 10;
   mathkata::Quaternion<T> qaa1(
-      mathkata::Quaternion<T>::FromAngleAxis(angle1, axis));
+      mathkata::Quaternion<T>::fromAngleAxis(angle1, axis));
   mathkata::Quaternion<T> qaa2(
-      mathkata::Quaternion<T>::FromAngleAxis(angle2, axis));
+      mathkata::Quaternion<T>::fromAngleAxis(angle2, axis));
   mathkata::Quaternion<T> qaa3(
-      mathkata::Quaternion<T>::FromAngleAxis(angle3, axis));
+      mathkata::Quaternion<T>::fromAngleAxis(angle3, axis));
   mathkata::Vector<T, 3> convertedAxis;
   T convertedAngle;
   // This will verify that multiplying two quaternions corresponds to the sum
   // of the rotations.
-  (qaa1 * qaa2).ToAngleAxis(&convertedAngle, &convertedAxis);
+  (qaa1 * qaa2).toAngleAxis(&convertedAngle, &convertedAxis);
   EXPECT_NEAR(angle1 + angle2, convertedAngle, precision);
-  // This will verify that ScaleAngle on a quaternion corresponds
+  // This will verify that scaleAngle on a quaternion corresponds
   // to scaling the rotation.
-  qaa1.ScaleAngle(2).ToAngleAxis(&convertedAngle, &convertedAxis);
+  qaa1.scaleAngle(2).toAngleAxis(&convertedAngle, &convertedAxis);
   EXPECT_NEAR(angle1 * 2, convertedAngle, precision);
   mathkata::Vector<T, 3> v(3.5f, 6.4f, 7.0f);
   mathkata::Vector<T, 4> v4(3.5f, 6.4f, 7.0f, 0.0f);
   // This will verify that multiplying by a vector corresponds to applying
   // the rotation to that vector.
-  mathkata::Vector<T, 3> quatRotatedV(qaa1.Rotate(v));
-  mathkata::Vector<T, 3> matRotatedV(qaa1.ToMatrix() * v);
-  mathkata::Vector<T, 4> mat4RotatedV(qaa1.ToMatrix4() * v4);
+  mathkata::Vector<T, 3> quatRotatedV(qaa1.rotate(v));
+  mathkata::Vector<T, 3> matRotatedV(qaa1.toMatrix() * v);
+  mathkata::Vector<T, 4> mat4RotatedV(qaa1.toMatrix4() * v4);
   EXPECT_NEAR(quatRotatedV[0], matRotatedV[0], 10 * precision);
   EXPECT_NEAR(quatRotatedV[1], matRotatedV[1], 10 * precision);
   EXPECT_NEAR(quatRotatedV[2], matRotatedV[2], 10 * precision);
@@ -437,16 +437,16 @@ void Mult_Test(const T& precision) {
   // This will verify that interpolating two quaternions corresponds to
   // interpolating the angle.
   mathkata::Quaternion<T> slerp1(
-      mathkata::Quaternion<T>::Slerp(qaa1, qaa2, 0.5));
-  slerp1.ToAngleAxis(&convertedAngle, &convertedAxis);
+      mathkata::Quaternion<T>::slerp(qaa1, qaa2, 0.5));
+  slerp1.toAngleAxis(&convertedAngle, &convertedAxis);
   EXPECT_NEAR(.5 * (angle1 + angle2), convertedAngle, precision);
   mathkata::Quaternion<T> slerp2(
-      mathkata::Quaternion<T>::Slerp(qaa2, qaa3, 0.5));
-  slerp2.ToAngleAxis(&convertedAngle, &convertedAxis);
+      mathkata::Quaternion<T>::slerp(qaa2, qaa3, 0.5));
+  slerp2.toAngleAxis(&convertedAngle, &convertedAxis);
   EXPECT_NEAR(.5 * (angle2 + angle3), convertedAngle, precision);
   mathkata::Quaternion<T> slerp3(
-      mathkata::Quaternion<T>::Slerp(qaa2, qaa2, 0.5));
-  slerp3.ToAngleAxis(&convertedAngle, &convertedAxis);
+      mathkata::Quaternion<T>::slerp(qaa2, qaa2, 0.5));
+  slerp3.toAngleAxis(&convertedAngle, &convertedAxis);
   EXPECT_NEAR(angle2, convertedAngle, precision);
 }
 TEST_ALL_F(Mult)
@@ -482,33 +482,33 @@ void MultQuatScalarComponentWise_Test(const T& precision) {
 }
 TEST_ALL_F(MultQuatScalarComponentWise)
 
-// This tests that ScaleAngle preserves the old angle-scaling behavior.
+// This tests that scaleAngle preserves the old angle-scaling behavior.
 template <class T>
-void ScaleAngle_Test(const T& precision) {
+void scaleAngle_Test(const T& precision) {
   (void)precision;
   using Quaternion = mathkata::Quaternion<T>;
   using Vector3 = mathkata::Vector<T, 3>;
   const double epsilon = 1e-5;
   const Vector3 up(0, 1, 0);
 
-  // ScaleAngle(1) on a big quaternion should condition it to the short path.
+  // scaleAngle(1) on a big quaternion should condition it to the short path.
   const Quaternion bigQuat =
-      Quaternion::FromAngleAxis(static_cast<T>(mathkata::kPi * 1.5), up);
+      Quaternion::fromAngleAxis(static_cast<T>(mathkata::kPi * 1.5), up);
   EXPECT_NEAR_QUAT(Quaternion(-bigQuat.scalar(), -bigQuat.vector()),
-                   bigQuat.ScaleAngle(1), epsilon);
+                   bigQuat.scaleAngle(1), epsilon);
 
-  // ScaleAngle is not associative for factors > 1.
+  // scaleAngle is not associative for factors > 1.
   const Quaternion base =
-      Quaternion::FromAngleAxis(static_cast<T>(mathkata::kPi * .75), up);
-  const Quaternion q1 = base.ScaleAngle(2).ScaleAngle(static_cast<T>(.5));
-  const Quaternion q2 = base.ScaleAngle(static_cast<T>(2 * .5));
+      Quaternion::fromAngleAxis(static_cast<T>(mathkata::kPi * .75), up);
+  const Quaternion q1 = base.scaleAngle(2).scaleAngle(static_cast<T>(.5));
+  const Quaternion q2 = base.scaleAngle(static_cast<T>(2 * .5));
   EXPECT_FALSE(IsNearOrientation(q1, q2, epsilon));
 
-  // ScaleAngle(0) should give identity.
-  const Quaternion rot = Quaternion::FromAngleAxis(static_cast<T>(1.2), up);
-  EXPECT_NEAR_QUAT(Quaternion::identity, rot.ScaleAngle(0), epsilon);
+  // scaleAngle(0) should give identity.
+  const Quaternion rot = Quaternion::fromAngleAxis(static_cast<T>(1.2), up);
+  EXPECT_NEAR_QUAT(Quaternion::identity, rot.scaleAngle(0), epsilon);
 }
-TEST_ALL_F(ScaleAngle)
+TEST_ALL_F(scaleAngle)
 
 // This tests that scalar multiplication distributes over quaternion addition.
 template <class T>
@@ -533,39 +533,39 @@ template <class T>
 void Dot_Test(const T& precision) {
   mathkata::Vector<T, 3> axis(static_cast<T>(4.3), static_cast<T>(7.6),
                               static_cast<T>(1.2));
-  axis.Normalize();
+  axis.normalize();
   T angle1 = static_cast<T>(1.2),
     angle2 = static_cast<T>(angle1 + std::numbers::pi_v<T> / 2),
     angle3 = static_cast<T>(angle1 + std::numbers::pi_v<T>),
     angle4 = static_cast<T>(0.7);
   mathkata::Quaternion<T> qaa1(
-      mathkata::Quaternion<T>::FromAngleAxis(angle1, axis));
+      mathkata::Quaternion<T>::fromAngleAxis(angle1, axis));
   mathkata::Quaternion<T> qaa2(
-      mathkata::Quaternion<T>::FromAngleAxis(angle2, axis));
+      mathkata::Quaternion<T>::fromAngleAxis(angle2, axis));
   mathkata::Quaternion<T> qaa3(
-      mathkata::Quaternion<T>::FromAngleAxis(angle3, axis));
+      mathkata::Quaternion<T>::fromAngleAxis(angle3, axis));
   mathkata::Quaternion<T> qaa4(
-      mathkata::Quaternion<T>::FromAngleAxis(angle4, axis));
+      mathkata::Quaternion<T>::fromAngleAxis(angle4, axis));
 
   // This will verify that Dotting two quaternions works correctly.
-  EXPECT_NEAR(mathkata::Quaternion<T>::DotProduct(qaa1, qaa1), 1.0, precision);
-  EXPECT_NEAR(mathkata::Quaternion<T>::DotProduct(qaa1, qaa2), sqrt(2.0) / 2.0,
+  EXPECT_NEAR(mathkata::Quaternion<T>::dotProduct(qaa1, qaa1), 1.0, precision);
+  EXPECT_NEAR(mathkata::Quaternion<T>::dotProduct(qaa1, qaa2), sqrt(2.0) / 2.0,
               precision);
-  EXPECT_NEAR(mathkata::Quaternion<T>::DotProduct(qaa1, qaa3), 0.0, precision);
+  EXPECT_NEAR(mathkata::Quaternion<T>::dotProduct(qaa1, qaa3), 0.0, precision);
   // 2 x acos(dot) should be the angle between two quaternions:
-  EXPECT_NEAR(acos(mathkata::Quaternion<T>::DotProduct(qaa1, qaa4)) * 2.0,
+  EXPECT_NEAR(acos(mathkata::Quaternion<T>::dotProduct(qaa1, qaa4)) * 2.0,
               angle1 - angle4, precision);
 }
 TEST_ALL_F(Dot)
 
 // This will test normalization of quaternions.
 template <class T>
-void Normalize_Test(const T& precision) {
+void normalize_Test(const T& precision) {
   mathkata::Quaternion<T> quat_1(static_cast<T>(12), static_cast<T>(0),
                                  static_cast<T>(0), static_cast<T>(0));
   const mathkata::Quaternion<T> const_quat_1 = quat_1;
-  const mathkata::Quaternion<T> normalized_quat_1 = const_quat_1.Normalized();
-  quat_1.Normalize();
+  const mathkata::Quaternion<T> normalized_quat_1 = const_quat_1.normalized();
+  quat_1.normalize();
   mathkata::Quaternion<T> reference_quat_1(static_cast<T>(1), static_cast<T>(0),
                                            static_cast<T>(0),
                                            static_cast<T>(0));
@@ -580,8 +580,8 @@ void Normalize_Test(const T& precision) {
 
   mathkata::Quaternion<T> quat_2(static_cast<T>(123), static_cast<T>(123),
                                  static_cast<T>(123), static_cast<T>(123));
-  mathkata::Quaternion<T> normalized_quat_2 = quat_2.Normalized();
-  quat_2.Normalize();
+  mathkata::Quaternion<T> normalized_quat_2 = quat_2.normalized();
+  quat_2.normalize();
   mathkata::Quaternion<T> reference_quat_2(
       static_cast<T>(sqrt(.25)), static_cast<T>(sqrt(.25)),
       static_cast<T>(sqrt(.25)), static_cast<T>(sqrt(.25)));
@@ -594,9 +594,9 @@ void Normalize_Test(const T& precision) {
   EXPECT_NEAR(reference_quat_2[2], normalized_quat_2[2], precision);
   EXPECT_NEAR(reference_quat_2[3], normalized_quat_2[3], precision);
 }
-TEST_ALL_F(Normalize)
+TEST_ALL_F(normalize)
 
-// This tests that ToAngleAxis returns angle <= 180 degrees, even if the
+// This tests that toAngleAxis returns angle <= 180 degrees, even if the
 // Quaternion had a larger angle.
 template <class T>
 void ToAngleAxisReturnsSmallQuat_Test(const T& precision) {
@@ -606,38 +606,38 @@ void ToAngleAxisReturnsSmallQuat_Test(const T& precision) {
   const float epsilon = 1e-5f;
 
   // Test the specific example called out in the documentation:
-  // "For example, if *this represents "Rotate 350 degrees left", you will
-  //  get the angle-axis "Rotate 10 degrees right"."
+  // "For example, if *this represents "rotate 350 degrees left", you will
+  //  get the angle-axis "rotate 10 degrees right"."
   const Vector3 kUp(0, 1, 0);
   const float k350Degrees = 350 * mathkata::kDegreesToRadians;
-  const Quaternion k350Left = Quaternion::FromAngleAxis(k350Degrees, kUp);
+  const Quaternion k350Left = Quaternion::fromAngleAxis(k350Degrees, kUp);
 
   const Vector3 kDown(0, -1, 0);
   const float k10Degrees = 10 * mathkata::kDegreesToRadians;
-  const Quaternion k10Right = Quaternion::FromAngleAxis(k10Degrees, kDown);
+  const Quaternion k10Right = Quaternion::fromAngleAxis(k10Degrees, kDown);
 
   {
     T angle;
     Vector3 axis;
-    k350Left.ToAngleAxis(&angle, &axis);
+    k350Left.toAngleAxis(&angle, &axis);
     EXPECT_NEAR(k10Degrees, angle, epsilon);
     EXPECT_NEAR_VEC3(kDown, axis, epsilon);
-    EXPECT_NEAR_QUAT(k10Right, Quaternion::FromAngleAxis(angle, axis), epsilon);
+    EXPECT_NEAR_QUAT(k10Right, Quaternion::fromAngleAxis(angle, axis), epsilon);
   }
   {
     T angle;
     Vector3 axis;
-    k350Left.ToAngleAxisFull(&angle, &axis);
+    k350Left.toAngleAxisFull(&angle, &axis);
     EXPECT_NEAR(k350Degrees, angle, epsilon);
     EXPECT_NEAR_VEC3(kUp, axis, epsilon);
-    EXPECT_NEAR_QUAT(k350Left, Quaternion::FromAngleAxis(angle, axis), epsilon);
+    EXPECT_NEAR_QUAT(k350Left, Quaternion::fromAngleAxis(angle, axis), epsilon);
   }
 }
 TEST_ALL_F(ToAngleAxisReturnsSmallQuat)
 
 // This will test normalization of quaternions.
 template <class T>
-void RotateFromTo_Test(const T& precision) {
+void rotateFromTo_Test(const T& precision) {
   mathkata::Vector<T, 3> x_axis = mathkata::Vector<T, 3>(
       static_cast<T>(1), static_cast<T>(0), static_cast<T>(0));
   mathkata::Vector<T, 3> y_axis = mathkata::Vector<T, 3>(
@@ -646,28 +646,28 @@ void RotateFromTo_Test(const T& precision) {
       static_cast<T>(0), static_cast<T>(0), static_cast<T>(1));
 
   mathkata::Quaternion<T> x_to_y =
-      mathkata::Quaternion<T>::RotateFromTo(x_axis, y_axis);
+      mathkata::Quaternion<T>::rotateFromTo(x_axis, y_axis);
   mathkata::Quaternion<T> y_to_z =
-      mathkata::Quaternion<T>::RotateFromTo(y_axis, z_axis);
+      mathkata::Quaternion<T>::rotateFromTo(y_axis, z_axis);
   mathkata::Quaternion<T> z_to_x =
-      mathkata::Quaternion<T>::RotateFromTo(z_axis, x_axis);
+      mathkata::Quaternion<T>::rotateFromTo(z_axis, x_axis);
 
   // Check some axis rotations:
   // By definition, rotateFromTo(v1, v2) * v2 should always equal v2.
   // if v1 and v2 are 90 degrees apart (as they are in the case of axes)
   // then applying the same rotation twice should invert the vector.
-  mathkata::Vector<T, 3> x_to_y_result = x_to_y.Rotate(x_axis);
-  mathkata::Vector<T, 3> x_to_y_twice_result = (x_to_y * x_to_y).Rotate(x_axis);
+  mathkata::Vector<T, 3> x_to_y_result = x_to_y.rotate(x_axis);
+  mathkata::Vector<T, 3> x_to_y_twice_result = (x_to_y * x_to_y).rotate(x_axis);
   EXPECT_NEAR_VEC3(x_to_y_result, y_axis, precision);
   EXPECT_NEAR_VEC3(x_to_y_twice_result, -x_axis, precision);
 
-  mathkata::Vector<T, 3> y_to_z_result = y_to_z.Rotate(y_axis);
-  mathkata::Vector<T, 3> y_to_z_twice_result = (y_to_z * y_to_z).Rotate(y_axis);
+  mathkata::Vector<T, 3> y_to_z_result = y_to_z.rotate(y_axis);
+  mathkata::Vector<T, 3> y_to_z_twice_result = (y_to_z * y_to_z).rotate(y_axis);
   EXPECT_NEAR_VEC3(y_to_z_result, z_axis, precision);
   EXPECT_NEAR_VEC3(y_to_z_twice_result, -y_axis, precision);
 
-  mathkata::Vector<T, 3> z_to_x_result = z_to_x.Rotate(z_axis);
-  mathkata::Vector<T, 3> z_to_x_twice_result = (z_to_x * z_to_x).Rotate(z_axis);
+  mathkata::Vector<T, 3> z_to_x_result = z_to_x.rotate(z_axis);
+  mathkata::Vector<T, 3> z_to_x_twice_result = (z_to_x * z_to_x).rotate(z_axis);
   EXPECT_NEAR_VEC3(z_to_x_result, x_axis, precision);
   EXPECT_NEAR_VEC3(z_to_x_twice_result, -z_axis, precision);
 
@@ -678,32 +678,32 @@ void RotateFromTo_Test(const T& precision) {
       static_cast<T>(-1), static_cast<T>(3), static_cast<T>(16));
 
   mathkata::Quaternion<T> arbitrary_to_arbitrary =
-      mathkata::Quaternion<T>::RotateFromTo(arbitrary_1, arbitrary_2);
+      mathkata::Quaternion<T>::rotateFromTo(arbitrary_1, arbitrary_2);
 
   mathkata::Vector<T, 3> arbitrary_1_to_2 =
-      arbitrary_to_arbitrary.Rotate(arbitrary_1);
-  arbitrary_1_to_2.Normalize();
-  mathkata::Vector<T, 3> arbitrary_2_normalized = arbitrary_2.Normalized();
+      arbitrary_to_arbitrary.rotate(arbitrary_1);
+  arbitrary_1_to_2.normalize();
+  mathkata::Vector<T, 3> arbitrary_2_normalized = arbitrary_2.normalized();
 
   EXPECT_NEAR_VEC3(arbitrary_1_to_2, arbitrary_2_normalized, precision);
 
-  // Using RotateFromTo on one vector should give us the identity quaternion:
+  // Using rotateFromTo on one vector should give us the identity quaternion:
   mathkata::Quaternion<T> identity =
-      mathkata::Quaternion<T>::RotateFromTo(arbitrary_1, arbitrary_1);
+      mathkata::Quaternion<T>::rotateFromTo(arbitrary_1, arbitrary_1);
 
-  mathkata::Vector<T, 3> arbitrary_2_identity = identity.Rotate(arbitrary_2);
+  mathkata::Vector<T, 3> arbitrary_2_identity = identity.rotate(arbitrary_2);
   EXPECT_NEAR_VEC3(arbitrary_2_identity, arbitrary_2, precision);
 
-  // Using RotateFromTo on an inverted vector should give a 180 degree rotation:
+  // Using rotateFromTo on an inverted vector should give a 180 degree rotation:
   mathkata::Quaternion<T> reverse =
-      mathkata::Quaternion<T>::RotateFromTo(arbitrary_1, -arbitrary_1);
+      mathkata::Quaternion<T>::rotateFromTo(arbitrary_1, -arbitrary_1);
 
   // Relaxing the precision slightly, because there are a lot of chained
   // float operations in here.
-  mathkata::Vector<T, 3> arbitrary_1_reversed = reverse.Rotate(arbitrary_1);
+  mathkata::Vector<T, 3> arbitrary_1_reversed = reverse.rotate(arbitrary_1);
   EXPECT_NEAR_VEC3(arbitrary_1_reversed, -arbitrary_1, precision * 2.0);
 }
-TEST_ALL_F(RotateFromTo)
+TEST_ALL_F(rotateFromTo)
 
 // Test the compilation of basic quaternion operations given in the sample
 // file. This will test interpolating two rotations.
@@ -714,11 +714,11 @@ TEST_F(QuaternionTests, QuaternionSample) {
   Vector<float, 3> angles1(0.66f, 1.3f, 0.76f);
   Vector<float, 3> angles2(0.85f, 0.33f, 1.6f);
 
-  Quaternion<float> quat1 = Quaternion<float>::FromEulerAngles(angles1);
-  Quaternion<float> quat2 = Quaternion<float>::FromEulerAngles(angles2);
+  Quaternion<float> quat1 = Quaternion<float>::fromEulerAngles(angles1);
+  Quaternion<float> quat2 = Quaternion<float>::fromEulerAngles(angles2);
 
-  Quaternion<float> quatSlerp = Quaternion<float>::Slerp(quat1, quat2, 0.5);
-  Vector<float, 3> angleSlerp = quatSlerp.ToEulerAngles();
+  Quaternion<float> quatSlerp = Quaternion<float>::slerp(quat1, quat2, 0.5);
+  Vector<float, 3> angleSlerp = quatSlerp.toEulerAngles();
   /// @doxysnippetend
   const float precision = 1e-2f;
   EXPECT_NEAR(0.93f, angleSlerp[0], precision);
@@ -732,13 +732,13 @@ TEST_F(QuaternionTests, IdentityConst) {
                  mathkata::Quaternion<float>::identity);
   EXPECT_EQ_QUAT(mathkata::kQuatIdentityf,
                  mathkata::Quaternion<float>(1.0f, 0.0f, 0.0f, 0.0f));
-  EXPECT_EQ(mathkata::kQuatIdentityf.ToEulerAngles(), mathkata::kZeros3f);
+  EXPECT_EQ(mathkata::kQuatIdentityf.toEulerAngles(), mathkata::kZeros3f);
 
   EXPECT_EQ_QUAT(mathkata::kQuatIdentityd,
                  mathkata::Quaternion<double>::identity);
   EXPECT_EQ_QUAT(mathkata::kQuatIdentityd,
                  mathkata::Quaternion<double>(1.0, 0.0, 0.0, 0.0));
-  EXPECT_EQ(mathkata::kQuatIdentityd.ToEulerAngles(), mathkata::kZeros3d);
+  EXPECT_EQ(mathkata::kQuatIdentityd.toEulerAngles(), mathkata::kZeros3d);
 }
 
 template <class T>
@@ -753,7 +753,7 @@ void OutputStream_Test(const T&) {
 TEST_ALL_F(OutputStream)
 
 template <class T>
-void LookAt_Test(const T& precision) {
+void lookAt_Test(const T& precision) {
   using Quaternion = mathkata::Quaternion<T>;
   using Vector3 = mathkata::Vector<T, 3>;
   constexpr auto kRH = mathkata::Handedness::kRightHanded;
@@ -772,7 +772,7 @@ void LookAt_Test(const T& precision) {
   // Looking along -Z (RH default forward) should give identity.
   {
     const Quaternion q =
-        Quaternion::template LookAt<kRH>(Vector3(zero, zero, neg_one), up);
+        Quaternion::template lookAt<kRH>(Vector3(zero, zero, neg_one), up);
     EXPECT_NEAR_ORIENTATION(Quaternion::identity, q, epsilon);
   }
 
@@ -780,9 +780,9 @@ void LookAt_Test(const T& precision) {
   // 180-degree rotation around the Y axis.
   {
     const Quaternion q =
-        Quaternion::template LookAt<kRH>(Vector3(zero, zero, one), up);
+        Quaternion::template lookAt<kRH>(Vector3(zero, zero, one), up);
     const Quaternion expected =
-        Quaternion::FromAngleAxis(std::numbers::pi_v<T>, up);
+        Quaternion::fromAngleAxis(std::numbers::pi_v<T>, up);
     EXPECT_NEAR_ORIENTATION(expected, q, epsilon);
   }
 
@@ -790,18 +790,18 @@ void LookAt_Test(const T& precision) {
   // from -Z forward to +X).
   {
     const Quaternion q =
-        Quaternion::template LookAt<kRH>(Vector3(one, zero, zero), up);
+        Quaternion::template lookAt<kRH>(Vector3(one, zero, zero), up);
     const Quaternion expected =
-        Quaternion::FromAngleAxis(-std::numbers::pi_v<T> / 2, up);
+        Quaternion::fromAngleAxis(-std::numbers::pi_v<T> / 2, up);
     EXPECT_NEAR_ORIENTATION(expected, q, epsilon);
   }
 
   // Explicit right-handed should match the default (no handedness argument).
   {
     const Quaternion q_default =
-        Quaternion::LookAt(Vector3(one, zero, zero), up);
+        Quaternion::lookAt(Vector3(one, zero, zero), up);
     const Quaternion q_explicit =
-        Quaternion::template LookAt<kRH>(Vector3(one, zero, zero), up);
+        Quaternion::template lookAt<kRH>(Vector3(one, zero, zero), up);
     EXPECT_NEAR_QUAT(q_default, q_explicit, epsilon);
   }
 
@@ -810,7 +810,7 @@ void LookAt_Test(const T& precision) {
   // Looking along +Z (LH default forward) should give identity.
   {
     const Quaternion q =
-        Quaternion::template LookAt<kLH>(Vector3(zero, zero, one), up);
+        Quaternion::template lookAt<kLH>(Vector3(zero, zero, one), up);
     EXPECT_NEAR_ORIENTATION(Quaternion::identity, q, epsilon);
   }
 
@@ -818,9 +818,9 @@ void LookAt_Test(const T& precision) {
   // 180-degree rotation around the Y axis.
   {
     const Quaternion q =
-        Quaternion::template LookAt<kLH>(Vector3(zero, zero, neg_one), up);
+        Quaternion::template lookAt<kLH>(Vector3(zero, zero, neg_one), up);
     const Quaternion expected =
-        Quaternion::FromAngleAxis(std::numbers::pi_v<T>, up);
+        Quaternion::fromAngleAxis(std::numbers::pi_v<T>, up);
     EXPECT_NEAR_ORIENTATION(expected, q, epsilon);
   }
 
@@ -828,9 +828,9 @@ void LookAt_Test(const T& precision) {
   // from +Z forward to +X).
   {
     const Quaternion q =
-        Quaternion::template LookAt<kLH>(Vector3(one, zero, zero), up);
+        Quaternion::template lookAt<kLH>(Vector3(one, zero, zero), up);
     const Quaternion expected =
-        Quaternion::FromAngleAxis(std::numbers::pi_v<T> / 2, up);
+        Quaternion::fromAngleAxis(std::numbers::pi_v<T> / 2, up);
     EXPECT_NEAR_ORIENTATION(expected, q, epsilon);
   }
 
@@ -841,8 +841,8 @@ void LookAt_Test(const T& precision) {
   {
     const Vector3 rh_forward(zero, zero, neg_one);
     const Vector3 target(one, zero, zero);
-    const Quaternion q = Quaternion::template LookAt<kRH>(target, up);
-    const Vector3 result = q.Rotate(rh_forward);
+    const Quaternion q = Quaternion::template lookAt<kRH>(target, up);
+    const Vector3 result = q.rotate(rh_forward);
     EXPECT_NEAR_VEC3(target, result, epsilon);
   }
 
@@ -850,8 +850,8 @@ void LookAt_Test(const T& precision) {
   {
     const Vector3 lh_forward(zero, zero, one);
     const Vector3 target(one, zero, zero);
-    const Quaternion q = Quaternion::template LookAt<kLH>(target, up);
-    const Vector3 result = q.Rotate(lh_forward);
+    const Quaternion q = Quaternion::template lookAt<kLH>(target, up);
+    const Vector3 result = q.rotate(lh_forward);
     EXPECT_NEAR_VEC3(target, result, epsilon);
   }
 
@@ -862,35 +862,35 @@ void LookAt_Test(const T& precision) {
         Vector3(zero, zero, one),
         Vector3(zero, zero, neg_one),
         Vector3(neg_one, zero, zero),
-        Vector3(one, one, zero).Normalized(),
-        Vector3(one, zero, one).Normalized(),
+        Vector3(one, one, zero).normalized(),
+        Vector3(one, zero, one).normalized(),
     };
     for (const auto& dir : directions) {
-      const Quaternion q_rh = Quaternion::template LookAt<kRH>(dir, up);
-      T length_rh = Quaternion::DotProduct(q_rh, q_rh);
+      const Quaternion q_rh = Quaternion::template lookAt<kRH>(dir, up);
+      T length_rh = Quaternion::dotProduct(q_rh, q_rh);
       EXPECT_NEAR(static_cast<T>(1), length_rh, epsilon);
 
-      const Quaternion q_lh = Quaternion::template LookAt<kLH>(dir, up);
-      T length_lh = Quaternion::DotProduct(q_lh, q_lh);
+      const Quaternion q_lh = Quaternion::template lookAt<kLH>(dir, up);
+      T length_lh = Quaternion::dotProduct(q_lh, q_lh);
       EXPECT_NEAR(static_cast<T>(1), length_lh, epsilon);
     }
   }
 }
-TEST_ALL_F(LookAt)
+TEST_ALL_F(lookAt)
 
 template <class T>
 void FromEulerAnglesSplit_Test(const T& precision) {
   mathkata::Vector<T, 3> eulers(static_cast<T>(0.1), static_cast<T>(0.2),
                                 static_cast<T>(0.3));
   EXPECT_NEAR_QUAT(
-      mathkata::Quaternion<T>::FromEulerAngles(eulers),
-      mathkata::Quaternion<T>::FromEulerAngles(eulers[0], eulers[1], eulers[2]),
+      mathkata::Quaternion<T>::fromEulerAngles(eulers),
+      mathkata::Quaternion<T>::fromEulerAngles(eulers[0], eulers[1], eulers[2]),
       precision);
 }
 TEST_ALL_F(FromEulerAnglesSplit)
 
 const float kSlerpTestAnglesInDegrees[]{
-    // Slerp algorithms commonly have trouble with angles near zero.
+    // slerp algorithms commonly have trouble with angles near zero.
     // To give a sense of what that means for common quaternion-dot cutoffs:
     // - Quaternion dot of .99999 = .512 degrees
     // - Quaternion dot of .9999 = 1.62 degrees
@@ -904,7 +904,7 @@ const float kSlerpTestAnglesInDegrees[]{
     179,
     180,
     181,
-    // Slerp is ill-defined at angles near 360.
+    // slerp is ill-defined at angles near 360.
     359,
     359.5f,
     360,
@@ -912,7 +912,7 @@ const float kSlerpTestAnglesInDegrees[]{
     361,
 };
 
-// Tests that Slerp returns unit-length quaternions.
+// Tests that slerp returns unit-length quaternions.
 template <class T>
 void SlerpResultIsUnit_Test(const T& precision) {
   (void)precision;
@@ -923,15 +923,15 @@ void SlerpResultIsUnit_Test(const T& precision) {
 
   for (float angle : kSlerpTestAnglesInDegrees) {
     const Quaternion q2 =
-        Quaternion::FromAngleAxis(angle * mathkata::kDegreesToRadians, axis);
+        Quaternion::fromAngleAxis(angle * mathkata::kDegreesToRadians, axis);
 
-    Quaternion slerp_result = Quaternion::Slerp(Quaternion::identity, q2, .5f);
-    const T slerp_length = slerp_result.Normalize();
+    Quaternion slerp_result = Quaternion::slerp(Quaternion::identity, q2, .5f);
+    const T slerp_length = slerp_result.normalize();
     EXPECT_NEAR(1.0f, slerp_length, kLengthEpsilon) << " for angle " << angle;
 
-    // Alternate spelling for Slerp
-    Quaternion scale_result = q2.ScaleAngle(static_cast<T>(.5));
-    const T scale_length = scale_result.Normalize();
+    // Alternate spelling for slerp
+    Quaternion scale_result = q2.scaleAngle(static_cast<T>(.5));
+    const T scale_length = scale_result.normalize();
     EXPECT_NEAR(1.0f, scale_length, kLengthEpsilon) << " for angle " << angle;
   }
 }
@@ -939,8 +939,8 @@ TEST_ALL_F(SlerpResultIsUnit)
 
 // Checks equality of
 // - quat(<some axis>, expected_angle) vs
-// - Slerp(identity, quat(<some axis>, angle), t) vs
-// - Slerp(quat(<some axis>, angle), identity, 1-t)
+// - slerp(identity, quat(<some axis>, angle), t) vs
+// - slerp(quat(<some axis>, angle), identity, 1-t)
 // Angles are in degrees.
 template <class T>
 void CheckSlerp(float angle, float t, float expected_angle) {
@@ -951,34 +951,34 @@ void CheckSlerp(float angle, float t, float expected_angle) {
   const T epsilon = 1e-6f;
   const Vector3 up(0, 1, 0);  // Could be any axis, really.
   const Quaternion original =
-      Quaternion::FromAngleAxis(angle * mathkata::kDegreesToRadians, up);
-  const Quaternion expected = Quaternion::FromAngleAxis(
+      Quaternion::fromAngleAxis(angle * mathkata::kDegreesToRadians, up);
+  const Quaternion expected = Quaternion::fromAngleAxis(
       expected_angle * mathkata::kDegreesToRadians, up);
 
-  // These are looser EXPECT_NEAR_ORIENTATION checks because Slerp() treats
-  // quats as orientations. For checking a mathematical Slerp(), they can
+  // These are looser EXPECT_NEAR_ORIENTATION checks because slerp() treats
+  // quats as orientations. For checking a mathematical slerp(), they can
   // (and should) be tightened back to EXPECT_NEAR_QUAT.
 
   Quaternion slerp_result =
-      Quaternion::Slerp(Quaternion::identity, original, t);
+      Quaternion::slerp(Quaternion::identity, original, t);
   EXPECT_NEAR_ORIENTATION(expected, slerp_result, epsilon)
       << " for angle " << angle << " and t " << t;
 
   // Apply the invariant that slerp(a, b, t) == slerp(b, a, 1-t).
   Quaternion slerp_backwards_result =
-      Quaternion::Slerp(original, Quaternion::identity, 1 - t);
+      Quaternion::slerp(original, Quaternion::identity, 1 - t);
   EXPECT_NEAR_ORIENTATION(expected, slerp_backwards_result, epsilon)
       << " for angle " << angle << " and t " << t;
 
-  Quaternion scale_result = original.ScaleAngle(t);
+  Quaternion scale_result = original.scaleAngle(t);
   EXPECT_NEAR_ORIENTATION(expected, scale_result, epsilon)
       << " for angle " << angle << " and t " << t;
 }
 
-// This doubles as a test of both Slerp() and operator*(quat, float),
+// This doubles as a test of both slerp() and operator*(quat, float),
 // since the two are pretty much the same operation with different spelling.
 template <class T>
-void Slerp_Test(const T& precision) {
+void slerp_Test(const T& precision) {
   (void)precision;
   // Easy and unambiguous cases.
   CheckSlerp<T>(+160, 0.375f, +60);
@@ -1006,7 +1006,7 @@ void Slerp_Test(const T& precision) {
   // For mathematical slerp, the axis is ill-defined and can take many values.
   CheckSlerp<T>(360, .25f, 0);
 }
-TEST_ALL_F(Slerp)
+TEST_ALL_F(slerp)
 
 }  // namespace
 

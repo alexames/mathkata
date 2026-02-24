@@ -33,11 +33,11 @@ namespace mathkata {
 /// <p>
 /// For example, the following:<br>
 /// <code>
-/// lookat = mat4::LookAt(target, position, mathkata::kAxisY3f);
+/// lookat = mat4::lookAt(target, position, mathkata::kAxisY3f);
 /// </code>
 /// <br>is preferable to:<br>
 /// <code>
-/// lookat = mat4::LookAt(target, position,
+/// lookat = mat4::lookAt(target, position,
 ///                       mathkata::Vector<float, 3>(0.0f, 1.0f, 0.0f));
 /// </code>
 /// <br> in terms of efficiency and in addition to resulting in more concise
@@ -156,12 +156,12 @@ inline constexpr Vector<int, 4> kAxisZ4i(0, 0, 1, 0);
 /// 4-dimensional <code>int</code> unit Vector pointing along the W axis.
 inline constexpr Vector<int, 4> kAxisW4i(0, 0, 0, 1);
 
-/// Quaternion Identity
+/// Quaternion identity
 inline const Quaternion<float> kQuatIdentityf(1.0f, 0.0f, 0.0f, 0.0f);
-/// Quaternion Identity
+/// Quaternion identity
 inline constexpr Quaternion<double> kQuatIdentityd(1.0, 0.0, 0.0, 0.0);
 
-// An AffineTransform versoin of the mat4 Identity matrix.
+// An AffineTransform versoin of the mat4 identity matrix.
 inline const AffineTransform kAffineIdentity(1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
                                              0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
                                              0.0f);

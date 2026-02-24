@@ -53,7 +53,7 @@ class IntersectionTests : public ::testing::Test {
   }
 
 // ============================================================================
-// RayIntersectsSphere tests
+// rayIntersectsSphere tests
 // ============================================================================
 
 template <class T, int N>
@@ -69,7 +69,7 @@ void RayIntersectsSphere_Hit_Test(T precision) {
   mathkata::Sphere<T, N> sphere(center, static_cast<T>(1));
 
   T t = static_cast<T>(0);
-  EXPECT_TRUE(mathkata::RayIntersectsSphere(ray, sphere, &t));
+  EXPECT_TRUE(mathkata::rayIntersectsSphere(ray, sphere, &t));
   EXPECT_NEAR(t, static_cast<T>(4), precision);
 }
 TEST_ALL_DIMS_F(RayIntersectsSphere_Hit)
@@ -87,7 +87,7 @@ void RayIntersectsSphere_Miss_Test(T precision) {
   mathkata::Vector<T, N> center(static_cast<T>(0));
   mathkata::Sphere<T, N> sphere(center, static_cast<T>(1));
 
-  EXPECT_FALSE(mathkata::RayIntersectsSphere(ray, sphere));
+  EXPECT_FALSE(mathkata::rayIntersectsSphere(ray, sphere));
 }
 TEST_ALL_DIMS_F(RayIntersectsSphere_Miss)
 
@@ -103,7 +103,7 @@ void RayIntersectsSphere_FromInside_Test(T precision) {
   mathkata::Sphere<T, N> sphere(center, static_cast<T>(2));
 
   T t = static_cast<T>(0);
-  EXPECT_TRUE(mathkata::RayIntersectsSphere(ray, sphere, &t));
+  EXPECT_TRUE(mathkata::rayIntersectsSphere(ray, sphere, &t));
   // The first intersection should be at t=2 (exit point).
   EXPECT_NEAR(t, static_cast<T>(2), precision);
 }
@@ -125,7 +125,7 @@ void RayIntersectsSphere_Tangent_Test(T precision) {
   mathkata::Sphere<T, N> sphere(center, static_cast<T>(1));
 
   T t = static_cast<T>(0);
-  EXPECT_TRUE(mathkata::RayIntersectsSphere(ray, sphere, &t));
+  EXPECT_TRUE(mathkata::rayIntersectsSphere(ray, sphere, &t));
   EXPECT_NEAR(t, static_cast<T>(5), precision);
 }
 TEST_ALL_DIMS_F(RayIntersectsSphere_Tangent)
@@ -146,12 +146,12 @@ void RayIntersectsSphere_MissOffset_Test(T precision) {
   mathkata::Vector<T, N> center(static_cast<T>(0));
   mathkata::Sphere<T, N> sphere(center, static_cast<T>(1));
 
-  EXPECT_FALSE(mathkata::RayIntersectsSphere(ray, sphere));
+  EXPECT_FALSE(mathkata::rayIntersectsSphere(ray, sphere));
 }
 TEST_ALL_DIMS_F(RayIntersectsSphere_MissOffset)
 
 // ============================================================================
-// RayIntersectsAABB tests
+// rayIntersectsAABB tests
 // ============================================================================
 
 template <class T, int N>
@@ -168,7 +168,7 @@ void RayIntersectsAABB_Hit_Test(T precision) {
   mathkata::AABB<T, N> aabb(box_min, box_max);
 
   T t = static_cast<T>(0);
-  EXPECT_TRUE(mathkata::RayIntersectsAABB(ray, aabb, &t));
+  EXPECT_TRUE(mathkata::rayIntersectsAABB(ray, aabb, &t));
   EXPECT_NEAR(t, static_cast<T>(4), precision);
 }
 TEST_ALL_DIMS_F(RayIntersectsAABB_Hit)
@@ -187,7 +187,7 @@ void RayIntersectsAABB_Miss_Test(T precision) {
   mathkata::Vector<T, N> box_max(static_cast<T>(1));
   mathkata::AABB<T, N> aabb(box_min, box_max);
 
-  EXPECT_FALSE(mathkata::RayIntersectsAABB(ray, aabb));
+  EXPECT_FALSE(mathkata::rayIntersectsAABB(ray, aabb));
 }
 TEST_ALL_DIMS_F(RayIntersectsAABB_Miss)
 
@@ -204,7 +204,7 @@ void RayIntersectsAABB_FromInside_Test(T precision) {
   mathkata::AABB<T, N> aabb(box_min, box_max);
 
   T t = static_cast<T>(0);
-  EXPECT_TRUE(mathkata::RayIntersectsAABB(ray, aabb, &t));
+  EXPECT_TRUE(mathkata::rayIntersectsAABB(ray, aabb, &t));
   EXPECT_NEAR(t, static_cast<T>(0), precision);
 }
 TEST_ALL_DIMS_F(RayIntersectsAABB_FromInside)
@@ -227,7 +227,7 @@ void RayIntersectsAABB_AlongEdge_Test(T precision) {
 
   T t = static_cast<T>(0);
   // Ray should still hit the AABB on the boundary.
-  EXPECT_TRUE(mathkata::RayIntersectsAABB(ray, aabb, &t));
+  EXPECT_TRUE(mathkata::rayIntersectsAABB(ray, aabb, &t));
   EXPECT_NEAR(t, static_cast<T>(4), precision);
 }
 TEST_ALL_DIMS_F(RayIntersectsAABB_AlongEdge)
@@ -250,13 +250,13 @@ void RayIntersectsAABB_Parallel_Test(T precision) {
   mathkata::AABB<T, N> aabb(box_min, box_max);
 
   if (N >= 2) {
-    EXPECT_FALSE(mathkata::RayIntersectsAABB(ray, aabb));
+    EXPECT_FALSE(mathkata::rayIntersectsAABB(ray, aabb));
   }
 }
 TEST_ALL_DIMS_F(RayIntersectsAABB_Parallel)
 
 // ============================================================================
-// RayIntersectsPlane tests (3D only)
+// rayIntersectsPlane tests (3D only)
 // ============================================================================
 
 template <class T>
@@ -273,7 +273,7 @@ void RayIntersectsPlane_Hit_Test(T precision) {
       static_cast<T>(-5));
 
   T t = static_cast<T>(0);
-  EXPECT_TRUE(mathkata::RayIntersectsPlane(ray, plane, &t));
+  EXPECT_TRUE(mathkata::rayIntersectsPlane(ray, plane, &t));
   EXPECT_NEAR(t, static_cast<T>(5), precision);
 }
 TEST_3D_F(RayIntersectsPlane_Hit)
@@ -292,7 +292,7 @@ void RayIntersectsPlane_Parallel_Test(T precision) {
                              static_cast<T>(1)),
       static_cast<T>(-5));
 
-  EXPECT_FALSE(mathkata::RayIntersectsPlane(ray, plane));
+  EXPECT_FALSE(mathkata::rayIntersectsPlane(ray, plane));
 }
 TEST_3D_F(RayIntersectsPlane_Parallel)
 
@@ -310,12 +310,12 @@ void RayIntersectsPlane_FromBehind_Test(T precision) {
                              static_cast<T>(1)),
       static_cast<T>(-5));
 
-  EXPECT_FALSE(mathkata::RayIntersectsPlane(ray, plane));
+  EXPECT_FALSE(mathkata::rayIntersectsPlane(ray, plane));
 }
 TEST_3D_F(RayIntersectsPlane_FromBehind)
 
 // ============================================================================
-// AABBIntersectsAABB tests
+// aabbIntersectsAABB tests
 // ============================================================================
 
 template <class T, int N>
@@ -325,7 +325,7 @@ void AABBIntersectsAABB_Overlap_Test(T precision) {
                          mathkata::Vector<T, N>(static_cast<T>(3)));
   mathkata::AABB<T, N> b(mathkata::Vector<T, N>(static_cast<T>(2)),
                          mathkata::Vector<T, N>(static_cast<T>(5)));
-  EXPECT_TRUE(mathkata::AABBIntersectsAABB(a, b));
+  EXPECT_TRUE(mathkata::aabbIntersectsAABB(a, b));
 }
 TEST_ALL_DIMS_F(AABBIntersectsAABB_Overlap)
 
@@ -336,7 +336,7 @@ void AABBIntersectsAABB_Touching_Test(T precision) {
                          mathkata::Vector<T, N>(static_cast<T>(2)));
   mathkata::AABB<T, N> b(mathkata::Vector<T, N>(static_cast<T>(2)),
                          mathkata::Vector<T, N>(static_cast<T>(4)));
-  EXPECT_TRUE(mathkata::AABBIntersectsAABB(a, b));
+  EXPECT_TRUE(mathkata::aabbIntersectsAABB(a, b));
 }
 TEST_ALL_DIMS_F(AABBIntersectsAABB_Touching)
 
@@ -347,12 +347,12 @@ void AABBIntersectsAABB_Separate_Test(T precision) {
                          mathkata::Vector<T, N>(static_cast<T>(1)));
   mathkata::AABB<T, N> b(mathkata::Vector<T, N>(static_cast<T>(3)),
                          mathkata::Vector<T, N>(static_cast<T>(5)));
-  EXPECT_FALSE(mathkata::AABBIntersectsAABB(a, b));
+  EXPECT_FALSE(mathkata::aabbIntersectsAABB(a, b));
 }
 TEST_ALL_DIMS_F(AABBIntersectsAABB_Separate)
 
 // ============================================================================
-// SphereIntersectsSphere tests
+// sphereIntersectsSphere tests
 // ============================================================================
 
 template <class T, int N>
@@ -363,7 +363,7 @@ void SphereIntersectsSphere_Overlap_Test(T precision) {
   c2[0] = static_cast<T>(1);
   mathkata::Sphere<T, N> s1(c1, static_cast<T>(2));
   mathkata::Sphere<T, N> s2(c2, static_cast<T>(2));
-  EXPECT_TRUE(mathkata::SphereIntersectsSphere(s1, s2));
+  EXPECT_TRUE(mathkata::sphereIntersectsSphere(s1, s2));
 }
 TEST_ALL_DIMS_F(SphereIntersectsSphere_Overlap)
 
@@ -375,7 +375,7 @@ void SphereIntersectsSphere_Touching_Test(T precision) {
   c2[0] = static_cast<T>(4);
   mathkata::Sphere<T, N> s1(c1, static_cast<T>(2));
   mathkata::Sphere<T, N> s2(c2, static_cast<T>(2));
-  EXPECT_TRUE(mathkata::SphereIntersectsSphere(s1, s2));
+  EXPECT_TRUE(mathkata::sphereIntersectsSphere(s1, s2));
 }
 TEST_ALL_DIMS_F(SphereIntersectsSphere_Touching)
 
@@ -387,12 +387,12 @@ void SphereIntersectsSphere_Separate_Test(T precision) {
   c2[0] = static_cast<T>(10);
   mathkata::Sphere<T, N> s1(c1, static_cast<T>(2));
   mathkata::Sphere<T, N> s2(c2, static_cast<T>(2));
-  EXPECT_FALSE(mathkata::SphereIntersectsSphere(s1, s2));
+  EXPECT_FALSE(mathkata::sphereIntersectsSphere(s1, s2));
 }
 TEST_ALL_DIMS_F(SphereIntersectsSphere_Separate)
 
 // ============================================================================
-// SphereIntersectsAABB tests
+// sphereIntersectsAABB tests
 // ============================================================================
 
 template <class T, int N>
@@ -404,7 +404,7 @@ void SphereIntersectsAABB_Overlap_Test(T precision) {
 
   mathkata::AABB<T, N> aabb(mathkata::Vector<T, N>(static_cast<T>(-1)),
                             mathkata::Vector<T, N>(static_cast<T>(1)));
-  EXPECT_TRUE(mathkata::SphereIntersectsAABB(sphere, aabb));
+  EXPECT_TRUE(mathkata::sphereIntersectsAABB(sphere, aabb));
 }
 TEST_ALL_DIMS_F(SphereIntersectsAABB_Overlap)
 
@@ -417,7 +417,7 @@ void SphereIntersectsAABB_Separate_Test(T precision) {
 
   mathkata::AABB<T, N> aabb(mathkata::Vector<T, N>(static_cast<T>(-1)),
                             mathkata::Vector<T, N>(static_cast<T>(1)));
-  EXPECT_FALSE(mathkata::SphereIntersectsAABB(sphere, aabb));
+  EXPECT_FALSE(mathkata::sphereIntersectsAABB(sphere, aabb));
 }
 TEST_ALL_DIMS_F(SphereIntersectsAABB_Separate)
 
@@ -429,12 +429,12 @@ void SphereIntersectsAABB_SphereInsideAABB_Test(T precision) {
 
   mathkata::AABB<T, N> aabb(mathkata::Vector<T, N>(static_cast<T>(-5)),
                             mathkata::Vector<T, N>(static_cast<T>(5)));
-  EXPECT_TRUE(mathkata::SphereIntersectsAABB(sphere, aabb));
+  EXPECT_TRUE(mathkata::sphereIntersectsAABB(sphere, aabb));
 }
 TEST_ALL_DIMS_F(SphereIntersectsAABB_SphereInsideAABB)
 
 // ============================================================================
-// PointInAABB tests
+// pointInAABB tests
 // ============================================================================
 
 template <class T, int N>
@@ -443,7 +443,7 @@ void PointInAABB_Inside_Test(T precision) {
   mathkata::Vector<T, N> point(static_cast<T>(0));
   mathkata::AABB<T, N> aabb(mathkata::Vector<T, N>(static_cast<T>(-1)),
                             mathkata::Vector<T, N>(static_cast<T>(1)));
-  EXPECT_TRUE(mathkata::PointInAABB(point, aabb));
+  EXPECT_TRUE(mathkata::pointInAABB(point, aabb));
 }
 TEST_ALL_DIMS_F(PointInAABB_Inside)
 
@@ -453,7 +453,7 @@ void PointInAABB_Outside_Test(T precision) {
   mathkata::Vector<T, N> point(static_cast<T>(5));
   mathkata::AABB<T, N> aabb(mathkata::Vector<T, N>(static_cast<T>(-1)),
                             mathkata::Vector<T, N>(static_cast<T>(1)));
-  EXPECT_FALSE(mathkata::PointInAABB(point, aabb));
+  EXPECT_FALSE(mathkata::pointInAABB(point, aabb));
 }
 TEST_ALL_DIMS_F(PointInAABB_Outside)
 
@@ -463,12 +463,12 @@ void PointInAABB_OnBoundary_Test(T precision) {
   mathkata::Vector<T, N> point(static_cast<T>(1));
   mathkata::AABB<T, N> aabb(mathkata::Vector<T, N>(static_cast<T>(-1)),
                             mathkata::Vector<T, N>(static_cast<T>(1)));
-  EXPECT_TRUE(mathkata::PointInAABB(point, aabb));
+  EXPECT_TRUE(mathkata::pointInAABB(point, aabb));
 }
 TEST_ALL_DIMS_F(PointInAABB_OnBoundary)
 
 // ============================================================================
-// PointInSphere tests
+// pointInSphere tests
 // ============================================================================
 
 template <class T, int N>
@@ -477,7 +477,7 @@ void PointInSphere_Inside_Test(T precision) {
   mathkata::Vector<T, N> point(static_cast<T>(0));
   mathkata::Vector<T, N> center(static_cast<T>(0));
   mathkata::Sphere<T, N> sphere(center, static_cast<T>(5));
-  EXPECT_TRUE(mathkata::PointInSphere(point, sphere));
+  EXPECT_TRUE(mathkata::pointInSphere(point, sphere));
 }
 TEST_ALL_DIMS_F(PointInSphere_Inside)
 
@@ -487,7 +487,7 @@ void PointInSphere_Outside_Test(T precision) {
   mathkata::Vector<T, N> point(static_cast<T>(10));
   mathkata::Vector<T, N> center(static_cast<T>(0));
   mathkata::Sphere<T, N> sphere(center, static_cast<T>(1));
-  EXPECT_FALSE(mathkata::PointInSphere(point, sphere));
+  EXPECT_FALSE(mathkata::pointInSphere(point, sphere));
 }
 TEST_ALL_DIMS_F(PointInSphere_Outside)
 
@@ -498,12 +498,12 @@ void PointInSphere_OnBoundary_Test(T precision) {
   point[0] = static_cast<T>(3);
   mathkata::Vector<T, N> center(static_cast<T>(0));
   mathkata::Sphere<T, N> sphere(center, static_cast<T>(3));
-  EXPECT_TRUE(mathkata::PointInSphere(point, sphere));
+  EXPECT_TRUE(mathkata::pointInSphere(point, sphere));
 }
 TEST_ALL_DIMS_F(PointInSphere_OnBoundary)
 
 // ============================================================================
-// PointOnPlane tests (3D only)
+// pointOnPlane tests (3D only)
 // ============================================================================
 
 template <class T>
@@ -515,7 +515,7 @@ void PointOnPlane_OnPlane_Test(T precision) {
   // Point at y=3 should be on the plane y=3.
   mathkata::Vector<T, 3> point(static_cast<T>(1), static_cast<T>(3),
                                static_cast<T>(2));
-  EXPECT_TRUE(mathkata::PointOnPlane(point, plane, precision));
+  EXPECT_TRUE(mathkata::pointOnPlane(point, plane, precision));
 }
 TEST_3D_F(PointOnPlane_OnPlane)
 
@@ -528,7 +528,7 @@ void PointOnPlane_OffPlane_Test(T precision) {
   // Point at y=5 should NOT be on the plane y=3.
   mathkata::Vector<T, 3> point(static_cast<T>(1), static_cast<T>(5),
                                static_cast<T>(2));
-  EXPECT_FALSE(mathkata::PointOnPlane(point, plane, precision));
+  EXPECT_FALSE(mathkata::pointOnPlane(point, plane, precision));
 }
 TEST_3D_F(PointOnPlane_OffPlane)
 
@@ -542,7 +542,7 @@ void PointOnPlane_NearPlane_Test(T precision) {
   mathkata::Vector<T, 3> point(static_cast<T>(1), static_cast<T>(2),
                                precision * static_cast<T>(0.5));
   EXPECT_TRUE(
-      mathkata::PointOnPlane(point, plane, precision * static_cast<T>(2)));
+      mathkata::pointOnPlane(point, plane, precision * static_cast<T>(2)));
 }
 TEST_3D_F(PointOnPlane_NearPlane)
 

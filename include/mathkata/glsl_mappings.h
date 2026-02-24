@@ -92,7 +92,7 @@ typedef AffineTransform2D<float> affine2d;
 /// RGBA color with 8-bit components.
 typedef Color color;
 
-/// @brief Reflect incident vector off a surface with the given normal.
+/// @brief reflect incident vector off a surface with the given normal.
 ///
 /// @param incident The incoming direction vector.
 /// @param normal The surface normal (must be normalized).
@@ -101,7 +101,7 @@ typedef Color color;
 template <class T, int d>
 inline Vector<T, d> reflect(const Vector<T, d>& incident,
                             const Vector<T, d>& normal) {
-  return Vector<T, d>::Reflect(incident, normal);
+  return Vector<T, d>::reflect(incident, normal);
 }
 
 /// @brief Compute the refracted direction using Snell's law.
@@ -115,7 +115,7 @@ inline Vector<T, d> reflect(const Vector<T, d>& incident,
 template <class T, int d>
 inline Vector<T, d> refract(const Vector<T, d>& incident,
                             const Vector<T, d>& normal, T eta) {
-  return Vector<T, d>::Refract(incident, normal, eta);
+  return Vector<T, d>::refract(incident, normal, eta);
 }
 
 /// @}

@@ -58,101 +58,101 @@ class Vector<T, 2> {
 
   constexpr const Vector<T, 2> xy() const { return Vector<T, 2>(x, y); }
 
-  constexpr void Pack(VectorPacked<T, 2>* const vector) const {
+  constexpr void pack(VectorPacked<T, 2>* const vector) const {
     vector->x = x;
     vector->y = y;
   }
 
-  constexpr T LengthSquared() const { return LengthSquaredHelper(*this); }
+  constexpr T lengthSquared() const { return lengthSquaredHelper(*this); }
 
-  inline T Length() const { return LengthHelper(*this); }
+  inline T length() const { return lengthHelper(*this); }
 
-  inline T Normalize() { return NormalizeHelper(*this); }
+  inline T normalize() { return normalizeHelper(*this); }
 
-  inline Vector<T, 2> Normalized() const { return NormalizedHelper(*this); }
+  inline Vector<T, 2> normalized() const { return normalizedHelper(*this); }
 
   template <typename CompatibleT>
-  static inline Vector<T, 2> FromType(const CompatibleT& compatible) {
-    return FromTypeHelper<T, Dims, CompatibleT>(compatible);
+  static inline Vector<T, 2> fromType(const CompatibleT& compatible) {
+    return fromTypeHelper<T, Dims, CompatibleT>(compatible);
   }
 
   template <typename CompatibleT>
-  static inline CompatibleT ToType(const Vector<T, 2>& v) {
-    return ToTypeHelper<T, Dims, CompatibleT>(v);
+  static inline CompatibleT toType(const Vector<T, 2>& v) {
+    return toTypeHelper<T, Dims, CompatibleT>(v);
   }
 
-  static constexpr T DotProduct(const Vector<T, 2>& v1,
+  static constexpr T dotProduct(const Vector<T, 2>& v1,
                                 const Vector<T, 2>& v2) {
-    return DotProductHelper(v1, v2);
+    return dotProductHelper(v1, v2);
   }
 
-  static constexpr Vector<T, 2> HadamardProduct(const Vector<T, 2>& v1,
+  static constexpr Vector<T, 2> hadamardProduct(const Vector<T, 2>& v1,
                                                 const Vector<T, 2>& v2) {
-    return HadamardProductHelper(v1, v2);
+    return hadamardProductHelper(v1, v2);
   }
 
-  static constexpr Vector<T, 2> HadamardDivide(const Vector<T, 2>& v1,
+  static constexpr Vector<T, 2> hadamardDivide(const Vector<T, 2>& v1,
                                                const Vector<T, 2>& v2) {
-    return HadamardDivideHelper(v1, v2);
+    return hadamardDivideHelper(v1, v2);
   }
 
-  static constexpr Vector<T, 2> Lerp(const Vector<T, 2>& v1,
+  static constexpr Vector<T, 2> lerp(const Vector<T, 2>& v1,
                                      const Vector<T, 2>& v2, const T percent) {
-    return LerpHelper(v1, v2, percent);
+    return lerpHelper(v1, v2, percent);
   }
 
-  static constexpr bool InRange(const Vector<T, 2>& val,
+  static constexpr bool inRange(const Vector<T, 2>& val,
                                 const Vector<T, 2>& range_start,
                                 const Vector<T, 2>& range_end) {
-    return InRangeHelper(val, range_start, range_end);
+    return inRangeHelper(val, range_start, range_end);
   }
 
-  static constexpr Vector<T, 2> Max(const Vector<T, 2>& v1,
+  static constexpr Vector<T, 2> max(const Vector<T, 2>& v1,
                                     const Vector<T, 2>& v2) {
-    return MaxHelper(v1, v2);
+    return maxHelper(v1, v2);
   }
 
-  static constexpr Vector<T, 2> Min(const Vector<T, 2>& v1,
+  static constexpr Vector<T, 2> min(const Vector<T, 2>& v1,
                                     const Vector<T, 2>& v2) {
-    return MinHelper(v1, v2);
+    return minHelper(v1, v2);
   }
 
-  static inline T Distance(const Vector<T, 2>& v1, const Vector<T, 2>& v2) {
-    return (v1 - v2).Length();
+  static inline T distance(const Vector<T, 2>& v1, const Vector<T, 2>& v2) {
+    return (v1 - v2).length();
   }
 
-  static constexpr T DistanceSquared(const Vector<T, 2>& v1,
+  static constexpr T distanceSquared(const Vector<T, 2>& v1,
                                      const Vector<T, 2>& v2) {
-    return (v1 - v2).LengthSquared();
+    return (v1 - v2).lengthSquared();
   }
 
-  static constexpr T CrossProduct(const Vector<T, 2>& v1,
+  static constexpr T crossProduct(const Vector<T, 2>& v1,
                                   const Vector<T, 2>& v2) {
-    return CrossProductHelper(v1, v2);
+    return crossProductHelper(v1, v2);
   }
 
-  static inline T Angle(const Vector<T, 2>& v1, const Vector<T, 2>& v2) {
-    return AngleHelper(v1, v2);
+  static inline T angle(const Vector<T, 2>& v1, const Vector<T, 2>& v2) {
+    return angleHelper(v1, v2);
   }
 
-  static constexpr Vector<T, 2> Project(const Vector<T, 2>& v,
+  static constexpr Vector<T, 2> project(const Vector<T, 2>& v,
                                         const Vector<T, 2>& onto) {
-    return ProjectHelper(v, onto);
+    return projectHelper(v, onto);
   }
 
-  static constexpr Vector<T, 2> Reject(const Vector<T, 2>& v,
+  static constexpr Vector<T, 2> reject(const Vector<T, 2>& v,
                                        const Vector<T, 2>& from) {
-    return RejectHelper(v, from);
+    return rejectHelper(v, from);
   }
 
-  static constexpr Vector<T, 2> Reflect(const Vector<T, 2>& incident,
+  static constexpr Vector<T, 2> reflect(const Vector<T, 2>& incident,
                                         const Vector<T, 2>& normal) {
-    return ReflectHelper(incident, normal);
+    return reflectHelper(incident, normal);
   }
 
-  static inline Vector<T, 2> Refract(const Vector<T, 2>& incident,
+  static inline Vector<T, 2> refract(const Vector<T, 2>& incident,
                                      const Vector<T, 2>& normal, T eta) {
-    return RefractHelper(incident, normal, eta);
+    return refractHelper(incident, normal, eta);
   }
 
   MATHKATA_DEFINE_CLASS_SIMD_AWARE_NEW_DELETE
@@ -177,7 +177,7 @@ struct VectorPacked<T, 2> {
   ///
   /// Both VectorPacked and Vector must have the same number of dimensions.
   /// @param vector Vector to create the VectorPacked from.
-  explicit VectorPacked(const Vector<T, 2>& vector) { vector.Pack(this); }
+  explicit VectorPacked(const Vector<T, 2>& vector) { vector.pack(this); }
 
   /// Copy a Vector to a VectorPacked.
   ///
@@ -185,7 +185,7 @@ struct VectorPacked<T, 2> {
   /// @param vector Vector to copy to the VectorPacked.
   /// @returns A reference to this VectorPacked.
   VectorPacked& operator=(const Vector<T, 2>& vector) {
-    vector.Pack(this);
+    vector.pack(this);
     return *this;
   }
 

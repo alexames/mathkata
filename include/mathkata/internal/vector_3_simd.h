@@ -152,7 +152,7 @@ class Vector<float, 3> {
   inline Vector<float, 2> xy() { return Vector<float, 2>(x, y); }
   inline const Vector<float, 2> xy() const { return Vector<float, 2>(x, y); }
 
-  inline void Pack(VectorPacked<float, 3>* const vector) const {
+  inline void pack(VectorPacked<float, 3>* const vector) const {
 #ifdef MATHKATA_COMPILE_WITH_PADDING
     simd4f_ustore3(simd3, vector->data_);
 #else
@@ -264,27 +264,26 @@ class Vector<float, 3> {
     return !operator==(v);
   }
 
-  inline float LengthSquared() const {
+  inline float lengthSquared() const {
     return simd4f_dot3_scalar(MATHKATA_VECTOR3_LOAD3(*this),
                               MATHKATA_VECTOR3_LOAD3(*this));
   }
 
-  inline float Length() const {
+  inline float length() const {
     return simd4f_get_x(simd4f_length3(MATHKATA_VECTOR3_LOAD3(*this)));
   }
 
-  /// @brief Normalize this vector in-place.
+  /// @brief normalize this vector in-place.
   ///
   /// The vector must have non-zero length. Normalizing a zero-length vector
   /// produces undefined results.
   ///
   /// @return The length of this vector.
-  inline float Normalize() {
-    const float length = Length();
+  inline float normalize() {
+    const float len = length();
     MATHKATA_VECTOR3_STORE3(
-        simd4f_mul(MATHKATA_VECTOR3_LOAD3(*this), simd4f_splat(1 / length)),
-        *this)
-    return length;
+        simd4f_mul(MATHKATA_VECTOR3_LOAD3(*this), simd4f_splat(1 / len)), *this)
+    return len;
   }
 
   /// @brief Calculate the normalized version of this vector.
@@ -293,45 +292,45 @@ class Vector<float, 3> {
   /// produces undefined results.
   ///
   /// @return The normalized vector.
-  inline Vector<float, 3> Normalized() const {
+  inline Vector<float, 3> normalized() const {
     return Vector<float, 3>(simd4f_normalize3(MATHKATA_VECTOR3_LOAD3(*this)));
   }
 
   template <typename CompatibleT>
-  static inline Vector<float, 3> FromType(const CompatibleT& compatible) {
-    return FromTypeHelper<float, 3, CompatibleT>(compatible);
+  static inline Vector<float, 3> fromType(const CompatibleT& compatible) {
+    return fromTypeHelper<float, 3, CompatibleT>(compatible);
   }
 
   template <typename CompatibleT>
-  static inline CompatibleT ToType(const Vector<float, 3>& v) {
-    return ToTypeHelper<float, 3, CompatibleT>(v);
+  static inline CompatibleT toType(const Vector<float, 3>& v) {
+    return toTypeHelper<float, 3, CompatibleT>(v);
   }
 
-  static inline float DotProduct(const Vector<float, 3>& v1,
+  static inline float dotProduct(const Vector<float, 3>& v1,
                                  const Vector<float, 3>& v2) {
     return simd4f_dot3_scalar(MATHKATA_VECTOR3_LOAD3(v1),
                               MATHKATA_VECTOR3_LOAD3(v2));
   }
 
-  static inline Vector<float, 3> CrossProduct(const Vector<float, 3>& v1,
+  static inline Vector<float, 3> crossProduct(const Vector<float, 3>& v1,
                                               const Vector<float, 3>& v2) {
     return Vector<float, 3>(
         simd4f_cross3(MATHKATA_VECTOR3_LOAD3(v1), MATHKATA_VECTOR3_LOAD3(v2)));
   }
 
-  static inline Vector<float, 3> HadamardProduct(const Vector<float, 3>& v1,
+  static inline Vector<float, 3> hadamardProduct(const Vector<float, 3>& v1,
                                                  const Vector<float, 3>& v2) {
     return Vector<float, 3>(
         simd4f_mul(MATHKATA_VECTOR3_LOAD3(v1), MATHKATA_VECTOR3_LOAD3(v2)));
   }
 
-  static inline Vector<float, 3> HadamardDivide(const Vector<float, 3>& v1,
+  static inline Vector<float, 3> hadamardDivide(const Vector<float, 3>& v1,
                                                 const Vector<float, 3>& v2) {
     return Vector<float, 3>(
         simd4f_div(MATHKATA_VECTOR3_LOAD3(v1), MATHKATA_VECTOR3_LOAD3(v2)));
   }
 
-  static inline Vector<float, 3> Lerp(const Vector<float, 3>& v1,
+  static inline Vector<float, 3> lerp(const Vector<float, 3>& v1,
                                       const Vector<float, 3>& v2,
                                       float percent) {
     const simd4f percentv = simd4f_splat(percent);
@@ -341,13 +340,13 @@ class Vector<float, 3> {
         simd4f_add(v1s, simd4f_mul(simd4f_sub(v2s, v1s), percentv)));
   }
 
-  static inline bool InRange(const Vector<float, 3>& val,
+  static inline bool inRange(const Vector<float, 3>& val,
                              const Vector<float, 3>& range_start,
                              const Vector<float, 3>& range_end) {
-    return InRangeHelper(val, range_start, range_end);
+    return inRangeHelper(val, range_start, range_end);
   }
 
-  static inline Vector<float, 3> Max(const Vector<float, 3>& v1,
+  static inline Vector<float, 3> max(const Vector<float, 3>& v1,
                                      const Vector<float, 3>& v2) {
 #ifdef MATHKATA_COMPILE_WITH_PADDING
     return Vector<float, 3>(
@@ -358,7 +357,7 @@ class Vector<float, 3> {
 #endif  // MATHKATA_COMPILE_WITH_PADDING
   }
 
-  static inline Vector<float, 3> Min(const Vector<float, 3>& v1,
+  static inline Vector<float, 3> min(const Vector<float, 3>& v1,
                                      const Vector<float, 3>& v2) {
 #ifdef MATHKATA_COMPILE_WITH_PADDING
     return Vector<float, 3>(
@@ -369,40 +368,40 @@ class Vector<float, 3> {
 #endif  // MATHKATA_COMPILE_WITH_PADDING
   }
 
-  static inline float Distance(const Vector<float, 3>& v1,
+  static inline float distance(const Vector<float, 3>& v1,
                                const Vector<float, 3>& v2) {
-    return (v1 - v2).Length();
+    return (v1 - v2).length();
   }
 
-  static inline float DistanceSquared(const Vector<float, 3>& v1,
+  static inline float distanceSquared(const Vector<float, 3>& v1,
                                       const Vector<float, 3>& v2) {
-    return (v1 - v2).LengthSquared();
+    return (v1 - v2).lengthSquared();
   }
 
-  static inline float Angle(const Vector<float, 3>& v1,
+  static inline float angle(const Vector<float, 3>& v1,
                             const Vector<float, 3>& v2) {
-    return AngleHelper(v1, v2);
+    return angleHelper(v1, v2);
   }
 
-  static inline Vector<float, 3> Project(const Vector<float, 3>& v,
+  static inline Vector<float, 3> project(const Vector<float, 3>& v,
                                          const Vector<float, 3>& onto) {
-    return ProjectHelper(v, onto);
+    return projectHelper(v, onto);
   }
 
-  static inline Vector<float, 3> Reject(const Vector<float, 3>& v,
+  static inline Vector<float, 3> reject(const Vector<float, 3>& v,
                                         const Vector<float, 3>& from) {
-    return RejectHelper(v, from);
+    return rejectHelper(v, from);
   }
 
-  static inline Vector<float, 3> Reflect(const Vector<float, 3>& incident,
+  static inline Vector<float, 3> reflect(const Vector<float, 3>& incident,
                                          const Vector<float, 3>& normal) {
-    return ReflectHelper(incident, normal);
+    return reflectHelper(incident, normal);
   }
 
-  static inline Vector<float, 3> Refract(const Vector<float, 3>& incident,
+  static inline Vector<float, 3> refract(const Vector<float, 3>& incident,
                                          const Vector<float, 3>& normal,
                                          float eta) {
-    return RefractHelper(incident, normal, eta);
+    return refractHelper(incident, normal, eta);
   }
 
   MATHKATA_DEFINE_CLASS_SIMD_AWARE_NEW_DELETE

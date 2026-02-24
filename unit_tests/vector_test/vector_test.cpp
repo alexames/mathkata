@@ -370,7 +370,7 @@ void Mul_Test(const T& precision) {
   mathkata::Vector<T, d> vector1(x1), vector2(x2);
 
   mathkata::Vector<T, d> mul_vector(
-      mathkata::Vector<T, d>::HadamardProduct(vector1, vector2));
+      mathkata::Vector<T, d>::hadamardProduct(vector1, vector2));
   for (int i = 0; i < d; ++i) {
     EXPECT_NEAR(x1[i] * x2[i], mul_vector[i], precision);
   }
@@ -404,7 +404,7 @@ void Div_Test(const T& precision) {
   mathkata::Vector<T, d> vector1(x1), vector2(x2);
 
   mathkata::Vector<T, d> div_vector_vector(
-      mathkata::Vector<T, d>::HadamardDivide(vector1, vector2));
+      mathkata::Vector<T, d>::hadamardDivide(vector1, vector2));
   for (int i = 0; i < d; ++i) {
     EXPECT_NEAR(x1[i] / x2[i], div_vector_vector[i], precision);
   }
@@ -434,9 +434,9 @@ void Norm_Test(const T& precision) {
   }
 
   mathkata::Vector<T, d> vector(x);
-  vector.Normalize();
+  vector.normalize();
   // This will verify that the dot product is 1.
-  T dot = mathkata::Vector<T, d>::DotProduct(vector, vector);
+  T dot = mathkata::Vector<T, d>::dotProduct(vector, vector);
   EXPECT_NEAR(dot, 1, precision);
 }
 TEST_ALL_F(Norm)
@@ -462,7 +462,7 @@ void Dot_Test(const T& precision) {
     my_dot += x1[i] * x2[i];
   }
 
-  T vec_dot = mathkata::Vector<T, d>::DotProduct(vector1, vector2);
+  T vec_dot = mathkata::Vector<T, d>::dotProduct(vector1, vector2);
   EXPECT_NEAR(my_dot, vec_dot, precision);
 }
 TEST_ALL_F(Dot)
@@ -474,13 +474,13 @@ void Cross_Test(const T& precision) {
                                    static_cast<T>(9.8));
   mathkata::Vector<T, 3> f2_vector(-static_cast<T>(1.4), static_cast<T>(9.5),
                                    static_cast<T>(3.2));
-  f1_vector.Normalize();
-  f2_vector.Normalize();
+  f1_vector.normalize();
+  f2_vector.normalize();
   mathkata::Vector<T, 3> fcross_vector(
-      mathkata::Vector<T, 3>::CrossProduct(f1_vector, f2_vector));
+      mathkata::Vector<T, 3>::crossProduct(f1_vector, f2_vector));
   // This will verify that v1*(v1xv2) and v2*(v1xv2) are 0.
-  T f1_dot = mathkata::Vector<T, 3>::DotProduct(fcross_vector, f1_vector);
-  T f2_dot = mathkata::Vector<T, 3>::DotProduct(fcross_vector, f2_vector);
+  T f1_dot = mathkata::Vector<T, 3>::dotProduct(fcross_vector, f1_vector);
+  T f2_dot = mathkata::Vector<T, 3>::dotProduct(fcross_vector, f2_vector);
   EXPECT_NEAR(f1_dot, 0, precision * 10);
   EXPECT_NEAR(f2_dot, 0, precision * 10);
 }
@@ -492,7 +492,7 @@ template <class T>
 void CrossProduct2D_Perpendicular_Test(const T& precision) {
   mathkata::Vector<T, 2> v1(static_cast<T>(3), static_cast<T>(0));
   mathkata::Vector<T, 2> v2(static_cast<T>(0), static_cast<T>(5));
-  T result = mathkata::Vector<T, 2>::CrossProduct(v1, v2);
+  T result = mathkata::Vector<T, 2>::crossProduct(v1, v2);
   EXPECT_NEAR(static_cast<T>(15), result, precision);
 }
 TEST_SCALAR_F(CrossProduct2D_Perpendicular)
@@ -502,7 +502,7 @@ template <class T>
 void CrossProduct2D_Parallel_Test(const T& precision) {
   mathkata::Vector<T, 2> v1(static_cast<T>(2), static_cast<T>(3));
   mathkata::Vector<T, 2> v2(static_cast<T>(4), static_cast<T>(6));
-  T result = mathkata::Vector<T, 2>::CrossProduct(v1, v2);
+  T result = mathkata::Vector<T, 2>::crossProduct(v1, v2);
   EXPECT_NEAR(static_cast<T>(0), result, precision);
 }
 TEST_SCALAR_F(CrossProduct2D_Parallel)
@@ -512,7 +512,7 @@ template <class T>
 void CrossProduct2D_AntiParallel_Test(const T& precision) {
   mathkata::Vector<T, 2> v1(static_cast<T>(2), static_cast<T>(3));
   mathkata::Vector<T, 2> v2(static_cast<T>(-4), static_cast<T>(-6));
-  T result = mathkata::Vector<T, 2>::CrossProduct(v1, v2);
+  T result = mathkata::Vector<T, 2>::crossProduct(v1, v2);
   EXPECT_NEAR(static_cast<T>(0), result, precision);
 }
 TEST_SCALAR_F(CrossProduct2D_AntiParallel)
@@ -523,7 +523,7 @@ void CrossProduct2D_CounterClockwise_Test(const T& precision) {
   // v1 along +x, v2 along +y is counter-clockwise.
   mathkata::Vector<T, 2> v1(static_cast<T>(1), static_cast<T>(0));
   mathkata::Vector<T, 2> v2(static_cast<T>(0), static_cast<T>(1));
-  T result = mathkata::Vector<T, 2>::CrossProduct(v1, v2);
+  T result = mathkata::Vector<T, 2>::crossProduct(v1, v2);
   EXPECT_GT(result, static_cast<T>(0));
   (void)precision;
 }
@@ -535,7 +535,7 @@ void CrossProduct2D_Clockwise_Test(const T& precision) {
   // v1 along +y, v2 along +x is clockwise.
   mathkata::Vector<T, 2> v1(static_cast<T>(0), static_cast<T>(1));
   mathkata::Vector<T, 2> v2(static_cast<T>(1), static_cast<T>(0));
-  T result = mathkata::Vector<T, 2>::CrossProduct(v1, v2);
+  T result = mathkata::Vector<T, 2>::crossProduct(v1, v2);
   EXPECT_LT(result, static_cast<T>(0));
   (void)precision;
 }
@@ -545,7 +545,7 @@ TEST_SCALAR_F(CrossProduct2D_Clockwise)
 template <class T>
 void CrossProduct2D_Self_Test(const T& precision) {
   mathkata::Vector<T, 2> v(static_cast<T>(7), static_cast<T>(11));
-  T result = mathkata::Vector<T, 2>::CrossProduct(v, v);
+  T result = mathkata::Vector<T, 2>::crossProduct(v, v);
   EXPECT_NEAR(static_cast<T>(0), result, precision);
 }
 TEST_SCALAR_F(CrossProduct2D_Self)
@@ -566,7 +566,7 @@ void LerpHalf_Test(const T& precision) {
   mathkata::Vector<T, d> vector1(RandomVector<T, d>());
   mathkata::Vector<T, d> vector2(RandomVector<T, d>());
   mathkata::Vector<T, d> flerp_vector(
-      mathkata::Vector<T, d>::Lerp(vector1, vector2, static_cast<T>(0.5)));
+      mathkata::Vector<T, d>::lerp(vector1, vector2, static_cast<T>(0.5)));
   // This will verify f1_vector.x + f2_vector.x == 2 * flerp_vector
   for (int i = 0; i < d; ++i) {
     EXPECT_NEAR(vector1[i] + vector2[i], static_cast<T>(2.0) * flerp_vector[i],
@@ -581,7 +581,7 @@ void Lerp0_Test(const T& precision) {
   mathkata::Vector<T, d> vector1(RandomVector<T, d>());
   mathkata::Vector<T, d> vector2(RandomVector<T, d>());
   mathkata::Vector<T, d> flerp_vector(
-      mathkata::Vector<T, d>::Lerp(vector1, vector2, static_cast<T>(0.0)));
+      mathkata::Vector<T, d>::lerp(vector1, vector2, static_cast<T>(0.0)));
   // This will verify f1_vector.x + f2_vector.x == 2 * flerp_vector
   for (int i = 0; i < d; ++i) {
     EXPECT_NEAR(vector1[i], flerp_vector[i], precision * 10);
@@ -595,7 +595,7 @@ void Lerp1_Test(const T& precision) {
   mathkata::Vector<T, d> vector1(RandomVector<T, d>());
   mathkata::Vector<T, d> vector2(RandomVector<T, d>());
   mathkata::Vector<T, d> flerp_vector(
-      mathkata::Vector<T, d>::Lerp(vector1, vector2, static_cast<T>(1.0)));
+      mathkata::Vector<T, d>::lerp(vector1, vector2, static_cast<T>(1.0)));
   // This will verify f1_vector.x + f2_vector.x == 2 * flerp_vector
   for (int i = 0; i < d; ++i) {
     EXPECT_NEAR(vector2[i], flerp_vector[i], precision * 10);
@@ -605,23 +605,23 @@ TEST_ALL_F(Lerp1)
 
 // This will test initialization by specifying all values explicitly.
 template <class T>
-void Clamp_Test() {
+void clamp_Test() {
   const T min = static_cast<T>(-1);
   const T max = static_cast<T>(8);
   const T inside = static_cast<T>(7);
   const T above = static_cast<T>(9);
   const T below = static_cast<T>(-11);
 
-  EXPECT_EQ(mathkata::Clamp<T>(inside, min, max), inside);
-  EXPECT_EQ(mathkata::Clamp<T>(above, min, max), max);
-  EXPECT_EQ(mathkata::Clamp<T>(below, min, max), min);
-  EXPECT_EQ(mathkata::Clamp<T>(max, min, max), max);
-  EXPECT_EQ(mathkata::Clamp<T>(min, min, max), min);
+  EXPECT_EQ(mathkata::clamp<T>(inside, min, max), inside);
+  EXPECT_EQ(mathkata::clamp<T>(above, min, max), max);
+  EXPECT_EQ(mathkata::clamp<T>(below, min, max), min);
+  EXPECT_EQ(mathkata::clamp<T>(max, min, max), max);
+  EXPECT_EQ(mathkata::clamp<T>(min, min, max), min);
 }
-TEST_F(VectorTests, Clamp) {
-  Clamp_Test<float>();
-  Clamp_Test<double>();
-  Clamp_Test<int>();
+TEST_F(VectorTests, clamp) {
+  clamp_Test<float>();
+  clamp_Test<double>();
+  clamp_Test<int>();
 }
 
 // Tests for int/float/double based lerp.  (i. e. not part of a vector)
@@ -639,26 +639,26 @@ void Numeric_Lerp_Test(const T& precision) {
   const T two_fifths_result = static_cast<T>(14);
   const T seven_tenths_result = static_cast<T>(17);
 
-  EXPECT_EQ(mathkata::Lerp<T>(a, b, zero), a);
-  EXPECT_EQ(mathkata::Lerp<T>(a, b, one), b);
-  EXPECT_EQ(mathkata::Lerp<T>(-a, b, zero), -a);
-  EXPECT_EQ(mathkata::Lerp<T>(-a, b, one), b);
-  EXPECT_EQ(mathkata::Lerp<T>(a, -b, zero), a);
-  EXPECT_EQ(mathkata::Lerp<T>(a, -b, one), -b);
-  EXPECT_EQ(mathkata::Lerp<T>(-a, -b, zero), -a);
-  EXPECT_EQ(mathkata::Lerp<T>(-a, -b, one), -b);
+  EXPECT_EQ(mathkata::lerp<T>(a, b, zero), a);
+  EXPECT_EQ(mathkata::lerp<T>(a, b, one), b);
+  EXPECT_EQ(mathkata::lerp<T>(-a, b, zero), -a);
+  EXPECT_EQ(mathkata::lerp<T>(-a, b, one), b);
+  EXPECT_EQ(mathkata::lerp<T>(a, -b, zero), a);
+  EXPECT_EQ(mathkata::lerp<T>(a, -b, one), -b);
+  EXPECT_EQ(mathkata::lerp<T>(-a, -b, zero), -a);
+  EXPECT_EQ(mathkata::lerp<T>(-a, -b, one), -b);
 
-  EXPECT_NE(mathkata::Lerp<T>(a, b, midpoint), a);
+  EXPECT_NE(mathkata::lerp<T>(a, b, midpoint), a);
 
-  EXPECT_NEAR(mathkata::Lerp<T>(a, b, midpoint), midpoint_result, precision);
-  EXPECT_NEAR(mathkata::Lerp<T>(a, b, two_fifths), two_fifths_result,
+  EXPECT_NEAR(mathkata::lerp<T>(a, b, midpoint), midpoint_result, precision);
+  EXPECT_NEAR(mathkata::lerp<T>(a, b, two_fifths), two_fifths_result,
               precision);
-  EXPECT_NEAR(mathkata::Lerp<T>(a, b, seven_tenths), seven_tenths_result,
+  EXPECT_NEAR(mathkata::lerp<T>(a, b, seven_tenths), seven_tenths_result,
               precision);
 }
 TEST_SCALAR_F(Numeric_Lerp)
 
-// Tests the InRange function for vectors.
+// Tests the inRange function for vectors.
 // A vector should be in range when every component is within
 // [range_start..range_end).
 template <class T, int d>
@@ -678,27 +678,27 @@ void Vector_InRange_Test(const T& precision) {
   for (int i = 0; i < d; ++i) {
     mid[i] = static_cast<T>(i + 5);
   }
-  EXPECT_TRUE(mathkata::InRange(mid, range_start, range_end));
-  EXPECT_TRUE((mathkata::Vector<T, d>::InRange(mid, range_start, range_end)));
+  EXPECT_TRUE(mathkata::inRange(mid, range_start, range_end));
+  EXPECT_TRUE((mathkata::Vector<T, d>::inRange(mid, range_start, range_end)));
 
   // A value equal to range_start should be in range (inclusive).
-  EXPECT_TRUE(mathkata::InRange(range_start, range_start, range_end));
+  EXPECT_TRUE(mathkata::inRange(range_start, range_start, range_end));
 
   // A value equal to range_end should NOT be in range (non-inclusive).
-  EXPECT_FALSE(mathkata::InRange(range_end, range_start, range_end));
+  EXPECT_FALSE(mathkata::inRange(range_end, range_start, range_end));
 
   // A value with one component out of range should fail.
   for (int axis = 0; axis < d; ++axis) {
     mathkata::Vector<T, d> out_of_range = mid;
     out_of_range[axis] = static_cast<T>(axis + 11);
-    EXPECT_FALSE(mathkata::InRange(out_of_range, range_start, range_end));
+    EXPECT_FALSE(mathkata::inRange(out_of_range, range_start, range_end));
   }
 
   // A value with one component below the start should fail.
   for (int axis = 0; axis < d; ++axis) {
     mathkata::Vector<T, d> below_range = mid;
     below_range[axis] = static_cast<T>(axis - 1);
-    EXPECT_FALSE(mathkata::InRange(below_range, range_start, range_end));
+    EXPECT_FALSE(mathkata::inRange(below_range, range_start, range_end));
   }
 }
 TEST_ALL_F(Vector_InRange)
@@ -727,7 +727,7 @@ TEST_ALL_F(Accessor)
 // This will test initialization by passing in values. The template parameter d
 // corresponds to the size of the vector.
 template <class T, int d>
-void Max_Test(const T& precision) {
+void max_Test(const T& precision) {
   (void)precision;
   T value1[] = {0, 0, 0, 0, 0};
   T value2[] = {1, 2, 3, 4, 5};
@@ -735,14 +735,14 @@ void Max_Test(const T& precision) {
   mathkata::Vector<T, d> v2(value2);
 
   // vs. zero vector.
-  mathkata::Vector<T, d> v3 = mathkata::Vector<T, d>::Max(v1, v2);
+  mathkata::Vector<T, d> v3 = mathkata::Vector<T, d>::max(v1, v2);
 
   // Comparing to {1, 2, 3, 4, 5}
   mathkata::Vector<T, d> r1(value2);
   EXPECT_PRED_FORMAT2(AssertVectorEqual, v3, r1);
 
   // inverse vs. zero vector.
-  mathkata::Vector<T, d> v4 = mathkata::Vector<T, d>::Max(v2, v1);
+  mathkata::Vector<T, d> v4 = mathkata::Vector<T, d>::max(v2, v1);
 
   // Comparing to {1, 2, 3, 4, 5}
   EXPECT_PRED_FORMAT2(AssertVectorEqual, v4, r1);
@@ -750,7 +750,7 @@ void Max_Test(const T& precision) {
   // vs. negative vector.
   T negative_value[] = {-1, -2, -3, -4, -5};
   v2 = mathkata::Vector<T, d>(negative_value);
-  mathkata::Vector<T, d> v5 = mathkata::Vector<T, d>::Max(v1, v2);
+  mathkata::Vector<T, d> v5 = mathkata::Vector<T, d>::max(v1, v2);
 
   // Comparing to {0, 0, 0, 0, 0}
   mathkata::Vector<T, d> r2(value1);
@@ -761,18 +761,18 @@ void Max_Test(const T& precision) {
   T value4[] = {1, 0, 3, 0, 5};
   v1 = mathkata::Vector<T, d>(value3);
   v2 = mathkata::Vector<T, d>(value4);
-  mathkata::Vector<T, d> v6 = mathkata::Vector<T, d>::Max(v1, v2);
+  mathkata::Vector<T, d> v6 = mathkata::Vector<T, d>::max(v1, v2);
 
   // Comparing to {1, 2, 3, 4, 5}
   mathkata::Vector<T, d> r3(value2);
   EXPECT_PRED_FORMAT2(AssertVectorEqual, v6, r3);
 }
-TEST_ALL_F(Max)
+TEST_ALL_F(max)
 
 // This will test initialization by passing in values. The template parameter d
 // corresponds to the size of the vector.
 template <class T, int d>
-void Min_Test(const T& precision) {
+void min_Test(const T& precision) {
   (void)precision;
   T value1[] = {0, 0, 0, 0, 0};
   T value2[] = {1, 2, 3, 4, 5};
@@ -780,14 +780,14 @@ void Min_Test(const T& precision) {
   mathkata::Vector<T, d> v2(value2);
 
   // vs. zero vector.
-  mathkata::Vector<T, d> v3 = mathkata::Vector<T, d>::Min(v1, v2);
+  mathkata::Vector<T, d> v3 = mathkata::Vector<T, d>::min(v1, v2);
 
   // Comparing to {0, 0, 0, 0, 0}
   mathkata::Vector<T, d> r1(value1);
   EXPECT_PRED_FORMAT2(AssertVectorEqual, v3, r1);
 
   // inverse vs. zero vector.
-  mathkata::Vector<T, d> v4 = mathkata::Vector<T, d>::Min(v2, v1);
+  mathkata::Vector<T, d> v4 = mathkata::Vector<T, d>::min(v2, v1);
 
   // Comparing to {0, 0, 0, 0, 0}
   EXPECT_PRED_FORMAT2(AssertVectorEqual, v4, r1);
@@ -795,7 +795,7 @@ void Min_Test(const T& precision) {
   // vs. negative vector.
   T negative_value[] = {-1, -2, -3, -4, -5};
   v2 = mathkata::Vector<T, d>(negative_value);
-  mathkata::Vector<T, d> v5 = mathkata::Vector<T, d>::Min(v1, v2);
+  mathkata::Vector<T, d> v5 = mathkata::Vector<T, d>::min(v1, v2);
 
   // Comparing to {-1, -2, -3, -4, -5}
   mathkata::Vector<T, d> r2(negative_value);
@@ -806,19 +806,19 @@ void Min_Test(const T& precision) {
   T value4[] = {1, 0, 3, 0, 5};
   v1 = mathkata::Vector<T, d>(value3);
   v2 = mathkata::Vector<T, d>(value4);
-  mathkata::Vector<T, d> v6 = mathkata::Vector<T, d>::Min(v1, v2);
+  mathkata::Vector<T, d> v6 = mathkata::Vector<T, d>::min(v1, v2);
 
   // Comparing to {0, 0, 0, 0, 0}
   EXPECT_PRED_FORMAT2(AssertVectorEqual, v6, r1);
 }
-TEST_ALL_F(Min)
+TEST_ALL_F(min)
 
 // Test distance function for vector2.
 TEST_F(VectorTests, Distance_Vector2) {
   using namespace mathkata;
   const Vector<float, 2> a(0, 10);
   const Vector<float, 2> b(15, 12);
-  const float distance = Vector<float, 2>::Distance(a, b);
+  const float distance = Vector<float, 2>::distance(a, b);
   EXPECT_NEAR(distance, sqrtf(15 * 15 + 2 * 2), FLOAT_PRECISION);
 }
 
@@ -827,7 +827,7 @@ TEST_F(VectorTests, Distance_Vector3) {
   using namespace mathkata;
   const Vector<float, 3> a(0, 10, 3);
   const Vector<float, 3> b(15, 12, -4);
-  const float distance = Vector<float, 3>::Distance(a, b);
+  const float distance = Vector<float, 3>::distance(a, b);
   EXPECT_NEAR(distance, sqrtf(15 * 15 + 2 * 2 + 7 * 7), FLOAT_PRECISION);
 }
 
@@ -836,7 +836,7 @@ TEST_F(VectorTests, Distance_Vector4) {
   using namespace mathkata;
   const Vector<float, 4> a(9, 10, 3, 5);
   const Vector<float, 4> b(15, 12, -4, 1);
-  const float distance = Vector<float, 4>::Distance(a, b);
+  const float distance = Vector<float, 4>::distance(a, b);
   EXPECT_NEAR(distance, sqrtf(6 * 6 + 2 * 2 + 7 * 7 + 4 * 4), FLOAT_PRECISION);
 }
 
@@ -844,41 +844,41 @@ TEST_F(VectorTests, Angle_Vector2) {
   using Vec2 = mathkata::Vector<float, 2>;
   Vec2 a(0, 1);
   Vec2 b(1, 0);
-  EXPECT_NEAR(Vec2::Angle(a, b), mathkata::kPi / 2.0f, FLOAT_PRECISION);
+  EXPECT_NEAR(Vec2::angle(a, b), mathkata::kPi / 2.0f, FLOAT_PRECISION);
 
   a = Vec2(1, 1);
   b = Vec2(0, -1);
-  EXPECT_NEAR(Vec2::Angle(a, b), 3.0f * mathkata::kPi / 4.0f, FLOAT_PRECISION);
+  EXPECT_NEAR(Vec2::angle(a, b), 3.0f * mathkata::kPi / 4.0f, FLOAT_PRECISION);
 }
 
 TEST_F(VectorTests, Angle_Vector3) {
   using Vec3 = mathkata::Vector<float, 3>;
   Vec3 a(0, 0, 1);
   Vec3 b(0, 1, 0);
-  EXPECT_NEAR(Vec3::Angle(a, b), mathkata::kPi / 2.0f, FLOAT_PRECISION);
+  EXPECT_NEAR(Vec3::angle(a, b), mathkata::kPi / 2.0f, FLOAT_PRECISION);
 
   a = Vec3(1, 2, 3);
   b = Vec3(-10, 3, -1);
-  EXPECT_NEAR(Vec3::Angle(a, b), 1.75013259f, FLOAT_PRECISION);
+  EXPECT_NEAR(Vec3::angle(a, b), 1.75013259f, FLOAT_PRECISION);
 
   a = Vec3(1, 2, 3);
   b = Vec3(-1, -2, -3);
-  EXPECT_NEAR(Vec3::Angle(a, b), mathkata::kPi, FLOAT_PRECISION * 1000.f);
+  EXPECT_NEAR(Vec3::angle(a, b), mathkata::kPi, FLOAT_PRECISION * 1000.f);
 }
 
-// Test that AngleHelper does not return NaN for anti-parallel vectors where
+// Test that angleHelper does not return NaN for anti-parallel vectors where
 // floating point rounding pushes cos_val slightly below -1.
 TEST_F(VectorTests, Angle_AntiParallelDoesNotReturnNaN) {
   using Vec3 = mathkata::Vector<float, 3>;
   Vec3 a(1, 0, 0);
   Vec3 b(-1, 0, 0);
-  float angle = Vec3::Angle(a, b);
+  float angle = Vec3::angle(a, b);
   EXPECT_FALSE(std::isnan(angle));
   EXPECT_NEAR(angle, mathkata::kPi, FLOAT_PRECISION);
 
   // Also test with parallel vectors (cos_val near +1).
   b = Vec3(1, 0, 0);
-  angle = Vec3::Angle(a, b);
+  angle = Vec3::angle(a, b);
   EXPECT_FALSE(std::isnan(angle));
   EXPECT_NEAR(angle, 0.0f, FLOAT_PRECISION);
 }
@@ -889,7 +889,7 @@ TEST_F(VectorTests, Project_OntoAxis) {
   Vec3 v(3.0f, 4.0f, 0.0f);
   Vec3 x_axis(1.0f, 0.0f, 0.0f);
 
-  Vec3 proj = Vec3::Project(v, x_axis);
+  Vec3 proj = Vec3::project(v, x_axis);
   EXPECT_NEAR(proj[0], 3.0f, FLOAT_PRECISION);
   EXPECT_NEAR(proj[1], 0.0f, FLOAT_PRECISION);
   EXPECT_NEAR(proj[2], 0.0f, FLOAT_PRECISION);
@@ -901,7 +901,7 @@ TEST_F(VectorTests, Project_Parallel) {
   Vec3 v(2.0f, 4.0f, 6.0f);
   Vec3 onto(1.0f, 2.0f, 3.0f);
 
-  Vec3 proj = Vec3::Project(v, onto);
+  Vec3 proj = Vec3::project(v, onto);
   EXPECT_NEAR(proj[0], 2.0f, FLOAT_PRECISION);
   EXPECT_NEAR(proj[1], 4.0f, FLOAT_PRECISION);
   EXPECT_NEAR(proj[2], 6.0f, FLOAT_PRECISION);
@@ -913,7 +913,7 @@ TEST_F(VectorTests, Project_Perpendicular) {
   Vec3 v(0.0f, 1.0f, 0.0f);
   Vec3 onto(1.0f, 0.0f, 0.0f);
 
-  Vec3 proj = Vec3::Project(v, onto);
+  Vec3 proj = Vec3::project(v, onto);
   EXPECT_NEAR(proj[0], 0.0f, FLOAT_PRECISION);
   EXPECT_NEAR(proj[1], 0.0f, FLOAT_PRECISION);
   EXPECT_NEAR(proj[2], 0.0f, FLOAT_PRECISION);
@@ -925,12 +925,12 @@ TEST_F(VectorTests, Reject_PerpendicularToFrom) {
   Vec3 v(3.0f, 4.0f, 5.0f);
   Vec3 from(1.0f, 2.0f, 0.0f);
 
-  Vec3 rej = Vec3::Reject(v, from);
-  float dot = Vec3::DotProduct(rej, from);
+  Vec3 rej = Vec3::reject(v, from);
+  float dot = Vec3::dotProduct(rej, from);
   EXPECT_NEAR(dot, 0.0f, FLOAT_PRECISION * 10);
 }
 
-// Test that Project + Reject reconstructs the original vector.
+// Test that project + reject reconstructs the original vector.
 template <class T, int d>
 void ProjectRejectSum_Test(const T& precision) {
   mathkata::Vector<T, d> v(RandomVector<T, d>());
@@ -939,8 +939,8 @@ void ProjectRejectSum_Test(const T& precision) {
   // Ensure onto is non-zero by adding 1 to the first component.
   onto[0] += static_cast<T>(1);
 
-  mathkata::Vector<T, d> proj = mathkata::Vector<T, d>::Project(v, onto);
-  mathkata::Vector<T, d> rej = mathkata::Vector<T, d>::Reject(v, onto);
+  mathkata::Vector<T, d> proj = mathkata::Vector<T, d>::project(v, onto);
+  mathkata::Vector<T, d> rej = mathkata::Vector<T, d>::reject(v, onto);
   mathkata::Vector<T, d> sum = proj + rej;
 
   for (int i = 0; i < d; ++i) {
@@ -949,13 +949,13 @@ void ProjectRejectSum_Test(const T& precision) {
 }
 TEST_ALL_F(ProjectRejectSum)
 
-// Test the free function versions of Project and Reject.
+// Test the free function versions of project and reject.
 TEST_F(VectorTests, Project_FreeFunction) {
   using Vec2 = mathkata::Vector<float, 2>;
   Vec2 v(3.0f, 4.0f);
   Vec2 onto(1.0f, 0.0f);
 
-  Vec2 proj = mathkata::Project(v, onto);
+  Vec2 proj = mathkata::project(v, onto);
   EXPECT_NEAR(proj[0], 3.0f, FLOAT_PRECISION);
   EXPECT_NEAR(proj[1], 0.0f, FLOAT_PRECISION);
 }
@@ -965,15 +965,15 @@ TEST_F(VectorTests, Reject_FreeFunction) {
   Vec2 v(3.0f, 4.0f);
   Vec2 from(1.0f, 0.0f);
 
-  Vec2 rej = mathkata::Reject(v, from);
+  Vec2 rej = mathkata::reject(v, from);
   EXPECT_NEAR(rej[0], 0.0f, FLOAT_PRECISION);
   EXPECT_NEAR(rej[1], 4.0f, FLOAT_PRECISION);
 }
 
-// This will test that scalar Lerp returns exact endpoints.
-// The formula a + (b - a) * t guarantees Lerp(a, b, 0) == a exactly because
+// This will test that scalar lerp returns exact endpoints.
+// The formula a + (b - a) * t guarantees lerp(a, b, 0) == a exactly because
 // (b - a) * 0 == 0 for all finite values, and a + 0 == a.
-// Lerp(a, b, 1) == b holds exactly when a + (b - a) can recover b without
+// lerp(a, b, 1) == b holds exactly when a + (b - a) can recover b without
 // rounding error. We test with representative values to verify both endpoints.
 template <class T>
 void Numeric_Lerp_Exact_Endpoints_Test(const T& precision) {
@@ -989,14 +989,14 @@ void Numeric_Lerp_Exact_Endpoints_Test(const T& precision) {
     for (int bi = 0; bi < num_values; ++bi) {
       const T a = test_values[ai];
       const T b = test_values[bi];
-      EXPECT_EQ(mathkata::Lerp(a, b, static_cast<T>(0)), a);
-      EXPECT_EQ(mathkata::Lerp(a, b, static_cast<T>(1)), b);
+      EXPECT_EQ(mathkata::lerp(a, b, static_cast<T>(0)), a);
+      EXPECT_EQ(mathkata::lerp(a, b, static_cast<T>(1)), b);
     }
   }
 }
 TEST_SCALAR_F(Numeric_Lerp_Exact_Endpoints)
 
-// This will test that vector Lerp returns exact endpoints.
+// This will test that vector lerp returns exact endpoints.
 template <class T, int d>
 void LerpExactEndpoints_Test(const T& precision) {
   (void)precision;
@@ -1016,9 +1016,9 @@ void LerpExactEndpoints_Test(const T& precision) {
     }
 
     mathkata::Vector<T, d> lerp_at_0 =
-        mathkata::Vector<T, d>::Lerp(v1, v2, static_cast<T>(0));
+        mathkata::Vector<T, d>::lerp(v1, v2, static_cast<T>(0));
     mathkata::Vector<T, d> lerp_at_1 =
-        mathkata::Vector<T, d>::Lerp(v1, v2, static_cast<T>(1));
+        mathkata::Vector<T, d>::lerp(v1, v2, static_cast<T>(1));
 
     for (int i = 0; i < d; ++i) {
       EXPECT_EQ(lerp_at_0[i], v1[i]);
@@ -1028,126 +1028,126 @@ void LerpExactEndpoints_Test(const T& precision) {
 }
 TEST_ALL_F(LerpExactEndpoints)
 
-// Tests scalar RoundUpToPowerOf2 for int32_t.
+// Tests scalar roundUpToPowerOf2 for int32_t.
 TEST_F(VectorTests, RoundUpToPowerOf2_Int32) {
   // Zero returns zero.
-  EXPECT_EQ(mathkata::RoundUpToPowerOf2(static_cast<int32_t>(0)), 0);
+  EXPECT_EQ(mathkata::roundUpToPowerOf2(static_cast<int32_t>(0)), 0);
 
   // One returns one (already a power of 2).
-  EXPECT_EQ(mathkata::RoundUpToPowerOf2(static_cast<int32_t>(1)), 1);
+  EXPECT_EQ(mathkata::roundUpToPowerOf2(static_cast<int32_t>(1)), 1);
 
   // Powers of 2 remain unchanged.
-  EXPECT_EQ(mathkata::RoundUpToPowerOf2(static_cast<int32_t>(2)), 2);
-  EXPECT_EQ(mathkata::RoundUpToPowerOf2(static_cast<int32_t>(4)), 4);
-  EXPECT_EQ(mathkata::RoundUpToPowerOf2(static_cast<int32_t>(64)), 64);
-  EXPECT_EQ(mathkata::RoundUpToPowerOf2(static_cast<int32_t>(1024)), 1024);
-  EXPECT_EQ(mathkata::RoundUpToPowerOf2(static_cast<int32_t>(1 << 30)),
+  EXPECT_EQ(mathkata::roundUpToPowerOf2(static_cast<int32_t>(2)), 2);
+  EXPECT_EQ(mathkata::roundUpToPowerOf2(static_cast<int32_t>(4)), 4);
+  EXPECT_EQ(mathkata::roundUpToPowerOf2(static_cast<int32_t>(64)), 64);
+  EXPECT_EQ(mathkata::roundUpToPowerOf2(static_cast<int32_t>(1024)), 1024);
+  EXPECT_EQ(mathkata::roundUpToPowerOf2(static_cast<int32_t>(1 << 30)),
             (1 << 30));
 
   // Non-powers of 2 round up.
-  EXPECT_EQ(mathkata::RoundUpToPowerOf2(static_cast<int32_t>(3)), 4);
-  EXPECT_EQ(mathkata::RoundUpToPowerOf2(static_cast<int32_t>(5)), 8);
-  EXPECT_EQ(mathkata::RoundUpToPowerOf2(static_cast<int32_t>(6)), 8);
-  EXPECT_EQ(mathkata::RoundUpToPowerOf2(static_cast<int32_t>(7)), 8);
-  EXPECT_EQ(mathkata::RoundUpToPowerOf2(static_cast<int32_t>(9)), 16);
-  EXPECT_EQ(mathkata::RoundUpToPowerOf2(static_cast<int32_t>(100)), 128);
-  EXPECT_EQ(mathkata::RoundUpToPowerOf2(static_cast<int32_t>(1000)), 1024);
-  EXPECT_EQ(mathkata::RoundUpToPowerOf2(static_cast<int32_t>(1025)), 2048);
+  EXPECT_EQ(mathkata::roundUpToPowerOf2(static_cast<int32_t>(3)), 4);
+  EXPECT_EQ(mathkata::roundUpToPowerOf2(static_cast<int32_t>(5)), 8);
+  EXPECT_EQ(mathkata::roundUpToPowerOf2(static_cast<int32_t>(6)), 8);
+  EXPECT_EQ(mathkata::roundUpToPowerOf2(static_cast<int32_t>(7)), 8);
+  EXPECT_EQ(mathkata::roundUpToPowerOf2(static_cast<int32_t>(9)), 16);
+  EXPECT_EQ(mathkata::roundUpToPowerOf2(static_cast<int32_t>(100)), 128);
+  EXPECT_EQ(mathkata::roundUpToPowerOf2(static_cast<int32_t>(1000)), 1024);
+  EXPECT_EQ(mathkata::roundUpToPowerOf2(static_cast<int32_t>(1025)), 2048);
 }
 
-// Tests scalar RoundUpToPowerOf2 for uint32_t.
+// Tests scalar roundUpToPowerOf2 for uint32_t.
 TEST_F(VectorTests, RoundUpToPowerOf2_Uint32) {
-  EXPECT_EQ(mathkata::RoundUpToPowerOf2(static_cast<uint32_t>(0)),
+  EXPECT_EQ(mathkata::roundUpToPowerOf2(static_cast<uint32_t>(0)),
             static_cast<uint32_t>(0));
-  EXPECT_EQ(mathkata::RoundUpToPowerOf2(static_cast<uint32_t>(1)),
+  EXPECT_EQ(mathkata::roundUpToPowerOf2(static_cast<uint32_t>(1)),
             static_cast<uint32_t>(1));
-  EXPECT_EQ(mathkata::RoundUpToPowerOf2(static_cast<uint32_t>(2)),
+  EXPECT_EQ(mathkata::roundUpToPowerOf2(static_cast<uint32_t>(2)),
             static_cast<uint32_t>(2));
-  EXPECT_EQ(mathkata::RoundUpToPowerOf2(static_cast<uint32_t>(3)),
+  EXPECT_EQ(mathkata::roundUpToPowerOf2(static_cast<uint32_t>(3)),
             static_cast<uint32_t>(4));
-  EXPECT_EQ(mathkata::RoundUpToPowerOf2(static_cast<uint32_t>(5)),
+  EXPECT_EQ(mathkata::roundUpToPowerOf2(static_cast<uint32_t>(5)),
             static_cast<uint32_t>(8));
-  EXPECT_EQ(mathkata::RoundUpToPowerOf2(static_cast<uint32_t>(255)),
+  EXPECT_EQ(mathkata::roundUpToPowerOf2(static_cast<uint32_t>(255)),
             static_cast<uint32_t>(256));
-  EXPECT_EQ(mathkata::RoundUpToPowerOf2(static_cast<uint32_t>(1u << 31)),
+  EXPECT_EQ(mathkata::roundUpToPowerOf2(static_cast<uint32_t>(1u << 31)),
             static_cast<uint32_t>(1u << 31));
 }
 
-// Tests scalar RoundUpToPowerOf2 for int64_t.
+// Tests scalar roundUpToPowerOf2 for int64_t.
 TEST_F(VectorTests, RoundUpToPowerOf2_Int64) {
-  EXPECT_EQ(mathkata::RoundUpToPowerOf2(static_cast<int64_t>(0)),
+  EXPECT_EQ(mathkata::roundUpToPowerOf2(static_cast<int64_t>(0)),
             static_cast<int64_t>(0));
-  EXPECT_EQ(mathkata::RoundUpToPowerOf2(static_cast<int64_t>(1)),
+  EXPECT_EQ(mathkata::roundUpToPowerOf2(static_cast<int64_t>(1)),
             static_cast<int64_t>(1));
-  EXPECT_EQ(mathkata::RoundUpToPowerOf2(static_cast<int64_t>(2)),
+  EXPECT_EQ(mathkata::roundUpToPowerOf2(static_cast<int64_t>(2)),
             static_cast<int64_t>(2));
-  EXPECT_EQ(mathkata::RoundUpToPowerOf2(static_cast<int64_t>(3)),
+  EXPECT_EQ(mathkata::roundUpToPowerOf2(static_cast<int64_t>(3)),
             static_cast<int64_t>(4));
-  EXPECT_EQ(mathkata::RoundUpToPowerOf2(static_cast<int64_t>(5)),
+  EXPECT_EQ(mathkata::roundUpToPowerOf2(static_cast<int64_t>(5)),
             static_cast<int64_t>(8));
 
   // Test values beyond 32-bit range.
   int64_t large = static_cast<int64_t>(1) << 32;
-  EXPECT_EQ(mathkata::RoundUpToPowerOf2(large), large);
-  EXPECT_EQ(mathkata::RoundUpToPowerOf2(large + 1), large * 2);
-  EXPECT_EQ(mathkata::RoundUpToPowerOf2(large - 1), large);
+  EXPECT_EQ(mathkata::roundUpToPowerOf2(large), large);
+  EXPECT_EQ(mathkata::roundUpToPowerOf2(large + 1), large * 2);
+  EXPECT_EQ(mathkata::roundUpToPowerOf2(large - 1), large);
 
   int64_t very_large = static_cast<int64_t>(1) << 62;
-  EXPECT_EQ(mathkata::RoundUpToPowerOf2(very_large), very_large);
-  EXPECT_EQ(mathkata::RoundUpToPowerOf2(very_large - 1), very_large);
+  EXPECT_EQ(mathkata::roundUpToPowerOf2(very_large), very_large);
+  EXPECT_EQ(mathkata::roundUpToPowerOf2(very_large - 1), very_large);
 }
 
-// Tests scalar RoundUpToPowerOf2 for uint64_t.
+// Tests scalar roundUpToPowerOf2 for uint64_t.
 TEST_F(VectorTests, RoundUpToPowerOf2_Uint64) {
-  EXPECT_EQ(mathkata::RoundUpToPowerOf2(static_cast<uint64_t>(0)),
+  EXPECT_EQ(mathkata::roundUpToPowerOf2(static_cast<uint64_t>(0)),
             static_cast<uint64_t>(0));
-  EXPECT_EQ(mathkata::RoundUpToPowerOf2(static_cast<uint64_t>(1)),
+  EXPECT_EQ(mathkata::roundUpToPowerOf2(static_cast<uint64_t>(1)),
             static_cast<uint64_t>(1));
-  EXPECT_EQ(mathkata::RoundUpToPowerOf2(static_cast<uint64_t>(3)),
+  EXPECT_EQ(mathkata::roundUpToPowerOf2(static_cast<uint64_t>(3)),
             static_cast<uint64_t>(4));
 
   // Test values beyond 32-bit range.
   uint64_t large = static_cast<uint64_t>(1) << 32;
-  EXPECT_EQ(mathkata::RoundUpToPowerOf2(large), large);
-  EXPECT_EQ(mathkata::RoundUpToPowerOf2(large + 1), large * 2);
-  EXPECT_EQ(mathkata::RoundUpToPowerOf2(large - 1), large);
+  EXPECT_EQ(mathkata::roundUpToPowerOf2(large), large);
+  EXPECT_EQ(mathkata::roundUpToPowerOf2(large + 1), large * 2);
+  EXPECT_EQ(mathkata::roundUpToPowerOf2(large - 1), large);
 
   uint64_t very_large = static_cast<uint64_t>(1) << 63;
-  EXPECT_EQ(mathkata::RoundUpToPowerOf2(very_large), very_large);
-  EXPECT_EQ(mathkata::RoundUpToPowerOf2(very_large - 1), very_large);
+  EXPECT_EQ(mathkata::roundUpToPowerOf2(very_large), very_large);
+  EXPECT_EQ(mathkata::roundUpToPowerOf2(very_large - 1), very_large);
 }
 
-// Tests scalar RoundUpToPowerOf2 for int16_t.
+// Tests scalar roundUpToPowerOf2 for int16_t.
 TEST_F(VectorTests, RoundUpToPowerOf2_Int16) {
-  EXPECT_EQ(mathkata::RoundUpToPowerOf2(static_cast<int16_t>(0)),
+  EXPECT_EQ(mathkata::roundUpToPowerOf2(static_cast<int16_t>(0)),
             static_cast<int16_t>(0));
-  EXPECT_EQ(mathkata::RoundUpToPowerOf2(static_cast<int16_t>(1)),
+  EXPECT_EQ(mathkata::roundUpToPowerOf2(static_cast<int16_t>(1)),
             static_cast<int16_t>(1));
-  EXPECT_EQ(mathkata::RoundUpToPowerOf2(static_cast<int16_t>(3)),
+  EXPECT_EQ(mathkata::roundUpToPowerOf2(static_cast<int16_t>(3)),
             static_cast<int16_t>(4));
-  EXPECT_EQ(mathkata::RoundUpToPowerOf2(static_cast<int16_t>(255)),
+  EXPECT_EQ(mathkata::roundUpToPowerOf2(static_cast<int16_t>(255)),
             static_cast<int16_t>(256));
-  EXPECT_EQ(mathkata::RoundUpToPowerOf2(static_cast<int16_t>(1 << 14)),
+  EXPECT_EQ(mathkata::roundUpToPowerOf2(static_cast<int16_t>(1 << 14)),
             static_cast<int16_t>(1 << 14));
 }
 
-// Tests scalar RoundUpToPowerOf2 for uint8_t.
+// Tests scalar roundUpToPowerOf2 for uint8_t.
 TEST_F(VectorTests, RoundUpToPowerOf2_Uint8) {
-  EXPECT_EQ(mathkata::RoundUpToPowerOf2(static_cast<uint8_t>(0)),
+  EXPECT_EQ(mathkata::roundUpToPowerOf2(static_cast<uint8_t>(0)),
             static_cast<uint8_t>(0));
-  EXPECT_EQ(mathkata::RoundUpToPowerOf2(static_cast<uint8_t>(1)),
+  EXPECT_EQ(mathkata::roundUpToPowerOf2(static_cast<uint8_t>(1)),
             static_cast<uint8_t>(1));
-  EXPECT_EQ(mathkata::RoundUpToPowerOf2(static_cast<uint8_t>(2)),
+  EXPECT_EQ(mathkata::roundUpToPowerOf2(static_cast<uint8_t>(2)),
             static_cast<uint8_t>(2));
-  EXPECT_EQ(mathkata::RoundUpToPowerOf2(static_cast<uint8_t>(3)),
+  EXPECT_EQ(mathkata::roundUpToPowerOf2(static_cast<uint8_t>(3)),
             static_cast<uint8_t>(4));
-  EXPECT_EQ(mathkata::RoundUpToPowerOf2(static_cast<uint8_t>(127)),
+  EXPECT_EQ(mathkata::roundUpToPowerOf2(static_cast<uint8_t>(127)),
             static_cast<uint8_t>(128));
-  EXPECT_EQ(mathkata::RoundUpToPowerOf2(static_cast<uint8_t>(128)),
+  EXPECT_EQ(mathkata::roundUpToPowerOf2(static_cast<uint8_t>(128)),
             static_cast<uint8_t>(128));
 }
 
-// Tests scalar RoundUpToPowerOf2 for all int values from 0 to 1024.
+// Tests scalar roundUpToPowerOf2 for all int values from 0 to 1024.
 TEST_F(VectorTests, RoundUpToPowerOf2_Exhaustive_Int32) {
   int32_t expected = 0;
   for (int32_t i = 0; i <= 1024; ++i) {
@@ -1164,12 +1164,12 @@ TEST_F(VectorTests, RoundUpToPowerOf2_Exhaustive_Int32) {
       expected = 1;
       while (expected < i) expected <<= 1;
     }
-    EXPECT_EQ(mathkata::RoundUpToPowerOf2(i), expected)
+    EXPECT_EQ(mathkata::roundUpToPowerOf2(i), expected)
         << "Failed for input " << i;
   }
 }
 
-// Tests the RoundUpToPowerOf2 function for vectors.
+// Tests the roundUpToPowerOf2 function for vectors.
 // Given a vector, it should return a vector whose elements are rounded up to
 // the nearest power of 2.
 template <class T, int d>
@@ -1181,8 +1181,8 @@ void Vector_RoundUpToPowerOf2_Test(const T& precision) {
     for (int i = 0; i < d; i++) {
       powof2[i] = static_cast<T>(count);
     }
-    result = mathkata::RoundUpToPowerOf2(powof2);
-    T expected = static_cast<T>(mathkata::RoundUpToPowerOf2(count));
+    result = mathkata::roundUpToPowerOf2(powof2);
+    T expected = static_cast<T>(mathkata::roundUpToPowerOf2(count));
     for (int i = 0; i < d; i++) {
       EXPECT_EQ(result[i], expected);
     }
@@ -1203,7 +1203,7 @@ TEST_F(VectorTests, SampleTest) {
   Vector<float, 3> vector1 = point2 - point1;
   Vector<float, 3> vector2 = point3 - point1;
 
-  Vector<float, 3> normal = Vector<float, 3>::CrossProduct(vector2, vector1);
+  Vector<float, 3> normal = Vector<float, 3>::crossProduct(vector2, vector1);
   /// @doxysnippetend
   const float precision = 1e-2f;
   EXPECT_NEAR(-0.25f, normal[0], precision);
@@ -1425,33 +1425,33 @@ TEST_F(VectorTests, LessThan_Rect_StdSet) {
 
 // Simple class that represents a possible compatible type for a vector.
 // That is, it's just an array of T of length d, so can be loaded and
-// stored from mathkata::Vector<T,d> using ToType() and FromType().
+// stored from mathkata::Vector<T,d> using toType() and fromType().
 template <class T, int d>
 struct SimpleVector {
   T values[d];
 };
 
-// This will test the FromType() conversion functions.
+// This will test the fromType() conversion functions.
 template <class T, int d>
-void FromType_Test(const T& precision) {
+void fromType_Test(const T& precision) {
   SimpleVector<T, d> compatible;
   for (int i = 0; i < d; ++i) {
     compatible.values[i] = static_cast<T>(i * precision);
   }
 
   const mathkata::Vector<T, d> vector =
-      mathkata::Vector<T, d>::FromType(compatible);
+      mathkata::Vector<T, d>::fromType(compatible);
 
   for (int i = 0; i < d; ++i) {
     EXPECT_EQ(compatible.values[i], vector[i]);
   }
 }
-TEST_ALL_F(FromType)
-TEST_ALL_INTS_F(FromType)
+TEST_ALL_F(fromType)
+TEST_ALL_INTS_F(fromType)
 
-// This will test the ToType() conversion functions.
+// This will test the toType() conversion functions.
 template <class T, int d>
-void ToType_Test(const T& precision) {
+void toType_Test(const T& precision) {
   typedef SimpleVector<T, d> CompatibleT;
   typedef mathkata::Vector<T, d> VectorT;
 
@@ -1460,16 +1460,16 @@ void ToType_Test(const T& precision) {
     vector[i] = static_cast<T>(i * precision);
   }
 
-  const CompatibleT compatible = VectorT::template ToType<CompatibleT>(vector);
+  const CompatibleT compatible = VectorT::template toType<CompatibleT>(vector);
 
   for (int i = 0; i < d; ++i) {
     EXPECT_EQ(compatible.values[i], vector[i]);
   }
 }
-TEST_ALL_F(ToType)
-TEST_ALL_INTS_F(ToType)
+TEST_ALL_F(toType)
+TEST_ALL_INTS_F(toType)
 
-// This will test a roundtrip through FromType() and ToType().
+// This will test a roundtrip through fromType() and toType().
 // Converts SimpleVector -> Vector -> SimpleVector and verifies the values
 // are preserved. This exercises the memcpy-based type-punning path.
 template <class T, int d>
@@ -1483,9 +1483,9 @@ void FromTypeToTypeRoundtrip_Test(const T& precision) {
   }
 
   // SimpleVector -> Vector -> SimpleVector
-  const VectorT vector = VectorT::FromType(original);
+  const VectorT vector = VectorT::fromType(original);
   const CompatibleT roundtripped =
-      VectorT::template ToType<CompatibleT>(vector);
+      VectorT::template toType<CompatibleT>(vector);
 
   for (int i = 0; i < d; ++i) {
     EXPECT_EQ(original.values[i], roundtripped.values[i]);
@@ -1595,12 +1595,12 @@ TEST_F(VectorTests, PaddingLaneZeroed_Arithmetic) {
 
   // Vector * Vector (Hadamard).
   mathkata::Vector<float, 3> prod =
-      mathkata::Vector<float, 3>::HadamardProduct(a, b);
+      mathkata::Vector<float, 3>::hadamardProduct(a, b);
   EXPECT_EQ(0.0f, prod.data_[3]);
 
   // Vector / Vector (Hadamard).
   mathkata::Vector<float, 3> quot =
-      mathkata::Vector<float, 3>::HadamardDivide(a, b);
+      mathkata::Vector<float, 3>::hadamardDivide(a, b);
   EXPECT_EQ(0.0f, quot.data_[3]);
 
   // Vector + scalar.
@@ -1670,36 +1670,36 @@ TEST_F(VectorTests, PaddingLaneZeroed_VectorOps) {
   mathkata::Vector<float, 3> a(1.0f, 2.0f, 3.0f);
   mathkata::Vector<float, 3> b(4.0f, 5.0f, 6.0f);
 
-  // CrossProduct.
+  // crossProduct.
   mathkata::Vector<float, 3> cross =
-      mathkata::Vector<float, 3>::CrossProduct(a, b);
+      mathkata::Vector<float, 3>::crossProduct(a, b);
   EXPECT_EQ(0.0f, cross.data_[3]);
 
-  // Normalized.
-  mathkata::Vector<float, 3> normd = a.Normalized();
+  // normalized.
+  mathkata::Vector<float, 3> normd = a.normalized();
   EXPECT_EQ(0.0f, normd.data_[3]);
 
-  // Normalize (in-place).
+  // normalize (in-place).
   mathkata::Vector<float, 3> norm_in_place(a);
-  norm_in_place.Normalize();
+  norm_in_place.normalize();
   EXPECT_EQ(0.0f, norm_in_place.data_[3]);
 
-  // HadamardProduct.
+  // hadamardProduct.
   mathkata::Vector<float, 3> hadamard =
-      mathkata::Vector<float, 3>::HadamardProduct(a, b);
+      mathkata::Vector<float, 3>::hadamardProduct(a, b);
   EXPECT_EQ(0.0f, hadamard.data_[3]);
 
-  // Lerp.
+  // lerp.
   mathkata::Vector<float, 3> lerp =
-      mathkata::Vector<float, 3>::Lerp(a, b, 0.5f);
+      mathkata::Vector<float, 3>::lerp(a, b, 0.5f);
   EXPECT_EQ(0.0f, lerp.data_[3]);
 
-  // Max.
-  mathkata::Vector<float, 3> max_v = mathkata::Vector<float, 3>::Max(a, b);
+  // max.
+  mathkata::Vector<float, 3> max_v = mathkata::Vector<float, 3>::max(a, b);
   EXPECT_EQ(0.0f, max_v.data_[3]);
 
-  // Min.
-  mathkata::Vector<float, 3> min_v = mathkata::Vector<float, 3>::Min(a, b);
+  // min.
+  mathkata::Vector<float, 3> min_v = mathkata::Vector<float, 3>::min(a, b);
   EXPECT_EQ(0.0f, min_v.data_[3]);
 }
 #endif  // defined(MATHKATA_COMPILE_WITH_PADDING)
@@ -1780,87 +1780,87 @@ TEST_F(VectorTests, Accessor_Swizzle_Vector4) {
   EXPECT_FLOAT_EQ(8.0f, czw[1]);
 }
 
-// Test Reflect: 45-degree angle off a horizontal surface.
+// Test reflect: 45-degree angle off a horizontal surface.
 // An incident vector coming down at 45 degrees should reflect up at 45 degrees.
 TEST_F(VectorTests, Reflect_45Degrees) {
   using Vec3 = mathkata::Vector<float, 3>;
   // Incident ray going down-right at 45 degrees.
   Vec3 incident(1.0f, -1.0f, 0.0f);
-  incident.Normalize();
+  incident.normalize();
   // Surface normal pointing straight up.
   Vec3 normal(0.0f, 1.0f, 0.0f);
 
-  Vec3 reflected = Vec3::Reflect(incident, normal);
+  Vec3 reflected = Vec3::reflect(incident, normal);
   // Expected: ray going up-right at 45 degrees.
   Vec3 expected(1.0f, 1.0f, 0.0f);
-  expected.Normalize();
+  expected.normalize();
   EXPECT_PRED_FORMAT3(AssertVectorNear, reflected, expected, FLOAT_PRECISION);
 }
 
-// Test Reflect: perpendicular incidence (bounces straight back).
+// Test reflect: perpendicular incidence (bounces straight back).
 TEST_F(VectorTests, Reflect_Perpendicular) {
   using Vec3 = mathkata::Vector<float, 3>;
   Vec3 incident(0.0f, -1.0f, 0.0f);
   Vec3 normal(0.0f, 1.0f, 0.0f);
 
-  Vec3 reflected = Vec3::Reflect(incident, normal);
+  Vec3 reflected = Vec3::reflect(incident, normal);
   Vec3 expected(0.0f, 1.0f, 0.0f);
   EXPECT_PRED_FORMAT3(AssertVectorNear, reflected, expected, FLOAT_PRECISION);
 }
 
-// Test Reflect: parallel incidence (grazing the surface, no change).
+// Test reflect: parallel incidence (grazing the surface, no change).
 TEST_F(VectorTests, Reflect_Parallel) {
   using Vec3 = mathkata::Vector<float, 3>;
   // Incident vector parallel to the surface (perpendicular to normal).
   Vec3 incident(1.0f, 0.0f, 0.0f);
   Vec3 normal(0.0f, 1.0f, 0.0f);
 
-  Vec3 reflected = Vec3::Reflect(incident, normal);
+  Vec3 reflected = Vec3::reflect(incident, normal);
   // When parallel, dot(incident, normal) == 0, so reflect returns incident.
   EXPECT_PRED_FORMAT3(AssertVectorNear, reflected, incident, FLOAT_PRECISION);
 }
 
-// Test Reflect with 2D vectors.
+// Test reflect with 2D vectors.
 TEST_F(VectorTests, Reflect_2D) {
   using Vec2 = mathkata::Vector<float, 2>;
   Vec2 incident(1.0f, -1.0f);
-  incident.Normalize();
+  incident.normalize();
   Vec2 normal(0.0f, 1.0f);
 
-  Vec2 reflected = Vec2::Reflect(incident, normal);
+  Vec2 reflected = Vec2::reflect(incident, normal);
   Vec2 expected(1.0f, 1.0f);
-  expected.Normalize();
+  expected.normalize();
   EXPECT_PRED_FORMAT3(AssertVectorNear, reflected, expected, FLOAT_PRECISION);
 }
 
-// Test Refract with eta=1 (no bending, same medium).
+// Test refract with eta=1 (no bending, same medium).
 TEST_F(VectorTests, Refract_EtaOne) {
   using Vec3 = mathkata::Vector<float, 3>;
   Vec3 incident(1.0f, -1.0f, 0.0f);
-  incident.Normalize();
+  incident.normalize();
   Vec3 normal(0.0f, 1.0f, 0.0f);
 
-  Vec3 refracted = Vec3::Refract(incident, normal, 1.0f);
+  Vec3 refracted = Vec3::refract(incident, normal, 1.0f);
   // With eta=1, refracted direction should equal incident direction.
   EXPECT_PRED_FORMAT3(AssertVectorNear, refracted, incident, FLOAT_PRECISION);
 }
 
-// Test Refract: total internal reflection returns zero vector.
+// Test refract: total internal reflection returns zero vector.
 TEST_F(VectorTests, Refract_TotalInternalReflection) {
   using Vec3 = mathkata::Vector<float, 3>;
   // A steep angle with high eta triggers total internal reflection.
   // Going from glass (n=1.5) to air (n=1.0), eta = 1.5.
   // At a steep angle (nearly parallel to surface), TIR should occur.
   Vec3 incident(1.0f, -0.1f, 0.0f);
-  incident.Normalize();
+  incident.normalize();
   Vec3 normal(0.0f, 1.0f, 0.0f);
 
-  Vec3 refracted = Vec3::Refract(incident, normal, 1.5f);
+  Vec3 refracted = Vec3::refract(incident, normal, 1.5f);
   Vec3 zero(0.0f);
   EXPECT_PRED_FORMAT3(AssertVectorNear, refracted, zero, FLOAT_PRECISION);
 }
 
-// Test Refract: Snell's law verification.
+// Test refract: Snell's law verification.
 // sin(theta_t) = eta * sin(theta_i)
 TEST_F(VectorTests, Refract_SnellsLaw) {
   using Vec3 = mathkata::Vector<float, 3>;
@@ -1872,10 +1872,10 @@ TEST_F(VectorTests, Refract_SnellsLaw) {
   Vec3 normal(0.0f, 1.0f, 0.0f);
   float eta = 1.0f / 1.5f;
 
-  Vec3 refracted = Vec3::Refract(incident, normal, eta);
+  Vec3 refracted = Vec3::refract(incident, normal, eta);
 
   // The refracted vector should be normalized (since incident and normal are).
-  float refracted_length = refracted.Length();
+  float refracted_length = refracted.length();
   EXPECT_NEAR(refracted_length, 1.0f, FLOAT_PRECISION);
 
   // Verify Snell's law: sin(theta_t) = eta * sin(theta_i).
@@ -1886,14 +1886,14 @@ TEST_F(VectorTests, Refract_SnellsLaw) {
   EXPECT_NEAR(sin_theta_t, expected_sin_theta_t, FLOAT_PRECISION);
 }
 
-// Test Refract with 2D vectors.
+// Test refract with 2D vectors.
 TEST_F(VectorTests, Refract_2D) {
   using Vec2 = mathkata::Vector<float, 2>;
   Vec2 incident(0.0f, -1.0f);
   Vec2 normal(0.0f, 1.0f);
 
   // Perpendicular incidence with any eta should pass straight through.
-  Vec2 refracted = Vec2::Refract(incident, normal, 0.5f);
+  Vec2 refracted = Vec2::refract(incident, normal, 0.5f);
   EXPECT_PRED_FORMAT3(AssertVectorNear, refracted, incident, FLOAT_PRECISION);
 }
 

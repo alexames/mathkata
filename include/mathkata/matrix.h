@@ -116,41 +116,41 @@ enum class Handedness {
 template <class T, int Rows, int Cols = Rows>
 class Matrix;
 template <class T, int Rows, int Cols>
-constexpr Matrix<T, Rows, Cols> IdentityHelper();
+constexpr Matrix<T, Rows, Cols> identityHelper();
 template <bool check_invertible, class T, int Rows, int Cols>
-inline bool InverseHelper(const Matrix<T, Rows, Cols>& m,
+inline bool inverseHelper(const Matrix<T, Rows, Cols>& m,
                           Matrix<T, Rows, Cols>* const inverse, T det_thresh);
 template <class T, int size1, int size2, int size3>
 constexpr void TimesHelper(const Matrix<T, size1, size2>& m1,
                            const Matrix<T, size2, size3>& m2,
                            Matrix<T, size1, size3>* out_m);
 template <class T, int Rows, int Cols>
-static constexpr Matrix<T, Rows, Cols> OuterProductHelper(
+static constexpr Matrix<T, Rows, Cols> outerProductHelper(
     const Vector<T, Rows>& v1, const Vector<T, Cols>& v2);
 template <class T, Handedness H>
-inline Matrix<T, 4, 4> PerspectiveHelper(T fovy, T aspect, T znear, T zfar,
+inline Matrix<T, 4, 4> perspectiveHelper(T fovy, T aspect, T znear, T zfar,
                                          DepthRange depth_range);
 template <class T, Handedness H>
-static inline Matrix<T, 4, 4> OrthoHelper(T left, T right, T bottom, T top,
+static inline Matrix<T, 4, 4> orthoHelper(T left, T right, T bottom, T top,
                                           T znear, T zfar,
                                           DepthRange depth_range);
 template <class T, Handedness H>
-static inline Matrix<T, 4, 4> LookAtHelper(const Vector<T, 3>& at,
+static inline Matrix<T, 4, 4> lookAtHelper(const Vector<T, 3>& at,
                                            const Vector<T, 3>& eye,
                                            const Vector<T, 3>& up);
 template <class T>
-static inline bool UnProjectHelper(const Vector<T, 3>& window_coord,
+static inline bool unProjectHelper(const Vector<T, 3>& window_coord,
                                    const Matrix<T, 4, 4>& model_view,
                                    const Matrix<T, 4, 4>& projection,
                                    const T window_width, const T window_height,
                                    Vector<T, 3>& result);
 
 template <typename T, int Rows, int Cols, typename CompatibleT>
-static inline Matrix<T, Rows, Cols> FromTypeHelper(
+static inline Matrix<T, Rows, Cols> fromTypeHelper(
     const CompatibleT& compatible);
 
 template <typename T, int Rows, int Cols, typename CompatibleT>
-static inline CompatibleT ToTypeHelper(const Matrix<T, Rows, Cols>& m);
+static inline CompatibleT toTypeHelper(const Matrix<T, Rows, Cols>& m);
 
 /// Struct used for template specialization for functions that return constants.
 template <class T>
@@ -165,8 +165,8 @@ class Constants {
   /// @returns Minimum absolute value of the determinant of an invertible
   /// <code>float</code> Matrix.
   ///
-  /// @related mathkata::Matrix::InverseWithDeterminantCheck()
-  static T GetDeterminantThreshold() {
+  /// @related mathkata::Matrix::inverseWithDeterminantCheck()
+  static T getDeterminantThreshold() {
     // No constant defined for the general case.
     assert(false);
     return 0;
@@ -179,7 +179,7 @@ template <>
 class Constants<float> {
  public:
   /// Effective uniform scale limit: ~(1/215)^3
-  static float GetDeterminantThreshold() { return 1e-7f; }
+  static float getDeterminantThreshold() { return 1e-7f; }
 };
 
 /// Functions that return constants for <code>double</code> values.
@@ -187,7 +187,7 @@ template <>
 class Constants<double> {
  public:
   /// Effective uniform scale limit: ~(1/100000)^3
-  static double GetDeterminantThreshold() { return 1e-15; }
+  static double getDeterminantThreshold() { return 1e-15; }
 };
 
 /// @addtogroup mathkata_matrix
@@ -205,7 +205,7 @@ class Matrix {
   /// @brief Construct a Matrix of uninitialized values.
   ///
   /// The elements of the Matrix are left uninitialized and have indeterminate
-  /// values. This is intentional for performance: use Matrix(T), Identity(),
+  /// values. This is intentional for performance: use Matrix(T), identity(),
   /// or one of the factory methods if you need specific values.
   constexpr Matrix() {}
 
@@ -401,25 +401,25 @@ class Matrix {
     return data_[col][row];
   }
 
-  /// @brief Pack the matrix to an array of "Rows" element vectors,
+  /// @brief pack the matrix to an array of "Rows" element vectors,
   /// one vector per matrix column.
   ///
   /// @param vector Array of "Cols" entries to write to.
-  constexpr void Pack(VectorPacked<T, Rows>* const vector) const {
-    MATHKATA_MAT_OPERATION(GetColumn(i).Pack(&vector[i]));
+  constexpr void pack(VectorPacked<T, Rows>* const vector) const {
+    MATHKATA_MAT_OPERATION(getColumn(i).pack(&vector[i]));
   }
 
   /// @brief Access a column vector of the Matrix.
   ///
   /// @param i Index of the column to access.
   /// @return Reference to the data that can be modified by the caller.
-  constexpr Vector<T, Rows>& GetColumn(const int i) { return data_[i]; }
+  constexpr Vector<T, Rows>& getColumn(const int i) { return data_[i]; }
 
   /// @brief Access a column vector of the Matrix.
   ///
   /// @param i Index of the column to access.
   /// @return Const reference to the data.
-  constexpr const Vector<T, Rows>& GetColumn(const int i) const {
+  constexpr const Vector<T, Rows>& getColumn(const int i) const {
     return data_[i];
   }
 
@@ -430,7 +430,7 @@ class Matrix {
   ///
   /// @param i Index of the row to access.
   /// @return Vector containing the row elements.
-  constexpr Vector<T, Cols> GetRow(const int i) const {
+  constexpr Vector<T, Cols> getRow(const int i) const {
     Vector<T, Cols> result;
     for (int j = 0; j < Cols; j++) {
       result[j] = data_[j][i];
@@ -479,7 +479,7 @@ class Matrix {
     MATHKATA_MAT_OPERATOR(data_[i] - s);
   }
 
-  /// @brief Multiply each element of this Matrix with a scalar.
+  /// @brief multiply each element of this Matrix with a scalar.
   ///
   /// @param s Scalar to multiply with this Matrix.
   /// @return Matrix containing the result.
@@ -495,18 +495,18 @@ class Matrix {
     return (*this) * (T(1) / s);
   }
 
-  /// @brief Multiply this Matrix with another Matrix.
+  /// @brief multiply this Matrix with another Matrix.
   ///
   /// @note This operator requires square matrices (Rows == Cols).
   /// For non-square matrix multiplication, use the free function
-  /// mathkata::Multiply() instead.
+  /// mathkata::multiply() instead.
   ///
   /// @param m Matrix to multiply with this Matrix.
   /// @return Matrix containing the result.
   constexpr Matrix<T, Rows, Cols> operator*(
       const Matrix<T, Rows, Cols>& m) const {
     static_assert(Rows == Cols,
-                  "operator* requires square matrices; use Multiply() for "
+                  "operator* requires square matrices; use multiply() for "
                   "non-square matrix multiplication");
     Matrix<T, Rows, Cols> result;
     TimesHelper(*this, m, &result);
@@ -545,7 +545,7 @@ class Matrix {
     MATHKATA_MAT_SELF_OPERATOR(data_[i] -= s);
   }
 
-  /// @brief Multiply each element of this Matrix with a scalar (in-place).
+  /// @brief multiply each element of this Matrix with a scalar (in-place).
   ///
   /// @param s Scalar to multiply with each element of this Matrix.
   /// @return Reference to this class.
@@ -561,17 +561,17 @@ class Matrix {
     return (*this) *= (T(1) / s);
   }
 
-  /// @brief Multiply this Matrix with another Matrix (in-place).
+  /// @brief multiply this Matrix with another Matrix (in-place).
   ///
   /// @note This operator requires square matrices (Rows == Cols).
   /// For non-square matrix multiplication, use the free function
-  /// mathkata::Multiply() instead.
+  /// mathkata::multiply() instead.
   ///
   /// @param m Matrix to multiply with this Matrix.
   /// @return Reference to this class.
   constexpr Matrix<T, Rows, Cols>& operator*=(const Matrix<T, Rows, Cols>& m) {
     static_assert(Rows == Cols,
-                  "operator*= requires square matrices; use Multiply() for "
+                  "operator*= requires square matrices; use multiply() for "
                   "non-square matrix multiplication");
     const Matrix<T, Rows, Cols> copy_of_this(*this);
     TimesHelper(copy_of_this, m, this);
@@ -581,15 +581,15 @@ class Matrix {
   /// @brief Calculate the inverse of this Matrix.
   ///
   /// This calculates the inverse Matrix such that
-  /// <code>m * m.Inverse()</code> is the identity.
+  /// <code>m * m.inverse()</code> is the identity.
   /// @pre The matrix must be invertible (non-zero determinant). In debug
   ///      builds, an assertion failure is triggered for singular matrices.
-  ///      Use InverseWithDeterminantCheck() when invertibility is uncertain.
+  ///      Use inverseWithDeterminantCheck() when invertibility is uncertain.
   /// @return Matrix containing the result.
-  inline Matrix<T, Rows, Cols> Inverse() const {
+  inline Matrix<T, Rows, Cols> inverse() const {
     Matrix<T, Rows, Cols> inverse;
-    bool invertible = InverseHelper<true>(
-        *this, &inverse, Constants<T>::GetDeterminantThreshold());
+    bool invertible = inverseHelper<true>(
+        *this, &inverse, Constants<T>::getDeterminantThreshold());
     assert(invertible);
     (void)invertible;
     return inverse;
@@ -598,11 +598,11 @@ class Matrix {
   /// @brief Calculate the inverse of this Matrix.
   ///
   /// This calculates the inverse Matrix such that
-  /// <code>m * m.Inverse()</code> is the identity.
-  /// By contrast to Inverse() this returns whether the matrix is invertible.
+  /// <code>m * m.inverse()</code> is the identity.
+  /// By contrast to inverse() this returns whether the matrix is invertible.
   ///
   /// The invertible check simply compares the calculated determinant with
-  /// Constants<T>::GetDeterminantThreshold() to roughly determine whether the
+  /// Constants<T>::getDeterminantThreshold() to roughly determine whether the
   /// matrix is invertible.  This simple check works in common cases but will
   /// fail for corner cases where the matrix is a combination of huge and tiny
   /// values that can't be accurately represented by the floating point
@@ -610,21 +610,21 @@ class Matrix {
   /// possible but <b>far</b> more expensive, complicated and difficult to
   /// test.
   /// @return Whether the matrix is invertible.
-  inline bool InverseWithDeterminantCheck(
+  inline bool inverseWithDeterminantCheck(
       Matrix<T, Rows, Cols>* const inverse,
-      T det_thresh = Constants<T>::GetDeterminantThreshold()) const {
-    return InverseHelper<true>(*this, inverse, det_thresh);
+      T det_thresh = Constants<T>::getDeterminantThreshold()) const {
+    return inverseHelper<true>(*this, inverse, det_thresh);
   }
 
   /// @brief Calculate the transpose of this Matrix.
   ///
   /// @return The transpose of the specified Matrix.
-  constexpr Matrix<T, Cols, Rows> Transpose() const {
+  constexpr Matrix<T, Cols, Rows> transpose() const {
     Matrix<T, Cols, Rows> transpose;
     MATHKATA_UNROLLED_LOOP(
         i, Cols,
         MATHKATA_UNROLLED_LOOP(j, Rows,
-                               transpose.GetColumn(j)[i] = GetColumn(i)[j]))
+                               transpose.getColumn(j)[i] = getColumn(i)[j]))
     return transpose;
   }
 
@@ -633,7 +633,7 @@ class Matrix {
   ///
   /// @note 2-dimensional affine transforms are represented by 3x3 matrices.
   /// @return Vector with the first two components of column 2 of this Matrix.
-  constexpr Vector<T, 2> TranslationVector2D() const {
+  constexpr Vector<T, 2> translationVector2D() const {
     static_assert(Rows == 3 && Cols == 3, "Rows and Cols must be 3");
     return Vector<T, 2>(data_[2][0], data_[2][1]);
   }
@@ -643,7 +643,7 @@ class Matrix {
   ///
   /// @note 3-dimensional affine transforms are represented by 4x4 matrices.
   /// @return Vector with the first three components of column 3.
-  constexpr Vector<T, 3> TranslationVector3D() const {
+  constexpr Vector<T, 3> translationVector3D() const {
     static_assert(Rows == 4 && Cols == 4, "Rows and Cols must be 4");
     return Vector<T, 3>(data_[3][0], data_[3][1], data_[3][2]);
   }
@@ -651,10 +651,10 @@ class Matrix {
   /// @brief Get the 3-dimensional scale along each local axis.
   ///
   /// @return Vector with the scale along each local axis.
-  inline Vector<T, 3> ScaleVector3D() const {
+  inline Vector<T, 3> scaleVector3D() const {
     static_assert(Rows >= 3 && Cols >= 3, "Rows and Cols must be at least 3");
-    return Vector<T, 3>(data_[0].xyz().Length(), data_[1].xyz().Length(),
-                        data_[2].xyz().Length());
+    return Vector<T, 3>(data_[0].xyz().length(), data_[1].xyz().length(),
+                        data_[2].xyz().length());
   }
 
   /// @brief Load from any byte-wise compatible external matrix.
@@ -674,8 +674,8 @@ class Matrix {
   ///                   array of Cols x Rows Ts.
   /// @returns `compatible` loaded as a mathkata::Matrix.
   template <typename CompatibleT>
-  static inline Matrix<T, Rows, Cols> FromType(const CompatibleT& compatible) {
-    return FromTypeHelper<T, Rows, Cols, CompatibleT>(compatible);
+  static inline Matrix<T, Rows, Cols> fromType(const CompatibleT& compatible) {
+    return fromTypeHelper<T, Rows, Cols, CompatibleT>(compatible);
   }
 
   /// @brief Load into any byte-wise compatible external matrix.
@@ -691,16 +691,16 @@ class Matrix {
   /// @param m reference to mathkata::Matrix to convert.
   /// @returns CompatibleT loaded from m.
   template <typename CompatibleT>
-  static inline CompatibleT ToType(const Matrix<T, Rows, Cols>& m) {
-    return ToTypeHelper<T, Rows, Cols, CompatibleT>(m);
+  static inline CompatibleT toType(const Matrix<T, Rows, Cols>& m) {
+    return toTypeHelper<T, Rows, Cols, CompatibleT>(m);
   }
 
   /// @brief Calculate the outer product of two Vectors.
   ///
   /// @return Matrix containing the result.
-  static constexpr Matrix<T, Rows, Cols> OuterProduct(
+  static constexpr Matrix<T, Rows, Cols> outerProduct(
       const Vector<T, Rows>& v1, const Vector<T, Cols>& v2) {
-    return OuterProductHelper(v1, v2);
+    return outerProductHelper(v1, v2);
   }
 
   /// @brief Calculate the hadamard / component-wise product of two matrices.
@@ -708,16 +708,16 @@ class Matrix {
   /// @param m1 First Matrix.
   /// @param m2 Second Matrix.
   /// @return Matrix containing the result.
-  static constexpr Matrix<T, Rows, Cols> HadamardProduct(
+  static constexpr Matrix<T, Rows, Cols> hadamardProduct(
       const Matrix<T, Rows, Cols>& m1, const Matrix<T, Rows, Cols>& m2) {
-    MATHKATA_MAT_OPERATOR(HadamardProductHelper(m1.data_[i], m2.data_[i]));
+    MATHKATA_MAT_OPERATOR(hadamardProductHelper(m1.data_[i], m2.data_[i]));
   }
 
   /// @brief Calculate the identity Matrix.
   ///
   /// @return Matrix containing the result.
-  static constexpr Matrix<T, Rows, Cols> Identity() {
-    return IdentityHelper<T, Rows, Cols>();
+  static constexpr Matrix<T, Rows, Cols> identity() {
+    return identityHelper<T, Rows, Cols>();
   }
 
   /// @brief Create a 3x3 translation Matrix from a 2-dimensional Vector.
@@ -726,7 +726,7 @@ class Matrix {
   ///
   /// @param v Vector of size 2.
   /// @return Matrix containing the result.
-  static constexpr Matrix<T, 3> FromTranslationVector(const Vector<T, 2>& v) {
+  static constexpr Matrix<T, 3> fromTranslationVector(const Vector<T, 2>& v) {
     return Matrix<T, 3>(1, 0, 0, 0, 1, 0, v[0], v[1], 1);
   }
 
@@ -736,7 +736,7 @@ class Matrix {
   ///
   /// @param v The vector of size 3.
   /// @return Matrix containing the result.
-  static constexpr Matrix<T, 4> FromTranslationVector(const Vector<T, 3>& v) {
+  static constexpr Matrix<T, 4> fromTranslationVector(const Vector<T, 3>& v) {
     return Matrix<T, 4>(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, v[0], v[1], v[2],
                         1);
   }
@@ -748,13 +748,13 @@ class Matrix {
   ///
   /// @param v Vector containing components for scaling.
   /// @return Matrix with v along the diagonal, and 1 in the bottom right.
-  static constexpr Matrix<T, Rows> FromScaleVector(
+  static constexpr Matrix<T, Rows> fromScaleVector(
       const Vector<T, Rows - 1>& v) {
-    // TODO OPT: Use a helper function in a similar way to Identity to
+    // TODO OPT: Use a helper function in a similar way to identity to
     // construct the matrix for the specialized cases 2, 3, 4, and only run
     // this method in the general case. This will also allow you to use the
     // helper methods from specialized classes like Matrix<T, 4, 4>.
-    Matrix<T, Rows> return_matrix(Identity());
+    Matrix<T, Rows> return_matrix(identity());
     for (int i = 0; i < Rows - 1; ++i) return_matrix(i, i) = v[i];
     return return_matrix;
   }
@@ -765,7 +765,7 @@ class Matrix {
   ///
   /// @param m 3x3 rotation Matrix.
   /// @return Matrix containing the result.
-  static constexpr Matrix<T, 4> FromRotationMatrix(const Matrix<T, 3>& m) {
+  static constexpr Matrix<T, 4> fromRotationMatrix(const Matrix<T, 3>& m) {
     return Matrix<T, 4>(m[0], m[1], m[2], 0, m[3], m[4], m[5], 0, m[6], m[7],
                         m[8], 0, 0, 0, 0, 1);
   }
@@ -777,7 +777,7 @@ class Matrix {
   ///
   /// @param m 4x4 Matrix.
   /// @return rotation Matrix containing the result.
-  static constexpr Matrix<T, 3> ToRotationMatrix(const Matrix<T, 4>& m) {
+  static constexpr Matrix<T, 3> toRotationMatrix(const Matrix<T, 4>& m) {
     return Matrix<T, 3>(m[0], m[1], m[2], m[4], m[5], m[6], m[8], m[9], m[10]);
   }
 
@@ -785,7 +785,7 @@ class Matrix {
   ///
   /// @param affine An AffineTransform reference to be used to construct
   /// a Matrix<float, 4> by adding in the 'w' row of [0, 0, 0, 1].
-  static constexpr Matrix<T, 4> FromAffineTransform(
+  static constexpr Matrix<T, 4> fromAffineTransform(
       const Matrix<T, 4, 3>& affine) {
     return Matrix<T, 4>(affine[0], affine[4], affine[8], static_cast<T>(0),
                         affine[1], affine[5], affine[9], static_cast<T>(0),
@@ -800,7 +800,7 @@ class Matrix {
   ///
   /// @return Returns an AffineTransform that contains the essential
   /// transformation data from the Matrix<float, 4>.
-  static constexpr Matrix<T, 4, 3> ToAffineTransform(const Matrix<T, 4>& m) {
+  static constexpr Matrix<T, 4, 3> toAffineTransform(const Matrix<T, 4>& m) {
     return Matrix<T, 4, 3>(m[0], m[4], m[8], m[12], m[1], m[5], m[9], m[13],
                            m[2], m[6], m[10], m[14]);
   }
@@ -810,7 +810,7 @@ class Matrix {
   ///
   /// @param v 2D normalized directional Vector.
   /// @return Matrix containing the result.
-  static constexpr Matrix<T, 3> RotationX(const Vector<T, 2>& v) {
+  static constexpr Matrix<T, 3> rotationX(const Vector<T, 2>& v) {
     return Matrix<T, 3>(1, 0, 0, 0, v.x, v.y, 0, -v.y, v.x);
   }
 
@@ -819,7 +819,7 @@ class Matrix {
   ///
   /// @param v 2D normalized directional Vector.
   /// @return Matrix containing the result.
-  static constexpr Matrix<T, 3> RotationY(const Vector<T, 2>& v) {
+  static constexpr Matrix<T, 3> rotationY(const Vector<T, 2>& v) {
     return Matrix<T, 3>(v.x, 0, -v.y, 0, 1, 0, v.y, 0, v.x);
   }
 
@@ -828,35 +828,35 @@ class Matrix {
   ///
   /// @param v 2D normalized directional Vector.
   /// @return Matrix containing the result.
-  static constexpr Matrix<T, 3> RotationZ(const Vector<T, 2>& v) {
+  static constexpr Matrix<T, 3> rotationZ(const Vector<T, 2>& v) {
     return Matrix<T, 3>(v.x, v.y, 0, -v.y, v.x, 0, 0, 0, 1);
   }
 
   /// @brief Create a 3x3 rotation Matrix from an angle (in radians) around
   /// the X axis.
   ///
-  /// @param angle Angle (in radians).
+  /// @param angle angle (in radians).
   /// @return Matrix containing the result.
-  static inline Matrix<T, 3> RotationX(T angle) {
-    return RotationX(Vector<T, 2>(std::cos(angle), std::sin(angle)));
+  static inline Matrix<T, 3> rotationX(T angle) {
+    return rotationX(Vector<T, 2>(std::cos(angle), std::sin(angle)));
   }
 
   /// @brief Create a 3x3 rotation Matrix from an angle (in radians) around
   /// the Y axis.
   ///
-  /// @param angle Angle (in radians).
+  /// @param angle angle (in radians).
   /// @return Matrix containing the result.
-  static inline Matrix<T, 3> RotationY(T angle) {
-    return RotationY(Vector<T, 2>(std::cos(angle), std::sin(angle)));
+  static inline Matrix<T, 3> rotationY(T angle) {
+    return rotationY(Vector<T, 2>(std::cos(angle), std::sin(angle)));
   }
 
   /// @brief Create a 3x3 rotation Matrix from an angle (in radians)
   /// around the Z axis.
   ///
-  /// @param angle Angle (in radians).
+  /// @param angle angle (in radians).
   /// @return Matrix containing the result.
-  static inline Matrix<T, 3> RotationZ(T angle) {
-    return RotationZ(Vector<T, 2>(std::cos(angle), std::sin(angle)));
+  static inline Matrix<T, 3> rotationZ(T angle) {
+    return rotationZ(Vector<T, 2>(std::cos(angle), std::sin(angle)));
   }
 
   /// @brief Create a 4x4 perspective Matrix.
@@ -871,10 +871,10 @@ class Matrix {
   ///                    DepthRange::kDirectX for z in [0,1].
   /// @return 4x4 perspective Matrix.
   template <Handedness H = Handedness::kRightHanded>
-  static inline Matrix<T, 4, 4> Perspective(
+  static inline Matrix<T, 4, 4> perspective(
       T fovy, T aspect, T znear, T zfar,
       DepthRange depth_range = DepthRange::kOpenGL) {
-    return PerspectiveHelper<T, H>(fovy, aspect, znear, zfar, depth_range);
+    return perspectiveHelper<T, H>(fovy, aspect, znear, zfar, depth_range);
   }
 
   /// @brief Create a 4x4 orthographic Matrix.
@@ -891,10 +891,10 @@ class Matrix {
   ///                    DepthRange::kDirectX for z in [0,1].
   /// @return 4x4 orthographic Matrix.
   template <Handedness H = Handedness::kRightHanded>
-  static inline Matrix<T, 4, 4> Ortho(
+  static inline Matrix<T, 4, 4> ortho(
       T left, T right, T bottom, T top, T znear, T zfar,
       DepthRange depth_range = DepthRange::kOpenGL) {
-    return OrthoHelper<T, H>(left, right, bottom, top, znear, zfar,
+    return orthoHelper<T, H>(left, right, bottom, top, znear, zfar,
                              depth_range);
   }
 
@@ -908,10 +908,10 @@ class Matrix {
   /// y-axis is up.
   /// @return 3-dimensional camera Matrix.
   template <Handedness H = Handedness::kRightHanded>
-  static inline Matrix<T, 4, 4> LookAt(const Vector<T, 3>& at,
+  static inline Matrix<T, 4, 4> lookAt(const Vector<T, 3>& at,
                                        const Vector<T, 3>& eye,
                                        const Vector<T, 3>& up) {
-    return LookAtHelper<T, H>(at, eye, up);
+    return lookAtHelper<T, H>(at, eye, up);
   }
 
   /// @brief Create a 3-dimensional transform Matrix.
@@ -920,10 +920,10 @@ class Matrix {
   /// @param rotation The rotation of the object.
   /// @param scale The scale of the object.
   /// @return 3-dimensional transform Matrix.
-  static inline Matrix<T, 4, 4> Transform(const Vector<T, 3>& position,
+  static inline Matrix<T, 4, 4> transform(const Vector<T, 3>& position,
                                           const Matrix<T, 3, 3>& rotation,
                                           const Vector<T, 3>& scale) {
-    return TransformHelper(position, rotation, scale);
+    return transformHelper(position, rotation, scale);
   }
 
   /// @brief Get the 3D position in object space from a window coordinate.
@@ -941,16 +941,16 @@ class Matrix {
   /// model-view-projection matrix is singular (not invertible), or if
   /// the homogeneous coordinate w is zero, or if the window_coord z
   /// value is outside the [0, 1] range.
-  static inline bool UnProject(const Vector<T, 3>& window_coord,
+  static inline bool unProject(const Vector<T, 3>& window_coord,
                                const Matrix<T, 4, 4>& model_view,
                                const Matrix<T, 4, 4>& projection,
                                const T window_width, const T window_height,
                                Vector<T, 3>* result) {
-    return UnProjectHelper(window_coord, model_view, projection, window_width,
+    return unProjectHelper(window_coord, model_view, projection, window_width,
                            window_height, *result);
   }
 
-  /// @brief Multiply a Vector by a Matrix.
+  /// @brief multiply a Vector by a Matrix.
   ///
   /// @param v Vector to multiply.
   /// @param m Matrix to multiply.
@@ -958,7 +958,7 @@ class Matrix {
   friend constexpr Vector<T, Cols> operator*(const Vector<T, Rows>& v,
                                              const Matrix<T, Rows, Cols>& m) {
     const int Dims = Cols;
-    MATHKATA_VECTOR_OPERATOR((Vector<T, Rows>::DotProduct(m.data_[i], v)));
+    MATHKATA_VECTOR_OPERATOR((Vector<T, Rows>::dotProduct(m.data_[i], v)));
   }
 
   // Dimensions of the matrix.
@@ -1029,7 +1029,7 @@ constexpr bool operator==(const Matrix<T, Rows, Cols>& lhs,
   return !(lhs != rhs);
 }
 
-/// @brief Multiply each element of a Matrix by a scalar.
+/// @brief multiply each element of a Matrix by a scalar.
 ///
 /// @param s Scalar to multiply by.
 /// @param m Matrix to multiply.
@@ -1044,7 +1044,7 @@ constexpr Matrix<T, Rows, Cols> operator*(T s, const Matrix<T, Cols, Rows>& m) {
   return m * s;
 }
 
-/// @brief Multiply a Matrix by a Vector.
+/// @brief multiply a Matrix by a Vector.
 ///
 /// @note Template specialized versions are implemented for 2x2, 3x3, and 4x4
 /// matrices to increase performance.  The 3x3 float is also specialized
@@ -1082,9 +1082,9 @@ template <class T>
 constexpr Vector<T, 3> operator*(const Matrix<T, 3, 3>& m,
                                  const Vector<T, 3>& v) {
   return Vector<T, 3>(
-      MATHKATA_MATRIX_3X3_DOT(&m.GetColumn(0).data_[0], v, 0, 3),
-      MATHKATA_MATRIX_3X3_DOT(&m.GetColumn(0).data_[0], v, 1, 3),
-      MATHKATA_MATRIX_3X3_DOT(&m.GetColumn(0).data_[0], v, 2, 3));
+      MATHKATA_MATRIX_3X3_DOT(&m.getColumn(0).data_[0], v, 0, 3),
+      MATHKATA_MATRIX_3X3_DOT(&m.getColumn(0).data_[0], v, 1, 3),
+      MATHKATA_MATRIX_3X3_DOT(&m.getColumn(0).data_[0], v, 2, 3));
 }
 /// @endcond
 
@@ -1093,11 +1093,11 @@ template <>
 inline Vector<float, 3> operator*(const Matrix<float, 3, 3>& m,
                                   const Vector<float, 3>& v) {
   return Vector<float, 3>(
-      MATHKATA_MATRIX_3X3_DOT(&m.GetColumn(0).data_[0], v, 0,
+      MATHKATA_MATRIX_3X3_DOT(&m.getColumn(0).data_[0], v, 0,
                               MATHKATA_VECTOR_STRIDE_FLOATS(v)),
-      MATHKATA_MATRIX_3X3_DOT(&m.GetColumn(0).data_[0], v, 1,
+      MATHKATA_MATRIX_3X3_DOT(&m.getColumn(0).data_[0], v, 1,
                               MATHKATA_VECTOR_STRIDE_FLOATS(v)),
-      MATHKATA_MATRIX_3X3_DOT(&m.GetColumn(0).data_[0], v, 2,
+      MATHKATA_MATRIX_3X3_DOT(&m.getColumn(0).data_[0], v, 2,
                               MATHKATA_VECTOR_STRIDE_FLOATS(v)));
 }
 /// @endcond
@@ -1106,14 +1106,14 @@ inline Vector<float, 3> operator*(const Matrix<float, 3, 3>& m,
 template <class T>
 constexpr Vector<T, 4> operator*(const Matrix<T, 4, 4>& m,
                                  const Vector<T, 4>& v) {
-  return Vector<T, 4>(MATHKATA_MATRIX_4X4_DOT(&m.GetColumn(0).data_[0], v, 0),
-                      MATHKATA_MATRIX_4X4_DOT(&m.GetColumn(0).data_[0], v, 1),
-                      MATHKATA_MATRIX_4X4_DOT(&m.GetColumn(0).data_[0], v, 2),
-                      MATHKATA_MATRIX_4X4_DOT(&m.GetColumn(0).data_[0], v, 3));
+  return Vector<T, 4>(MATHKATA_MATRIX_4X4_DOT(&m.getColumn(0).data_[0], v, 0),
+                      MATHKATA_MATRIX_4X4_DOT(&m.getColumn(0).data_[0], v, 1),
+                      MATHKATA_MATRIX_4X4_DOT(&m.getColumn(0).data_[0], v, 2),
+                      MATHKATA_MATRIX_4X4_DOT(&m.getColumn(0).data_[0], v, 3));
 }
 /// @endcond
 
-/// @brief Multiply a 4x4 Matrix by a 3-dimensional Vector, with perspective
+/// @brief multiply a 4x4 Matrix by a 3-dimensional Vector, with perspective
 /// division.
 ///
 /// This extends the 3D vector to homogeneous coordinates (w=1), multiplies by
@@ -1129,7 +1129,7 @@ constexpr Vector<T, 4> operator*(const Matrix<T, 4, 4>& m,
 /// [0, 0, 0, 1]), the resulting w is always 1 and the perspective division is
 /// a no-op. If you know your matrix is affine, you can avoid the division by
 /// using @ref operator*(const Matrix<T,4,4>&, const Vector<T,4>&) directly
-/// with a 4D vector, or by using TransformPoint3D().
+/// with a 4D vector, or by using transformPoint3D().
 ///
 /// @param m 4x4 Matrix.
 /// @param v 3-dimensional Vector.
@@ -1145,7 +1145,7 @@ constexpr Vector<T, 3> operator*(const Matrix<T, 4, 4>& m,
   return Vector<T, 3>(v4[0] / v4[3], v4[1] / v4[3], v4[2] / v4[3]);
 }
 
-/// @brief Transform a 3D point by a 4x4 affine matrix, without perspective
+/// @brief transform a 3D point by a 4x4 affine matrix, without perspective
 /// division.
 ///
 /// This extends the 3D vector to homogeneous coordinates (w=1), multiplies by
@@ -1163,7 +1163,7 @@ constexpr Vector<T, 3> operator*(const Matrix<T, 4, 4>& m,
 ///
 /// @related mathkata::Matrix
 template <class T>
-constexpr Vector<T, 3> TransformPoint3D(const Matrix<T, 4, 4>& m,
+constexpr Vector<T, 3> transformPoint3D(const Matrix<T, 4, 4>& m,
                                         const Vector<T, 3>& v) {
   Vector<T, 4> v4(v[0], v[1], v[2], 1);
   v4 = m * v4;
@@ -1171,7 +1171,7 @@ constexpr Vector<T, 3> TransformPoint3D(const Matrix<T, 4, 4>& m,
 }
 
 /// @cond MATHKATA_INTERNAL
-/// @brief Multiply a Matrix with another Matrix.
+/// @brief multiply a Matrix with another Matrix.
 ///
 /// @note Template specialized versions are implemented for 2x2, 3x3, and 4x4
 /// matrices to improve performance. 3x3 float is also specialized because if
@@ -1195,7 +1195,7 @@ constexpr void TimesHelper(const Matrix<T, size1, size2>& m1,
       for (int k = 0; k < size2; k++) {
         row[k] = m1(i, k);
       }
-      (*out_m)(i, j) = Vector<T, size2>::DotProduct(m2.GetColumn(j), row);
+      (*out_m)(i, j) = Vector<T, size2>::dotProduct(m2.getColumn(j), row);
     }
   }
 }
@@ -1220,21 +1220,21 @@ constexpr void TimesHelper(const Matrix<T, 3, 3>& m1, const Matrix<T, 3, 3>& m2,
   Matrix<T, 3, 3>& out = *out_m;
   {
     Vector<T, 3> row(m1[0], m1[3], m1[6]);
-    out[0] = Vector<T, 3>::DotProduct(m2.GetColumn(0), row);
-    out[3] = Vector<T, 3>::DotProduct(m2.GetColumn(1), row);
-    out[6] = Vector<T, 3>::DotProduct(m2.GetColumn(2), row);
+    out[0] = Vector<T, 3>::dotProduct(m2.getColumn(0), row);
+    out[3] = Vector<T, 3>::dotProduct(m2.getColumn(1), row);
+    out[6] = Vector<T, 3>::dotProduct(m2.getColumn(2), row);
   }
   {
     Vector<T, 3> row(m1[1], m1[4], m1[7]);
-    out[1] = Vector<T, 3>::DotProduct(m2.GetColumn(0), row);
-    out[4] = Vector<T, 3>::DotProduct(m2.GetColumn(1), row);
-    out[7] = Vector<T, 3>::DotProduct(m2.GetColumn(2), row);
+    out[1] = Vector<T, 3>::dotProduct(m2.getColumn(0), row);
+    out[4] = Vector<T, 3>::dotProduct(m2.getColumn(1), row);
+    out[7] = Vector<T, 3>::dotProduct(m2.getColumn(2), row);
   }
   {
     Vector<T, 3> row(m1[2], m1[5], m1[8]);
-    out[2] = Vector<T, 3>::DotProduct(m2.GetColumn(0), row);
-    out[5] = Vector<T, 3>::DotProduct(m2.GetColumn(1), row);
-    out[8] = Vector<T, 3>::DotProduct(m2.GetColumn(2), row);
+    out[2] = Vector<T, 3>::dotProduct(m2.getColumn(0), row);
+    out[5] = Vector<T, 3>::dotProduct(m2.getColumn(1), row);
+    out[8] = Vector<T, 3>::dotProduct(m2.getColumn(2), row);
   }
 }
 /// @endcond
@@ -1246,36 +1246,36 @@ constexpr void TimesHelper(const Matrix<T, 4, 4>& m1, const Matrix<T, 4, 4>& m2,
   Matrix<T, 4, 4>& out = *out_m;
   {
     Vector<T, 4> row(m1[0], m1[4], m1[8], m1[12]);
-    out[0] = Vector<T, 4>::DotProduct(m2.GetColumn(0), row);
-    out[4] = Vector<T, 4>::DotProduct(m2.GetColumn(1), row);
-    out[8] = Vector<T, 4>::DotProduct(m2.GetColumn(2), row);
-    out[12] = Vector<T, 4>::DotProduct(m2.GetColumn(3), row);
+    out[0] = Vector<T, 4>::dotProduct(m2.getColumn(0), row);
+    out[4] = Vector<T, 4>::dotProduct(m2.getColumn(1), row);
+    out[8] = Vector<T, 4>::dotProduct(m2.getColumn(2), row);
+    out[12] = Vector<T, 4>::dotProduct(m2.getColumn(3), row);
   }
   {
     Vector<T, 4> row(m1[1], m1[5], m1[9], m1[13]);
-    out[1] = Vector<T, 4>::DotProduct(m2.GetColumn(0), row);
-    out[5] = Vector<T, 4>::DotProduct(m2.GetColumn(1), row);
-    out[9] = Vector<T, 4>::DotProduct(m2.GetColumn(2), row);
-    out[13] = Vector<T, 4>::DotProduct(m2.GetColumn(3), row);
+    out[1] = Vector<T, 4>::dotProduct(m2.getColumn(0), row);
+    out[5] = Vector<T, 4>::dotProduct(m2.getColumn(1), row);
+    out[9] = Vector<T, 4>::dotProduct(m2.getColumn(2), row);
+    out[13] = Vector<T, 4>::dotProduct(m2.getColumn(3), row);
   }
   {
     Vector<T, 4> row(m1[2], m1[6], m1[10], m1[14]);
-    out[2] = Vector<T, 4>::DotProduct(m2.GetColumn(0), row);
-    out[6] = Vector<T, 4>::DotProduct(m2.GetColumn(1), row);
-    out[10] = Vector<T, 4>::DotProduct(m2.GetColumn(2), row);
-    out[14] = Vector<T, 4>::DotProduct(m2.GetColumn(3), row);
+    out[2] = Vector<T, 4>::dotProduct(m2.getColumn(0), row);
+    out[6] = Vector<T, 4>::dotProduct(m2.getColumn(1), row);
+    out[10] = Vector<T, 4>::dotProduct(m2.getColumn(2), row);
+    out[14] = Vector<T, 4>::dotProduct(m2.getColumn(3), row);
   }
   {
     Vector<T, 4> row(m1[3], m1[7], m1[11], m1[15]);
-    out[3] = Vector<T, 4>::DotProduct(m2.GetColumn(0), row);
-    out[7] = Vector<T, 4>::DotProduct(m2.GetColumn(1), row);
-    out[11] = Vector<T, 4>::DotProduct(m2.GetColumn(2), row);
-    out[15] = Vector<T, 4>::DotProduct(m2.GetColumn(3), row);
+    out[3] = Vector<T, 4>::dotProduct(m2.getColumn(0), row);
+    out[7] = Vector<T, 4>::dotProduct(m2.getColumn(1), row);
+    out[11] = Vector<T, 4>::dotProduct(m2.getColumn(2), row);
+    out[15] = Vector<T, 4>::dotProduct(m2.getColumn(3), row);
   }
 }
 /// @endcond
 
-/// @brief Multiply two matrices of arbitrary compatible dimensions.
+/// @brief multiply two matrices of arbitrary compatible dimensions.
 ///
 /// Computes the matrix product m1 * m2 where m1 is an R1 x C1 matrix and m2
 /// is a C1 x C2 matrix, producing an R1 x C2 result.  This function works
@@ -1293,7 +1293,7 @@ constexpr void TimesHelper(const Matrix<T, 4, 4>& m1, const Matrix<T, 4, 4>& m2,
 ///
 /// @related mathkata::Matrix
 template <class T, int R1, int C1, int C2>
-constexpr Matrix<T, R1, C2> Multiply(const Matrix<T, R1, C1>& m1,
+constexpr Matrix<T, R1, C2> multiply(const Matrix<T, R1, C1>& m1,
                                      const Matrix<T, C1, C2>& m2) {
   Matrix<T, R1, C2> result;
   for (int c = 0; c < C2; ++c) {
@@ -1314,12 +1314,12 @@ constexpr Matrix<T, R1, C2> Multiply(const Matrix<T, R1, C1>& m1,
 /// @note There are template specializations for 2x2, 3x3, and 4x4 matrices to
 /// increase performance.
 ///
-/// @return Identity Matrix.
+/// @return identity Matrix.
 /// @tparam T Type of each element in the returned Matrix.
 /// @tparam Rows Number of Rows in the returned Matrix.
 /// @tparam Cols Number of Cols in the returned Matrix.
 template <class T, int Rows, int Cols>
-constexpr Matrix<T, Rows, Cols> IdentityHelper() {
+constexpr Matrix<T, Rows, Cols> identityHelper() {
   Matrix<T, Rows, Cols> return_matrix(T(0));
   int min_d = Rows < Cols ? Rows : Cols;
   for (int i = 0; i < min_d; ++i) return_matrix(i, i) = T(1);
@@ -1329,21 +1329,21 @@ constexpr Matrix<T, Rows, Cols> IdentityHelper() {
 
 /// @cond MATHKATA_INTERNAL
 template <class T>
-constexpr Matrix<T, 2, 2> IdentityHelper() {
+constexpr Matrix<T, 2, 2> identityHelper() {
   return Matrix<T, 2, 2>(1, 0, 0, 1);
 }
 /// @endcond
 
 /// @cond MATHKATA_INTERNAL
 template <class T>
-constexpr Matrix<T, 3, 3> IdentityHelper() {
+constexpr Matrix<T, 3, 3> identityHelper() {
   return Matrix<T, 3, 3>(1, 0, 0, 0, 1, 0, 0, 0, 1);
 }
 /// @endcond
 
 /// @cond MATHKATA_INTERNAL
 template <class T>
-constexpr Matrix<T, 4, 4> IdentityHelper() {
+constexpr Matrix<T, 4, 4> identityHelper() {
   return Matrix<T, 4, 4>(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
 }
 /// @endcond
@@ -1354,7 +1354,7 @@ constexpr Matrix<T, 4, 4> IdentityHelper() {
 /// @note There are template specialization for 2x2, 3x3, and 4x4 matrices to
 /// increase performance.
 template <class T, int Rows, int Cols>
-static constexpr Matrix<T, Rows, Cols> OuterProductHelper(
+static constexpr Matrix<T, Rows, Cols> outerProductHelper(
     const Vector<T, Rows>& v1, const Vector<T, Cols>& v2) {
   Matrix<T, Rows, Cols> result(static_cast<T>(0));
   int offset = 0;
@@ -1370,7 +1370,7 @@ static constexpr Matrix<T, Rows, Cols> OuterProductHelper(
 
 /// @cond MATHKATA_INTERNAL
 template <class T>
-static constexpr Matrix<T, 2, 2> OuterProductHelper(const Vector<T, 2>& v1,
+static constexpr Matrix<T, 2, 2> outerProductHelper(const Vector<T, 2>& v1,
                                                     const Vector<T, 2>& v2) {
   return Matrix<T, 2, 2>(v1[0] * v2[0], v1[1] * v2[0], v1[0] * v2[1],
                          v1[1] * v2[1]);
@@ -1379,7 +1379,7 @@ static constexpr Matrix<T, 2, 2> OuterProductHelper(const Vector<T, 2>& v1,
 
 /// @cond MATHKATA_INTERNAL
 template <class T>
-static constexpr Matrix<T, 3, 3> OuterProductHelper(const Vector<T, 3>& v1,
+static constexpr Matrix<T, 3, 3> outerProductHelper(const Vector<T, 3>& v1,
                                                     const Vector<T, 3>& v2) {
   return Matrix<T, 3, 3>(v1[0] * v2[0], v1[1] * v2[0], v1[2] * v2[0],
                          v1[0] * v2[1], v1[1] * v2[1], v1[2] * v2[1],
@@ -1389,7 +1389,7 @@ static constexpr Matrix<T, 3, 3> OuterProductHelper(const Vector<T, 3>& v1,
 
 /// @cond MATHKATA_INTERNAL
 template <class T>
-static constexpr Matrix<T, 4, 4> OuterProductHelper(const Vector<T, 4>& v1,
+static constexpr Matrix<T, 4, 4> outerProductHelper(const Vector<T, 4>& v1,
                                                     const Vector<T, 4>& v2) {
   return Matrix<T, 4, 4>(
       v1[0] * v2[0], v1[1] * v2[0], v1[2] * v2[0], v1[3] * v2[0], v1[0] * v2[1],
@@ -1403,16 +1403,16 @@ static constexpr Matrix<T, 4, 4> OuterProductHelper(const Vector<T, 4>& v1,
 /// @brief Compute the inverse of a matrix.
 ///
 /// There is template specialization  for 2x2, 3x3, and 4x4 matrices to
-/// increase performance. Inverse is not implemented for dense matrices that
+/// increase performance. inverse is not implemented for dense matrices that
 /// are not of size 2x2, 3x3, and 4x4.  If check_invertible is true the
 /// determinate of the matrix is compared with
-/// Constants<T>::GetDeterminantThreshold() to roughly determine whether the
+/// Constants<T>::getDeterminantThreshold() to roughly determine whether the
 /// Matrix is invertible.
 template <bool check_invertible, class T, int Rows, int Cols>
-inline bool InverseHelper(const Matrix<T, Rows, Cols>& m,
+inline bool inverseHelper(const Matrix<T, Rows, Cols>& m,
                           Matrix<T, Rows, Cols>* const inverse, T det_thresh) {
   static_assert(sizeof(T) == 0,
-                "Matrix::Inverse() is only implemented for "
+                "Matrix::inverse() is only implemented for "
                 "2x2, 3x3, and 4x4 matrices");
   (void)m;
   (void)inverse;
@@ -1423,7 +1423,7 @@ inline bool InverseHelper(const Matrix<T, Rows, Cols>& m,
 
 /// @cond MATHKATA_INTERNAL
 template <bool check_invertible, class T>
-inline bool InverseHelper(const Matrix<T, 2, 2>& m,
+inline bool inverseHelper(const Matrix<T, 2, 2>& m,
                           Matrix<T, 2, 2>* const inverse, T det_thresh) {
   T determinant = m[0] * m[3] - m[1] * m[2];
   if (check_invertible && fabs(determinant) < det_thresh) {
@@ -1440,7 +1440,7 @@ inline bool InverseHelper(const Matrix<T, 2, 2>& m,
 
 /// @cond MATHKATA_INTERNAL
 template <bool check_invertible, class T>
-inline bool InverseHelper(const Matrix<T, 3, 3>& m,
+inline bool inverseHelper(const Matrix<T, 3, 3>& m,
                           Matrix<T, 3, 3>* const inverse, T det_thresh) {
   // Find determinant of matrix.
   T sub11 = m[4] * m[8] - m[5] * m[7], sub12 = -m[1] * m[8] + m[2] * m[7],
@@ -1461,7 +1461,7 @@ inline bool InverseHelper(const Matrix<T, 3, 3>& m,
 
 /// @cond MATHKATA_INTERNAL
 template <class T>
-inline int FindLargestPivotElem(const Matrix<T, 4, 4>& m) {
+inline int findLargestPivotElem(const Matrix<T, 4, 4>& m) {
   Vector<T, 4> fabs_column(fabs(m[0]), fabs(m[1]), fabs(m[2]), fabs(m[3]));
   if (fabs_column[0] > fabs_column[1]) {
     if (fabs_column[0] > fabs_column[2]) {
@@ -1491,10 +1491,10 @@ inline int FindLargestPivotElem(const Matrix<T, 4, 4>& m) {
 
 /// @cond MATHKATA_INTERNAL
 template <bool check_invertible, class T>
-bool InverseHelper(const Matrix<T, 4, 4>& m, Matrix<T, 4, 4>* const inverse,
+bool inverseHelper(const Matrix<T, 4, 4>& m, Matrix<T, 4, 4>* const inverse,
                    T det_thresh) {
   // This will find the pivot element.
-  int pivot_elem = FindLargestPivotElem(m);
+  int pivot_elem = findLargestPivotElem(m);
   // This will perform the pivot and find the row, column, and 3x3 submatrix
   // for this pivot.
   Vector<T, 3> row, column;
@@ -1522,21 +1522,21 @@ bool InverseHelper(const Matrix<T, 4, 4>& m, Matrix<T, 4, 4>* const inverse,
   }
   T pivot_value = m[pivot_elem];
   if (check_invertible
-      && fabs(pivot_value) < Constants<T>::GetDeterminantThreshold()) {
+      && fabs(pivot_value) < Constants<T>::getDeterminantThreshold()) {
     return false;
   }
   // This will compute the inverse using the row, column, and 3x3 submatrix.
   T inv = T(-1) / pivot_value;
   row *= inv;
-  matrix += Matrix<T, 3>::OuterProduct(column, row);
+  matrix += Matrix<T, 3>::outerProduct(column, row);
   Matrix<T, 3> mat_inverse;
-  if (!InverseHelper<check_invertible>(matrix, &mat_inverse, det_thresh)
+  if (!inverseHelper<check_invertible>(matrix, &mat_inverse, det_thresh)
       && check_invertible) {
     return false;
   }
   Vector<T, 3> col_inverse = mat_inverse * (column * inv);
   Vector<T, 3> row_inverse = row * mat_inverse;
-  T pivot_inverse = Vector<T, 3>::DotProduct(row, col_inverse) - inv;
+  T pivot_inverse = Vector<T, 3>::dotProduct(row, col_inverse) - inv;
   if (pivot_elem == 0) {
     *inverse = Matrix<T, 4, 4>(
         pivot_inverse, col_inverse[0], col_inverse[1], col_inverse[2],
@@ -1577,7 +1577,7 @@ bool InverseHelper(const Matrix<T, 4, 4>& m, Matrix<T, 4, 4>* const inverse,
 ///   m[2][2] = zfar / (znear - zfar)
 ///   m[3][2] = (znear * zfar) / (znear - zfar)
 template <class T, Handedness H>
-inline Matrix<T, 4, 4> PerspectiveHelper(T fovy, T aspect, T znear, T zfar,
+inline Matrix<T, 4, 4> perspectiveHelper(T fovy, T aspect, T znear, T zfar,
                                          DepthRange depth_range) {
   const T handedness = static_cast<T>(H);
   const T y = T(1) / std::tan(fovy * T(0.5));
@@ -1609,7 +1609,7 @@ inline Matrix<T, 4, 4> PerspectiveHelper(T fovy, T aspect, T znear, T zfar,
 ///   m[2][2] = -1 / (zfar - znear)
 ///   m[3][2] = -znear / (zfar - znear)
 template <class T, Handedness H>
-static inline Matrix<T, 4, 4> OrthoHelper(T left, T right, T bottom, T top,
+static inline Matrix<T, 4, 4> orthoHelper(T left, T right, T bottom, T top,
                                           T znear, T zfar,
                                           DepthRange depth_range) {
   const T handedness = static_cast<T>(H);
@@ -1643,12 +1643,12 @@ static void LookAtHelperCalculateAxes(const Vector<T, 3>& at,
                                       Vector<T, 3>* const axes) {
   const T handedness = static_cast<T>(H);
   // Notice that y-axis is always the same regardless of handedness.
-  axes[2] = (at - eye).Normalized();
-  axes[0] = Vector<T, 3>::CrossProduct(up, axes[2]).Normalized();
-  axes[1] = Vector<T, 3>::CrossProduct(axes[2], axes[0]);
-  axes[3] = Vector<T, 3>(handedness * Vector<T, 3>::DotProduct(axes[0], eye),
-                         -Vector<T, 3>::DotProduct(axes[1], eye),
-                         handedness * Vector<T, 3>::DotProduct(axes[2], eye));
+  axes[2] = (at - eye).normalized();
+  axes[0] = Vector<T, 3>::crossProduct(up, axes[2]).normalized();
+  axes[1] = Vector<T, 3>::crossProduct(axes[2], axes[0]);
+  axes[3] = Vector<T, 3>(handedness * Vector<T, 3>::dotProduct(axes[0], eye),
+                         -Vector<T, 3>::dotProduct(axes[1], eye),
+                         handedness * Vector<T, 3>::dotProduct(axes[2], eye));
 
   // Default calculation is left-handed (i.e. handedness=-1).
   // Negate x and z axes for right-handed (i.e. handedness=+1) case.
@@ -1661,7 +1661,7 @@ static void LookAtHelperCalculateAxes(const Vector<T, 3>& at,
 /// @cond MATHKATA_INTERNAL
 /// Create a 3-dimensional camera matrix.
 template <class T, Handedness H>
-static inline Matrix<T, 4, 4> LookAtHelper(const Vector<T, 3>& at,
+static inline Matrix<T, 4, 4> lookAtHelper(const Vector<T, 3>& at,
                                            const Vector<T, 3>& eye,
                                            const Vector<T, 3>& up) {
   Vector<T, 3> axes[4];
@@ -1677,7 +1677,7 @@ static inline Matrix<T, 4, 4> LookAtHelper(const Vector<T, 3>& at,
 /// @cond MATHKATA_INTERNAL
 /// Create a 3-dimensional transform matrix.
 template <class T>
-static constexpr Matrix<T, 4, 4> TransformHelper(
+static constexpr Matrix<T, 4, 4> transformHelper(
     const Vector<T, 3>& position, const Matrix<T, 3, 3>& rotation,
     const Vector<T, 3>& scale) {
   Vector<T, 4> c0(rotation(0, 0), rotation(1, 0), rotation(2, 0), 0);
@@ -1697,7 +1697,7 @@ static constexpr Matrix<T, 4, 4> TransformHelper(
 /// @cond MATHKATA_INTERNAL
 /// Get the 3D position in object space from a window coordinate.
 template <class T>
-static inline bool UnProjectHelper(const Vector<T, 3>& window_coord,
+static inline bool unProjectHelper(const Vector<T, 3>& window_coord,
                                    const Matrix<T, 4, 4>& model_view,
                                    const Matrix<T, 4, 4>& projection,
                                    const T window_width, const T window_height,
@@ -1711,7 +1711,7 @@ static inline bool UnProjectHelper(const Vector<T, 3>& window_coord,
   }
   Matrix<T, 4, 4> mvp = projection * model_view;
   Matrix<T, 4, 4> matrix;
-  if (!mvp.InverseWithDeterminantCheck(&matrix)) {
+  if (!mvp.inverseWithDeterminantCheck(&matrix)) {
     return false;
   }
   Vector<T, 4> standardized = Vector<T, 4>(
@@ -1733,7 +1733,7 @@ static inline bool UnProjectHelper(const Vector<T, 3>& window_coord,
 
 /// @cond MATHKATA_INTERNAL
 template <typename T, int Rows, int Cols, typename CompatibleT>
-static inline Matrix<T, Rows, Cols> FromTypeHelper(
+static inline Matrix<T, Rows, Cols> fromTypeHelper(
     const CompatibleT& compatible) {
   // Use memcpy to safely reinterpret between compatible types without
   // undefined behavior. The compiler will optimize memcpy of small types
@@ -1748,14 +1748,14 @@ static inline Matrix<T, Rows, Cols> FromTypeHelper(
 
 /// @cond MATHKATA_INTERNAL
 template <typename T, int Rows, int Cols, typename CompatibleT>
-static inline CompatibleT ToTypeHelper(const Matrix<T, Rows, Cols>& m) {
+static inline CompatibleT toTypeHelper(const Matrix<T, Rows, Cols>& m) {
   // Use memcpy to safely reinterpret between compatible types without
   // undefined behavior. The compiler will optimize memcpy of small types
   // into simple register moves.
   VectorPacked<T, Rows> packed[Cols];
   static_assert(sizeof(CompatibleT) == sizeof(packed),
                 "Conversion size mismatch.");
-  m.Pack(packed);
+  m.pack(packed);
   CompatibleT compatible;
   std::memcpy(&compatible, static_cast<const void*>(packed), sizeof(packed));
   return compatible;

@@ -27,7 +27,7 @@
 #include "mathkata/vector.h"
 
 /// @file mathkata/intersections.h Intersections
-/// @brief Intersection test free functions for geometric primitives.
+/// @brief intersection test free functions for geometric primitives.
 /// @addtogroup mathkata_intersections
 
 #if defined(_MSC_VER)
@@ -51,13 +51,13 @@ namespace mathkata {
 /// @param t_out Optional pointer to receive the intersection parameter.
 /// @return true if the ray intersects the sphere.
 template <class T, int N>
-inline bool RayIntersectsSphere(const Ray<T, N>& ray,
+inline bool rayIntersectsSphere(const Ray<T, N>& ray,
                                 const Sphere<T, N>& sphere,
                                 T* t_out = nullptr) {
   const Vector<T, N> oc = ray.origin - sphere.center;
-  const T a = Vector<T, N>::DotProduct(ray.direction, ray.direction);
-  const T b = static_cast<T>(2) * Vector<T, N>::DotProduct(oc, ray.direction);
-  const T c = Vector<T, N>::DotProduct(oc, oc) - sphere.radius * sphere.radius;
+  const T a = Vector<T, N>::dotProduct(ray.direction, ray.direction);
+  const T b = static_cast<T>(2) * Vector<T, N>::dotProduct(oc, ray.direction);
+  const T c = Vector<T, N>::dotProduct(oc, oc) - sphere.radius * sphere.radius;
   const T discriminant = b * b - static_cast<T>(4) * a * c;
 
   if (discriminant < static_cast<T>(0)) {
@@ -95,7 +95,7 @@ inline bool RayIntersectsSphere(const Ray<T, N>& ray,
 /// @param t_out Optional pointer to receive the intersection parameter.
 /// @return true if the ray intersects the AABB.
 template <class T, int N>
-inline bool RayIntersectsAABB(const Ray<T, N>& ray, const AABB<T, N>& aabb,
+inline bool rayIntersectsAABB(const Ray<T, N>& ray, const AABB<T, N>& aabb,
                               T* t_out = nullptr) {
   T t_min = static_cast<T>(0);
   T t_max = std::numeric_limits<T>::max();
@@ -140,21 +140,21 @@ inline bool RayIntersectsAABB(const Ray<T, N>& ray, const AABB<T, N>& aabb,
 /// @param t_out Optional pointer to receive the intersection parameter.
 /// @return true if the ray intersects the plane.
 template <class T>
-inline bool RayIntersectsPlane(const Ray<T, 3>& ray, const Plane<T>& plane,
+inline bool rayIntersectsPlane(const Ray<T, 3>& ray, const Plane<T>& plane,
                                T* t_out = nullptr) {
-  const T denom = Vector<T, 3>::DotProduct(plane.normal, ray.direction);
+  const T denom = Vector<T, 3>::dotProduct(plane.normal, ray.direction);
 
   if (std::abs(denom) < std::numeric_limits<T>::epsilon()) {
     return false;  // Ray is parallel to the plane.
   }
 
   const T numer =
-      -(Vector<T, 3>::DotProduct(plane.normal, ray.origin) + plane.distance);
+      -(Vector<T, 3>::dotProduct(plane.normal, ray.origin) + plane.distance);
   // denom is guaranteed non-zero by the epsilon check above.
   const T t = numer / denom;
 
   if (t < static_cast<T>(0)) {
-    return false;  // Intersection is behind the ray origin.
+    return false;  // intersection is behind the ray origin.
   }
 
   if (t_out) {
@@ -165,27 +165,27 @@ inline bool RayIntersectsPlane(const Ray<T, 3>& ray, const Plane<T>& plane,
 
 /// @brief Test whether two AABBs overlap.
 ///
-/// Free function wrapper around AABB::Intersects().
+/// Free function wrapper around AABB::intersects().
 ///
 /// @param a First AABB.
 /// @param b Second AABB.
 /// @return true if the AABBs overlap (including touching boundaries).
 template <class T, int N>
-constexpr bool AABBIntersectsAABB(const AABB<T, N>& a, const AABB<T, N>& b) {
-  return a.Intersects(b);
+constexpr bool aabbIntersectsAABB(const AABB<T, N>& a, const AABB<T, N>& b) {
+  return a.intersects(b);
 }
 
 /// @brief Test whether two spheres overlap.
 ///
-/// Free function wrapper around Sphere::Intersects().
+/// Free function wrapper around Sphere::intersects().
 ///
 /// @param a First sphere.
 /// @param b Second sphere.
 /// @return true if the spheres overlap.
 template <class T, int N>
-constexpr bool SphereIntersectsSphere(const Sphere<T, N>& a,
+constexpr bool sphereIntersectsSphere(const Sphere<T, N>& a,
                                       const Sphere<T, N>& b) {
-  return a.Intersects(b);
+  return a.intersects(b);
 }
 
 /// @brief Test whether a sphere and an AABB overlap.
@@ -197,40 +197,40 @@ constexpr bool SphereIntersectsSphere(const Sphere<T, N>& a,
 /// @param aabb The AABB to test against.
 /// @return true if the sphere and AABB overlap.
 template <class T, int N>
-constexpr bool SphereIntersectsAABB(const Sphere<T, N>& sphere,
+constexpr bool sphereIntersectsAABB(const Sphere<T, N>& sphere,
                                     const AABB<T, N>& aabb) {
   // Find the closest point on the AABB to the sphere center.
   Vector<T, N> closest;
   for (int i = 0; i < N; ++i) {
-    closest[i] = Clamp(sphere.center[i], aabb.min[i], aabb.max[i]);
+    closest[i] = clamp(sphere.center[i], aabb.min[i], aabb.max[i]);
   }
-  return Vector<T, N>::DistanceSquared(sphere.center, closest)
+  return Vector<T, N>::distanceSquared(sphere.center, closest)
          <= sphere.radius * sphere.radius;
 }
 
 /// @brief Test whether a point is inside an AABB.
 ///
-/// Free function wrapper around AABB::Contains().
+/// Free function wrapper around AABB::contains().
 ///
 /// @param point The point to test.
 /// @param aabb The AABB to test against.
 /// @return true if the point is inside or on the boundary of the AABB.
 template <class T, int N>
-constexpr bool PointInAABB(const Vector<T, N>& point, const AABB<T, N>& aabb) {
-  return aabb.Contains(point);
+constexpr bool pointInAABB(const Vector<T, N>& point, const AABB<T, N>& aabb) {
+  return aabb.contains(point);
 }
 
 /// @brief Test whether a point is inside a sphere.
 ///
-/// Free function wrapper around Sphere::Contains().
+/// Free function wrapper around Sphere::contains().
 ///
 /// @param point The point to test.
 /// @param sphere The sphere to test against.
 /// @return true if the point is inside or on the boundary of the sphere.
 template <class T, int N>
-constexpr bool PointInSphere(const Vector<T, N>& point,
+constexpr bool pointInSphere(const Vector<T, N>& point,
                              const Sphere<T, N>& sphere) {
-  return sphere.Contains(point);
+  return sphere.contains(point);
 }
 
 /// @brief Test whether a point lies on a plane within a given tolerance.
@@ -245,9 +245,9 @@ constexpr bool PointInSphere(const Vector<T, N>& point,
 /// @param epsilon The tolerance for the distance check.
 /// @return true if the point is within epsilon of the plane.
 template <class T>
-inline bool PointOnPlane(const Vector<T, 3>& point, const Plane<T>& plane,
+inline bool pointOnPlane(const Vector<T, 3>& point, const Plane<T>& plane,
                          T epsilon) {
-  return std::abs(plane.SignedDistance(point)) < epsilon;
+  return std::abs(plane.signedDistance(point)) < epsilon;
 }
 
 /// @}
