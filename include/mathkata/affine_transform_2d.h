@@ -350,6 +350,17 @@ constexpr AffineTransform2D<T> operator*(const AffineTransform2D<T>& lhs,
   return result;
 }
 
+/// @brief Transform a 2D point by an affine transform.
+///
+/// @param transform The transform to apply.
+/// @param point The point to transform.
+/// @return The transformed point.
+template <class T>
+constexpr Vector<T, 2> operator*(const AffineTransform2D<T>& transform,
+                                 const Vector<T, 2>& point) {
+  return transform.TransformPoint(point);
+}
+
 /// @brief Compose two 2D affine transforms in-place.
 ///
 /// @param lhs Left-hand side transform, modified in-place.
