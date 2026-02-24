@@ -17,6 +17,8 @@
 #ifndef MATHKATA_GLSL_MAPPINGS_H_
 #define MATHKATA_GLSL_MAPPINGS_H_
 
+#include "mathkata/affine_transform_2d.h"
+#include "mathkata/color.h"
 #include "mathkata/matrix.h"
 #include "mathkata/quaternion.h"
 #include "mathkata/rect.h"
@@ -83,6 +85,12 @@ typedef Rect<float> rectf;
 typedef Rect<double> rectd;
 /// Rect composed of type <code>int</code>.
 typedef Rect<int> recti;
+
+/// 2D affine transform composed of type <code>float</code>.
+typedef AffineTransform2D<float> affine2d;
+
+/// RGBA color with 8-bit components.
+typedef Color color;
 
 /// @brief Reflect incident vector off a surface with the given normal.
 ///
