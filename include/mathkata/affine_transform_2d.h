@@ -179,6 +179,14 @@ class AffineTransform2D {
 
   /// @brief Apply a translation to this transform.
   ///
+  /// @param offset Translation vector.
+  /// @return Reference to this transform for chaining.
+  constexpr AffineTransform2D& Translate(const Vector<T, 2>& offset) {
+    return Translate(offset.x, offset.y);
+  }
+
+  /// @brief Apply a translation to this transform.
+  ///
   /// @param x Translation along the X axis.
   /// @param y Translation along the Y axis.
   /// @return Reference to this transform for chaining.
@@ -211,6 +219,24 @@ class AffineTransform2D {
     Translate(center.x, center.y);
     Rotate(angle_degrees);
     return Translate(-center.x, -center.y);
+  }
+
+  /// @brief Apply a scale to this transform.
+  ///
+  /// @param factors Scale factors for each axis.
+  /// @return Reference to this transform for chaining.
+  constexpr AffineTransform2D& Scale(const Vector<T, 2>& factors) {
+    return Scale(factors.x, factors.y);
+  }
+
+  /// @brief Apply a scale around a center point to this transform.
+  ///
+  /// @param factors Scale factors for each axis.
+  /// @param center The center of scaling.
+  /// @return Reference to this transform for chaining.
+  constexpr AffineTransform2D& Scale(const Vector<T, 2>& factors,
+                                     const Vector<T, 2>& center) {
+    return Scale(factors.x, factors.y, center);
   }
 
   /// @brief Apply a scale to this transform.
