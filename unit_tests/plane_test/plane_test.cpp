@@ -66,99 +66,99 @@ void ConstructVector4_Test(T /*precision*/) {
 }
 TEST_PLANE_F(ConstructVector4)
 
-// Test FromPointNormal factory method.
+// Test fromPointNormal factory method.
 template <class T>
-void FromPointNormal_Test(T precision) {
+void fromPointNormal_Test(T precision) {
   // A plane at y=3 with normal pointing up.
   const Vec3<T> point(0, 3, 0);
   const Vec3<T> normal(0, 1, 0);
   const mathkata::Plane<T> plane =
-      mathkata::Plane<T>::FromPointNormal(point, normal);
+      mathkata::Plane<T>::fromPointNormal(point, normal);
   EXPECT_EQ(plane.normal, normal);
   // distance should be -dot(normal, point) = -3
   EXPECT_NEAR(plane.distance, static_cast<T>(-3), precision);
   // The point itself should lie on the plane.
-  EXPECT_NEAR(plane.SignedDistance(point), static_cast<T>(0), precision);
+  EXPECT_NEAR(plane.signedDistance(point), static_cast<T>(0), precision);
 }
-TEST_PLANE_F(FromPointNormal)
+TEST_PLANE_F(fromPointNormal)
 
-// Test FromPoints factory method.
+// Test fromPoints factory method.
 template <class T>
-void FromPoints_Test(T precision) {
+void fromPoints_Test(T precision) {
   // Three points on the XZ plane (y=0).
   const Vec3<T> a(0, 0, 0);
   const Vec3<T> b(1, 0, 0);
   const Vec3<T> c(0, 0, 1);
-  const mathkata::Plane<T> plane = mathkata::Plane<T>::FromPoints(a, b, c);
+  const mathkata::Plane<T> plane = mathkata::Plane<T>::fromPoints(a, b, c);
   // The normal should point in the +Y or -Y direction.
   // Cross product of (b-a)=(1,0,0) and (c-a)=(0,0,1) is (0,-1,0).
-  // Normalized: (0,-1,0).
+  // normalized: (0,-1,0).
   EXPECT_NEAR(std::abs(plane.normal[1]), static_cast<T>(1), precision);
   EXPECT_NEAR(plane.normal[0], static_cast<T>(0), precision);
   EXPECT_NEAR(plane.normal[2], static_cast<T>(0), precision);
   // All three points should lie on the plane.
-  EXPECT_NEAR(plane.SignedDistance(a), static_cast<T>(0), precision);
-  EXPECT_NEAR(plane.SignedDistance(b), static_cast<T>(0), precision);
-  EXPECT_NEAR(plane.SignedDistance(c), static_cast<T>(0), precision);
+  EXPECT_NEAR(plane.signedDistance(a), static_cast<T>(0), precision);
+  EXPECT_NEAR(plane.signedDistance(b), static_cast<T>(0), precision);
+  EXPECT_NEAR(plane.signedDistance(c), static_cast<T>(0), precision);
 }
-TEST_PLANE_F(FromPoints)
+TEST_PLANE_F(fromPoints)
 
-// Test SignedDistance with points on positive side, negative side, and on
+// Test signedDistance with points on positive side, negative side, and on
 // plane.
 template <class T>
-void SignedDistance_Test(T precision) {
+void signedDistance_Test(T precision) {
   // Plane: y = 2 (normal=(0,1,0), distance=-2)
   const Vec3<T> plane_point(0, 2, 0);
   const Vec3<T> plane_normal(0, 1, 0);
   const mathkata::Plane<T> plane =
-      mathkata::Plane<T>::FromPointNormal(plane_point, plane_normal);
+      mathkata::Plane<T>::fromPointNormal(plane_point, plane_normal);
   // Point on the plane.
   const Vec3<T> on_plane(5, 2, 3);
-  EXPECT_NEAR(plane.SignedDistance(on_plane), static_cast<T>(0), precision);
+  EXPECT_NEAR(plane.signedDistance(on_plane), static_cast<T>(0), precision);
   // Point on the positive side (above the plane).
   const Vec3<T> above(0, 5, 0);
-  EXPECT_NEAR(plane.SignedDistance(above), static_cast<T>(3), precision);
+  EXPECT_NEAR(plane.signedDistance(above), static_cast<T>(3), precision);
   // Point on the negative side (below the plane).
   const Vec3<T> below(0, -1, 0);
-  EXPECT_NEAR(plane.SignedDistance(below), static_cast<T>(-3), precision);
+  EXPECT_NEAR(plane.signedDistance(below), static_cast<T>(-3), precision);
 }
-TEST_PLANE_F(SignedDistance)
+TEST_PLANE_F(signedDistance)
 
-// Test ProjectPoint.
+// Test projectPoint.
 template <class T>
-void ProjectPoint_Test(T precision) {
+void projectPoint_Test(T precision) {
   // Plane: y = 2 (normal=(0,1,0), distance=-2)
   const Vec3<T> plane_point(0, 2, 0);
   const Vec3<T> plane_normal(0, 1, 0);
   const mathkata::Plane<T> plane =
-      mathkata::Plane<T>::FromPointNormal(plane_point, plane_normal);
-  // Project a point above the plane.
+      mathkata::Plane<T>::fromPointNormal(plane_point, plane_normal);
+  // project a point above the plane.
   const Vec3<T> point_above(3, 7, 4);
-  const Vec3<T> projected = plane.ProjectPoint(point_above);
+  const Vec3<T> projected = plane.projectPoint(point_above);
   EXPECT_NEAR(projected[0], static_cast<T>(3), precision);
   EXPECT_NEAR(projected[1], static_cast<T>(2), precision);
   EXPECT_NEAR(projected[2], static_cast<T>(4), precision);
   // A point already on the plane should project to itself.
   const Vec3<T> on_plane(3, 2, 4);
-  const Vec3<T> projected_on = plane.ProjectPoint(on_plane);
+  const Vec3<T> projected_on = plane.projectPoint(on_plane);
   EXPECT_NEAR(projected_on[0], on_plane[0], precision);
   EXPECT_NEAR(projected_on[1], on_plane[1], precision);
   EXPECT_NEAR(projected_on[2], on_plane[2], precision);
 }
-TEST_PLANE_F(ProjectPoint)
+TEST_PLANE_F(projectPoint)
 
-// Test Flipped.
+// Test flipped.
 template <class T>
-void Flipped_Test(T /*precision*/) {
+void flipped_Test(T /*precision*/) {
   const Vec3<T> normal(0, 1, 0);
   const T distance = static_cast<T>(-3);
   const mathkata::Plane<T> plane(normal, distance);
-  const mathkata::Plane<T> flipped = plane.Flipped();
+  const mathkata::Plane<T> flipped = plane.flipped();
   const Vec3<T> neg_normal = -normal;
   EXPECT_EQ(flipped.normal, neg_normal);
   EXPECT_EQ(flipped.distance, -distance);
 }
-TEST_PLANE_F(Flipped)
+TEST_PLANE_F(flipped)
 
 // Test equality and inequality operators.
 template <class T>

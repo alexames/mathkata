@@ -68,7 +68,7 @@ void ConstructCenterExtents_Test(T precision) {
   mathkata::Vector<T, N> center(static_cast<T>(3));
   mathkata::Vector<T, N> extents(static_cast<T>(2));
   mathkata::AABB<T, N> box =
-      mathkata::AABB<T, N>::FromCenterExtents(center, extents);
+      mathkata::AABB<T, N>::fromCenterExtents(center, extents);
   for (int i = 0; i < N; ++i) {
     EXPECT_NEAR(box.min[i], static_cast<T>(1), precision);
     EXPECT_NEAR(box.max[i], static_cast<T>(5), precision);
@@ -76,73 +76,73 @@ void ConstructCenterExtents_Test(T precision) {
 }
 TEST_ALL_AABB_F(ConstructCenterExtents)
 
-// --- Center, Extents, Size tests ---
+// --- center, extents, size tests ---
 
 template <class T, int N>
-void Center_Test(T precision) {
+void center_Test(T precision) {
   mathkata::Vector<T, N> lo(static_cast<T>(2));
   mathkata::Vector<T, N> hi(static_cast<T>(8));
   mathkata::AABB<T, N> box(lo, hi);
-  mathkata::Vector<T, N> c = box.Center();
+  mathkata::Vector<T, N> c = box.center();
   for (int i = 0; i < N; ++i) {
     EXPECT_NEAR(c[i], static_cast<T>(5), precision);
   }
 }
-TEST_ALL_AABB_F(Center)
+TEST_ALL_AABB_F(center)
 
 template <class T, int N>
-void Extents_Test(T precision) {
+void extents_Test(T precision) {
   mathkata::Vector<T, N> lo(static_cast<T>(2));
   mathkata::Vector<T, N> hi(static_cast<T>(8));
   mathkata::AABB<T, N> box(lo, hi);
-  mathkata::Vector<T, N> ext = box.Extents();
+  mathkata::Vector<T, N> ext = box.extents();
   for (int i = 0; i < N; ++i) {
     EXPECT_NEAR(ext[i], static_cast<T>(3), precision);
   }
 }
-TEST_ALL_AABB_F(Extents)
+TEST_ALL_AABB_F(extents)
 
 template <class T, int N>
-void Size_Test(T precision) {
+void size_Test(T precision) {
   mathkata::Vector<T, N> lo(static_cast<T>(2));
   mathkata::Vector<T, N> hi(static_cast<T>(8));
   mathkata::AABB<T, N> box(lo, hi);
-  mathkata::Vector<T, N> s = box.Size();
+  mathkata::Vector<T, N> s = box.size();
   for (int i = 0; i < N; ++i) {
     EXPECT_NEAR(s[i], static_cast<T>(6), precision);
   }
 }
-TEST_ALL_AABB_F(Size)
+TEST_ALL_AABB_F(size)
 
-// --- Contains (point) tests ---
+// --- contains (point) tests ---
 
 template <class T, int N>
-void ContainsPoint_Test(T /*precision*/) {
+void containsPoint_Test(T /*precision*/) {
   mathkata::Vector<T, N> lo(static_cast<T>(0));
   mathkata::Vector<T, N> hi(static_cast<T>(10));
   mathkata::AABB<T, N> box(lo, hi);
 
   // Point inside
   mathkata::Vector<T, N> inside(static_cast<T>(5));
-  EXPECT_TRUE(box.Contains(inside));
+  EXPECT_TRUE(box.contains(inside));
 
   // Point on min boundary
-  EXPECT_TRUE(box.Contains(lo));
+  EXPECT_TRUE(box.contains(lo));
 
   // Point on max boundary
-  EXPECT_TRUE(box.Contains(hi));
+  EXPECT_TRUE(box.contains(hi));
 
   // Point outside (below min)
   mathkata::Vector<T, N> below(static_cast<T>(-1));
-  EXPECT_FALSE(box.Contains(below));
+  EXPECT_FALSE(box.contains(below));
 
   // Point outside (above max)
   mathkata::Vector<T, N> above(static_cast<T>(11));
-  EXPECT_FALSE(box.Contains(above));
+  EXPECT_FALSE(box.contains(above));
 }
-TEST_ALL_AABB_F(ContainsPoint)
+TEST_ALL_AABB_F(containsPoint)
 
-// --- Contains (AABB) tests ---
+// --- contains (AABB) tests ---
 
 template <class T, int N>
 void ContainsAABB_Test(T /*precision*/) {
@@ -153,27 +153,27 @@ void ContainsAABB_Test(T /*precision*/) {
   // Inner box fully contained
   mathkata::AABB<T, N> inner(mathkata::Vector<T, N>(static_cast<T>(2)),
                              mathkata::Vector<T, N>(static_cast<T>(8)));
-  EXPECT_TRUE(outer.Contains(inner));
+  EXPECT_TRUE(outer.contains(inner));
 
   // Same box contains itself
-  EXPECT_TRUE(outer.Contains(outer));
+  EXPECT_TRUE(outer.contains(outer));
 
   // Partially overlapping box is not contained
   mathkata::AABB<T, N> partial(mathkata::Vector<T, N>(static_cast<T>(5)),
                                mathkata::Vector<T, N>(static_cast<T>(15)));
-  EXPECT_FALSE(outer.Contains(partial));
+  EXPECT_FALSE(outer.contains(partial));
 
   // Completely outside box is not contained
   mathkata::AABB<T, N> outside(mathkata::Vector<T, N>(static_cast<T>(11)),
                                mathkata::Vector<T, N>(static_cast<T>(20)));
-  EXPECT_FALSE(outer.Contains(outside));
+  EXPECT_FALSE(outer.contains(outside));
 }
 TEST_ALL_AABB_F(ContainsAABB)
 
-// --- Intersects tests ---
+// --- intersects tests ---
 
 template <class T, int N>
-void Intersects_Test(T /*precision*/) {
+void intersects_Test(T /*precision*/) {
   mathkata::Vector<T, N> lo(static_cast<T>(0));
   mathkata::Vector<T, N> hi(static_cast<T>(10));
   mathkata::AABB<T, N> box(lo, hi);
@@ -181,84 +181,84 @@ void Intersects_Test(T /*precision*/) {
   // Overlapping box
   mathkata::AABB<T, N> overlapping(mathkata::Vector<T, N>(static_cast<T>(5)),
                                    mathkata::Vector<T, N>(static_cast<T>(15)));
-  EXPECT_TRUE(box.Intersects(overlapping));
+  EXPECT_TRUE(box.intersects(overlapping));
 
   // Touching at boundary
   mathkata::AABB<T, N> touching(mathkata::Vector<T, N>(static_cast<T>(10)),
                                 mathkata::Vector<T, N>(static_cast<T>(20)));
-  EXPECT_TRUE(box.Intersects(touching));
+  EXPECT_TRUE(box.intersects(touching));
 
   // Fully contained box
   mathkata::AABB<T, N> inner(mathkata::Vector<T, N>(static_cast<T>(2)),
                              mathkata::Vector<T, N>(static_cast<T>(8)));
-  EXPECT_TRUE(box.Intersects(inner));
+  EXPECT_TRUE(box.intersects(inner));
 
   // Non-overlapping box
   mathkata::AABB<T, N> separate(mathkata::Vector<T, N>(static_cast<T>(11)),
                                 mathkata::Vector<T, N>(static_cast<T>(20)));
-  EXPECT_FALSE(box.Intersects(separate));
+  EXPECT_FALSE(box.intersects(separate));
 
   // Self intersection
-  EXPECT_TRUE(box.Intersects(box));
+  EXPECT_TRUE(box.intersects(box));
 }
-TEST_ALL_AABB_F(Intersects)
+TEST_ALL_AABB_F(intersects)
 
-// --- Intersection tests ---
+// --- intersection tests ---
 
 template <class T, int N>
-void Intersection_Test(T precision) {
+void intersection_Test(T precision) {
   mathkata::AABB<T, N> a(mathkata::Vector<T, N>(static_cast<T>(0)),
                          mathkata::Vector<T, N>(static_cast<T>(10)));
   mathkata::AABB<T, N> b(mathkata::Vector<T, N>(static_cast<T>(5)),
                          mathkata::Vector<T, N>(static_cast<T>(15)));
-  mathkata::AABB<T, N> result = a.Intersection(b);
+  mathkata::AABB<T, N> result = a.intersection(b);
   for (int i = 0; i < N; ++i) {
     EXPECT_NEAR(result.min[i], static_cast<T>(5), precision);
     EXPECT_NEAR(result.max[i], static_cast<T>(10), precision);
   }
 }
-TEST_ALL_AABB_F(Intersection)
+TEST_ALL_AABB_F(intersection)
 
-// --- Union tests ---
+// --- merge tests ---
 
 template <class T, int N>
-void Union_Test(T precision) {
+void merge_Test(T precision) {
   mathkata::AABB<T, N> a(mathkata::Vector<T, N>(static_cast<T>(0)),
                          mathkata::Vector<T, N>(static_cast<T>(5)));
   mathkata::AABB<T, N> b(mathkata::Vector<T, N>(static_cast<T>(3)),
                          mathkata::Vector<T, N>(static_cast<T>(10)));
-  mathkata::AABB<T, N> result = a.Union(b);
+  mathkata::AABB<T, N> result = a.merge(b);
   for (int i = 0; i < N; ++i) {
     EXPECT_NEAR(result.min[i], static_cast<T>(0), precision);
     EXPECT_NEAR(result.max[i], static_cast<T>(10), precision);
   }
 }
-TEST_ALL_AABB_F(Union)
+TEST_ALL_AABB_F(merge)
 
-// --- Expand (point) tests ---
+// --- expand (point) tests ---
 
 template <class T, int N>
 void ExpandPoint_Test(T precision) {
   mathkata::AABB<T, N> box(mathkata::Vector<T, N>(static_cast<T>(0)),
                            mathkata::Vector<T, N>(static_cast<T>(5)));
   mathkata::Vector<T, N> point(static_cast<T>(10));
-  box.Expand(point);
+  box.expand(point);
   for (int i = 0; i < N; ++i) {
     EXPECT_NEAR(box.min[i], static_cast<T>(0), precision);
     EXPECT_NEAR(box.max[i], static_cast<T>(10), precision);
   }
 
-  // Expand with point below min
+  // expand with point below min
   mathkata::Vector<T, N> below(static_cast<T>(-5));
-  box.Expand(below);
+  box.expand(below);
   for (int i = 0; i < N; ++i) {
     EXPECT_NEAR(box.min[i], static_cast<T>(-5), precision);
     EXPECT_NEAR(box.max[i], static_cast<T>(10), precision);
   }
 
-  // Expand with point already inside does nothing
+  // expand with point already inside does nothing
   mathkata::Vector<T, N> inside(static_cast<T>(3));
-  box.Expand(inside);
+  box.expand(inside);
   for (int i = 0; i < N; ++i) {
     EXPECT_NEAR(box.min[i], static_cast<T>(-5), precision);
     EXPECT_NEAR(box.max[i], static_cast<T>(10), precision);
@@ -266,7 +266,7 @@ void ExpandPoint_Test(T precision) {
 }
 TEST_ALL_AABB_F(ExpandPoint)
 
-// --- Expand (AABB) tests ---
+// --- expand (AABB) tests ---
 
 template <class T, int N>
 void ExpandAABB_Test(T precision) {
@@ -274,16 +274,16 @@ void ExpandAABB_Test(T precision) {
                            mathkata::Vector<T, N>(static_cast<T>(5)));
   mathkata::AABB<T, N> other(mathkata::Vector<T, N>(static_cast<T>(3)),
                              mathkata::Vector<T, N>(static_cast<T>(10)));
-  box.Expand(other);
+  box.expand(other);
   for (int i = 0; i < N; ++i) {
     EXPECT_NEAR(box.min[i], static_cast<T>(0), precision);
     EXPECT_NEAR(box.max[i], static_cast<T>(10), precision);
   }
 
-  // Expand with fully contained AABB does nothing
+  // expand with fully contained AABB does nothing
   mathkata::AABB<T, N> inner(mathkata::Vector<T, N>(static_cast<T>(2)),
                              mathkata::Vector<T, N>(static_cast<T>(8)));
-  box.Expand(inner);
+  box.expand(inner);
   for (int i = 0; i < N; ++i) {
     EXPECT_NEAR(box.min[i], static_cast<T>(0), precision);
     EXPECT_NEAR(box.max[i], static_cast<T>(10), precision);
@@ -320,24 +320,24 @@ TEST_F(AABBTests, NonUniform2D_float) {
   mathkata::Vector<float, 2> hi(5.0f, 8.0f);
   mathkata::AABB<float, 2> box(lo, hi);
 
-  mathkata::Vector<float, 2> center = box.Center();
+  mathkata::Vector<float, 2> center = box.center();
   EXPECT_NEAR(center[0], 3.0f, FLOAT_PRECISION);
   EXPECT_NEAR(center[1], 5.0f, FLOAT_PRECISION);
 
-  mathkata::Vector<float, 2> extents = box.Extents();
+  mathkata::Vector<float, 2> extents = box.extents();
   EXPECT_NEAR(extents[0], 2.0f, FLOAT_PRECISION);
   EXPECT_NEAR(extents[1], 3.0f, FLOAT_PRECISION);
 
-  mathkata::Vector<float, 2> size = box.Size();
+  mathkata::Vector<float, 2> size = box.size();
   EXPECT_NEAR(size[0], 4.0f, FLOAT_PRECISION);
   EXPECT_NEAR(size[1], 6.0f, FLOAT_PRECISION);
 
   // Point inside
-  EXPECT_TRUE(box.Contains(mathkata::Vector<float, 2>(3.0f, 5.0f)));
+  EXPECT_TRUE(box.contains(mathkata::Vector<float, 2>(3.0f, 5.0f)));
   // Point outside in x
-  EXPECT_FALSE(box.Contains(mathkata::Vector<float, 2>(0.0f, 5.0f)));
+  EXPECT_FALSE(box.contains(mathkata::Vector<float, 2>(0.0f, 5.0f)));
   // Point outside in y
-  EXPECT_FALSE(box.Contains(mathkata::Vector<float, 2>(3.0f, 9.0f)));
+  EXPECT_FALSE(box.contains(mathkata::Vector<float, 2>(3.0f, 9.0f)));
 }
 
 // --- Test with specific 3D values (non-uniform) ---
@@ -347,17 +347,17 @@ TEST_F(AABBTests, NonUniform3D_double) {
   mathkata::Vector<double, 3> hi(7.0, 10.0, 9.0);
   mathkata::AABB<double, 3> box(lo, hi);
 
-  mathkata::Vector<double, 3> center = box.Center();
+  mathkata::Vector<double, 3> center = box.center();
   EXPECT_NEAR(center[0], 4.0, DOUBLE_PRECISION);
   EXPECT_NEAR(center[1], 6.0, DOUBLE_PRECISION);
   EXPECT_NEAR(center[2], 6.0, DOUBLE_PRECISION);
 
-  mathkata::Vector<double, 3> extents = box.Extents();
+  mathkata::Vector<double, 3> extents = box.extents();
   EXPECT_NEAR(extents[0], 3.0, DOUBLE_PRECISION);
   EXPECT_NEAR(extents[1], 4.0, DOUBLE_PRECISION);
   EXPECT_NEAR(extents[2], 3.0, DOUBLE_PRECISION);
 
-  mathkata::Vector<double, 3> size = box.Size();
+  mathkata::Vector<double, 3> size = box.size();
   EXPECT_NEAR(size[0], 6.0, DOUBLE_PRECISION);
   EXPECT_NEAR(size[1], 8.0, DOUBLE_PRECISION);
   EXPECT_NEAR(size[2], 6.0, DOUBLE_PRECISION);
@@ -369,22 +369,22 @@ TEST_F(AABBTests, DefaultDimension) {
   // AABB<float> should default to N=3.
   mathkata::AABB<float> box(mathkata::Vector<float, 3>(0.0f, 0.0f, 0.0f),
                             mathkata::Vector<float, 3>(1.0f, 1.0f, 1.0f));
-  mathkata::Vector<float, 3> center = box.Center();
+  mathkata::Vector<float, 3> center = box.center();
   EXPECT_NEAR(center[0], 0.5f, FLOAT_PRECISION);
   EXPECT_NEAR(center[1], 0.5f, FLOAT_PRECISION);
   EXPECT_NEAR(center[2], 0.5f, FLOAT_PRECISION);
 }
 
-// --- Test FromCenterExtents round-trip ---
+// --- Test fromCenterExtents round-trip ---
 
 TEST_F(AABBTests, CenterExtentsRoundTrip_float_3) {
   mathkata::Vector<float, 3> center(5.0f, 10.0f, 15.0f);
   mathkata::Vector<float, 3> extents(2.0f, 3.0f, 4.0f);
   mathkata::AABB<float, 3> box =
-      mathkata::AABB<float, 3>::FromCenterExtents(center, extents);
+      mathkata::AABB<float, 3>::fromCenterExtents(center, extents);
 
-  mathkata::Vector<float, 3> computed_center = box.Center();
-  mathkata::Vector<float, 3> computed_extents = box.Extents();
+  mathkata::Vector<float, 3> computed_center = box.center();
+  mathkata::Vector<float, 3> computed_extents = box.extents();
 
   for (int i = 0; i < 3; ++i) {
     EXPECT_NEAR(computed_center[i], center[i], FLOAT_PRECISION);

@@ -67,23 +67,23 @@ class Vector;
 
 /// @cond MATHKATA_INTERNAL
 template <class T, int Dims>
-static constexpr T DotProductHelper(const Vector<T, Dims>& v1,
+static constexpr T dotProductHelper(const Vector<T, Dims>& v1,
                                     const Vector<T, Dims>& v2);
 template <class T>
-static constexpr T DotProductHelper(const Vector<T, 2>& v1,
+static constexpr T dotProductHelper(const Vector<T, 2>& v1,
                                     const Vector<T, 2>& v2);
 template <class T>
-static constexpr T DotProductHelper(const Vector<T, 3>& v1,
+static constexpr T dotProductHelper(const Vector<T, 3>& v1,
                                     const Vector<T, 3>& v2);
 template <class T>
-static constexpr T DotProductHelper(const Vector<T, 4>& v1,
+static constexpr T dotProductHelper(const Vector<T, 4>& v1,
                                     const Vector<T, 4>& v2);
 
 template <typename T, int Dims, typename CompatibleT>
-static inline Vector<T, Dims> FromTypeHelper(const CompatibleT& compatible);
+static inline Vector<T, Dims> fromTypeHelper(const CompatibleT& compatible);
 
 template <typename T, int Dims, typename CompatibleT>
-static inline CompatibleT ToTypeHelper(const Vector<T, Dims>& v);
+static inline CompatibleT toTypeHelper(const Vector<T, Dims>& v);
 /// @endcond
 
 /// @addtogroup mathkata_vector
@@ -102,7 +102,7 @@ static inline CompatibleT ToTypeHelper(const Vector<T, Dims>& v);
 /// <blockquote><code><pre>
 /// VectorPacked<float, 3> packed;
 /// Vector<float, 3> vector(3, 2, 1);
-/// vector.Pack(&packed);
+/// vector.pack(&packed);
 /// </pre></code></blockquote>
 /// or<br>
 /// <blockquote><code><pre>
@@ -134,7 +134,7 @@ struct VectorPacked {
   ///
   /// Both VectorPacked and Vector must have the same number of dimensions.
   /// @param vector Vector to create the VectorPacked from.
-  explicit VectorPacked(const Vector<T, Dims>& vector) { vector.Pack(this); }
+  explicit VectorPacked(const Vector<T, Dims>& vector) { vector.pack(this); }
 
   /// Copy a Vector to a VectorPacked.
   ///
@@ -142,7 +142,7 @@ struct VectorPacked {
   /// @param vector Vector to copy to the VectorPacked.
   /// @returns A reference to this VectorPacked.
   VectorPacked& operator=(const Vector<T, Dims>& vector) {
-    vector.Pack(this);
+    vector.pack(this);
     return *this;
   }
 
@@ -476,30 +476,30 @@ class Vector {
     return Vector<T, 2>(data_[2], data_[3]);
   }
 
-  /// @brief Pack a Vector to a packed "Dims" element vector structure.
+  /// @brief pack a Vector to a packed "Dims" element vector structure.
   ///
   /// @param vector Packed "Dims" element vector to write to.
-  constexpr void Pack(VectorPacked<T, Dims>* const vector) const {
+  constexpr void pack(VectorPacked<T, Dims>* const vector) const {
     MATHKATA_VECTOR_OPERATION(vector->data_[i] = data_[i]);
   }
 
   /// @brief Calculate the squared length of this vector.
   ///
   /// @return The length of this vector squared.
-  constexpr T LengthSquared() const { return LengthSquaredHelper(*this); }
+  constexpr T lengthSquared() const { return lengthSquaredHelper(*this); }
 
   /// @brief Calculate the length of this vector.
   ///
   /// @return The length of this vector.
-  inline T Length() const { return LengthHelper(*this); }
+  inline T length() const { return lengthHelper(*this); }
 
-  /// @brief Normalize this vector in-place.
+  /// @brief normalize this vector in-place.
   ///
   /// The vector must have non-zero length. Normalizing a zero-length vector
   /// produces undefined results.
   ///
   /// @return The length of this vector.
-  inline T Normalize() { return NormalizeHelper(*this); }
+  inline T normalize() { return normalizeHelper(*this); }
 
   /// @brief Calculate the normalized version of this vector.
   ///
@@ -507,7 +507,7 @@ class Vector {
   /// produces undefined results.
   ///
   /// @return The normalized vector.
-  inline Vector<T, Dims> Normalized() const { return NormalizedHelper(*this); }
+  inline Vector<T, Dims> normalized() const { return normalizedHelper(*this); }
 
   /// @brief Load from any type that is some formulation of a length Dims array
   /// of
@@ -518,8 +518,8 @@ class Vector {
   ///
   /// @return `compatible` cast to `Vector<T,Dims>` and dereferenced.
   template <typename CompatibleT>
-  static inline Vector<T, Dims> FromType(const CompatibleT& compatible) {
-    return FromTypeHelper<T, Dims, CompatibleT>(compatible);
+  static inline Vector<T, Dims> fromType(const CompatibleT& compatible) {
+    return fromTypeHelper<T, Dims, CompatibleT>(compatible);
   }
 
   /// @brief Load into any type that is some formulation of a length Dims array
@@ -531,8 +531,8 @@ class Vector {
   ///
   /// @return `v` cast to `CompatibleT` and dereferenced.
   template <typename CompatibleT>
-  static inline CompatibleT ToType(const Vector<T, Dims>& v) {
-    return ToTypeHelper<T, Dims, CompatibleT>(v);
+  static inline CompatibleT toType(const Vector<T, Dims>& v) {
+    return toTypeHelper<T, Dims, CompatibleT>(v);
   }
 
   /// @brief Calculate the dot product of two vectors.
@@ -540,9 +540,9 @@ class Vector {
   /// @param v1 First vector.
   /// @param v2 Second vector.
   /// @return The dot product of v1 and v2.
-  static constexpr T DotProduct(const Vector<T, Dims>& v1,
+  static constexpr T dotProduct(const Vector<T, Dims>& v1,
                                 const Vector<T, Dims>& v2) {
-    return DotProductHelper(v1, v2);
+    return dotProductHelper(v1, v2);
   }
 
   /// @brief Calculate the hadamard or componentwise product of two vectors.
@@ -550,9 +550,9 @@ class Vector {
   /// @param v1 First vector.
   /// @param v2 Second vector.
   /// @return The hadamard product of v1 and v2.
-  static constexpr Vector<T, Dims> HadamardProduct(const Vector<T, Dims>& v1,
+  static constexpr Vector<T, Dims> hadamardProduct(const Vector<T, Dims>& v1,
                                                    const Vector<T, Dims>& v2) {
-    return HadamardProductHelper(v1, v2);
+    return hadamardProductHelper(v1, v2);
   }
 
   /// @brief Calculate the componentwise division of two vectors.
@@ -560,9 +560,9 @@ class Vector {
   /// @param v1 First vector (numerator).
   /// @param v2 Second vector (denominator).
   /// @return The componentwise quotient of v1 and v2.
-  static constexpr Vector<T, Dims> HadamardDivide(const Vector<T, Dims>& v1,
+  static constexpr Vector<T, Dims> hadamardDivide(const Vector<T, Dims>& v1,
                                                   const Vector<T, Dims>& v2) {
-    return HadamardDivideHelper(v1, v2);
+    return hadamardDivideHelper(v1, v2);
   }
 
   /// @brief Calculate the cross product of two vectors.
@@ -571,9 +571,9 @@ class Vector {
   /// @param v1 First vector.
   /// @param v2 Second vector.
   /// @return The cross product of v1 and v2.
-  static constexpr Vector<T, 3> CrossProduct(const Vector<T, 3>& v1,
+  static constexpr Vector<T, 3> crossProduct(const Vector<T, 3>& v1,
                                              const Vector<T, 3>& v2) {
-    return CrossProductHelper(v1, v2);
+    return crossProductHelper(v1, v2);
   }
 
   /// @brief Calculate the 2D pseudo cross product of two vectors.
@@ -583,9 +583,9 @@ class Vector {
   /// @param v1 First vector.
   /// @param v2 Second vector.
   /// @return The scalar cross product of v1 and v2.
-  static constexpr T CrossProduct(const Vector<T, 2>& v1,
+  static constexpr T crossProduct(const Vector<T, 2>& v1,
                                   const Vector<T, 2>& v2) {
-    return CrossProductHelper(v1, v2);
+    return crossProductHelper(v1, v2);
   }
 
   /// @brief Linearly interpolate two vectors.
@@ -594,30 +594,30 @@ class Vector {
   /// @param v2 Second vector.
   /// @param percent Percentage from v1 to v2 in range 0.0...1.0.
   /// @return The hadamard product of v1 and v2.
-  static constexpr Vector<T, Dims> Lerp(const Vector<T, Dims>& v1,
+  static constexpr Vector<T, Dims> lerp(const Vector<T, Dims>& v1,
                                         const Vector<T, Dims>& v2,
                                         const T percent) {
-    return LerpHelper(v1, v2, percent);
+    return lerpHelper(v1, v2, percent);
   }
 
   /// @brief Compare each component and returns max values.
   ///
   /// @param v1 First vector.
   /// @param v2 Second vector.
-  /// @return Max value of v1 and v2.
-  static constexpr Vector<T, Dims> Max(const Vector<T, Dims>& v1,
+  /// @return max value of v1 and v2.
+  static constexpr Vector<T, Dims> max(const Vector<T, Dims>& v1,
                                        const Vector<T, Dims>& v2) {
-    return MaxHelper(v1, v2);
+    return maxHelper(v1, v2);
   }
 
   /// @brief Compare each component and returns min values.
   ///
   /// @param v1 First vector.
   /// @param v2 Second vector.
-  /// @return Min value of v1 and v2.
-  static constexpr Vector<T, Dims> Min(const Vector<T, Dims>& v1,
+  /// @return min value of v1 and v2.
+  static constexpr Vector<T, Dims> min(const Vector<T, Dims>& v1,
                                        const Vector<T, Dims>& v2) {
-    return MinHelper(v1, v2);
+    return minHelper(v1, v2);
   }
 
   /// @brief Check if val is within [range_start..range_end), checking all
@@ -627,20 +627,20 @@ class Vector {
   /// @param range_start Starting point of the range (inclusive).
   /// @param range_end Ending point of the range (non-inclusive).
   /// @return Bool indicating val is in range for every component.
-  static constexpr bool InRange(const Vector<T, Dims>& val,
+  static constexpr bool inRange(const Vector<T, Dims>& val,
                                 const Vector<T, Dims>& range_start,
                                 const Vector<T, Dims>& range_end) {
-    return InRangeHelper(val, range_start, range_end);
+    return inRangeHelper(val, range_start, range_end);
   }
 
   /// @brief Returns the distance between 2 vectors.
   ///
   /// @param v1 First vector.
   /// @param v2 Second vector.
-  /// @return Distance between vectors v1 and v2.
-  static inline T Distance(const Vector<T, Dims>& v1,
+  /// @return distance between vectors v1 and v2.
+  static inline T distance(const Vector<T, Dims>& v1,
                            const Vector<T, Dims>& v2) {
-    return (v1 - v2).Length();
+    return (v1 - v2).length();
   }
 
   /// @brief Returns the squared distance between 2 vectors.
@@ -648,9 +648,9 @@ class Vector {
   /// @param v1 First vector.
   /// @param v2 Second vector.
   /// @return Squared distance between vectors v1 and v2.
-  static constexpr T DistanceSquared(const Vector<T, Dims>& v1,
+  static constexpr T distanceSquared(const Vector<T, Dims>& v1,
                                      const Vector<T, Dims>& v2) {
-    return (v1 - v2).LengthSquared();
+    return (v1 - v2).lengthSquared();
   }
 
   /// @brief Returns the angle between 2 vectors in radians.
@@ -658,9 +658,9 @@ class Vector {
   /// @pre Both input vectors must be non-zero.
   /// @param v1 First vector.
   /// @param v2 Second vector.
-  /// @return Angle between vectors v1 and v2.
-  static inline T Angle(const Vector<T, Dims>& v1, const Vector<T, Dims>& v2) {
-    return AngleHelper(v1, v2);
+  /// @return angle between vectors v1 and v2.
+  static inline T angle(const Vector<T, Dims>& v1, const Vector<T, Dims>& v2) {
+    return angleHelper(v1, v2);
   }
 
   /// @brief Calculate the projection of a vector onto another vector.
@@ -668,9 +668,9 @@ class Vector {
   /// @param v The vector to project.
   /// @param onto The vector to project onto. Must be non-zero.
   /// @return The vector projection of v onto onto.
-  static constexpr Vector<T, Dims> Project(const Vector<T, Dims>& v,
+  static constexpr Vector<T, Dims> project(const Vector<T, Dims>& v,
                                            const Vector<T, Dims>& onto) {
-    return ProjectHelper(v, onto);
+    return projectHelper(v, onto);
   }
 
   /// @brief Calculate the rejection of a vector from another vector.
@@ -679,20 +679,20 @@ class Vector {
   /// @param v The vector to reject.
   /// @param from The vector to reject from. Must be non-zero.
   /// @return The vector rejection of v from from.
-  static constexpr Vector<T, Dims> Reject(const Vector<T, Dims>& v,
+  static constexpr Vector<T, Dims> reject(const Vector<T, Dims>& v,
                                           const Vector<T, Dims>& from) {
-    return RejectHelper(v, from);
+    return rejectHelper(v, from);
   }
 
-  /// @brief Reflect an incident vector off a surface with the given normal.
+  /// @brief reflect an incident vector off a surface with the given normal.
   ///
   /// @param incident The incoming direction vector.
   /// @param normal The surface normal (must be normalized).
   /// @return The reflected direction.
   /// Matches GLSL reflect() semantics.
-  static constexpr Vector<T, Dims> Reflect(const Vector<T, Dims>& incident,
+  static constexpr Vector<T, Dims> reflect(const Vector<T, Dims>& incident,
                                            const Vector<T, Dims>& normal) {
-    return ReflectHelper(incident, normal);
+    return reflectHelper(incident, normal);
   }
 
   /// @brief Compute the refracted direction using Snell's law.
@@ -703,9 +703,9 @@ class Vector {
   /// @return The refracted direction, or zero vector for total internal
   ///         reflection.
   /// Matches GLSL refract() semantics.
-  static inline Vector<T, Dims> Refract(const Vector<T, Dims>& incident,
+  static inline Vector<T, Dims> refract(const Vector<T, Dims>& incident,
                                         const Vector<T, Dims>& normal, T eta) {
-    return RefractHelper(incident, normal, eta);
+    return refractHelper(incident, normal, eta);
   }
 
   MATHKATA_DEFINE_CLASS_SIMD_AWARE_NEW_DELETE
@@ -722,8 +722,8 @@ class Vector {
 ///
 /// @note: The likelyhood of two float values being the same is very small.
 /// Instead consider comparing the difference between two float vectors using
-/// LengthSquared() with an epsilon value.
-/// For example, v1.LengthSquared(v2) < epsilon.
+/// lengthSquared() with an epsilon value.
+/// For example, v1.lengthSquared(v2) < epsilon.
 ///
 /// @return true if the 2 vectors contains the same value, false otherwise.
 template <class T, int Dims>
@@ -771,7 +771,7 @@ constexpr Vector<T, Dims> operator-(const Vector<T, Dims>& v) {
   MATHKATA_VECTOR_OPERATOR(-v.data_[i]);
 }
 
-/// @brief Multiply a Vector by a scalar.
+/// @brief multiply a Vector by a scalar.
 ///
 /// Multiplies each component of the specified Vector with a scalar.
 ///
@@ -854,7 +854,7 @@ constexpr Vector<T, Dims> operator-(const Vector<T, Dims>& lhs,
   MATHKATA_VECTOR_OPERATOR(lhs.data_[i] - rhs[i]);
 }
 
-/// @brief Multiply a vector with a scalar.
+/// @brief multiply a vector with a scalar.
 ///
 /// @param v Vector for the operation.
 /// @param s A scalar to multiply the vector with.
@@ -908,7 +908,7 @@ constexpr Vector<T, Dims>& operator-=(Vector<T, Dims>& lhs,
   return lhs;
 }
 
-/// @brief Multiply (in-place) each element of a vector with a scalar.
+/// @brief multiply (in-place) each element of a vector with a scalar.
 ///
 /// @param v Vector for the operation.
 /// @param s A scalar to multiply the vector with.
@@ -958,7 +958,7 @@ constexpr Vector<T, Dims>& operator-=(Vector<T, Dims>& v, T s) {
 /// @param v2 Second vector.
 /// @return The hadamard product of v1 and v2.
 template <class T, int Dims>
-constexpr Vector<T, Dims> HadamardProductHelper(const Vector<T, Dims>& v1,
+constexpr Vector<T, Dims> hadamardProductHelper(const Vector<T, Dims>& v1,
                                                 const Vector<T, Dims>& v2) {
   MATHKATA_VECTOR_OPERATOR(v1[i] * v2[i]);
 }
@@ -969,7 +969,7 @@ constexpr Vector<T, Dims> HadamardProductHelper(const Vector<T, Dims>& v1,
 /// @param v2 Second vector (denominator).
 /// @return The componentwise quotient of v1 and v2.
 template <class T, int Dims>
-constexpr Vector<T, Dims> HadamardDivideHelper(const Vector<T, Dims>& v1,
+constexpr Vector<T, Dims> hadamardDivideHelper(const Vector<T, Dims>& v1,
                                                const Vector<T, Dims>& v2) {
   MATHKATA_VECTOR_OPERATOR(v1[i] / v2[i]);
 }
@@ -981,7 +981,7 @@ constexpr Vector<T, Dims> HadamardDivideHelper(const Vector<T, Dims>& v1,
 /// @param v2 Second vector.
 /// @return The cross product of v1 and v2.
 template <class T>
-constexpr Vector<T, 3> CrossProductHelper(const Vector<T, 3>& v1,
+constexpr Vector<T, 3> crossProductHelper(const Vector<T, 3>& v1,
                                           const Vector<T, 3>& v2) {
   return Vector<T, 3>(v1[1] * v2[2] - v1[2] * v2[1],
                       v1[2] * v2[0] - v1[0] * v2[2],
@@ -997,7 +997,7 @@ constexpr Vector<T, 3> CrossProductHelper(const Vector<T, 3>& v1,
 /// @param v2 Second vector.
 /// @return The scalar cross product of v1 and v2.
 template <class T>
-constexpr T CrossProductHelper(const Vector<T, 2>& v1, const Vector<T, 2>& v2) {
+constexpr T crossProductHelper(const Vector<T, 2>& v1, const Vector<T, 2>& v2) {
   return v1[0] * v2[1] - v1[1] * v2[0];
 }
 
@@ -1006,8 +1006,8 @@ constexpr T CrossProductHelper(const Vector<T, 2>& v1, const Vector<T, 2>& v2) {
 /// @param v Vector to get the squared length of.
 /// @return The squared length of the vector.
 template <class T, int Dims>
-constexpr T LengthSquaredHelper(const Vector<T, Dims>& v) {
-  return DotProductHelper(v, v);
+constexpr T lengthSquaredHelper(const Vector<T, Dims>& v) {
+  return dotProductHelper(v, v);
 }
 
 /// @brief Calculate the length of a vector.
@@ -1015,11 +1015,11 @@ constexpr T LengthSquaredHelper(const Vector<T, Dims>& v) {
 /// @param v Vector to get the length of.
 /// @return The length of the vector.
 template <class T, int Dims>
-inline T LengthHelper(const Vector<T, Dims>& v) {
-  return sqrt(LengthSquaredHelper(v));
+inline T lengthHelper(const Vector<T, Dims>& v) {
+  return sqrt(lengthSquaredHelper(v));
 }
 
-/// @brief Normalize a vector in-place.
+/// @brief normalize a vector in-place.
 ///
 /// The vector must have non-zero length. Normalizing a zero-length vector
 /// produces undefined results.
@@ -1027,8 +1027,8 @@ inline T LengthHelper(const Vector<T, Dims>& v) {
 /// @param v Vector to normalize.
 /// @return The length of the vector.
 template <class T, int Dims>
-inline T NormalizeHelper(Vector<T, Dims>& v) {
-  const T length = LengthHelper(v);
+inline T normalizeHelper(Vector<T, Dims>& v) {
+  const T length = lengthHelper(v);
   v *= (T(1) / length);
   return length;
 }
@@ -1041,8 +1041,8 @@ inline T NormalizeHelper(Vector<T, Dims>& v) {
 /// @param v Vector to get the normalized version of.
 /// @return The normalized vector.
 template <class T, int Dims>
-inline Vector<T, Dims> NormalizedHelper(const Vector<T, Dims>& v) {
-  return v * (T(1) / LengthHelper(v));
+inline Vector<T, Dims> normalizedHelper(const Vector<T, Dims>& v) {
+  return v * (T(1) / lengthHelper(v));
 }
 
 /// @brief Linearly interpolate two vectors.
@@ -1052,7 +1052,7 @@ inline Vector<T, Dims> NormalizedHelper(const Vector<T, Dims>& v) {
 /// @param percent Percentage from v1 to v2, usually in the range 0.0...1.0.
 /// @return The lerped mixture of v1 and v2.
 template <class T, int Dims>
-constexpr Vector<T, Dims> LerpHelper(const Vector<T, Dims>& v1,
+constexpr Vector<T, Dims> lerpHelper(const Vector<T, Dims>& v1,
                                      const Vector<T, Dims>& v2,
                                      const T percent) {
   MATHKATA_VECTOR_OPERATOR(v1[i] + (v2[i] - v1[i]) * percent);
@@ -1062,9 +1062,9 @@ constexpr Vector<T, Dims> LerpHelper(const Vector<T, Dims>& v1,
 ///
 /// @param v1 First vector.
 /// @param v2 Second vector.
-/// @return Max value of v1 and v2.
+/// @return max value of v1 and v2.
 template <class T, int Dims>
-constexpr Vector<T, Dims> MaxHelper(const Vector<T, Dims>& v1,
+constexpr Vector<T, Dims> maxHelper(const Vector<T, Dims>& v1,
                                     const Vector<T, Dims>& v2) {
   Vector<T, Dims> result;
   MATHKATA_VECTOR_OPERATION(result[i] = std::max(v1[i], v2[i]));
@@ -1075,9 +1075,9 @@ constexpr Vector<T, Dims> MaxHelper(const Vector<T, Dims>& v1,
 ///
 /// @param v1 First vector.
 /// @param v2 Second vector.
-/// @return Min value of v1 and v2.
+/// @return min value of v1 and v2.
 template <class T, int Dims>
-constexpr Vector<T, Dims> MinHelper(const Vector<T, Dims>& v1,
+constexpr Vector<T, Dims> minHelper(const Vector<T, Dims>& v1,
                                     const Vector<T, Dims>& v2) {
   Vector<T, Dims> result;
   MATHKATA_VECTOR_OPERATION(result[i] = std::min(v1[i], v2[i]));
@@ -1089,16 +1089,16 @@ constexpr Vector<T, Dims> MinHelper(const Vector<T, Dims>& v1,
 /// @pre Both input vectors must be non-zero.
 /// @param v1 First vector.
 /// @param v2 Second vector.
-/// @return Angle between vectors v1 and v2.
+/// @return angle between vectors v1 and v2.
 template <class T, int Dims>
-inline T AngleHelper(const Vector<T, Dims>& v1, const Vector<T, Dims>& v2) {
+inline T angleHelper(const Vector<T, Dims>& v1, const Vector<T, Dims>& v2) {
   // Applying law of cosines.
   // https://stackoverflow.com/questions/10507620/finding-the-angle-between-vectors
-  const T divisor = v1.Length() * v2.Length();
+  const T divisor = v1.length() * v2.length();
   assert(divisor != T(0));
-  const T cos_val = Vector<T, Dims>::DotProduct(v1, v2) / divisor;
-  // Clamp to [-1, 1] to avoid NaN from acos due to floating point error.
-  return std::acos(Clamp(cos_val, T(-1), T(1)));
+  const T cos_val = Vector<T, Dims>::dotProduct(v1, v2) / divisor;
+  // clamp to [-1, 1] to avoid NaN from acos due to floating point error.
+  return std::acos(clamp(cos_val, T(-1), T(1)));
 }
 
 /// @cond MATHKATA_INTERNAL
@@ -1113,11 +1113,11 @@ inline T AngleHelper(const Vector<T, Dims>& v1, const Vector<T, Dims>& v2) {
 /// @tparam T Type of vector components to test.
 /// @tparam Dims Number of dimensions of the vector.
 template <class T, int Dims>
-bool InRangeHelper(const Vector<T, Dims>& val,
+bool inRangeHelper(const Vector<T, Dims>& val,
                    const Vector<T, Dims>& range_start,
                    const Vector<T, Dims>& range_end) {
   for (int i = 0; i < Dims; ++i) {
-    if (!InRange(val[i], range_start[i], range_end[i])) return false;
+    if (!inRange(val[i], range_start[i], range_end[i])) return false;
   }
   return true;
 }
@@ -1134,9 +1134,9 @@ bool InRangeHelper(const Vector<T, Dims>& val,
 /// @tparam T Type of vector components to test.
 /// @tparam Dims Number of dimensions of the vector.
 template <class T, int Dims>
-bool InRange(const Vector<T, Dims>& val, const Vector<T, Dims>& range_start,
+bool inRange(const Vector<T, Dims>& val, const Vector<T, Dims>& range_start,
              const Vector<T, Dims>& range_end) {
-  return InRangeHelper(val, range_start, range_end);
+  return inRangeHelper(val, range_start, range_end);
 }
 
 /// @brief Calculate the projection of a vector onto another vector.
@@ -1145,9 +1145,9 @@ bool InRange(const Vector<T, Dims>& val, const Vector<T, Dims>& range_start,
 /// @param onto The vector to project onto. Must be non-zero.
 /// @return The vector projection of v onto onto.
 template <class T, int Dims>
-constexpr Vector<T, Dims> ProjectHelper(const Vector<T, Dims>& v,
+constexpr Vector<T, Dims> projectHelper(const Vector<T, Dims>& v,
                                         const Vector<T, Dims>& onto) {
-  return onto * (DotProductHelper(v, onto) / DotProductHelper(onto, onto));
+  return onto * (dotProductHelper(v, onto) / dotProductHelper(onto, onto));
 }
 
 /// @brief Calculate the rejection of a vector from another vector.
@@ -1157,22 +1157,22 @@ constexpr Vector<T, Dims> ProjectHelper(const Vector<T, Dims>& v,
 /// @param from The vector to reject from. Must be non-zero.
 /// @return The vector rejection of v from from.
 template <class T, int Dims>
-constexpr Vector<T, Dims> RejectHelper(const Vector<T, Dims>& v,
+constexpr Vector<T, Dims> rejectHelper(const Vector<T, Dims>& v,
                                        const Vector<T, Dims>& from) {
-  return v - ProjectHelper(v, from);
+  return v - projectHelper(v, from);
 }
 
-/// @brief Reflect an incident vector off a surface with the given normal.
+/// @brief reflect an incident vector off a surface with the given normal.
 ///
 /// @param incident The incoming direction vector.
 /// @param normal The surface normal (must be normalized).
 /// @return The reflected direction.
 /// Matches GLSL reflect() semantics.
 template <class T, int Dims>
-constexpr Vector<T, Dims> ReflectHelper(const Vector<T, Dims>& incident,
+constexpr Vector<T, Dims> reflectHelper(const Vector<T, Dims>& incident,
                                         const Vector<T, Dims>& normal) {
   return incident
-         - normal * (T(2) * Vector<T, Dims>::DotProduct(incident, normal));
+         - normal * (T(2) * Vector<T, Dims>::dotProduct(incident, normal));
 }
 
 /// @brief Compute the refracted direction using Snell's law.
@@ -1184,9 +1184,9 @@ constexpr Vector<T, Dims> ReflectHelper(const Vector<T, Dims>& incident,
 ///         reflection.
 /// Matches GLSL refract() semantics.
 template <class T, int Dims>
-inline Vector<T, Dims> RefractHelper(const Vector<T, Dims>& incident,
+inline Vector<T, Dims> refractHelper(const Vector<T, Dims>& incident,
                                      const Vector<T, Dims>& normal, T eta) {
-  T dot = Vector<T, Dims>::DotProduct(incident, normal);
+  T dot = Vector<T, Dims>::dotProduct(incident, normal);
   T k = T(1) - eta * eta * (T(1) - dot * dot);
   if (k < T(0)) return Vector<T, Dims>(T(0));
   return incident * eta - normal * (eta * dot + std::sqrt(k));
@@ -1195,7 +1195,7 @@ inline Vector<T, Dims> RefractHelper(const Vector<T, Dims>& incident,
 /// @brief Check if val is within [range_start..range_end), denoting a
 /// rectangular area.
 ///
-/// @deprecated Use InRange() instead, which works with any vector dimension.
+/// @deprecated Use inRange() instead, which works with any vector dimension.
 ///
 /// @param val 2D vector to be tested.
 /// @param range_start Starting point of the range (inclusive).
@@ -1204,10 +1204,10 @@ inline Vector<T, Dims> RefractHelper(const Vector<T, Dims>& incident,
 ///
 /// @tparam T Type of vector components to test.
 template <class T>
-[[deprecated("Use InRange() instead")]]
-bool InRange2D(const Vector<T, 2>& val, const Vector<T, 2>& range_start,
+[[deprecated("Use inRange() instead")]]
+bool inRange2D(const Vector<T, 2>& val, const Vector<T, 2>& range_start,
                const Vector<T, 2>& range_end) {
-  return InRange(val, range_start, range_end);
+  return inRange(val, range_start, range_end);
 }
 
 /// @cond MATHKATA_INTERNAL
@@ -1218,7 +1218,7 @@ bool InRange2D(const Vector<T, 2>& val, const Vector<T, 2>& range_start,
 /// @return The dot product of v1 and v2.
 /// @related Vector
 template <class T, int Dims>
-static constexpr T DotProductHelper(const Vector<T, Dims>& v1,
+static constexpr T dotProductHelper(const Vector<T, Dims>& v1,
                                     const Vector<T, Dims>& v2) {
   T result = T(0);
   MATHKATA_VECTOR_OPERATION(result += v1[i] * v2[i]);
@@ -1228,7 +1228,7 @@ static constexpr T DotProductHelper(const Vector<T, Dims>& v1,
 
 /// @cond MATHKATA_INTERNAL
 template <class T>
-static constexpr T DotProductHelper(const Vector<T, 2>& v1,
+static constexpr T dotProductHelper(const Vector<T, 2>& v1,
                                     const Vector<T, 2>& v2) {
   return v1[0] * v2[0] + v1[1] * v2[1];
 }
@@ -1236,7 +1236,7 @@ static constexpr T DotProductHelper(const Vector<T, 2>& v1,
 
 /// @cond MATHKATA_INTERNAL
 template <class T>
-static constexpr T DotProductHelper(const Vector<T, 3>& v1,
+static constexpr T dotProductHelper(const Vector<T, 3>& v1,
                                     const Vector<T, 3>& v2) {
   return v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2];
 }
@@ -1244,7 +1244,7 @@ static constexpr T DotProductHelper(const Vector<T, 3>& v1,
 
 /// @cond MATHKATA_INTERNAL
 template <class T>
-static constexpr T DotProductHelper(const Vector<T, 4>& v1,
+static constexpr T dotProductHelper(const Vector<T, 4>& v1,
                                     const Vector<T, 4>& v2) {
   return v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2] + v1[3] * v2[3];
 }
@@ -1252,7 +1252,7 @@ static constexpr T DotProductHelper(const Vector<T, 4>& v1,
 
 /// @cond MATHKATA_INTERNAL
 template <typename T, int Dims, typename CompatibleT>
-static inline Vector<T, Dims> FromTypeHelper(const CompatibleT& compatible) {
+static inline Vector<T, Dims> fromTypeHelper(const CompatibleT& compatible) {
   // Use memcpy to safely reinterpret between compatible types without
   // undefined behavior. The compiler will optimize memcpy of small types
   // into simple register moves.
@@ -1266,14 +1266,14 @@ static inline Vector<T, Dims> FromTypeHelper(const CompatibleT& compatible) {
 
 /// @cond MATHKATA_INTERNAL
 template <typename T, int Dims, typename CompatibleT>
-static inline CompatibleT ToTypeHelper(const Vector<T, Dims>& v) {
+static inline CompatibleT toTypeHelper(const Vector<T, Dims>& v) {
   // Use memcpy to safely reinterpret between compatible types without
   // undefined behavior. The compiler will optimize memcpy of small types
   // into simple register moves.
   VectorPacked<T, Dims> packed;
   static_assert(sizeof(CompatibleT) == sizeof(packed),
                 "Conversion size mismatch.");
-  v.Pack(&packed);
+  v.pack(&packed);
   CompatibleT compatible;
   std::memcpy(&compatible, static_cast<const void*>(&packed), sizeof(packed));
   return compatible;
@@ -1292,7 +1292,7 @@ static inline CompatibleT ToTypeHelper(const Vector<T, Dims>& v) {
 /// @return Scalar dot product result.
 template <class T, int d>
 constexpr T dot(const Vector<T, d>& v1, const Vector<T, d>& v2) {
-  return Vector<T, d>::DotProduct(v1, v2);
+  return Vector<T, d>::dotProduct(v1, v2);
 }
 
 /// @brief Calculate the cross product of two 3-dimensional Vectors.
@@ -1302,7 +1302,7 @@ constexpr T dot(const Vector<T, d>& v1, const Vector<T, d>& v2) {
 /// @return 3-dimensional vector that contains the result.
 template <class T>
 constexpr Vector<T, 3> cross(const Vector<T, 3>& v1, const Vector<T, 3>& v2) {
-  return Vector<T, 3>::CrossProduct(v1, v2);
+  return Vector<T, 3>::crossProduct(v1, v2);
 }
 
 /// @brief Calculate the 2D pseudo cross product of two 2-dimensional Vectors.
@@ -1312,16 +1312,16 @@ constexpr Vector<T, 3> cross(const Vector<T, 3>& v1, const Vector<T, 3>& v2) {
 /// @return Scalar cross product result.
 template <class T>
 constexpr T cross(const Vector<T, 2>& v1, const Vector<T, 2>& v2) {
-  return Vector<T, 2>::CrossProduct(v1, v2);
+  return Vector<T, 2>::crossProduct(v1, v2);
 }
 
-/// @brief Normalize an N-dimensional Vector.
+/// @brief normalize an N-dimensional Vector.
 ///
 /// @param v Vector to normalize.
-/// @return Normalized vector.
+/// @return normalized vector.
 template <class T, int d>
 inline Vector<T, d> normalize(const Vector<T, d>& v) {
-  return v.Normalized();
+  return v.normalized();
 }
 
 /// @}
@@ -1329,20 +1329,20 @@ inline Vector<T, d> normalize(const Vector<T, d>& v) {
 /// @addtogroup mathkata_utilities
 /// @{
 
-/// @brief Specialized version of RoundUpToPowerOf2 for vector.
+/// @brief Specialized version of roundUpToPowerOf2 for vector.
 template <typename T, int Dims>
-constexpr Vector<T, Dims> RoundUpToPowerOf2(const Vector<T, Dims>& v) {
+constexpr Vector<T, Dims> roundUpToPowerOf2(const Vector<T, Dims>& v) {
   Vector<T, Dims> ret;
-  MATHKATA_VECTOR_OPERATION(ret(i) = RoundUpToPowerOf2(v(i)));
+  MATHKATA_VECTOR_OPERATION(ret(i) = roundUpToPowerOf2(v(i)));
   return ret;
 }
 
-/// @brief Specialized version of Clamp for vector.
+/// @brief Specialized version of clamp for vector.
 template <typename T, int Dims>
-constexpr Vector<T, Dims> Clamp(const Vector<T, Dims>& x,
+constexpr Vector<T, Dims> clamp(const Vector<T, Dims>& x,
                                 const Vector<T, Dims>& lower,
                                 const Vector<T, Dims>& upper) {
-  return Vector<T, Dims>::Max(lower, Vector<T, Dims>::Min(x, upper));
+  return Vector<T, Dims>::max(lower, Vector<T, Dims>::min(x, upper));
 }
 
 /// @brief Calculate the projection of a vector onto another vector.
@@ -1351,9 +1351,9 @@ constexpr Vector<T, Dims> Clamp(const Vector<T, Dims>& x,
 /// @param onto The vector to project onto. Must be non-zero.
 /// @return The vector projection of v onto onto.
 template <class T, int Dims>
-constexpr Vector<T, Dims> Project(const Vector<T, Dims>& v,
+constexpr Vector<T, Dims> project(const Vector<T, Dims>& v,
                                   const Vector<T, Dims>& onto) {
-  return Vector<T, Dims>::Project(v, onto);
+  return Vector<T, Dims>::project(v, onto);
 }
 
 /// @brief Calculate the rejection of a vector from another vector.
@@ -1363,9 +1363,9 @@ constexpr Vector<T, Dims> Project(const Vector<T, Dims>& v,
 /// @param from The vector to reject from. Must be non-zero.
 /// @return The vector rejection of v from from.
 template <class T, int Dims>
-constexpr Vector<T, Dims> Reject(const Vector<T, Dims>& v,
+constexpr Vector<T, Dims> reject(const Vector<T, Dims>& v,
                                  const Vector<T, Dims>& from) {
-  return Vector<T, Dims>::Reject(v, from);
+  return Vector<T, Dims>::reject(v, from);
 }
 /// @}
 

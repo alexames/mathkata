@@ -232,7 +232,7 @@ static constexpr const char *kVersion = "2.0.0";
 /// @addtogroup mathkata_utilities
 /// @{
 
-/// @brief Clamp x within [lower, upper].
+/// @brief clamp x within [lower, upper].
 /// @anchor mathkata_Clamp
 ///
 /// @note Results are undefined if lower > upper.
@@ -242,7 +242,7 @@ static constexpr const char *kVersion = "2.0.0";
 /// @param upper Upper value of the range.
 /// @returns Clamped value.
 template <class T>
-constexpr T Clamp(const T &x, const T &lower, const T &upper) {
+constexpr T clamp(const T &x, const T &lower, const T &upper) {
   return std::max<T>(lower, std::min<T>(x, upper));
 }
 
@@ -261,7 +261,7 @@ constexpr T Clamp(const T &x, const T &lower, const T &upper) {
 /// @tparam T2 Type of the value used to perform interpolation
 ///         (e.g float or double).
 template <class T, class T2>
-constexpr T Lerp(const T &range_start, const T &range_end, const T2 &percent) {
+constexpr T lerp(const T &range_start, const T &range_end, const T2 &percent) {
   return range_start + (range_end - range_start) * percent;
 }
 
@@ -278,8 +278,8 @@ constexpr T Lerp(const T &range_start, const T &range_end, const T2 &percent) {
 ///
 /// @tparam T Type of the range to interpolate over.
 template <class T>
-constexpr T Lerp(const T &range_start, const T &range_end, const T &percent) {
-  return Lerp<T, T>(range_start, range_end, percent);
+constexpr T lerp(const T &range_start, const T &range_end, const T &percent) {
+  return lerp<T, T>(range_start, range_end, percent);
 }
 
 /// @brief Check if val is within [range_start..range_end).
@@ -292,7 +292,7 @@ constexpr T Lerp(const T &range_start, const T &range_end, const T &percent) {
 ///
 /// @tparam T Type of values to test.
 template <class T>
-constexpr bool InRange(T val, T range_start, T range_end) {
+constexpr bool inRange(T val, T range_start, T range_end) {
   return val >= range_start && val < range_end;
 }
 
@@ -310,7 +310,7 @@ constexpr bool InRange(T val, T range_start, T range_end) {
 /// @param x Value to round up. Must be non-negative for signed types.
 /// @returns Value rounded up to the nearest power of 2.
 template <std::integral T>
-constexpr T RoundUpToPowerOf2(T x) {
+constexpr T roundUpToPowerOf2(T x) {
   // Use unsigned arithmetic to avoid undefined behavior with signed shifts.
   typedef typename std::make_unsigned<T>::type U;
   if (x <= 1) return x;
@@ -337,7 +337,7 @@ constexpr T RoundUpToPowerOf2(T x) {
 /// @param x Value to round up. Must be non-negative.
 /// @returns Value rounded up to the nearest power of 2.
 template <std::floating_point T>
-T RoundUpToPowerOf2(T x) {
+T roundUpToPowerOf2(T x) {
   if (x <= 0) return x;
   return static_cast<T>(
       pow(static_cast<T>(2), ceil(log(x) / log(static_cast<T>(2)))));
@@ -388,7 +388,7 @@ constexpr size_t RoundUpToTypeBoundary(size_t v) {
 /// This function allocates a block of memory aligned to MATHKATA_ALIGNMENT
 /// bytes.
 ///
-/// @param n Size of memory to allocate.
+/// @param n size of memory to allocate.
 /// @return Pointer to aligned block of allocated memory or nullptr if
 /// allocation failed.
 inline void *AllocateAligned(size_t n) {
@@ -423,7 +423,7 @@ inline void FreeAligned(void *p) {
 template <typename T>
 class simd_allocator : public std::allocator<T> {
  public:
-  /// Size type.
+  /// size type.
   typedef size_t size_type;
   /// Pointer of type T.
   typedef T *pointer;

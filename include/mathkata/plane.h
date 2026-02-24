@@ -60,9 +60,9 @@ struct Plane {
   /// @param point A point on the plane.
   /// @param normal The normal vector of the plane.
   /// @return A Plane passing through the given point with the given normal.
-  static constexpr Plane<T> FromPointNormal(const Vector<T, 3>& point,
+  static constexpr Plane<T> fromPointNormal(const Vector<T, 3>& point,
                                             const Vector<T, 3>& normal) {
-    return Plane<T>(normal, -Vector<T, 3>::DotProduct(normal, point));
+    return Plane<T>(normal, -Vector<T, 3>::dotProduct(normal, point));
   }
 
   /// @brief Create a plane through three points.
@@ -74,12 +74,12 @@ struct Plane {
   /// @param b Second point on the plane.
   /// @param c Third point on the plane.
   /// @return A Plane passing through the three given points.
-  static inline Plane<T> FromPoints(const Vector<T, 3>& a,
+  static inline Plane<T> fromPoints(const Vector<T, 3>& a,
                                     const Vector<T, 3>& b,
                                     const Vector<T, 3>& c) {
     const Vector<T, 3> normal =
-        Vector<T, 3>::CrossProduct(b - a, c - a).Normalized();
-    return FromPointNormal(a, normal);
+        Vector<T, 3>::crossProduct(b - a, c - a).normalized();
+    return fromPointNormal(a, normal);
   }
 
   /// @brief Compute the signed distance from a point to the plane.
@@ -90,16 +90,16 @@ struct Plane {
   ///
   /// @param point The point to compute the distance for.
   /// @return The signed distance from the point to the plane.
-  constexpr T SignedDistance(const Vector<T, 3>& point) const {
-    return Vector<T, 3>::DotProduct(normal, point) + distance;
+  constexpr T signedDistance(const Vector<T, 3>& point) const {
+    return Vector<T, 3>::dotProduct(normal, point) + distance;
   }
 
-  /// @brief Project a point onto the plane (closest point on plane).
+  /// @brief project a point onto the plane (closest point on plane).
   ///
   /// @param point The point to project.
   /// @return The closest point on the plane to the given point.
-  constexpr Vector<T, 3> ProjectPoint(const Vector<T, 3>& point) const {
-    return point - normal * SignedDistance(point);
+  constexpr Vector<T, 3> projectPoint(const Vector<T, 3>& point) const {
+    return point - normal * signedDistance(point);
   }
 
   /// @brief Return a plane with negated normal and distance.
@@ -108,7 +108,7 @@ struct Plane {
   /// opposite facing direction.
   ///
   /// @return A new Plane with negated normal and distance.
-  constexpr Plane<T> Flipped() const { return Plane<T>(-normal, -distance); }
+  constexpr Plane<T> flipped() const { return Plane<T>(-normal, -distance); }
 };
 /// @}
 

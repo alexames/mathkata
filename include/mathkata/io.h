@@ -45,9 +45,9 @@ inline std::ostream& operator<<(std::ostream& os, const Vector<T, d>& v) {
 template <typename T, int rows, int columns>
 inline std::ostream& operator<<(std::ostream& os,
                                 const Matrix<T, rows, columns>& m) {
-  os << "(" << m.GetColumn(0);
+  os << "(" << m.getColumn(0);
   for (int i = 1; i < columns; ++i) {
-    os << ", " << m.GetColumn(i);
+    os << ", " << m.getColumn(i);
   }
   return os << ")";
 }
@@ -72,7 +72,7 @@ inline std::ostream& operator<<(std::ostream& os, const Color& c) {
 template <typename T>
 inline std::ostream& operator<<(std::ostream& os,
                                 const AffineTransform2D<T>& t) {
-  const T* m = t.GetMatrix();
+  const T* m = t.getMatrix();
   return os << "((" << m[0] << ", " << m[4] << ", " << m[12] << "), (" << m[1]
             << ", " << m[5] << ", " << m[13] << "), (" << m[3] << ", " << m[7]
             << ", " << m[15] << "))";

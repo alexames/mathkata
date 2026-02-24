@@ -63,8 +63,8 @@ struct Sphere {
   ///
   /// @param point The point to test.
   /// @return true if the point is inside the sphere, false otherwise.
-  constexpr bool Contains(const Vector<T, N>& point) const {
-    return Vector<T, N>::DistanceSquared(center, point) <= radius * radius;
+  constexpr bool contains(const Vector<T, N>& point) const {
+    return Vector<T, N>::distanceSquared(center, point) <= radius * radius;
   }
 
   /// @brief Check whether another sphere is fully contained within this sphere.
@@ -72,8 +72,8 @@ struct Sphere {
   /// @param other The sphere to test.
   /// @return true if the other sphere is fully inside this sphere, false
   ///     otherwise.
-  inline bool Contains(const Sphere<T, N>& other) const {
-    T dist = Vector<T, N>::Distance(center, other.center);
+  inline bool contains(const Sphere<T, N>& other) const {
+    T dist = Vector<T, N>::distance(center, other.center);
     return dist + other.radius <= radius;
   }
 
@@ -81,25 +81,25 @@ struct Sphere {
   ///
   /// @param other The sphere to test for intersection.
   /// @return true if the spheres overlap, false otherwise.
-  constexpr bool Intersects(const Sphere<T, N>& other) const {
+  constexpr bool intersects(const Sphere<T, N>& other) const {
     T sum_radii = radius + other.radius;
-    return Vector<T, N>::DistanceSquared(center, other.center)
+    return Vector<T, N>::distanceSquared(center, other.center)
            <= sum_radii * sum_radii;
   }
 
   /// @brief Calculate the area of a 2D circle (N=2).
   ///
   /// @return The area of the circle (pi * r^2).
-  constexpr T Area() const {
-    static_assert(N == 2, "Area() is only defined for 2D circles (N=2).");
+  constexpr T area() const {
+    static_assert(N == 2, "area() is only defined for 2D circles (N=2).");
     return std::numbers::pi_v<T> * radius * radius;
   }
 
   /// @brief Calculate the volume of a 3D sphere (N=3).
   ///
   /// @return The volume of the sphere (4/3 * pi * r^3).
-  constexpr T Volume() const {
-    static_assert(N == 3, "Volume() is only defined for 3D spheres (N=3).");
+  constexpr T volume() const {
+    static_assert(N == 3, "volume() is only defined for 3D spheres (N=3).");
     return (static_cast<T>(4) / static_cast<T>(3)) * std::numbers::pi_v<T>
            * radius * radius * radius;
   }
@@ -107,7 +107,7 @@ struct Sphere {
   /// @brief Calculate the diameter of the sphere.
   ///
   /// @return The diameter (2 * radius).
-  constexpr T Diameter() const { return static_cast<T>(2) * radius; }
+  constexpr T diameter() const { return static_cast<T>(2) * radius; }
 };
 /// @}
 

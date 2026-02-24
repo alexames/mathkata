@@ -53,7 +53,7 @@ int main(int argc, char** argv) {
   Vector<T, 3> sum(0.0f);
   for (size_t i = 0; i < kVectorSize; i++) {
     Vector<T, 3> vec(BenchRandom<T>(), BenchRandom<T>(), BenchRandom<T>());
-    if (vec.LengthSquared() == static_cast<T>(0.0)) {
+    if (vec.lengthSquared() == static_cast<T>(0.0)) {
       vec.x = static_cast<T>(1.0);
     }
     vectors[i] = vec;
@@ -66,16 +66,16 @@ int main(int argc, char** argv) {
   PERFTEST_2D_VECTOR_LOOP(kIterations, kVectorSize) sum -= vectors[j];
   PERFTEST_2D_VECTOR_LOOP(kIterations, kVectorSize) sum *= 0.1f;
   PERFTEST_2D_VECTOR_LOOP(kIterations, kVectorSize) {
-    sum += Vector<T, 3>::CrossProduct(vectors[i], vectors[j]);
+    sum += Vector<T, 3>::crossProduct(vectors[i], vectors[j]);
   }
   PERFTEST_2D_VECTOR_LOOP(kIterations, kVectorSize) {
-    final_sum += Vector<T, 3>::DotProduct(vectors[j], vectors[i]);
+    final_sum += Vector<T, 3>::dotProduct(vectors[j], vectors[i]);
   }
   PERFTEST_2D_VECTOR_LOOP(kIterations, kVectorSize) {
-    final_sum -= vectors[i].Length();
+    final_sum -= vectors[i].length();
   }
   PERFTEST_2D_VECTOR_LOOP(kIterations, kVectorSize) {
-    final_sum += vectors[i].Normalize();
+    final_sum += vectors[i].normalize();
   }
   final_sum += sum[0] + sum[1] + sum[2];
   // End vector performance code

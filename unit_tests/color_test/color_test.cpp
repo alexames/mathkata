@@ -188,20 +188,20 @@ TEST_F(ColorTests, CompoundModulation) {
   EXPECT_EQ(c.a, 255);
 }
 
-// --- Normalized Conversion ---
+// --- normalized Conversion ---
 
-TEST_F(ColorTests, ToNormalized) {
+TEST_F(ColorTests, toNormalized) {
   mathkata::Color c(255, 0, 128, 255);
-  mathkata::Vector<float, 4> v = c.ToNormalized();
+  mathkata::Vector<float, 4> v = c.toNormalized();
   EXPECT_NEAR(v[0], 1.0f, FLOAT_PRECISION);
   EXPECT_NEAR(v[1], 0.0f, FLOAT_PRECISION);
   EXPECT_NEAR(v[2], 128.0f / 255.0f, FLOAT_PRECISION);
   EXPECT_NEAR(v[3], 1.0f, FLOAT_PRECISION);
 }
 
-TEST_F(ColorTests, FromNormalized) {
+TEST_F(ColorTests, fromNormalized) {
   mathkata::Vector<float, 4> v(1.0f, 0.0f, 0.5f, 1.0f);
-  mathkata::Color c = mathkata::Color::FromNormalized(v);
+  mathkata::Color c = mathkata::Color::fromNormalized(v);
   EXPECT_EQ(c.r, 255);
   EXPECT_EQ(c.g, 0);
   EXPECT_EQ(c.b, 128);
@@ -210,7 +210,7 @@ TEST_F(ColorTests, FromNormalized) {
 
 TEST_F(ColorTests, FromNormalizedClamped) {
   mathkata::Vector<float, 4> v(1.5f, -0.5f, 0.5f, 2.0f);
-  mathkata::Color c = mathkata::Color::FromNormalized(v);
+  mathkata::Color c = mathkata::Color::fromNormalized(v);
   EXPECT_EQ(c.r, 255);
   EXPECT_EQ(c.g, 0);
   EXPECT_EQ(c.b, 128);
@@ -219,8 +219,8 @@ TEST_F(ColorTests, FromNormalizedClamped) {
 
 TEST_F(ColorTests, NormalizedRoundTrip) {
   mathkata::Color original(42, 128, 200, 100);
-  mathkata::Vector<float, 4> normalized = original.ToNormalized();
-  mathkata::Color recovered = mathkata::Color::FromNormalized(normalized);
+  mathkata::Vector<float, 4> normalized = original.toNormalized();
+  mathkata::Color recovered = mathkata::Color::fromNormalized(normalized);
   EXPECT_EQ(recovered, original);
 }
 

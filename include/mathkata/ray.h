@@ -49,7 +49,7 @@ struct Ray {
   /// Returns origin + direction * t.
   /// @param t The parameter value.
   /// @return The point at parameter t.
-  constexpr Vector<T, Dims> PointAt(T t) const {
+  constexpr Vector<T, Dims> pointAt(T t) const {
     return origin + direction * t;
   }
 
@@ -105,13 +105,13 @@ struct Line {
 
   /// @brief Create a Line from two points.
   ///
-  /// The direction is computed as (b - a).Normalized().
+  /// The direction is computed as (b - a).normalized().
   /// @param a The first point.
   /// @param b The second point.
   /// @return A Line passing through a and b.
-  static Line<T, Dims> FromPoints(const Vector<T, Dims>& a,
+  static Line<T, Dims> fromPoints(const Vector<T, Dims>& a,
                                   const Vector<T, Dims>& b) {
-    return Line<T, Dims>(a, (b - a).Normalized());
+    return Line<T, Dims>(a, (b - a).normalized());
   }
 
   /// @brief Compute the point at parameter t along the line.
@@ -119,7 +119,7 @@ struct Line {
   /// Returns point + direction * t.
   /// @param t The parameter value.
   /// @return The point at parameter t.
-  constexpr Vector<T, Dims> PointAt(T t) const { return point + direction * t; }
+  constexpr Vector<T, Dims> pointAt(T t) const { return point + direction * t; }
 
   /// A point on the line.
   Vector<T, Dims> point;
@@ -174,37 +174,37 @@ struct LineSegment {
   /// @brief Compute the midpoint of the segment.
   ///
   /// @return The center point between start and end.
-  constexpr Vector<T, Dims> Center() const {
+  constexpr Vector<T, Dims> center() const {
     return (start + end) * static_cast<T>(0.5);
   }
 
   /// @brief Compute the length of the segment.
   ///
   /// @return The distance between start and end.
-  T Length() const { return (end - start).Length(); }
+  T length() const { return (end - start).length(); }
 
   /// @brief Compute the squared length of the segment.
   ///
   /// @return The squared distance between start and end.
-  constexpr T LengthSquared() const { return (end - start).LengthSquared(); }
+  constexpr T lengthSquared() const { return (end - start).lengthSquared(); }
 
   /// @brief Compute the normalized direction from start to end.
   ///
   /// The segment must have non-zero length.
   /// @return The unit direction vector from start to end.
-  Vector<T, Dims> Direction() const { return (end - start).Normalized(); }
+  Vector<T, Dims> direction() const { return (end - start).normalized(); }
 
   /// @brief Compute the closest point on the segment to a given point.
   ///
   /// @param point The point to find the closest point to.
   /// @return The closest point on the segment to the given point.
-  constexpr Vector<T, Dims> ClosestPoint(const Vector<T, Dims>& point) const {
+  constexpr Vector<T, Dims> closestPoint(const Vector<T, Dims>& point) const {
     const Vector<T, Dims> segment = end - start;
-    const T length_squared = segment.LengthSquared();
+    const T length_squared = segment.lengthSquared();
     if (length_squared == static_cast<T>(0)) {
       return start;
     }
-    T t = Vector<T, Dims>::DotProduct(point - start, segment) / length_squared;
+    T t = Vector<T, Dims>::dotProduct(point - start, segment) / length_squared;
     if (t < static_cast<T>(0)) {
       t = static_cast<T>(0);
     } else if (t > static_cast<T>(1)) {

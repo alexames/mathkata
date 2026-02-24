@@ -70,20 +70,20 @@ void RayPointAt_Test(T precision) {
   mathkata::Ray<T, Dims> ray(origin, direction);
 
   // At t=0, should be at origin.
-  mathkata::Vector<T, Dims> p0 = ray.PointAt(static_cast<T>(0));
+  mathkata::Vector<T, Dims> p0 = ray.pointAt(static_cast<T>(0));
   for (int i = 0; i < Dims; ++i) {
     EXPECT_NEAR(p0[i], origin[i], precision);
   }
 
   // At t=3, should be origin + direction * 3.
-  mathkata::Vector<T, Dims> p3 = ray.PointAt(static_cast<T>(3));
+  mathkata::Vector<T, Dims> p3 = ray.pointAt(static_cast<T>(3));
   EXPECT_NEAR(p3[0], static_cast<T>(4), precision);
   for (int i = 1; i < Dims; ++i) {
     EXPECT_NEAR(p3[i], static_cast<T>(1), precision);
   }
 
   // At t=-2, should be origin + direction * -2.
-  mathkata::Vector<T, Dims> pn = ray.PointAt(static_cast<T>(-2));
+  mathkata::Vector<T, Dims> pn = ray.pointAt(static_cast<T>(-2));
   EXPECT_NEAR(pn[0], static_cast<T>(-1), precision);
 }
 TEST_ALL_F(RayPointAt)
@@ -133,17 +133,17 @@ void LineFromPoints_Test(T precision) {
   mathkata::Vector<T, Dims> b(static_cast<T>(0));
   b[0] = static_cast<T>(5);
 
-  mathkata::Line<T, Dims> line = mathkata::Line<T, Dims>::FromPoints(a, b);
+  mathkata::Line<T, Dims> line = mathkata::Line<T, Dims>::fromPoints(a, b);
   EXPECT_EQ(line.point, a);
 
-  // Direction should be normalized (1, 0, ...).
+  // direction should be normalized (1, 0, ...).
   EXPECT_NEAR(line.direction[0], static_cast<T>(1), precision);
   for (int i = 1; i < Dims; ++i) {
     EXPECT_NEAR(line.direction[i], static_cast<T>(0), precision);
   }
 
-  // Direction should be unit length.
-  EXPECT_NEAR(line.direction.Length(), static_cast<T>(1), precision);
+  // direction should be unit length.
+  EXPECT_NEAR(line.direction.length(), static_cast<T>(1), precision);
 }
 TEST_ALL_F(LineFromPoints)
 
@@ -156,13 +156,13 @@ void LinePointAt_Test(T precision) {
   mathkata::Line<T, Dims> line(point, direction);
 
   // At t=0, should be at point.
-  mathkata::Vector<T, Dims> p0 = line.PointAt(static_cast<T>(0));
+  mathkata::Vector<T, Dims> p0 = line.pointAt(static_cast<T>(0));
   for (int i = 0; i < Dims; ++i) {
     EXPECT_NEAR(p0[i], point[i], precision);
   }
 
   // At t=5, should be point + direction * 5.
-  mathkata::Vector<T, Dims> p5 = line.PointAt(static_cast<T>(5));
+  mathkata::Vector<T, Dims> p5 = line.pointAt(static_cast<T>(5));
   EXPECT_NEAR(p5[0], static_cast<T>(7), precision);
   for (int i = 1; i < Dims; ++i) {
     EXPECT_NEAR(p5[i], static_cast<T>(2), precision);
@@ -214,7 +214,7 @@ void LineSegmentCenter_Test(T precision) {
   mathkata::Vector<T, Dims> end(static_cast<T>(4));
 
   mathkata::LineSegment<T, Dims> segment(start, end);
-  mathkata::Vector<T, Dims> center = segment.Center();
+  mathkata::Vector<T, Dims> center = segment.center();
 
   for (int i = 0; i < Dims; ++i) {
     EXPECT_NEAR(center[i], static_cast<T>(2), precision);
@@ -229,7 +229,7 @@ void LineSegmentLength_Test(T precision) {
   end[0] = static_cast<T>(5);
 
   mathkata::LineSegment<T, Dims> segment(start, end);
-  EXPECT_NEAR(segment.Length(), static_cast<T>(5), precision);
+  EXPECT_NEAR(segment.length(), static_cast<T>(5), precision);
 }
 TEST_ALL_F(LineSegmentLength)
 
@@ -241,7 +241,7 @@ void LineSegmentLengthSquared_Test(T precision) {
   end[1] = static_cast<T>(4);
 
   mathkata::LineSegment<T, Dims> segment(start, end);
-  EXPECT_NEAR(segment.LengthSquared(), static_cast<T>(25), precision);
+  EXPECT_NEAR(segment.lengthSquared(), static_cast<T>(25), precision);
 }
 TEST_ALL_F(LineSegmentLengthSquared)
 
@@ -252,15 +252,15 @@ void LineSegmentDirection_Test(T precision) {
   end[0] = static_cast<T>(10);
 
   mathkata::LineSegment<T, Dims> segment(start, end);
-  mathkata::Vector<T, Dims> dir = segment.Direction();
+  mathkata::Vector<T, Dims> dir = segment.direction();
 
   EXPECT_NEAR(dir[0], static_cast<T>(1), precision);
   for (int i = 1; i < Dims; ++i) {
     EXPECT_NEAR(dir[i], static_cast<T>(0), precision);
   }
 
-  // Direction should be unit length.
-  EXPECT_NEAR(dir.Length(), static_cast<T>(1), precision);
+  // direction should be unit length.
+  EXPECT_NEAR(dir.length(), static_cast<T>(1), precision);
 }
 TEST_ALL_F(LineSegmentDirection)
 
@@ -279,7 +279,7 @@ void LineSegmentClosestPoint_Test(T precision) {
   if (Dims > 1) {
     mid_point[1] = static_cast<T>(3);
   }
-  mathkata::Vector<T, Dims> closest = segment.ClosestPoint(mid_point);
+  mathkata::Vector<T, Dims> closest = segment.closestPoint(mid_point);
   EXPECT_NEAR(closest[0], static_cast<T>(5), precision);
   for (int i = 1; i < Dims; ++i) {
     EXPECT_NEAR(closest[i], static_cast<T>(0), precision);
@@ -288,7 +288,7 @@ void LineSegmentClosestPoint_Test(T precision) {
   // Point before the start - should clamp to start.
   mathkata::Vector<T, Dims> before_start(static_cast<T>(0));
   before_start[0] = static_cast<T>(-5);
-  closest = segment.ClosestPoint(before_start);
+  closest = segment.closestPoint(before_start);
   for (int i = 0; i < Dims; ++i) {
     EXPECT_NEAR(closest[i], start[i], precision);
   }
@@ -296,7 +296,7 @@ void LineSegmentClosestPoint_Test(T precision) {
   // Point beyond the end - should clamp to end.
   mathkata::Vector<T, Dims> past_end(static_cast<T>(0));
   past_end[0] = static_cast<T>(15);
-  closest = segment.ClosestPoint(past_end);
+  closest = segment.closestPoint(past_end);
   for (int i = 0; i < Dims; ++i) {
     EXPECT_NEAR(closest[i], end[i], precision);
   }
@@ -304,7 +304,7 @@ void LineSegmentClosestPoint_Test(T precision) {
   // Zero-length segment - should return start.
   mathkata::LineSegment<T, Dims> zero_segment(start, start);
   mathkata::Vector<T, Dims> any_point(static_cast<T>(5));
-  closest = zero_segment.ClosestPoint(any_point);
+  closest = zero_segment.closestPoint(any_point);
   for (int i = 0; i < Dims; ++i) {
     EXPECT_NEAR(closest[i], start[i], precision);
   }

@@ -29,7 +29,7 @@ namespace mathkata {
 /// @addtogroup mathkata_transform
 /// @{
 /// @class Transform "mathkata/transform.h"
-/// @brief Represents a 3D rigid body transform as position, rotation
+/// @brief Represents a 3D rigid body Transform as position, rotation
 /// (quaternion), and scale.
 ///
 /// Transform stores a position (Vector<T, 3>), rotation (Quaternion<T>),
@@ -91,8 +91,8 @@ struct Transform {
   /// translate), which is the standard convention for 3D transforms.
   ///
   /// @return 4x4 transformation matrix.
-  inline Matrix<T, 4> ToMatrix() const {
-    return Matrix<T, 4>::Transform(position, rotation.ToMatrix(), scale);
+  inline Matrix<T, 4> toMatrix() const {
+    return Matrix<T, 4>::transform(position, rotation.toMatrix(), scale);
   }
 
   /// @brief Apply the full transform to a point.
@@ -101,8 +101,8 @@ struct Transform {
   ///
   /// @param point The point to transform.
   /// @return The transformed point.
-  constexpr Vector<T, 3> TransformPoint(const Vector<T, 3>& point) const {
-    return rotation.Rotate(Vector<T, 3>(point.x * scale.x, point.y * scale.y,
+  constexpr Vector<T, 3> transformPoint(const Vector<T, 3>& point) const {
+    return rotation.rotate(Vector<T, 3>(point.x * scale.x, point.y * scale.y,
                                         point.z * scale.z))
            + position;
   }
@@ -113,24 +113,24 @@ struct Transform {
   ///
   /// @param direction The direction vector to transform.
   /// @return The transformed direction.
-  constexpr Vector<T, 3> TransformDirection(
+  constexpr Vector<T, 3> transformDirection(
       const Vector<T, 3>& direction) const {
-    return rotation.Rotate(Vector<T, 3>(
+    return rotation.rotate(Vector<T, 3>(
         direction.x * scale.x, direction.y * scale.y, direction.z * scale.z));
   }
 
   /// @brief Compute the inverse of this transform.
   ///
   /// The inverse satisfies:
-  /// <code>t.Inverse().TransformPoint(t.TransformPoint(v)) == v</code>
+  /// <code>t.inverse().transformPoint(t.transformPoint(v)) == v</code>
   ///
   /// @note Composition and inversion are exact for uniform scale. With
   /// non-uniform scale combined with rotation, a small amount of error
   /// is introduced because TRS decomposition is lossy for sheared matrices.
   ///
   /// @return The inverse transform.
-  constexpr Transform<T> Inverse() const {
-    Quaternion<T> inv_rotation = rotation.Inverse();
+  constexpr Transform<T> inverse() const {
+    Quaternion<T> inv_rotation = rotation.inverse();
     Vector<T, 3> inv_scale(T(1) / scale.x, T(1) / scale.y, T(1) / scale.z);
     // The inverse of T*R*S applied to a point:
     //   forward:  r * (s .* v) + p
@@ -143,7 +143,7 @@ struct Transform {
     Vector<T, 3> neg_p(-position.x, -position.y, -position.z);
     Vector<T, 3> scaled_neg_p(neg_p.x * inv_scale.x, neg_p.y * inv_scale.y,
                               neg_p.z * inv_scale.z);
-    Vector<T, 3> inv_position = inv_rotation.Rotate(scaled_neg_p);
+    Vector<T, 3> inv_position = inv_rotation.rotate(scaled_neg_p);
     return Transform<T>(inv_position, inv_rotation, inv_scale);
   }
 
@@ -165,7 +165,7 @@ struct Transform {
     Vector<T, 3> scaled_rhs_pos(rhs.position.x * scale.x,
                                 rhs.position.y * scale.y,
                                 rhs.position.z * scale.z);
-    Vector<T, 3> new_position = rotation.Rotate(scaled_rhs_pos) + position;
+    Vector<T, 3> new_position = rotation.rotate(scaled_rhs_pos) + position;
     Quaternion<T> new_rotation = rotation * rhs.rotation;
     Vector<T, 3> new_scale(scale.x * rhs.scale.x, scale.y * rhs.scale.y,
                            scale.z * rhs.scale.z);
@@ -175,13 +175,13 @@ struct Transform {
   /// @brief Returns the identity transform.
   ///
   /// @return Transform with zero position, identity rotation, and unit scale.
-  static inline Transform<T> Identity() { return Transform<T>(); }
+  static inline Transform<T> identity() { return Transform<T>(); }
 };
 
 /// @brief Check if two transforms are identical.
 ///
 /// @param t1 Transform to be tested.
-/// @param t2 Other transform to be tested.
+/// @param t2 Other Transform to be tested.
 template <class T>
 constexpr bool operator==(const Transform<T>& t1, const Transform<T>& t2) {
   return t1.position == t2.position && t1.rotation == t2.rotation
@@ -191,7 +191,7 @@ constexpr bool operator==(const Transform<T>& t1, const Transform<T>& t2) {
 /// @brief Check if two transforms are not identical.
 ///
 /// @param t1 Transform to be tested.
-/// @param t2 Other transform to be tested.
+/// @param t2 Other Transform to be tested.
 template <class T>
 constexpr bool operator!=(const Transform<T>& t1, const Transform<T>& t2) {
   return !(t1 == t2);

@@ -45,14 +45,14 @@ template <>
 inline void TimesHelper(const Matrix<float, 4, 4>& m1,
                         const Matrix<float, 4, 4>& m2,
                         Matrix<float, 4, 4>* out_m) {
-  const simd4f c0 = m1.GetColumn(0).simd4;
-  const simd4f c1 = m1.GetColumn(1).simd4;
-  const simd4f c2 = m1.GetColumn(2).simd4;
-  const simd4f c3 = m1.GetColumn(3).simd4;
+  const simd4f c0 = m1.getColumn(0).simd4;
+  const simd4f c1 = m1.getColumn(1).simd4;
+  const simd4f c2 = m1.getColumn(2).simd4;
+  const simd4f c3 = m1.getColumn(3).simd4;
 
   for (int i = 0; i < 4; ++i) {
-    const simd4f m2_col = m2.GetColumn(i).simd4;
-    out_m->GetColumn(i).simd4 = simd4f_madd(
+    const simd4f m2_col = m2.getColumn(i).simd4;
+    out_m->getColumn(i).simd4 = simd4f_madd(
         c0, simd4f_splat_x(m2_col),
         simd4f_madd(c1, simd4f_splat_y(m2_col),
                     simd4f_madd(c2, simd4f_splat_z(m2_col),
@@ -69,10 +69,10 @@ inline void TimesHelper(const Matrix<float, 4, 4>& m1,
 template <>
 inline Vector<float, 4> operator*(const Matrix<float, 4, 4>& m,
                                   const Vector<float, 4>& v) {
-  const simd4f c0 = m.GetColumn(0).simd4;
-  const simd4f c1 = m.GetColumn(1).simd4;
-  const simd4f c2 = m.GetColumn(2).simd4;
-  const simd4f c3 = m.GetColumn(3).simd4;
+  const simd4f c0 = m.getColumn(0).simd4;
+  const simd4f c1 = m.getColumn(1).simd4;
+  const simd4f c2 = m.getColumn(2).simd4;
+  const simd4f c3 = m.getColumn(3).simd4;
   const simd4f sv = v.simd4;
 
   return Vector<float, 4>(simd4f_madd(

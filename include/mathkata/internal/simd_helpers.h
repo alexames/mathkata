@@ -139,7 +139,7 @@ inline simd4f simd4f_cross3(simd4f a, simd4f b) {
                  ba.get(0) * bb.get(1) - ba.get(1) * bb.get(0), 0.0f);
 }
 
-// ---- Min / Max ----
+// ---- min / max ----
 
 inline simd4f simd4f_min(simd4f a, simd4f b) {
   return xsimd::min(batch4f(a), batch4f(b));
@@ -157,7 +157,7 @@ inline simd4f simd4f_rsqrt(simd4f v) { return xsimd::rsqrt(batch4f(v)); }
 
 inline simd4f simd4f_reciprocal(simd4f v) { return batch4f(1.0f) / batch4f(v); }
 
-// ---- Length / Normalize ----
+// ---- length / normalize ----
 
 inline simd4f simd4f_length3(simd4f v) {
   return simd4f_sqrt(simd4f_dot3(v, v));

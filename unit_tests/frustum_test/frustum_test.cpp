@@ -51,13 +51,13 @@ using Mat4 = mathkata::Matrix<T, 4, 4>;
 // Maps x in [-hw, hw], y in [-hh, hh], z in [-near, -far] to NDC.
 template <class T>
 Mat4<T> MakeOrthoMatrix(T hw, T hh, T near_val, T far_val) {
-  return Mat4<T>::Ortho(-hw, hw, -hh, hh, near_val, far_val);
+  return Mat4<T>::ortho(-hw, hw, -hh, hh, near_val, far_val);
 }
 
 // Helper to create a symmetric perspective projection matrix for testing.
 template <class T>
 Mat4<T> MakePerspectiveMatrix(T fovy, T aspect, T near_val, T far_val) {
-  return Mat4<T>::Perspective(fovy, aspect, near_val, far_val);
+  return Mat4<T>::perspective(fovy, aspect, near_val, far_val);
 }
 
 // Test: Construction from 6 planes.
@@ -73,16 +73,16 @@ void ConstructFromPlanes_Test(T /*precision*/) {
   const mathkata::Frustum<T> frustum(near_p, far_p, left_p, right_p, top_p,
                                      bottom_p);
 
-  EXPECT_EQ(frustum.GetPlane(mathkata::Frustum<T>::kNear), near_p);
-  EXPECT_EQ(frustum.GetPlane(mathkata::Frustum<T>::kFar), far_p);
-  EXPECT_EQ(frustum.GetPlane(mathkata::Frustum<T>::kLeft), left_p);
-  EXPECT_EQ(frustum.GetPlane(mathkata::Frustum<T>::kRight), right_p);
-  EXPECT_EQ(frustum.GetPlane(mathkata::Frustum<T>::kTop), top_p);
-  EXPECT_EQ(frustum.GetPlane(mathkata::Frustum<T>::kBottom), bottom_p);
+  EXPECT_EQ(frustum.getPlane(mathkata::Frustum<T>::kNear), near_p);
+  EXPECT_EQ(frustum.getPlane(mathkata::Frustum<T>::kFar), far_p);
+  EXPECT_EQ(frustum.getPlane(mathkata::Frustum<T>::kLeft), left_p);
+  EXPECT_EQ(frustum.getPlane(mathkata::Frustum<T>::kRight), right_p);
+  EXPECT_EQ(frustum.getPlane(mathkata::Frustum<T>::kTop), top_p);
+  EXPECT_EQ(frustum.getPlane(mathkata::Frustum<T>::kBottom), bottom_p);
 }
 TEST_FRUSTUM_F(ConstructFromPlanes)
 
-// Test: FromViewProjection with an orthographic matrix produces valid planes.
+// Test: fromViewProjection with an orthographic matrix produces valid planes.
 template <class T>
 void FromViewProjectionOrtho_Test(T precision) {
   // Orthographic: x in [-10, 10], y in [-5, 5], z in [-1, -100]
@@ -93,7 +93,7 @@ void FromViewProjectionOrtho_Test(T precision) {
 
   const Mat4<T> ortho = MakeOrthoMatrix(hw, hh, near_val, far_val);
   const mathkata::Frustum<T> frustum =
-      mathkata::Frustum<T>::FromViewProjection(ortho);
+      mathkata::Frustum<T>::fromViewProjection(ortho);
 
   // The origin should be inside the frustum (it's between near and far,
   // and within x/y bounds). Actually, with RH convention, the camera looks
@@ -102,37 +102,37 @@ void FromViewProjectionOrtho_Test(T precision) {
   // it should be outside.
   // A point at (0, 0, -50) should be inside.
   const Vec3<T> inside(0, 0, static_cast<T>(-50));
-  EXPECT_TRUE(frustum.ContainsPoint(inside));
+  EXPECT_TRUE(frustum.containsPoint(inside));
 
   // A point outside to the left.
   const Vec3<T> outside_left(static_cast<T>(-15), 0, static_cast<T>(-50));
-  EXPECT_FALSE(frustum.ContainsPoint(outside_left));
+  EXPECT_FALSE(frustum.containsPoint(outside_left));
 
   // A point outside to the right.
   const Vec3<T> outside_right(static_cast<T>(15), 0, static_cast<T>(-50));
-  EXPECT_FALSE(frustum.ContainsPoint(outside_right));
+  EXPECT_FALSE(frustum.containsPoint(outside_right));
 
   // A point behind the far plane.
   const Vec3<T> outside_far(0, 0, static_cast<T>(-200));
-  EXPECT_FALSE(frustum.ContainsPoint(outside_far));
+  EXPECT_FALSE(frustum.containsPoint(outside_far));
 
   // A point in front of the near plane.
   const Vec3<T> outside_near(0, 0, static_cast<T>(5));
-  EXPECT_FALSE(frustum.ContainsPoint(outside_near));
+  EXPECT_FALSE(frustum.containsPoint(outside_near));
 
   // Verify that all extracted plane normals are unit length.
   for (int i = 0; i < mathkata::Frustum<T>::kPlaneCount; ++i) {
     const T len =
         frustum
-            .GetPlane(
+            .getPlane(
                 static_cast<typename mathkata::Frustum<T>::FrustumPlane>(i))
-            .normal.Length();
+            .normal.length();
     EXPECT_NEAR(static_cast<double>(len), 1.0, static_cast<double>(precision));
   }
 }
 TEST_FRUSTUM_F(FromViewProjectionOrtho)
 
-// Test: FromViewProjection with a perspective matrix.
+// Test: fromViewProjection with a perspective matrix.
 template <class T>
 void FromViewProjectionPerspective_Test(T precision) {
   const T fovy = std::numbers::pi_v<T> / static_cast<T>(2);  // 90 degrees
@@ -142,42 +142,42 @@ void FromViewProjectionPerspective_Test(T precision) {
 
   const Mat4<T> persp = MakePerspectiveMatrix(fovy, aspect, near_val, far_val);
   const mathkata::Frustum<T> frustum =
-      mathkata::Frustum<T>::FromViewProjection(persp);
+      mathkata::Frustum<T>::fromViewProjection(persp);
 
   // A point at the center of the frustum should be inside.
   const Vec3<T> inside(0, 0, static_cast<T>(-10));
-  EXPECT_TRUE(frustum.ContainsPoint(inside));
+  EXPECT_TRUE(frustum.containsPoint(inside));
 
   // A point behind the camera should be outside.
   const Vec3<T> behind(0, 0, static_cast<T>(5));
-  EXPECT_FALSE(frustum.ContainsPoint(behind));
+  EXPECT_FALSE(frustum.containsPoint(behind));
 
   // A point beyond the far plane should be outside.
   const Vec3<T> beyond_far(0, 0, static_cast<T>(-200));
-  EXPECT_FALSE(frustum.ContainsPoint(beyond_far));
+  EXPECT_FALSE(frustum.containsPoint(beyond_far));
 
   // With 90-degree FOV and aspect=1, at z=-10 the half-width is 10.
   // A point at (9, 0, -10) should be inside.
   const Vec3<T> inside_edge(static_cast<T>(9), 0, static_cast<T>(-10));
-  EXPECT_TRUE(frustum.ContainsPoint(inside_edge));
+  EXPECT_TRUE(frustum.containsPoint(inside_edge));
 
   // A point at (11, 0, -10) should be outside.
   const Vec3<T> outside_right(static_cast<T>(11), 0, static_cast<T>(-10));
-  EXPECT_FALSE(frustum.ContainsPoint(outside_right));
+  EXPECT_FALSE(frustum.containsPoint(outside_right));
 
   // Verify unit normals.
   for (int i = 0; i < mathkata::Frustum<T>::kPlaneCount; ++i) {
     const T len =
         frustum
-            .GetPlane(
+            .getPlane(
                 static_cast<typename mathkata::Frustum<T>::FrustumPlane>(i))
-            .normal.Length();
+            .normal.length();
     EXPECT_NEAR(static_cast<double>(len), 1.0, static_cast<double>(precision));
   }
 }
 TEST_FRUSTUM_F(FromViewProjectionPerspective)
 
-// Test: ContainsPoint with points inside and outside each plane.
+// Test: containsPoint with points inside and outside each plane.
 template <class T>
 void ContainsPointAllPlanes_Test(T /*precision*/) {
   // Use an orthographic frustum for simplicity:
@@ -185,165 +185,165 @@ void ContainsPointAllPlanes_Test(T /*precision*/) {
   const Mat4<T> ortho = MakeOrthoMatrix(static_cast<T>(10), static_cast<T>(5),
                                         static_cast<T>(1), static_cast<T>(100));
   const mathkata::Frustum<T> frustum =
-      mathkata::Frustum<T>::FromViewProjection(ortho);
+      mathkata::Frustum<T>::fromViewProjection(ortho);
 
-  // Center of the frustum.
+  // center of the frustum.
   const Vec3<T> center(0, 0, static_cast<T>(-50));
-  EXPECT_TRUE(frustum.ContainsPoint(center));
+  EXPECT_TRUE(frustum.containsPoint(center));
 
   // Outside left (x < -10).
-  EXPECT_FALSE(frustum.ContainsPoint(
+  EXPECT_FALSE(frustum.containsPoint(
       Vec3<T>(static_cast<T>(-11), 0, static_cast<T>(-50))));
 
   // Outside right (x > 10).
-  EXPECT_FALSE(frustum.ContainsPoint(
+  EXPECT_FALSE(frustum.containsPoint(
       Vec3<T>(static_cast<T>(11), 0, static_cast<T>(-50))));
 
   // Outside bottom (y < -5).
-  EXPECT_FALSE(frustum.ContainsPoint(
+  EXPECT_FALSE(frustum.containsPoint(
       Vec3<T>(0, static_cast<T>(-6), static_cast<T>(-50))));
 
   // Outside top (y > 5).
-  EXPECT_FALSE(frustum.ContainsPoint(
+  EXPECT_FALSE(frustum.containsPoint(
       Vec3<T>(0, static_cast<T>(6), static_cast<T>(-50))));
 
   // Outside near (z > -1, i.e., in front of near plane).
-  EXPECT_FALSE(frustum.ContainsPoint(Vec3<T>(0, 0, static_cast<T>(0))));
+  EXPECT_FALSE(frustum.containsPoint(Vec3<T>(0, 0, static_cast<T>(0))));
 
   // Outside far (z < -100, i.e., behind far plane).
-  EXPECT_FALSE(frustum.ContainsPoint(Vec3<T>(0, 0, static_cast<T>(-101))));
+  EXPECT_FALSE(frustum.containsPoint(Vec3<T>(0, 0, static_cast<T>(-101))));
 }
 TEST_FRUSTUM_F(ContainsPointAllPlanes)
 
-// Test: IntersectsAABB - box fully inside the frustum.
+// Test: intersectsAABB - box fully inside the frustum.
 template <class T>
 void IntersectsAABBInside_Test(T /*precision*/) {
   const Mat4<T> ortho = MakeOrthoMatrix(static_cast<T>(10), static_cast<T>(5),
                                         static_cast<T>(1), static_cast<T>(100));
   const mathkata::Frustum<T> frustum =
-      mathkata::Frustum<T>::FromViewProjection(ortho);
+      mathkata::Frustum<T>::fromViewProjection(ortho);
 
   // An AABB fully inside the frustum.
   const mathkata::AABB<T, 3> inside(
       Vec3<T>(static_cast<T>(-2), static_cast<T>(-2), static_cast<T>(-60)),
       Vec3<T>(static_cast<T>(2), static_cast<T>(2), static_cast<T>(-40)));
-  EXPECT_TRUE(frustum.IntersectsAABB(inside));
+  EXPECT_TRUE(frustum.intersectsAABB(inside));
 }
 TEST_FRUSTUM_F(IntersectsAABBInside)
 
-// Test: IntersectsAABB - box fully outside the frustum.
+// Test: intersectsAABB - box fully outside the frustum.
 template <class T>
 void IntersectsAABBOutside_Test(T /*precision*/) {
   const Mat4<T> ortho = MakeOrthoMatrix(static_cast<T>(10), static_cast<T>(5),
                                         static_cast<T>(1), static_cast<T>(100));
   const mathkata::Frustum<T> frustum =
-      mathkata::Frustum<T>::FromViewProjection(ortho);
+      mathkata::Frustum<T>::fromViewProjection(ortho);
 
   // An AABB fully to the right of the frustum.
   const mathkata::AABB<T, 3> outside_right(
       Vec3<T>(static_cast<T>(20), static_cast<T>(-1), static_cast<T>(-60)),
       Vec3<T>(static_cast<T>(30), static_cast<T>(1), static_cast<T>(-40)));
-  EXPECT_FALSE(frustum.IntersectsAABB(outside_right));
+  EXPECT_FALSE(frustum.intersectsAABB(outside_right));
 
   // An AABB fully behind the far plane.
   const mathkata::AABB<T, 3> outside_far(
       Vec3<T>(static_cast<T>(-1), static_cast<T>(-1), static_cast<T>(-200)),
       Vec3<T>(static_cast<T>(1), static_cast<T>(1), static_cast<T>(-150)));
-  EXPECT_FALSE(frustum.IntersectsAABB(outside_far));
+  EXPECT_FALSE(frustum.intersectsAABB(outside_far));
 
   // An AABB fully in front of the near plane.
   const mathkata::AABB<T, 3> outside_near(
       Vec3<T>(static_cast<T>(-1), static_cast<T>(-1), static_cast<T>(5)),
       Vec3<T>(static_cast<T>(1), static_cast<T>(1), static_cast<T>(10)));
-  EXPECT_FALSE(frustum.IntersectsAABB(outside_near));
+  EXPECT_FALSE(frustum.intersectsAABB(outside_near));
 }
 TEST_FRUSTUM_F(IntersectsAABBOutside)
 
-// Test: IntersectsAABB - box straddling the frustum boundary.
+// Test: intersectsAABB - box straddling the frustum boundary.
 template <class T>
 void IntersectsAABBStraddling_Test(T /*precision*/) {
   const Mat4<T> ortho = MakeOrthoMatrix(static_cast<T>(10), static_cast<T>(5),
                                         static_cast<T>(1), static_cast<T>(100));
   const mathkata::Frustum<T> frustum =
-      mathkata::Frustum<T>::FromViewProjection(ortho);
+      mathkata::Frustum<T>::fromViewProjection(ortho);
 
   // An AABB that straddles the right boundary (partially inside).
   const mathkata::AABB<T, 3> straddle_right(
       Vec3<T>(static_cast<T>(8), static_cast<T>(-1), static_cast<T>(-50)),
       Vec3<T>(static_cast<T>(15), static_cast<T>(1), static_cast<T>(-40)));
-  EXPECT_TRUE(frustum.IntersectsAABB(straddle_right));
+  EXPECT_TRUE(frustum.intersectsAABB(straddle_right));
 
   // An AABB that straddles the near plane.
   const mathkata::AABB<T, 3> straddle_near(
       Vec3<T>(static_cast<T>(-1), static_cast<T>(-1), static_cast<T>(-5)),
       Vec3<T>(static_cast<T>(1), static_cast<T>(1), static_cast<T>(5)));
-  EXPECT_TRUE(frustum.IntersectsAABB(straddle_near));
+  EXPECT_TRUE(frustum.intersectsAABB(straddle_near));
 
   // An AABB that straddles the far plane.
   const mathkata::AABB<T, 3> straddle_far(
       Vec3<T>(static_cast<T>(-1), static_cast<T>(-1), static_cast<T>(-105)),
       Vec3<T>(static_cast<T>(1), static_cast<T>(1), static_cast<T>(-95)));
-  EXPECT_TRUE(frustum.IntersectsAABB(straddle_far));
+  EXPECT_TRUE(frustum.intersectsAABB(straddle_far));
 }
 TEST_FRUSTUM_F(IntersectsAABBStraddling)
 
-// Test: IntersectsSphere - sphere fully inside the frustum.
+// Test: intersectsSphere - sphere fully inside the frustum.
 template <class T>
 void IntersectsSphereInside_Test(T /*precision*/) {
   const Mat4<T> ortho = MakeOrthoMatrix(static_cast<T>(10), static_cast<T>(5),
                                         static_cast<T>(1), static_cast<T>(100));
   const mathkata::Frustum<T> frustum =
-      mathkata::Frustum<T>::FromViewProjection(ortho);
+      mathkata::Frustum<T>::fromViewProjection(ortho);
 
   const mathkata::Sphere<T, 3> inside(Vec3<T>(0, 0, static_cast<T>(-50)),
                                       static_cast<T>(2));
-  EXPECT_TRUE(frustum.IntersectsSphere(inside));
+  EXPECT_TRUE(frustum.intersectsSphere(inside));
 }
 TEST_FRUSTUM_F(IntersectsSphereInside)
 
-// Test: IntersectsSphere - sphere fully outside the frustum.
+// Test: intersectsSphere - sphere fully outside the frustum.
 template <class T>
 void IntersectsSphereOutside_Test(T /*precision*/) {
   const Mat4<T> ortho = MakeOrthoMatrix(static_cast<T>(10), static_cast<T>(5),
                                         static_cast<T>(1), static_cast<T>(100));
   const mathkata::Frustum<T> frustum =
-      mathkata::Frustum<T>::FromViewProjection(ortho);
+      mathkata::Frustum<T>::fromViewProjection(ortho);
 
   // Sphere far to the right.
   const mathkata::Sphere<T, 3> outside(
       Vec3<T>(static_cast<T>(20), 0, static_cast<T>(-50)), static_cast<T>(2));
-  EXPECT_FALSE(frustum.IntersectsSphere(outside));
+  EXPECT_FALSE(frustum.intersectsSphere(outside));
 
   // Sphere behind far plane.
   const mathkata::Sphere<T, 3> outside_far(Vec3<T>(0, 0, static_cast<T>(-200)),
                                            static_cast<T>(2));
-  EXPECT_FALSE(frustum.IntersectsSphere(outside_far));
+  EXPECT_FALSE(frustum.intersectsSphere(outside_far));
 
   // Sphere in front of near plane.
   const mathkata::Sphere<T, 3> outside_near(Vec3<T>(0, 0, static_cast<T>(10)),
                                             static_cast<T>(2));
-  EXPECT_FALSE(frustum.IntersectsSphere(outside_near));
+  EXPECT_FALSE(frustum.intersectsSphere(outside_near));
 }
 TEST_FRUSTUM_F(IntersectsSphereOutside)
 
-// Test: IntersectsSphere - sphere straddling the frustum boundary.
+// Test: intersectsSphere - sphere straddling the frustum boundary.
 template <class T>
 void IntersectsSphereStraddling_Test(T /*precision*/) {
   const Mat4<T> ortho = MakeOrthoMatrix(static_cast<T>(10), static_cast<T>(5),
                                         static_cast<T>(1), static_cast<T>(100));
   const mathkata::Frustum<T> frustum =
-      mathkata::Frustum<T>::FromViewProjection(ortho);
+      mathkata::Frustum<T>::fromViewProjection(ortho);
 
   // Sphere centered just outside the right boundary but with radius that
   // reaches inside.
   const mathkata::Sphere<T, 3> straddle(
       Vec3<T>(static_cast<T>(11), 0, static_cast<T>(-50)), static_cast<T>(3));
-  EXPECT_TRUE(frustum.IntersectsSphere(straddle));
+  EXPECT_TRUE(frustum.intersectsSphere(straddle));
 
   // Sphere centered just outside the right boundary and too far away.
   const mathkata::Sphere<T, 3> too_far(
       Vec3<T>(static_cast<T>(15), 0, static_cast<T>(-50)), static_cast<T>(2));
-  EXPECT_FALSE(frustum.IntersectsSphere(too_far));
+  EXPECT_FALSE(frustum.intersectsSphere(too_far));
 }
 TEST_FRUSTUM_F(IntersectsSphereStraddling)
 
@@ -371,9 +371,9 @@ void Equality_Test(T /*precision*/) {
 }
 TEST_FRUSTUM_F(Equality)
 
-// Test: GetPlane accessor.
+// Test: getPlane accessor.
 template <class T>
-void GetPlane_Test(T /*precision*/) {
+void getPlane_Test(T /*precision*/) {
   const mathkata::Plane<T> near_p(Vec3<T>(0, 0, 1), static_cast<T>(1));
   const mathkata::Plane<T> far_p(Vec3<T>(0, 0, -1), static_cast<T>(100));
   const mathkata::Plane<T> left_p(Vec3<T>(1, 0, 0), static_cast<T>(5));
@@ -384,16 +384,16 @@ void GetPlane_Test(T /*precision*/) {
   const mathkata::Frustum<T> frustum(near_p, far_p, left_p, right_p, top_p,
                                      bottom_p);
 
-  EXPECT_EQ(frustum.GetPlane(mathkata::Frustum<T>::kNear), near_p);
-  EXPECT_EQ(frustum.GetPlane(mathkata::Frustum<T>::kFar), far_p);
-  EXPECT_EQ(frustum.GetPlane(mathkata::Frustum<T>::kLeft), left_p);
-  EXPECT_EQ(frustum.GetPlane(mathkata::Frustum<T>::kRight), right_p);
-  EXPECT_EQ(frustum.GetPlane(mathkata::Frustum<T>::kTop), top_p);
-  EXPECT_EQ(frustum.GetPlane(mathkata::Frustum<T>::kBottom), bottom_p);
+  EXPECT_EQ(frustum.getPlane(mathkata::Frustum<T>::kNear), near_p);
+  EXPECT_EQ(frustum.getPlane(mathkata::Frustum<T>::kFar), far_p);
+  EXPECT_EQ(frustum.getPlane(mathkata::Frustum<T>::kLeft), left_p);
+  EXPECT_EQ(frustum.getPlane(mathkata::Frustum<T>::kRight), right_p);
+  EXPECT_EQ(frustum.getPlane(mathkata::Frustum<T>::kTop), top_p);
+  EXPECT_EQ(frustum.getPlane(mathkata::Frustum<T>::kBottom), bottom_p);
 }
-TEST_FRUSTUM_F(GetPlane)
+TEST_FRUSTUM_F(getPlane)
 
-// Test: Perspective frustum with various points to verify correctness.
+// Test: perspective frustum with various points to verify correctness.
 template <class T>
 void PerspectiveCulling_Test(T /*precision*/) {
   // 90-degree FOV, aspect 16:9, near=0.1, far=1000
@@ -404,22 +404,22 @@ void PerspectiveCulling_Test(T /*precision*/) {
 
   const Mat4<T> persp = MakePerspectiveMatrix(fovy, aspect, near_val, far_val);
   const mathkata::Frustum<T> frustum =
-      mathkata::Frustum<T>::FromViewProjection(persp);
+      mathkata::Frustum<T>::fromViewProjection(persp);
 
   // Point directly in front of camera, well inside frustum.
-  EXPECT_TRUE(frustum.ContainsPoint(Vec3<T>(0, 0, static_cast<T>(-10))));
+  EXPECT_TRUE(frustum.containsPoint(Vec3<T>(0, 0, static_cast<T>(-10))));
 
   // Point just inside the near plane.
-  EXPECT_TRUE(frustum.ContainsPoint(Vec3<T>(0, 0, static_cast<T>(-0.2))));
+  EXPECT_TRUE(frustum.containsPoint(Vec3<T>(0, 0, static_cast<T>(-0.2))));
 
   // Point just inside the far plane.
-  EXPECT_TRUE(frustum.ContainsPoint(Vec3<T>(0, 0, static_cast<T>(-999))));
+  EXPECT_TRUE(frustum.containsPoint(Vec3<T>(0, 0, static_cast<T>(-999))));
 
   // Point behind camera.
-  EXPECT_FALSE(frustum.ContainsPoint(Vec3<T>(0, 0, static_cast<T>(1))));
+  EXPECT_FALSE(frustum.containsPoint(Vec3<T>(0, 0, static_cast<T>(1))));
 
   // Point beyond far plane.
-  EXPECT_FALSE(frustum.ContainsPoint(Vec3<T>(0, 0, static_cast<T>(-1001))));
+  EXPECT_FALSE(frustum.containsPoint(Vec3<T>(0, 0, static_cast<T>(-1001))));
 }
 TEST_FRUSTUM_F(PerspectiveCulling)
 

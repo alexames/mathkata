@@ -63,7 +63,7 @@ struct Rect {
   /// @brief Returns the center point of the rect.
   ///
   /// @return A Vector<T, 2> at the center of the rect.
-  constexpr Vector<T, 2> Center() const {
+  constexpr Vector<T, 2> center() const {
     return pos + size / static_cast<T>(2);
   }
 
@@ -72,17 +72,17 @@ struct Rect {
   /// This is equivalent to the position.
   ///
   /// @return A Vector<T, 2> at the minimum corner (pos).
-  constexpr Vector<T, 2> Min() const { return pos; }
+  constexpr Vector<T, 2> min() const { return pos; }
 
   /// @brief Returns the maximum corner of the rect.
   ///
   /// @return A Vector<T, 2> at the maximum corner (pos + size).
-  constexpr Vector<T, 2> Max() const { return pos + size; }
+  constexpr Vector<T, 2> max() const { return pos + size; }
 
   /// @brief Returns the area of the rect.
   ///
   /// @return The product of width and height.
-  constexpr T Area() const { return size.x * size.y; }
+  constexpr T area() const { return size.x * size.y; }
 
   /// @brief Tests whether a point is contained within the rect.
   ///
@@ -90,27 +90,27 @@ struct Rect {
   ///
   /// @param point The point to test.
   /// @return true if the point is inside or on the boundary of the rect.
-  constexpr bool Contains(const Vector<T, 2>& point) const {
-    const Vector<T, 2> max = Max();
-    return point.x >= pos.x && point.y >= pos.y && point.x <= max.x
-           && point.y <= max.y;
+  constexpr bool contains(const Vector<T, 2>& point) const {
+    const Vector<T, 2> rect_max = max();
+    return point.x >= pos.x && point.y >= pos.y && point.x <= rect_max.x
+           && point.y <= rect_max.y;
   }
 
   /// @brief Tests whether another rect is entirely contained within this rect.
   ///
   /// @param other The rect to test.
   /// @return true if other is entirely inside or on the boundary of this rect.
-  constexpr bool Contains(const Rect<T>& other) const {
-    return Contains(other.Min()) && Contains(other.Max());
+  constexpr bool contains(const Rect<T>& other) const {
+    return contains(other.min()) && contains(other.max());
   }
 
   /// @brief Tests whether another rect overlaps with this rect.
   ///
   /// @param other The rect to test.
   /// @return true if the rects overlap.
-  constexpr bool Intersects(const Rect<T>& other) const {
-    const Vector<T, 2> this_max = Max();
-    const Vector<T, 2> other_max = other.Max();
+  constexpr bool intersects(const Rect<T>& other) const {
+    const Vector<T, 2> this_max = max();
+    const Vector<T, 2> other_max = other.max();
     return pos.x < other_max.x && this_max.x > other.pos.x
            && pos.y < other_max.y && this_max.y > other.pos.y;
   }
@@ -121,9 +121,9 @@ struct Rect {
   ///
   /// @param other The rect to intersect with.
   /// @return The intersection rect, or a zero-sized rect if no overlap.
-  constexpr Rect<T> Intersection(const Rect<T>& other) const {
-    const Vector<T, 2> max1 = Max();
-    const Vector<T, 2> max2 = other.Max();
+  constexpr Rect<T> intersection(const Rect<T>& other) const {
+    const Vector<T, 2> max1 = max();
+    const Vector<T, 2> max2 = other.max();
     const Vector<T, 2> inter_min(std::max(pos.x, other.pos.x),
                                  std::max(pos.y, other.pos.y));
     const Vector<T, 2> inter_max(std::min(max1.x, max2.x),
@@ -138,11 +138,11 @@ struct Rect {
   ///
   /// @param other The rect to union with.
   /// @return The smallest rect containing both this and other.
-  constexpr Rect<T> Union(const Rect<T>& other) const {
+  constexpr Rect<T> merge(const Rect<T>& other) const {
     const Vector<T, 2> union_min(std::min(pos.x, other.pos.x),
                                  std::min(pos.y, other.pos.y));
-    const Vector<T, 2> union_max(std::max(Max().x, other.Max().x),
-                                 std::max(Max().y, other.Max().y));
+    const Vector<T, 2> union_max(std::max(max().x, other.max().x),
+                                 std::max(max().y, other.max().y));
     return Rect<T>(union_min, union_max - union_min);
   }
 
@@ -152,11 +152,11 @@ struct Rect {
   ///
   /// @param point The point to include.
   /// @return A new rect expanded to contain the point.
-  constexpr Rect<T> Expand(const Vector<T, 2>& point) const {
+  constexpr Rect<T> expand(const Vector<T, 2>& point) const {
     const Vector<T, 2> new_min(std::min(pos.x, point.x),
                                std::min(pos.y, point.y));
-    const Vector<T, 2> new_max(std::max(Max().x, point.x),
-                               std::max(Max().y, point.y));
+    const Vector<T, 2> new_max(std::max(max().x, point.x),
+                               std::max(max().y, point.y));
     return Rect<T>(new_min, new_max - new_min);
   }
 
@@ -167,7 +167,7 @@ struct Rect {
   ///
   /// @param amount The amount to expand by.
   /// @return A new rect expanded by the given amount.
-  constexpr Rect<T> Expand(T amount) const {
+  constexpr Rect<T> expand(T amount) const {
     return Rect<T>(Vector<T, 2>(pos.x - amount, pos.y - amount),
                    Vector<T, 2>(size.x + static_cast<T>(2) * amount,
                                 size.y + static_cast<T>(2) * amount));

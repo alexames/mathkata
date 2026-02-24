@@ -54,7 +54,7 @@ int main(int argc, char** argv) {
   (void)argv;
   // Create an array of matrices containing random values.
   TestMatrix* const matrices = new TestMatrix[kMatrixSize];
-  TestMatrix mul = TestMatrix::Identity();
+  TestMatrix mul = TestMatrix::identity();
   for (size_t i = 0; i < kMatrixSize; ++i) {
     TestMatrix mat;
     for (size_t j = 0; j < MATRIX_DIMENSIONS; ++j) {
@@ -76,7 +76,7 @@ int main(int argc, char** argv) {
         * mathkata::Vector<T, MATRIX_DIMENSIONS>(
             matrices[i](0, 0), matrices[i](1, 0), matrices[i](2, 0),
             matrices[i](3, 0));
-    mul -= TestMatrix::OuterProduct(tmp, tmp);
+    mul -= TestMatrix::outerProduct(tmp, tmp);
   }
 #endif  // MATRIX_DIMENSIONS == 4
   PERFTEST_2D_VECTOR_LOOP(kIterations, kMatrixSize) {

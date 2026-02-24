@@ -112,14 +112,14 @@ class AffineTransform2D {
   /// The data is suitable for uploading directly to a GPU.
   ///
   /// @return Pointer to 16 elements in column-major order.
-  constexpr const T* GetMatrix() const { return matrix_; }
+  constexpr const T* getMatrix() const { return matrix_; }
 
   /// @brief Compute the inverse of this transform.
   ///
   /// Uses the 3x3 determinant to invert the affine portion.
   ///
   /// @return The inverse transform.
-  inline AffineTransform2D GetInverse() const {
+  inline AffineTransform2D getInverse() const {
     // Extract the 3x3 row-major elements.
     T a00 = matrix_[0];
     T a01 = matrix_[4];
@@ -143,30 +143,30 @@ class AffineTransform2D {
         (a00 * a11 - a01 * a10) * inv_det);
   }
 
-  /// @brief Transform a 2D point by this affine transform.
+  /// @brief transform a 2D point by this affine transform.
   ///
   /// @param point The point to transform.
   /// @return The transformed point.
-  constexpr Vector<T, 2> TransformPoint(const Vector<T, 2>& point) const {
+  constexpr Vector<T, 2> transformPoint(const Vector<T, 2>& point) const {
     return Vector<T, 2>(
         matrix_[0] * point.x + matrix_[4] * point.y + matrix_[12],
         matrix_[1] * point.x + matrix_[5] * point.y + matrix_[13]);
   }
 
-  /// @brief Transform a rect and return the axis-aligned bounding box.
+  /// @brief transform a rect and return the axis-aligned bounding box.
   ///
   /// All four corners of the input rect are transformed, and the AABB
   /// enclosing all four transformed points is returned.
   ///
   /// @param rect The rect to transform.
   /// @return The axis-aligned bounding box of the transformed rect.
-  constexpr Rect<T> TransformRect(const Rect<T>& rect) const {
-    Vector<T, 2> p0 = TransformPoint(rect.pos);
+  constexpr Rect<T> transformRect(const Rect<T>& rect) const {
+    Vector<T, 2> p0 = transformPoint(rect.pos);
     Vector<T, 2> p1 =
-        TransformPoint(Vector<T, 2>(rect.pos.x + rect.size.x, rect.pos.y));
+        transformPoint(Vector<T, 2>(rect.pos.x + rect.size.x, rect.pos.y));
     Vector<T, 2> p2 =
-        TransformPoint(Vector<T, 2>(rect.pos.x, rect.pos.y + rect.size.y));
-    Vector<T, 2> p3 = TransformPoint(
+        transformPoint(Vector<T, 2>(rect.pos.x, rect.pos.y + rect.size.y));
+    Vector<T, 2> p3 = transformPoint(
         Vector<T, 2>(rect.pos.x + rect.size.x, rect.pos.y + rect.size.y));
 
     T min_x = std::min({p0.x, p1.x, p2.x, p3.x});
@@ -181,8 +181,8 @@ class AffineTransform2D {
   ///
   /// @param offset Translation vector.
   /// @return Reference to this transform for chaining.
-  constexpr AffineTransform2D& Translate(const Vector<T, 2>& offset) {
-    return Translate(offset.x, offset.y);
+  constexpr AffineTransform2D& translate(const Vector<T, 2>& offset) {
+    return translate(offset.x, offset.y);
   }
 
   /// @brief Apply a translation to this transform.
@@ -190,23 +190,23 @@ class AffineTransform2D {
   /// @param x Translation along the X axis.
   /// @param y Translation along the Y axis.
   /// @return Reference to this transform for chaining.
-  constexpr AffineTransform2D& Translate(T x, T y) {
+  constexpr AffineTransform2D& translate(T x, T y) {
     AffineTransform2D translation(T(1), T(0), x, T(0), T(1), y, T(0), T(0),
                                   T(1));
-    return Combine(translation);
+    return combine(translation);
   }
 
   /// @brief Apply a rotation to this transform.
   ///
   /// @param angle_degrees Rotation angle in degrees (counter-clockwise).
   /// @return Reference to this transform for chaining.
-  inline AffineTransform2D& Rotate(T angle_degrees) {
+  inline AffineTransform2D& rotate(T angle_degrees) {
     T radians = angle_degrees * std::numbers::pi_v<T> / T(180);
     T cos_a = std::cos(radians);
     T sin_a = std::sin(radians);
     AffineTransform2D rotation(cos_a, -sin_a, T(0), sin_a, cos_a, T(0), T(0),
                                T(0), T(1));
-    return Combine(rotation);
+    return combine(rotation);
   }
 
   /// @brief Apply a rotation around a center point to this transform.
@@ -214,65 +214,65 @@ class AffineTransform2D {
   /// @param angle_degrees Rotation angle in degrees (counter-clockwise).
   /// @param center The center of rotation.
   /// @return Reference to this transform for chaining.
-  inline AffineTransform2D& Rotate(T angle_degrees,
+  inline AffineTransform2D& rotate(T angle_degrees,
                                    const Vector<T, 2>& center) {
-    Translate(center.x, center.y);
-    Rotate(angle_degrees);
-    return Translate(-center.x, -center.y);
+    translate(center.x, center.y);
+    rotate(angle_degrees);
+    return translate(-center.x, -center.y);
   }
 
   /// @brief Apply a scale to this transform.
   ///
-  /// @param factors Scale factors for each axis.
+  /// @param factors scale factors for each axis.
   /// @return Reference to this transform for chaining.
-  constexpr AffineTransform2D& Scale(const Vector<T, 2>& factors) {
-    return Scale(factors.x, factors.y);
+  constexpr AffineTransform2D& scale(const Vector<T, 2>& factors) {
+    return scale(factors.x, factors.y);
   }
 
   /// @brief Apply a scale around a center point to this transform.
   ///
-  /// @param factors Scale factors for each axis.
+  /// @param factors scale factors for each axis.
   /// @param center The center of scaling.
   /// @return Reference to this transform for chaining.
-  constexpr AffineTransform2D& Scale(const Vector<T, 2>& factors,
+  constexpr AffineTransform2D& scale(const Vector<T, 2>& factors,
                                      const Vector<T, 2>& center) {
-    return Scale(factors.x, factors.y, center);
+    return scale(factors.x, factors.y, center);
   }
 
   /// @brief Apply a scale to this transform.
   ///
-  /// @param sx Scale factor along the X axis.
-  /// @param sy Scale factor along the Y axis.
+  /// @param sx scale factor along the X axis.
+  /// @param sy scale factor along the Y axis.
   /// @return Reference to this transform for chaining.
-  constexpr AffineTransform2D& Scale(T sx, T sy) {
+  constexpr AffineTransform2D& scale(T sx, T sy) {
     AffineTransform2D scaling(sx, T(0), T(0), T(0), sy, T(0), T(0), T(0), T(1));
-    return Combine(scaling);
+    return combine(scaling);
   }
 
   /// @brief Apply a scale around a center point to this transform.
   ///
-  /// @param sx Scale factor along the X axis.
-  /// @param sy Scale factor along the Y axis.
+  /// @param sx scale factor along the X axis.
+  /// @param sy scale factor along the Y axis.
   /// @param center The center of scaling.
   /// @return Reference to this transform for chaining.
-  constexpr AffineTransform2D& Scale(T sx, T sy, const Vector<T, 2>& center) {
-    Translate(center.x, center.y);
-    Scale(sx, sy);
-    return Translate(-center.x, -center.y);
+  constexpr AffineTransform2D& scale(T sx, T sy, const Vector<T, 2>& center) {
+    translate(center.x, center.y);
+    scale(sx, sy);
+    return translate(-center.x, -center.y);
   }
 
-  /// @brief Combine this transform with another transform.
+  /// @brief combine this transform with another transform.
   ///
   /// The other transform is applied after this transform. This is equivalent
   /// to multiplying the matrices: this = this * other.
   ///
   /// @param other The transform to combine with.
   /// @return Reference to this transform for chaining.
-  constexpr AffineTransform2D& Combine(const AffineTransform2D& other) {
+  constexpr AffineTransform2D& combine(const AffineTransform2D& other) {
     const T* a = matrix_;
     const T* b = other.matrix_;
 
-    // Multiply the two 4x4 column-major matrices, but since we know the
+    // multiply the two 4x4 column-major matrices, but since we know the
     // structure (row 2 is [0,0,1,0], certain elements are always 0 or 1),
     // we only need to compute the relevant elements of the 3x3 affine
     // portion embedded in the 4x4.
@@ -305,7 +305,7 @@ class AffineTransform2D {
   /// @brief Returns an identity transform.
   ///
   /// @return An AffineTransform2D representing the identity transformation.
-  static constexpr AffineTransform2D Identity() { return AffineTransform2D(); }
+  static constexpr AffineTransform2D identity() { return AffineTransform2D(); }
 
  private:
   T matrix_[16];
@@ -314,13 +314,13 @@ class AffineTransform2D {
 
 /// @brief Check if two 2D affine transforms are identical.
 ///
-/// @param t1 Transform to be tested.
+/// @param t1 transform to be tested.
 /// @param t2 Other transform to be tested.
 template <class T>
 constexpr bool operator==(const AffineTransform2D<T>& t1,
                           const AffineTransform2D<T>& t2) {
-  const T* a = t1.GetMatrix();
-  const T* b = t2.GetMatrix();
+  const T* a = t1.getMatrix();
+  const T* b = t2.getMatrix();
   for (int i = 0; i < 16; ++i) {
     if (a[i] != b[i]) return false;
   }
@@ -329,7 +329,7 @@ constexpr bool operator==(const AffineTransform2D<T>& t1,
 
 /// @brief Check if two 2D affine transforms are <b>not</b> identical.
 ///
-/// @param t1 Transform to be tested.
+/// @param t1 transform to be tested.
 /// @param t2 Other transform to be tested.
 template <class T>
 constexpr bool operator!=(const AffineTransform2D<T>& t1,
@@ -346,11 +346,11 @@ template <class T>
 constexpr AffineTransform2D<T> operator*(const AffineTransform2D<T>& lhs,
                                          const AffineTransform2D<T>& rhs) {
   AffineTransform2D<T> result = lhs;
-  result.Combine(rhs);
+  result.combine(rhs);
   return result;
 }
 
-/// @brief Transform a 2D point by an affine transform.
+/// @brief transform a 2D point by an affine transform.
 ///
 /// @param transform The transform to apply.
 /// @param point The point to transform.
@@ -358,7 +358,7 @@ constexpr AffineTransform2D<T> operator*(const AffineTransform2D<T>& lhs,
 template <class T>
 constexpr Vector<T, 2> operator*(const AffineTransform2D<T>& transform,
                                  const Vector<T, 2>& point) {
-  return transform.TransformPoint(point);
+  return transform.transformPoint(point);
 }
 
 /// @brief Compose two 2D affine transforms in-place.
@@ -369,7 +369,7 @@ constexpr Vector<T, 2> operator*(const AffineTransform2D<T>& transform,
 template <class T>
 constexpr AffineTransform2D<T>& operator*=(AffineTransform2D<T>& lhs,
                                            const AffineTransform2D<T>& rhs) {
-  return lhs.Combine(rhs);
+  return lhs.combine(rhs);
 }
 
 }  // namespace mathkata

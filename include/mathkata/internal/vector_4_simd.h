@@ -111,7 +111,7 @@ class Vector<float, 4> {
   inline Vector<float, 2> zw() { return Vector<float, 2>(z, w); }
   inline const Vector<float, 2> zw() const { return Vector<float, 2>(z, w); }
 
-  inline void Pack(VectorPacked<float, 4>* const vector) const {
+  inline void pack(VectorPacked<float, 4>* const vector) const {
     simd4f_ustore4(simd4, vector->data_);
   }
 
@@ -184,22 +184,22 @@ class Vector<float, 4> {
     return !operator==(v);
   }
 
-  inline float LengthSquared() const {
+  inline float lengthSquared() const {
     return simd4f_get_x(simd4f_dot4(simd4, simd4));
   }
 
-  inline float Length() const { return simd4f_get_x(simd4f_length4(simd4)); }
+  inline float length() const { return simd4f_get_x(simd4f_length4(simd4)); }
 
-  /// @brief Normalize this vector in-place.
+  /// @brief normalize this vector in-place.
   ///
   /// The vector must have non-zero length. Normalizing a zero-length vector
   /// produces undefined results.
   ///
   /// @return The length of this vector.
-  inline float Normalize() {
-    const float length = Length();
-    simd4 = simd4f_mul(simd4, simd4f_splat(1 / length));
-    return length;
+  inline float normalize() {
+    const float len = length();
+    simd4 = simd4f_mul(simd4, simd4f_splat(1 / len));
+    return len;
   }
 
   /// @brief Calculate the normalized version of this vector.
@@ -208,36 +208,36 @@ class Vector<float, 4> {
   /// produces undefined results.
   ///
   /// @return The normalized vector.
-  inline Vector<float, 4> Normalized() const {
+  inline Vector<float, 4> normalized() const {
     return Vector<float, 4>(simd4f_normalize4(simd4));
   }
 
   template <typename CompatibleT>
-  static inline Vector<float, 4> FromType(const CompatibleT& compatible) {
-    return FromTypeHelper<float, 4, CompatibleT>(compatible);
+  static inline Vector<float, 4> fromType(const CompatibleT& compatible) {
+    return fromTypeHelper<float, 4, CompatibleT>(compatible);
   }
 
   template <typename CompatibleT>
-  static inline CompatibleT ToType(const Vector<float, 4>& v) {
-    return ToTypeHelper<float, 4, CompatibleT>(v);
+  static inline CompatibleT toType(const Vector<float, 4>& v) {
+    return toTypeHelper<float, 4, CompatibleT>(v);
   }
 
-  static inline float DotProduct(const Vector<float, 4>& v1,
+  static inline float dotProduct(const Vector<float, 4>& v1,
                                  const Vector<float, 4>& v2) {
     return simd4f_get_x(simd4f_dot4(v1.simd4, v2.simd4));
   }
 
-  static inline Vector<float, 4> HadamardProduct(const Vector<float, 4>& v1,
+  static inline Vector<float, 4> hadamardProduct(const Vector<float, 4>& v1,
                                                  const Vector<float, 4>& v2) {
     return Vector<float, 4>(simd4f_mul(v1.simd4, v2.simd4));
   }
 
-  static inline Vector<float, 4> HadamardDivide(const Vector<float, 4>& v1,
+  static inline Vector<float, 4> hadamardDivide(const Vector<float, 4>& v1,
                                                 const Vector<float, 4>& v2) {
     return Vector<float, 4>(simd4f_div(v1.simd4, v2.simd4));
   }
 
-  static inline Vector<float, 4> Lerp(const Vector<float, 4>& v1,
+  static inline Vector<float, 4> lerp(const Vector<float, 4>& v1,
                                       const Vector<float, 4>& v2,
                                       float percent) {
     const simd4f percentv = simd4f_splat(percent);
@@ -245,56 +245,56 @@ class Vector<float, 4> {
         v1.simd4, simd4f_mul(simd4f_sub(v2.simd4, v1.simd4), percentv)));
   }
 
-  static inline bool InRange(const Vector<float, 4>& val,
+  static inline bool inRange(const Vector<float, 4>& val,
                              const Vector<float, 4>& range_start,
                              const Vector<float, 4>& range_end) {
-    return InRangeHelper(val, range_start, range_end);
+    return inRangeHelper(val, range_start, range_end);
   }
 
-  static inline Vector<float, 4> Max(const Vector<float, 4>& v1,
+  static inline Vector<float, 4> max(const Vector<float, 4>& v1,
                                      const Vector<float, 4>& v2) {
     return Vector<float, 4>(simd4f_max(v1.simd4, v2.simd4));
   }
 
-  static inline Vector<float, 4> Min(const Vector<float, 4>& v1,
+  static inline Vector<float, 4> min(const Vector<float, 4>& v1,
                                      const Vector<float, 4>& v2) {
     return Vector<float, 4>(simd4f_min(v1.simd4, v2.simd4));
   }
 
-  static inline float Distance(const Vector<float, 4>& v1,
+  static inline float distance(const Vector<float, 4>& v1,
                                const Vector<float, 4>& v2) {
-    return (v1 - v2).Length();
+    return (v1 - v2).length();
   }
 
-  static inline float DistanceSquared(const Vector<float, 4>& v1,
+  static inline float distanceSquared(const Vector<float, 4>& v1,
                                       const Vector<float, 4>& v2) {
-    return (v1 - v2).LengthSquared();
+    return (v1 - v2).lengthSquared();
   }
 
-  static inline float Angle(const Vector<float, 4>& v1,
+  static inline float angle(const Vector<float, 4>& v1,
                             const Vector<float, 4>& v2) {
-    return AngleHelper(v1, v2);
+    return angleHelper(v1, v2);
   }
 
-  static inline Vector<float, 4> Project(const Vector<float, 4>& v,
+  static inline Vector<float, 4> project(const Vector<float, 4>& v,
                                          const Vector<float, 4>& onto) {
-    return ProjectHelper(v, onto);
+    return projectHelper(v, onto);
   }
 
-  static inline Vector<float, 4> Reject(const Vector<float, 4>& v,
+  static inline Vector<float, 4> reject(const Vector<float, 4>& v,
                                         const Vector<float, 4>& from) {
-    return RejectHelper(v, from);
+    return rejectHelper(v, from);
   }
 
-  static inline Vector<float, 4> Reflect(const Vector<float, 4>& incident,
+  static inline Vector<float, 4> reflect(const Vector<float, 4>& incident,
                                          const Vector<float, 4>& normal) {
-    return ReflectHelper(incident, normal);
+    return reflectHelper(incident, normal);
   }
 
-  static inline Vector<float, 4> Refract(const Vector<float, 4>& incident,
+  static inline Vector<float, 4> refract(const Vector<float, 4>& incident,
                                          const Vector<float, 4>& normal,
                                          float eta) {
-    return RefractHelper(incident, normal, eta);
+    return refractHelper(incident, normal, eta);
   }
 
   MATHKATA_DEFINE_CLASS_SIMD_AWARE_NEW_DELETE

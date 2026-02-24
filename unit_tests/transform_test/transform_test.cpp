@@ -93,7 +93,7 @@ TEST_ALL_F(PositionOnlyConstruction)
 template <class T>
 void PositionRotationConstruction_Test(T precision) {
   mathkata::Vector<T, 3> pos(T(4), T(5), T(6));
-  mathkata::Quaternion<T> rot = mathkata::Quaternion<T>::FromAngleAxis(
+  mathkata::Quaternion<T> rot = mathkata::Quaternion<T>::fromAngleAxis(
       std::numbers::pi_v<T> / 4, mathkata::Vector<T, 3>(T(0), T(1), T(0)));
   mathkata::Transform<T> t(pos, rot);
   EXPECT_TRUE(NearVector(t.position, pos, precision));
@@ -107,7 +107,7 @@ TEST_ALL_F(PositionRotationConstruction)
 template <class T>
 void FullConstruction_Test(T precision) {
   mathkata::Vector<T, 3> pos(T(1), T(2), T(3));
-  mathkata::Quaternion<T> rot = mathkata::Quaternion<T>::FromAngleAxis(
+  mathkata::Quaternion<T> rot = mathkata::Quaternion<T>::fromAngleAxis(
       std::numbers::pi_v<T> / 2, mathkata::Vector<T, 3>(T(0), T(0), T(1)));
   mathkata::Vector<T, 3> scl(T(2), T(3), T(4));
   mathkata::Transform<T> t(pos, rot, scl);
@@ -117,77 +117,77 @@ void FullConstruction_Test(T precision) {
 }
 TEST_ALL_F(FullConstruction)
 
-// Test: ToMatrix produces the expected TRS matrix.
+// Test: toMatrix produces the expected TRS matrix.
 template <class T>
-void ToMatrix_Test(T precision) {
+void toMatrix_Test(T precision) {
   mathkata::Vector<T, 3> pos(T(10), T(20), T(30));
-  mathkata::Quaternion<T> rot = mathkata::Quaternion<T>::FromAngleAxis(
+  mathkata::Quaternion<T> rot = mathkata::Quaternion<T>::fromAngleAxis(
       std::numbers::pi_v<T> / 2, mathkata::Vector<T, 3>(T(0), T(1), T(0)));
   mathkata::Vector<T, 3> scl(T(2), T(3), T(4));
   mathkata::Transform<T> t(pos, rot, scl);
 
-  mathkata::Matrix<T, 4> result = t.ToMatrix();
+  mathkata::Matrix<T, 4> result = t.toMatrix();
   mathkata::Matrix<T, 4> expected =
-      mathkata::Matrix<T, 4>::Transform(pos, rot.ToMatrix(), scl);
+      mathkata::Matrix<T, 4>::transform(pos, rot.toMatrix(), scl);
   EXPECT_TRUE(NearMatrix(result, expected, precision))
-      << "ToMatrix should match Matrix::Transform.";
+      << "toMatrix should match Matrix::transform.";
 }
-TEST_ALL_F(ToMatrix)
+TEST_ALL_F(toMatrix)
 
-// Test: TransformPoint applies scale, rotate, then translate.
+// Test: transformPoint applies scale, rotate, then translate.
 template <class T>
-void TransformPoint_Test(T precision) {
+void transformPoint_Test(T precision) {
   // A transform that scales by 2 along x, rotates 90 degrees around Z,
   // and translates by (10, 0, 0).
   mathkata::Vector<T, 3> pos(T(10), T(0), T(0));
-  mathkata::Quaternion<T> rot = mathkata::Quaternion<T>::FromAngleAxis(
+  mathkata::Quaternion<T> rot = mathkata::Quaternion<T>::fromAngleAxis(
       std::numbers::pi_v<T> / 2, mathkata::Vector<T, 3>(T(0), T(0), T(1)));
   mathkata::Vector<T, 3> scl(T(2), T(1), T(1));
   mathkata::Transform<T> t(pos, rot, scl);
 
   // Point (1, 0, 0):
-  // 1. Scale: (2, 0, 0)
-  // 2. Rotate 90 deg around Z: (0, 2, 0)
-  // 3. Translate: (10, 2, 0)
+  // 1. scale: (2, 0, 0)
+  // 2. rotate 90 deg around Z: (0, 2, 0)
+  // 3. translate: (10, 2, 0)
   mathkata::Vector<T, 3> point(T(1), T(0), T(0));
-  mathkata::Vector<T, 3> result = t.TransformPoint(point);
+  mathkata::Vector<T, 3> result = t.transformPoint(point);
   mathkata::Vector<T, 3> expected(T(10), T(2), T(0));
   EXPECT_TRUE(NearVector(result, expected, precision))
-      << "TransformPoint should apply scale, rotate, translate.";
+      << "transformPoint should apply scale, rotate, translate.";
 }
-TEST_ALL_F(TransformPoint)
+TEST_ALL_F(transformPoint)
 
-// Test: TransformDirection applies rotation and scale but not translation.
+// Test: transformDirection applies rotation and scale but not translation.
 template <class T>
-void TransformDirection_Test(T precision) {
+void transformDirection_Test(T precision) {
   mathkata::Vector<T, 3> pos(T(100), T(200), T(300));
-  mathkata::Quaternion<T> rot = mathkata::Quaternion<T>::FromAngleAxis(
+  mathkata::Quaternion<T> rot = mathkata::Quaternion<T>::fromAngleAxis(
       std::numbers::pi_v<T> / 2, mathkata::Vector<T, 3>(T(0), T(0), T(1)));
   mathkata::Vector<T, 3> scl(T(2), T(1), T(1));
   mathkata::Transform<T> t(pos, rot, scl);
 
-  // Direction (1, 0, 0):
-  // 1. Scale: (2, 0, 0)
-  // 2. Rotate 90 deg around Z: (0, 2, 0)
+  // direction (1, 0, 0):
+  // 1. scale: (2, 0, 0)
+  // 2. rotate 90 deg around Z: (0, 2, 0)
   // No translation applied.
   mathkata::Vector<T, 3> dir(T(1), T(0), T(0));
-  mathkata::Vector<T, 3> result = t.TransformDirection(dir);
+  mathkata::Vector<T, 3> result = t.transformDirection(dir);
   mathkata::Vector<T, 3> expected(T(0), T(2), T(0));
   EXPECT_TRUE(NearVector(result, expected, precision))
-      << "TransformDirection should not apply translation.";
+      << "transformDirection should not apply translation.";
 }
-TEST_ALL_F(TransformDirection)
+TEST_ALL_F(transformDirection)
 
-// Test: Inverse produces a transform that composes to identity (uniform scale).
+// Test: inverse produces a transform that composes to identity (uniform scale).
 template <class T>
-void Inverse_Test(T precision) {
+void inverse_Test(T precision) {
   mathkata::Vector<T, 3> pos(T(3), T(-1), T(7));
-  mathkata::Quaternion<T> rot = mathkata::Quaternion<T>::FromAngleAxis(
+  mathkata::Quaternion<T> rot = mathkata::Quaternion<T>::fromAngleAxis(
       std::numbers::pi_v<T> / 3, mathkata::Vector<T, 3>(T(0), T(1), T(0)));
   mathkata::Vector<T, 3> scl(T(2), T(2), T(2));
   mathkata::Transform<T> t(pos, rot, scl);
 
-  mathkata::Transform<T> inv = t.Inverse();
+  mathkata::Transform<T> inv = t.inverse();
   mathkata::Transform<T> composed = t * inv;
 
   // The composed transform should be approximately identity.
@@ -195,9 +195,9 @@ void Inverse_Test(T precision) {
   mathkata::Vector<T, 3> one(T(1), T(1), T(1));
   T relaxed = precision * T(100);
   EXPECT_TRUE(NearVector(composed.position, zero, relaxed))
-      << "t * t.Inverse() position should be zero.";
+      << "t * t.inverse() position should be zero.";
   EXPECT_TRUE(NearVector(composed.scale, one, relaxed))
-      << "t * t.Inverse() scale should be one.";
+      << "t * t.inverse() scale should be one.";
 
   // Check rotation is identity (scalar ~1, vector ~0).
   EXPECT_NEAR(static_cast<double>(std::fabs(composed.rotation.scalar())), 1.0,
@@ -209,45 +209,45 @@ void Inverse_Test(T precision) {
   EXPECT_NEAR(static_cast<double>(composed.rotation.vector()[2]), 0.0,
               static_cast<double>(relaxed));
 }
-TEST_ALL_F(Inverse)
+TEST_ALL_F(inverse)
 
-// Test: Inverse via point round-trip (uniform scale).
+// Test: inverse via point round-trip (uniform scale).
 template <class T>
 void InversePointRoundTrip_Test(T precision) {
   mathkata::Vector<T, 3> pos(T(5), T(-2), T(8));
-  mathkata::Quaternion<T> rot = mathkata::Quaternion<T>::FromAngleAxis(
+  mathkata::Quaternion<T> rot = mathkata::Quaternion<T>::fromAngleAxis(
       std::numbers::pi_v<T> / 6, mathkata::Vector<T, 3>(T(1), T(0), T(0)));
   mathkata::Vector<T, 3> scl(T(3), T(3), T(3));
   mathkata::Transform<T> t(pos, rot, scl);
-  mathkata::Transform<T> inv = t.Inverse();
+  mathkata::Transform<T> inv = t.inverse();
 
   mathkata::Vector<T, 3> original(T(7), T(-3), T(4));
-  mathkata::Vector<T, 3> transformed = t.TransformPoint(original);
-  mathkata::Vector<T, 3> recovered = inv.TransformPoint(transformed);
+  mathkata::Vector<T, 3> transformed = t.transformPoint(original);
+  mathkata::Vector<T, 3> recovered = inv.transformPoint(transformed);
 
   T relaxed = precision * T(100);
   EXPECT_TRUE(NearVector(recovered, original, relaxed))
-      << "Inverse transform should recover the original point.";
+      << "inverse transform should recover the original point.";
 }
 TEST_ALL_F(InversePointRoundTrip)
 
-// Test: Inverse with unit scale and rotation.
+// Test: inverse with unit scale and rotation.
 template <class T>
 void InverseUnitScale_Test(T precision) {
   mathkata::Vector<T, 3> pos(T(10), T(-5), T(3));
-  mathkata::Quaternion<T> rot = mathkata::Quaternion<T>::FromAngleAxis(
+  mathkata::Quaternion<T> rot = mathkata::Quaternion<T>::fromAngleAxis(
       std::numbers::pi_v<T> / 4,
-      mathkata::Vector<T, 3>(T(1), T(1), T(0)).Normalized());
+      mathkata::Vector<T, 3>(T(1), T(1), T(0)).normalized());
   mathkata::Transform<T> t(pos, rot);
-  mathkata::Transform<T> inv = t.Inverse();
+  mathkata::Transform<T> inv = t.inverse();
 
   mathkata::Vector<T, 3> original(T(1), T(2), T(3));
-  mathkata::Vector<T, 3> transformed = t.TransformPoint(original);
-  mathkata::Vector<T, 3> recovered = inv.TransformPoint(transformed);
+  mathkata::Vector<T, 3> transformed = t.transformPoint(original);
+  mathkata::Vector<T, 3> recovered = inv.transformPoint(transformed);
 
   T relaxed = precision * T(10);
   EXPECT_TRUE(NearVector(recovered, original, relaxed))
-      << "Inverse with unit scale should recover the original point.";
+      << "inverse with unit scale should recover the original point.";
 }
 TEST_ALL_F(InverseUnitScale)
 
@@ -256,7 +256,7 @@ template <class T>
 void Composition_Test(T precision) {
   // Create two transforms and compose them.
   mathkata::Vector<T, 3> pos1(T(1), T(0), T(0));
-  mathkata::Quaternion<T> rot1 = mathkata::Quaternion<T>::FromAngleAxis(
+  mathkata::Quaternion<T> rot1 = mathkata::Quaternion<T>::fromAngleAxis(
       std::numbers::pi_v<T> / 2, mathkata::Vector<T, 3>(T(0), T(0), T(1)));
   mathkata::Transform<T> t1(pos1, rot1);
 
@@ -270,11 +270,11 @@ void Composition_Test(T precision) {
   mathkata::Vector<T, 3> point(T(0), T(0), T(0));
 
   // Through composition:
-  mathkata::Vector<T, 3> result_composed = composed.TransformPoint(point);
+  mathkata::Vector<T, 3> result_composed = composed.transformPoint(point);
 
   // Step by step: first t2, then t1:
-  mathkata::Vector<T, 3> after_t2 = t2.TransformPoint(point);
-  mathkata::Vector<T, 3> result_stepwise = t1.TransformPoint(after_t2);
+  mathkata::Vector<T, 3> after_t2 = t2.transformPoint(point);
+  mathkata::Vector<T, 3> result_stepwise = t1.transformPoint(after_t2);
 
   T relaxed = precision * T(10);
   EXPECT_TRUE(NearVector(result_composed, result_stepwise, relaxed))
@@ -286,23 +286,23 @@ TEST_ALL_F(Composition)
 template <class T>
 void CompositionMatchesMatrix_Test(T precision) {
   mathkata::Vector<T, 3> pos1(T(2), T(-1), T(3));
-  mathkata::Quaternion<T> rot1 = mathkata::Quaternion<T>::FromAngleAxis(
+  mathkata::Quaternion<T> rot1 = mathkata::Quaternion<T>::fromAngleAxis(
       std::numbers::pi_v<T> / 4, mathkata::Vector<T, 3>(T(0), T(1), T(0)));
   mathkata::Vector<T, 3> scl1(T(2), T(2), T(2));
   mathkata::Transform<T> t1(pos1, rot1, scl1);
 
   mathkata::Vector<T, 3> pos2(T(-1), T(0), T(5));
-  mathkata::Quaternion<T> rot2 = mathkata::Quaternion<T>::FromAngleAxis(
+  mathkata::Quaternion<T> rot2 = mathkata::Quaternion<T>::fromAngleAxis(
       std::numbers::pi_v<T> / 6, mathkata::Vector<T, 3>(T(1), T(0), T(0)));
   mathkata::Vector<T, 3> scl2(T(3), T(3), T(3));
   mathkata::Transform<T> t2(pos2, rot2, scl2);
 
   // Compose transforms.
   mathkata::Transform<T> composed = t1 * t2;
-  mathkata::Matrix<T, 4> composed_matrix = composed.ToMatrix();
+  mathkata::Matrix<T, 4> composed_matrix = composed.toMatrix();
 
-  // Multiply matrices directly.
-  mathkata::Matrix<T, 4> expected_matrix = t1.ToMatrix() * t2.ToMatrix();
+  // multiply matrices directly.
+  mathkata::Matrix<T, 4> expected_matrix = t1.toMatrix() * t2.toMatrix();
 
   T relaxed = precision * T(100);
   EXPECT_TRUE(NearMatrix(composed_matrix, expected_matrix, relaxed))
@@ -310,10 +310,10 @@ void CompositionMatchesMatrix_Test(T precision) {
 }
 TEST_ALL_F(CompositionMatchesMatrix)
 
-// Test: Static Identity returns identity transform.
+// Test: Static identity returns identity transform.
 template <class T>
 void StaticIdentity_Test(T precision) {
-  mathkata::Transform<T> id = mathkata::Transform<T>::Identity();
+  mathkata::Transform<T> id = mathkata::Transform<T>::identity();
   EXPECT_TRUE(NearVector(id.position, mathkata::Vector<T, 3>(T(0), T(0), T(0)),
                          precision));
   EXPECT_EQ(id.rotation, mathkata::Quaternion<T>::identity);
@@ -327,7 +327,7 @@ template <class T>
 void Equality_Test(T precision) {
   (void)precision;
   mathkata::Vector<T, 3> pos(T(1), T(2), T(3));
-  mathkata::Quaternion<T> rot = mathkata::Quaternion<T>::FromAngleAxis(
+  mathkata::Quaternion<T> rot = mathkata::Quaternion<T>::fromAngleAxis(
       std::numbers::pi_v<T> / 4, mathkata::Vector<T, 3>(T(0), T(1), T(0)));
   mathkata::Vector<T, 3> scl(T(2), T(3), T(4));
 
@@ -342,25 +342,25 @@ void Equality_Test(T precision) {
 }
 TEST_ALL_F(Equality)
 
-// Test: Identity transform does not change a point.
+// Test: identity transform does not change a point.
 template <class T>
 void IdentityTransformPoint_Test(T precision) {
-  mathkata::Transform<T> id = mathkata::Transform<T>::Identity();
+  mathkata::Transform<T> id = mathkata::Transform<T>::identity();
   mathkata::Vector<T, 3> point(T(7), T(-3), T(11));
-  mathkata::Vector<T, 3> result = id.TransformPoint(point);
+  mathkata::Vector<T, 3> result = id.transformPoint(point);
   EXPECT_TRUE(NearVector(result, point, precision))
-      << "Identity should not change a point.";
+      << "identity should not change a point.";
 }
 TEST_ALL_F(IdentityTransformPoint)
 
-// Test: ToMatrix for identity transform produces identity matrix.
+// Test: toMatrix for identity transform produces identity matrix.
 template <class T>
 void IdentityToMatrix_Test(T precision) {
-  mathkata::Transform<T> id = mathkata::Transform<T>::Identity();
-  mathkata::Matrix<T, 4> result = id.ToMatrix();
-  mathkata::Matrix<T, 4> expected = mathkata::Matrix<T, 4>::Identity();
+  mathkata::Transform<T> id = mathkata::Transform<T>::identity();
+  mathkata::Matrix<T, 4> result = id.toMatrix();
+  mathkata::Matrix<T, 4> expected = mathkata::Matrix<T, 4>::identity();
   EXPECT_TRUE(NearMatrix(result, expected, precision))
-      << "Identity transform should produce identity matrix.";
+      << "identity transform should produce identity matrix.";
 }
 TEST_ALL_F(IdentityToMatrix)
 

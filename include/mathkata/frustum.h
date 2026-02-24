@@ -86,7 +86,7 @@ struct Frustum {
   ///
   /// @param vp The combined view-projection matrix.
   /// @return A Frustum with normalized planes extracted from the matrix.
-  static inline Frustum<T> FromViewProjection(const Matrix<T, 4, 4>& vp) {
+  static inline Frustum<T> fromViewProjection(const Matrix<T, 4, 4>& vp) {
     Frustum<T> frustum;
 
     // Extract rows of the matrix. In mathkata, operator()(row, col) accesses
@@ -133,9 +133,9 @@ struct Frustum {
   ///
   /// @param point The point to test.
   /// @return true if the point is inside or on the boundary of the frustum.
-  constexpr bool ContainsPoint(const Vector<T, 3>& point) const {
+  constexpr bool containsPoint(const Vector<T, 3>& point) const {
     for (int i = 0; i < kPlaneCount; ++i) {
-      if (planes[i].SignedDistance(point) < static_cast<T>(0)) {
+      if (planes[i].signedDistance(point) < static_cast<T>(0)) {
         return false;
       }
     }
@@ -151,7 +151,7 @@ struct Frustum {
   ///
   /// @param aabb The axis-aligned bounding box to test.
   /// @return true if the AABB intersects or is inside the frustum.
-  constexpr bool IntersectsAABB(const AABB<T, 3>& aabb) const {
+  constexpr bool intersectsAABB(const AABB<T, 3>& aabb) const {
     for (int i = 0; i < kPlaneCount; ++i) {
       // Find the positive vertex: for each axis, pick the component of min
       // or max that is most in the direction of the plane normal.
@@ -160,7 +160,7 @@ struct Frustum {
         p_vertex[j] = (planes[i].normal[j] >= static_cast<T>(0)) ? aabb.max[j]
                                                                  : aabb.min[j];
       }
-      if (planes[i].SignedDistance(p_vertex) < static_cast<T>(0)) {
+      if (planes[i].signedDistance(p_vertex) < static_cast<T>(0)) {
         return false;
       }
     }
@@ -175,9 +175,9 @@ struct Frustum {
   ///
   /// @param sphere The sphere to test.
   /// @return true if the sphere intersects or is inside the frustum.
-  constexpr bool IntersectsSphere(const Sphere<T, 3>& sphere) const {
+  constexpr bool intersectsSphere(const Sphere<T, 3>& sphere) const {
     for (int i = 0; i < kPlaneCount; ++i) {
-      if (planes[i].SignedDistance(sphere.center) < -sphere.radius) {
+      if (planes[i].signedDistance(sphere.center) < -sphere.radius) {
         return false;
       }
     }
@@ -188,7 +188,7 @@ struct Frustum {
   ///
   /// @param p The plane index to retrieve.
   /// @return Const reference to the requested plane.
-  constexpr const Plane<T>& GetPlane(FrustumPlane p) const { return planes[p]; }
+  constexpr const Plane<T>& getPlane(FrustumPlane p) const { return planes[p]; }
 
  private:
   /// @brief Create a normalized Plane from raw (a, b, c, d) coefficients.
@@ -196,7 +196,7 @@ struct Frustum {
   /// @param a X component of the plane normal.
   /// @param b Y component of the plane normal.
   /// @param c Z component of the plane normal.
-  /// @param d Distance coefficient of the plane.
+  /// @param d distance coefficient of the plane.
   /// @return A normalized Plane.
   static inline Plane<T> NormalizePlane(T a, T b, T c, T d) {
     const T length = std::sqrt(a * a + b * b + c * c);
