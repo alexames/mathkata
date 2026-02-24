@@ -77,6 +77,52 @@ cd Build && ctest --output-on-failure -C Release
 
 ---
 
+## Releasing a New Version
+
+MathKata is distributed via a custom vcpkg registry at
+`alexames/vcpkg-registry` (one directory up from this repo at
+`../vcpkg-registry`). To release a new version:
+
+1. Ensure all changes are merged to `main` and tests pass.
+2. Get the HEAD commit hash:
+   ```bash
+   git rev-parse HEAD
+   ```
+3. From the vcpkg-registry directory, run `vcpkger.py update`:
+   ```bash
+   cd ../vcpkg-registry
+   python vcpkger.py update mathkata \
+     --github-repo alexames/mathkata \
+     --commit-hash <HASH> \
+     --version <VERSION>
+   ```
+   The script will update `ports/mathkata/portfile.cmake` (REF and SHA512)
+   and `ports/mathkata/vcpkg.json` (version number). It pauses for review —
+   verify that the header-only portfile structure is preserved (it should use
+   `file(INSTALL ...)` to copy headers, not `vcpkg_cmake_configure`).
+4. If running non-interactively (e.g., from Claude Code), complete the
+   remaining steps manually after the script updates the port files:
+   ```bash
+   git add ports/mathkata/ && git commit -m "[mathkata] Updated port to version <VERSION>"
+   git rev-parse HEAD:ports/mathkata   # get the git-tree hash
+   ```
+   Then prepend a new entry to `versions/m-/mathkata.json` with the git-tree
+   hash, update the baseline in `versions/baseline.json`, amend the commit
+   to include the version files, and push.
+5. Push the registry changes:
+   ```bash
+   git push
+   ```
+
+### Version Numbering
+
+Follow [Semantic Versioning](https://semver.org/):
+- **Major** (X.0.0): Breaking API changes (e.g., renaming public functions)
+- **Minor** (0.X.0): New features, backwards-compatible
+- **Patch** (0.0.X): Bug fixes, backwards-compatible
+
+---
+
 ## Git Workflow
 
 ### Never Commit Directly to Main
