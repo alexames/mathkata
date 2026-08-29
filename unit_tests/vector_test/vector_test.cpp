@@ -192,7 +192,7 @@ void Initialization_Test(const T& precision) {
   EXPECT_NE(vector_copy[0], vector_arr[0]);
 
   // Construct a vector from an integer vector.
-  mathkata::Vector<int, d> integer_vector;
+  auto integer_vector = mathkata::Vector<int, d>::uninitialized();
   for (int i = 0; i < d; ++i) {
     integer_vector[i] = i;
   }
@@ -227,7 +227,7 @@ TEST_SCALAR_F(InitializationPerDimension)
 template <class T, int d>
 void InitializationPacked_Test(const T& precision) {
   (void)precision;
-  mathkata::VectorPacked<T, d> packed;
+  auto packed = mathkata::VectorPacked<T, d>::uninitialized();
   for (int i = 0; i < d; ++i) {
     packed.data_[i] = static_cast<T>(i);
   }
@@ -243,7 +243,7 @@ TEST_ALL_F(InitializationPacked)
 template <class T, int d>
 void PackedSerialization_Test(const T& precision) {
   (void)precision;
-  mathkata::Vector<T, d> unpacked;
+  auto unpacked = mathkata::Vector<T, d>::uninitialized();
   for (int i = 0; i < d; ++i) {
     unpacked[i] = static_cast<T>(i);
   }
@@ -254,7 +254,7 @@ void PackedSerialization_Test(const T& precision) {
         << "Element " << i;
   }
 
-  mathkata::VectorPacked<T, d> packed_assignment;
+  auto packed_assignment = mathkata::VectorPacked<T, d>::uninitialized();
   packed_assignment = unpacked;
   for (int i = 0; i < d; ++i) {
     EXPECT_NEAR(unpacked[i], packed_assignment.data_[i], static_cast<T>(0))
@@ -666,15 +666,15 @@ void Vector_InRange_Test(const T& precision) {
   (void)precision;
 
   // Build range_start and range_end vectors.
-  mathkata::Vector<T, d> range_start;
-  mathkata::Vector<T, d> range_end;
+  auto range_start = mathkata::Vector<T, d>::uninitialized();
+  auto range_end = mathkata::Vector<T, d>::uninitialized();
   for (int i = 0; i < d; ++i) {
     range_start[i] = static_cast<T>(i);
     range_end[i] = static_cast<T>(i + 10);
   }
 
   // A value in the middle of the range should be in range.
-  mathkata::Vector<T, d> mid;
+  auto mid = mathkata::Vector<T, d>::uninitialized();
   for (int i = 0; i < d; ++i) {
     mid[i] = static_cast<T>(i + 5);
   }
@@ -1009,7 +1009,8 @@ void LerpExactEndpoints_Test(const T& precision) {
 
   // Test a selection of value pairs to keep runtime manageable.
   for (int vi = 0; vi < num_values; ++vi) {
-    mathkata::Vector<T, d> v1, v2;
+    auto v1 = mathkata::Vector<T, d>::uninitialized();
+    auto v2 = mathkata::Vector<T, d>::uninitialized();
     for (int i = 0; i < d; ++i) {
       v1[i] = test_values[(vi + i) % num_values];
       v2[i] = test_values[(vi + i + 1) % num_values];
@@ -1175,7 +1176,8 @@ TEST_F(VectorTests, RoundUpToPowerOf2_Exhaustive_Int32) {
 template <class T, int d>
 void Vector_RoundUpToPowerOf2_Test(const T& precision) {
   (void)precision;
-  mathkata::Vector<T, d> powof2, result;
+  auto powof2 = mathkata::Vector<T, d>::uninitialized();
+  auto result = mathkata::Vector<T, d>::uninitialized();
 
   for (int count = 0; count < 1024; count++) {
     for (int i = 0; i < d; i++) {
@@ -1244,7 +1246,7 @@ TEST_F(VectorTests, ConstantTest) {
 // This will test the == vectors operator.
 template <class T, int d>
 void Equal_Test(const T& precision) {
-  mathkata::Vector<T, d> expected;
+  auto expected = mathkata::Vector<T, d>::uninitialized();
   for (int i = 0; i < d; ++i) {
     expected[i] = static_cast<T>(i * precision);
   }
@@ -1260,7 +1262,7 @@ TEST_ALL_INTS_F(Equal)
 // This will test the != vectors operator.
 template <class T, int d>
 void NotEqual_Test(const T& precision) {
-  mathkata::Vector<T, d> expected;
+  auto expected = mathkata::Vector<T, d>::uninitialized();
   for (int i = 0; i < d; ++i) {
     expected[i] = static_cast<T>(i * precision);
   }
@@ -1276,8 +1278,8 @@ TEST_ALL_INTS_F(NotEqual)
 // This will test the == operator for VectorPacked.
 template <class T, int d>
 void PackedEqual_Test(const T& precision) {
-  mathkata::VectorPacked<T, d> a;
-  mathkata::VectorPacked<T, d> b;
+  auto a = mathkata::VectorPacked<T, d>::uninitialized();
+  auto b = mathkata::VectorPacked<T, d>::uninitialized();
   for (int i = 0; i < d; ++i) {
     a.data_[i] = static_cast<T>(i * precision);
     b.data_[i] = static_cast<T>(i * precision);
@@ -1294,8 +1296,8 @@ TEST_ALL_INTS_F(PackedEqual)
 // This will test the != operator for VectorPacked.
 template <class T, int d>
 void PackedNotEqual_Test(const T& precision) {
-  mathkata::VectorPacked<T, d> a;
-  mathkata::VectorPacked<T, d> b;
+  auto a = mathkata::VectorPacked<T, d>::uninitialized();
+  auto b = mathkata::VectorPacked<T, d>::uninitialized();
   for (int i = 0; i < d; ++i) {
     a.data_[i] = static_cast<T>(i * precision);
     b.data_[i] = static_cast<T>(i * precision);
@@ -1315,7 +1317,7 @@ void LessThan_Test(const T& precision) {
   (void)precision;
 
   // Equal vectors should not compare as less-than.
-  mathkata::Vector<T, d> a;
+  auto a = mathkata::Vector<T, d>::uninitialized();
   for (int i = 0; i < d; ++i) {
     a[i] = static_cast<T>(i + 1);
   }
@@ -1455,7 +1457,7 @@ void toType_Test(const T& precision) {
   typedef SimpleVector<T, d> CompatibleT;
   typedef mathkata::Vector<T, d> VectorT;
 
-  VectorT vector;
+  auto vector = VectorT::uninitialized();
   for (int i = 0; i < d; ++i) {
     vector[i] = static_cast<T>(i * precision);
   }
@@ -1497,7 +1499,7 @@ TEST_ALL_INTS_F(FromTypeToTypeRoundtrip)
 // Test output stream operator.
 template <class T, int d>
 void OutputStream_Test(const T&) {
-  mathkata::Vector<T, d> vector;
+  auto vector = mathkata::Vector<T, d>::uninitialized();
   for (int i = 0; i < d; ++i) {
     vector[i] = static_cast<T>(i);
   }
@@ -1564,7 +1566,7 @@ TEST_F(VectorTests, PaddingLaneZeroed_Constructors) {
   EXPECT_EQ(0.0f, vc.data_[3]);
 
   // Constructor from VectorPacked.
-  mathkata::VectorPacked<float, 3> packed;
+  auto packed = mathkata::VectorPacked<float, 3>::uninitialized();
   packed.data_[0] = 7.0f;
   packed.data_[1] = 8.0f;
   packed.data_[2] = 9.0f;
@@ -1902,7 +1904,7 @@ TEST_F(VectorTests, Refract_2D) {
 // when SIMD specializations are not active.
 TEST_F(VectorTests, NamedAccessors_Generic_5D) {
   // A 5-dimensional vector always uses the generic (unspecialized) template.
-  mathkata::Vector<float, 5> v;
+  auto v = mathkata::Vector<float, 5>::uninitialized();
   v[0] = 1.0f;
   v[1] = 2.0f;
   v[2] = 3.0f;
@@ -1950,7 +1952,7 @@ TEST_F(VectorTests, NamedAccessors_Generic_1D) {
 
 // Test named accessors work with integer types on the generic template.
 TEST_F(VectorTests, NamedAccessors_Generic_Int) {
-  mathkata::Vector<int, 5> v;
+  auto v = mathkata::Vector<int, 5>::uninitialized();
   v[0] = 10;
   v[1] = 20;
   v[2] = 30;

@@ -44,11 +44,11 @@
 /// @endcond
 
 /// @cond MATHKATA_INTERNAL
-#define MATHKATA_VECTOR_OPERATOR(OP)           \
-  {                                            \
-    Vector<T, Dims> result;                    \
-    MATHKATA_VECTOR_OPERATION(result[i] = OP); \
-    return result;                             \
+#define MATHKATA_VECTOR_OPERATOR(OP)                \
+  {                                                 \
+    auto result = Vector<T, Dims>::uninitialized(); \
+    MATHKATA_VECTOR_OPERATION(result[i] = OP);      \
+    return result;                                  \
   }
 /// @endcond
 
@@ -122,13 +122,31 @@ static inline CompatibleT toTypeHelper(const Vector<T, Dims>& v);
 /// @tparam Dims dimensions (number of elements) in the VectorPacked structure.
 template <class T, int Dims>
 struct VectorPacked {
-  /// @brief Create an uninitialized VectorPacked.
+ private:
+  /// Selects the constructor that leaves the elements unassigned. Private,
+  /// so uninitialized() is the only way to reach it.
+  struct UninitializedTag {};
+
+  /// @brief Create a VectorPacked without assigning the elements.
   ///
-  /// The elements of the VectorPacked are left uninitialized and have
-  /// indeterminate values. This is intentional for performance: use
-  /// VectorPacked(const Vector&) or aggregate initialization if you need
-  /// specific values.
-  VectorPacked() {}
+  /// @param tag Unused; selects this constructor.
+  explicit VectorPacked(UninitializedTag tag) { static_cast<void>(tag); }
+
+ public:
+  /// @brief Deleted; give the elements, or call uninitialized() to skip
+  ///        assigning them on purpose.
+  VectorPacked() = delete;
+
+  /// @brief Create a VectorPacked without assigning the elements.
+  ///
+  /// Reading any of the elements before assigning it is undefined behavior.
+  /// This is for code that fills every one of them immediately, where zeroing
+  /// first would be a wasted store.
+  ///
+  /// @return A VectorPacked with indeterminate elements.
+  static inline VectorPacked<T, Dims> uninitialized() {
+    return VectorPacked<T, Dims>(UninitializedTag{});
+  }
 
   /// Create a VectorPacked from a Vector.
   ///
@@ -190,12 +208,33 @@ class Vector {
   /// @brief The number of dimensions in this Vector.
   static constexpr int kDims = Dims;
 
-  /// @brief Create an uninitialized Vector.
+ private:
+  /// Selects the constructor that leaves the elements unassigned. Private,
+  /// so uninitialized() is the only way to reach it.
+  struct UninitializedTag {};
+
+  /// @brief Create a Vector without assigning the elements.
   ///
-  /// The elements of the Vector are left uninitialized and have indeterminate
-  /// values. This is intentional for performance: use Vector(T) or one of the
-  /// component constructors if you need specific values.
-  constexpr Vector() {}
+  /// @param tag Unused; selects this constructor.
+  explicit constexpr Vector(UninitializedTag tag) { static_cast<void>(tag); }
+
+ public:
+  /// @brief Deleted; give the elements, or call uninitialized() to skip
+  ///        assigning them on purpose.
+  Vector() = delete;
+
+  /// @brief Create a Vector without assigning the elements.
+  ///
+  /// Reading any of the elements before assigning it is undefined behavior.
+  /// This is for code that fills every one of them immediately, where zeroing
+  /// first would be a wasted store. It is constexpr so that constexpr functions
+  /// can call it, but the result can never be a constant itself: reading an
+  /// unassigned element in a constant expression is ill-formed.
+  ///
+  /// @return A Vector with indeterminate elements.
+  static constexpr Vector<T, Dims> uninitialized() {
+    return Vector<T, Dims>(UninitializedTag{});
+  }
 
   /// @brief Create a vector from another vector copying each element.
   ///
@@ -1066,7 +1105,7 @@ constexpr Vector<T, Dims> lerpHelper(const Vector<T, Dims>& v1,
 template <class T, int Dims>
 constexpr Vector<T, Dims> maxHelper(const Vector<T, Dims>& v1,
                                     const Vector<T, Dims>& v2) {
-  Vector<T, Dims> result;
+  auto result = Vector<T, Dims>::uninitialized();
   MATHKATA_VECTOR_OPERATION(result[i] = std::max(v1[i], v2[i]));
   return result;
 }
@@ -1079,7 +1118,7 @@ constexpr Vector<T, Dims> maxHelper(const Vector<T, Dims>& v1,
 template <class T, int Dims>
 constexpr Vector<T, Dims> minHelper(const Vector<T, Dims>& v1,
                                     const Vector<T, Dims>& v2) {
-  Vector<T, Dims> result;
+  auto result = Vector<T, Dims>::uninitialized();
   MATHKATA_VECTOR_OPERATION(result[i] = std::min(v1[i], v2[i]));
   return result;
 }
@@ -1256,7 +1295,7 @@ static inline Vector<T, Dims> fromTypeHelper(const CompatibleT& compatible) {
   // Use memcpy to safely reinterpret between compatible types without
   // undefined behavior. The compiler will optimize memcpy of small types
   // into simple register moves.
-  VectorPacked<T, Dims> packed;
+  auto packed = VectorPacked<T, Dims>::uninitialized();
   static_assert(sizeof(compatible) == sizeof(packed),
                 "Conversion size mismatch.");
   std::memcpy(static_cast<void*>(&packed), &compatible, sizeof(packed));
@@ -1270,7 +1309,7 @@ static inline CompatibleT toTypeHelper(const Vector<T, Dims>& v) {
   // Use memcpy to safely reinterpret between compatible types without
   // undefined behavior. The compiler will optimize memcpy of small types
   // into simple register moves.
-  VectorPacked<T, Dims> packed;
+  auto packed = VectorPacked<T, Dims>::uninitialized();
   static_assert(sizeof(CompatibleT) == sizeof(packed),
                 "Conversion size mismatch.");
   v.pack(&packed);
@@ -1332,7 +1371,7 @@ inline Vector<T, d> normalize(const Vector<T, d>& v) {
 /// @brief Specialized version of roundUpToPowerOf2 for vector.
 template <typename T, int Dims>
 constexpr Vector<T, Dims> roundUpToPowerOf2(const Vector<T, Dims>& v) {
-  Vector<T, Dims> ret;
+  auto ret = Vector<T, Dims>::uninitialized();
   MATHKATA_VECTOR_OPERATION(ret(i) = roundUpToPowerOf2(v(i)));
   return ret;
 }

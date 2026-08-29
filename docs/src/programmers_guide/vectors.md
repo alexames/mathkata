@@ -37,8 +37,12 @@ using the following:
 
 ## Initialization  {#mathkata_guide_vectors_initialization}
 
-For efficiency, [Vector][] is uninitialized when constructed.  Constructors
-are provided for common vector sizes that allow initialization on construction:
+[Vector][] has no default constructor: `mathkata::vec2 v;` does not compile, so
+a value cannot be left unassigned by accident, and neither can a member of an
+enclosing type that forgets to initialize it. Where the elements really are
+about to be overwritten, `auto v = mathkata::vec2::uninitialized();` says so
+explicitly and writes nothing. Constructors are provided for common vector sizes
+that allow initialization on construction:
 
 ~~~{.cpp}
     mathkata::vec2 vector(1.0f, 2.0f);

@@ -41,12 +41,31 @@ class Vector<float, 4> {
   typedef float Scalar;
   static constexpr int kDims = 4;
 
-  /// @brief Create an uninitialized Vector.
+ private:
+  /// Selects the constructor that leaves the elements unassigned. Private,
+  /// so uninitialized() is the only way to reach it.
+  struct UninitializedTag {};
+
+  /// @brief Create a Vector without assigning the elements.
   ///
-  /// The elements of the Vector are left uninitialized and have indeterminate
-  /// values. This is intentional for performance: use Vector(float) or the
-  /// component constructor if you need specific values.
-  inline Vector() {}
+  /// @param tag Unused; selects this constructor.
+  explicit Vector(UninitializedTag tag) { static_cast<void>(tag); }
+
+ public:
+  /// @brief Deleted; give the elements, or call uninitialized() to skip
+  ///        assigning them on purpose.
+  Vector() = delete;
+
+  /// @brief Create a Vector without assigning the elements.
+  ///
+  /// Reading any of the elements before assigning it is undefined behavior.
+  /// This is for code that fills every one of them immediately, where zeroing
+  /// first would be a wasted store.
+  ///
+  /// @return A Vector with indeterminate elements.
+  static inline Vector<float, 4> uninitialized() {
+    return Vector<float, 4>(UninitializedTag{});
+  }
 
   inline Vector(const Vector<float, 4>& v) { simd4 = v.simd4; }
 

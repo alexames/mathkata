@@ -16,6 +16,7 @@
 #include "mathkata/capsule.h"
 
 #include <cmath>
+#include <type_traits>
 
 #include "gtest/gtest.h"
 #include "precision.h"
@@ -105,15 +106,22 @@ void Construction_Test(T precision) {
 }
 TEST_ALL_CAPSULE_F(Construction)
 
-// Test default construction compiles (values are uninitialized).
+// Inside the template so it runs for every T and N the suite
+// instantiates.
 template <class T, int N>
-void DefaultConstruction_Test(T precision) {
+void UninitializedConstruction_Test(T precision) {
   (void)precision;
-  mathkata::Capsule<T, N> capsule;
-  // Just verify it compiles and doesn't crash. Values are indeterminate.
-  (void)capsule;
+  static_assert(!std::is_default_constructible_v<mathkata::Capsule<T, N>>);
+
+  auto capsule = mathkata::Capsule<T, N>::uninitialized();
+  capsule.start = mathkata::Vector<T, N>(static_cast<T>(1));
+  capsule.end = mathkata::Vector<T, N>(static_cast<T>(2));
+  capsule.radius = static_cast<T>(3);
+
+  EXPECT_EQ(capsule.start[0], static_cast<T>(1));
+  EXPECT_EQ(capsule.radius, static_cast<T>(3));
 }
-TEST_ALL_CAPSULE_F(DefaultConstruction)
+TEST_ALL_CAPSULE_F(UninitializedConstruction)
 
 // Test center() returns the midpoint of start and end.
 template <class T, int N>

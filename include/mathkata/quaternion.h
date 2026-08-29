@@ -42,14 +42,37 @@ namespace mathkata {
 /// @tparam T Type of each element in the Quaternion.
 template <class T>
 class Quaternion {
- public:
-  /// @brief Construct an uninitialized Quaternion.
+ private:
+  /// Selects the constructor that leaves the components unassigned. Private,
+  /// so uninitialized() is the only way to reach it.
+  struct UninitializedTag {};
+
+  /// @brief Create a Quaternion without assigning the components.
   ///
-  /// The scalar and vector components of the Quaternion are left uninitialized
-  /// and have indeterminate values. This is intentional for performance: use
-  /// Quaternion(T, T, T, T) or Quaternion::identity if you need specific
-  /// values.
-  constexpr Quaternion() {}
+  /// @param tag Unused; selects this constructor.
+  explicit constexpr Quaternion(UninitializedTag tag)
+      : data_(Vector<T, 4>::uninitialized()) {
+    static_cast<void>(tag);
+  }
+
+ public:
+  /// @brief Deleted; give the components, or call uninitialized() to skip
+  ///        assigning them on purpose.
+  Quaternion() = delete;
+
+  /// @brief Create a Quaternion without assigning the components.
+  ///
+  /// Reading any of the components before assigning it is undefined behavior.
+  /// This is for code that fills every one of them immediately, where zeroing
+  /// first would be a wasted store. It is constexpr so that constexpr
+  /// functions can call it, but the result can never be a constant itself:
+  /// reading an unassigned component in a constant expression is ill-formed.
+  /// It is not the identity rotation; Quaternion::identity is.
+  ///
+  /// @return A Quaternion with indeterminate components.
+  static constexpr Quaternion<T> uninitialized() {
+    return Quaternion<T>(UninitializedTag{});
+  }
 
   /// @brief Construct a Quaternion from a copy.
   /// @param q Quaternion to copy.
@@ -211,7 +234,7 @@ class Quaternion {
   /// @return Quaternion containing the result.
   inline Quaternion<T> scaleAngle(T s1) const {
     T angle;
-    Vector<T, 3> axis;
+    auto axis = Vector<T, 3>::uninitialized();
     toAngleAxis(&angle, &axis);
     angle *= s1;
     const T half_angle = static_cast<T>(0.5) * angle;

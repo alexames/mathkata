@@ -18,6 +18,7 @@
 #define MATHKATA_UTILITIES_H_
 
 #include <algorithm>
+#include <array>
 #include <cassert>
 #include <climits>
 #include <cmath>
@@ -26,6 +27,7 @@
 #include <cstdlib>
 #include <memory>
 #include <type_traits>
+#include <utility>
 
 /// @file mathkata/utilities.h Utilities
 /// @brief Utility macros and functions.
@@ -509,6 +511,61 @@ class simd_allocator : public std::allocator<T> {
   static void operator delete[](void *p) { mathkata::FreeAligned(p); }  \
   static void operator delete(void * /*p*/, void * /*place*/) {}        \
   static void operator delete[](void * /*p*/, void * /*place*/) {}
+
+/// @brief Storage for Count values of T, none of them assigned.
+///
+/// The mathkata value types have no default constructor, so `T values[Count];`
+/// does not compile. This is the array equivalent of T::uninitialized(): every
+/// element is constructed in place, so nothing is written and nothing is
+/// copied. Reading an element before assigning it is undefined behavior.
+///
+/// The elements are contiguous and the object is exactly Count * sizeof(T)
+/// bytes, so data() may be passed to an API expecting a T array.
+///
+/// @tparam T Element type; must provide a static uninitialized().
+/// @tparam Count Number of elements; must be greater than zero.
+template <typename T, std::size_t Count>
+class UninitializedArray {
+  static_assert(Count > 0);
+  static_assert(sizeof(std::array<T, Count>) == Count * sizeof(T));
+
+ public:
+  /// @brief Create the elements without assigning any of them.
+  UninitializedArray()
+      : UninitializedArray(std::make_index_sequence<Count>{}) {}
+
+  /// @return Pointer to the first element, valid until this object dies.
+  T *data() { return m_values.data(); }
+
+  /// @return Pointer to the first element, valid until this object dies.
+  const T *data() const { return m_values.data(); }
+
+  /// @param index Element to access; must be less than Count.
+  /// @return Reference to that element, valid until this object dies.
+  T &operator[](std::size_t index) { return m_values[index]; }
+
+  /// @param index Element to access; must be less than Count.
+  /// @return Reference to that element, valid until this object dies.
+  const T &operator[](std::size_t index) const { return m_values[index]; }
+
+  /// @return The number of elements, which is always Count.
+  static constexpr std::size_t size() { return Count; }
+
+ private:
+  /// @brief Construct every element from T::uninitialized().
+  ///
+  /// @param sequence Unused; its pack expands the initializer once per
+  ///        element, which is what constructs them in place rather than
+  ///        copying a prototype.
+  /// @tparam Is Index pack covering the elements.
+  template <std::size_t... Is>
+  explicit UninitializedArray(std::index_sequence<Is...> sequence)
+      : m_values{(static_cast<void>(Is), T::uninitialized())...} {
+    static_cast<void>(sequence);
+  }
+
+  std::array<T, Count> m_values;
+};
 
 /// @}
 

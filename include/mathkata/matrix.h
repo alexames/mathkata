@@ -19,7 +19,9 @@
 
 #include <cassert>
 #include <cmath>
+#include <cstddef>
 #include <cstring>
+#include <utility>
 
 #include "mathkata/utilities.h"
 #include "mathkata/vector.h"
@@ -60,11 +62,11 @@
 
 /// @cond MATHKATA_INTERNAL
 /// This will perform a given OP on each matrix column and return the result
-#define MATHKATA_MAT_OPERATOR(OP)                   \
-  {                                                 \
-    Matrix<T, Rows, Cols> result;                   \
-    MATHKATA_MAT_OPERATION(result.data_[i] = (OP)); \
-    return result;                                  \
+#define MATHKATA_MAT_OPERATOR(OP)                         \
+  {                                                       \
+    auto result = Matrix<T, Rows, Cols>::uninitialized(); \
+    MATHKATA_MAT_OPERATION(result.data_[i] = (OP));       \
+    return result;                                        \
   }
 /// @endcond
 
@@ -201,18 +203,55 @@ class Constants<double> {
 /// @tparam Cols Number of Cols in the matrix.
 template <class T, int Rows, int Cols>
 class Matrix {
- public:
-  /// @brief Construct a Matrix of uninitialized values.
+ private:
+  /// Selects the constructors that leave the elements unassigned. Private, so
+  /// uninitialized() is the only way to reach them.
+  struct UninitializedTag {};
+
+  /// @brief Create a Matrix with every column left unassigned.
   ///
-  /// The elements of the Matrix are left uninitialized and have indeterminate
-  /// values. This is intentional for performance: use Matrix(T), identity(),
-  /// or one of the factory methods if you need specific values.
-  constexpr Matrix() {}
+  /// @param tag Unused; selects this constructor.
+  /// @param sequence Unused; its pack expands the initializer once per
+  ///        column, which is what constructs each one in place.
+  /// @tparam Is Index pack covering the columns.
+  template <std::size_t... Is>
+  explicit constexpr Matrix(UninitializedTag tag,
+                            std::index_sequence<Is...> sequence)
+      : data_{(static_cast<void>(Is), Vector<T, Rows>::uninitialized())...} {
+    static_cast<void>(tag);
+    static_cast<void>(sequence);
+  }
+
+  /// @brief Create a Matrix without assigning the elements.
+  ///
+  /// @param tag Unused; selects this constructor.
+  explicit constexpr Matrix(UninitializedTag tag)
+      : Matrix(tag, std::make_index_sequence<Cols>{}) {}
+
+ public:
+  /// @brief Deleted; give the elements, or call uninitialized() to skip
+  ///        assigning them on purpose.
+  Matrix() = delete;
+
+  /// @brief Create a Matrix without assigning the elements.
+  ///
+  /// Reading any of the elements before assigning it is undefined behavior.
+  /// This is for code that fills every one of them immediately, where zeroing
+  /// first would be a wasted store. It is constexpr so that constexpr functions
+  /// can call it, but the result can never be a constant itself: reading an
+  /// unassigned element in a constant expression is ill-formed. It does not
+  /// yield the identity; identity() does.
+  ///
+  /// @return A Matrix with indeterminate elements.
+  static constexpr Matrix<T, Rows, Cols> uninitialized() {
+    return Matrix<T, Rows, Cols>(UninitializedTag{});
+  }
 
   /// @brief Construct a Matrix from another Matrix copying each element.
   ////
   /// @param m Matrix that the data will be copied from.
-  constexpr Matrix(const Matrix<T, Rows, Cols>& m) {
+  constexpr Matrix(const Matrix<T, Rows, Cols>& m)
+      : Matrix(UninitializedTag{}) {
     MATHKATA_MAT_OPERATION(data_[i] = m.data_[i]);
   }
 
@@ -222,7 +261,7 @@ class Matrix {
   /// @brief Construct a Matrix from a single float.
   ///
   /// @param s Scalar value used to initialize each element of the matrix.
-  explicit constexpr Matrix(T s) {
+  explicit constexpr Matrix(T s) : Matrix(UninitializedTag{}) {
     MATHKATA_MAT_OPERATION((data_[i] = Vector<T, Rows>(s)));
   }
 
@@ -234,7 +273,7 @@ class Matrix {
   /// @param s10 Value of the second row, first column.
   /// @param s01 Value of the first row, second column.
   /// @param s11 Value of the second row and column.
-  constexpr Matrix(T s00, T s10, T s01, T s11) {
+  constexpr Matrix(T s00, T s10, T s01, T s11) : Matrix(UninitializedTag{}) {
     static_assert(Rows == 2 && Cols == 2, "Rows and Cols must be 2");
     data_[0] = Vector<T, Rows>(s00, s10);
     data_[1] = Vector<T, Rows>(s01, s11);
@@ -254,7 +293,8 @@ class Matrix {
   /// @param s12 Value of the second row, third column.
   /// @param s22 Value of the third row and column.
   constexpr Matrix(T s00, T s10, T s20, T s01, T s11, T s21, T s02, T s12,
-                   T s22) {
+                   T s22)
+      : Matrix(UninitializedTag{}) {
     static_assert(Rows == 3 && Cols == 3, "Rows and Cols must be 3");
     data_[0] = Vector<T, Rows>(s00, s10, s20);
     data_[1] = Vector<T, Rows>(s01, s11, s21);
@@ -279,7 +319,8 @@ class Matrix {
   /// @param s22 Value of the third row and column.
   /// @param s32 Value of the fourth row, third column.
   constexpr Matrix(T s00, T s10, T s20, T s30, T s01, T s11, T s21, T s31,
-                   T s02, T s12, T s22, T s32) {
+                   T s02, T s12, T s22, T s32)
+      : Matrix(UninitializedTag{}) {
     static_assert(Rows == 4 && Cols == 3, "Rows must be 4 and Cols must be 3");
     data_[0] = Vector<T, Rows>(s00, s10, s20, s30);
     data_[1] = Vector<T, Rows>(s01, s11, s21, s31);
@@ -307,7 +348,8 @@ class Matrix {
   /// @param s23 Value of the third row, fourth column.
   /// @param s33 Value of the fourth row and column.
   constexpr Matrix(T s00, T s10, T s20, T s30, T s01, T s11, T s21, T s31,
-                   T s02, T s12, T s22, T s32, T s03, T s13, T s23, T s33) {
+                   T s02, T s12, T s22, T s32, T s03, T s13, T s23, T s33)
+      : Matrix(UninitializedTag{}) {
     static_assert(Rows == 4 && Cols == 4, "Rows and Cols must be 4");
     data_[0] = Vector<T, Rows>(s00, s10, s20, s30);
     data_[1] = Vector<T, Rows>(s01, s11, s21, s31);
@@ -324,7 +366,8 @@ class Matrix {
   /// @param column2 Vector used for the third column.
   /// @param column3 Vector used for the fourth column.
   constexpr Matrix(const Vector<T, 4>& column0, const Vector<T, 4>& column1,
-                   const Vector<T, 4>& column2, const Vector<T, 4>& column3) {
+                   const Vector<T, 4>& column2, const Vector<T, 4>& column3)
+      : Matrix(UninitializedTag{}) {
     static_assert(Rows == 4 && Cols == 4, "Rows and Cols must be 4");
     data_[0] = column0;
     data_[1] = column1;
@@ -335,7 +378,7 @@ class Matrix {
   /// @brief Create a Matrix from the first row * column elements of an array.
   ///
   /// @param a Array of values that the matrix will be iniitlized to.
-  explicit constexpr Matrix(const T* const a) {
+  explicit constexpr Matrix(const T* const a) : Matrix(UninitializedTag{}) {
     MATHKATA_MAT_OPERATION((data_[i] = Vector<T, Rows>(&a[i * Rows])));
   }
 
@@ -343,7 +386,8 @@ class Matrix {
   /// vectors.
   ///
   /// @param vectors Array of "Cols", "Rows" element packed vectors.
-  explicit constexpr Matrix(const VectorPacked<T, Rows>* const vectors) {
+  explicit constexpr Matrix(const VectorPacked<T, Rows>* const vectors)
+      : Matrix(UninitializedTag{}) {
     MATHKATA_MAT_OPERATION((data_[i] = Vector<T, Rows>(vectors[i])));
   }
 
@@ -431,7 +475,7 @@ class Matrix {
   /// @param i Index of the row to access.
   /// @return Vector containing the row elements.
   constexpr Vector<T, Cols> getRow(const int i) const {
-    Vector<T, Cols> result;
+    auto result = Vector<T, Cols>::uninitialized();
     for (int j = 0; j < Cols; j++) {
       result[j] = data_[j][i];
     }
@@ -508,7 +552,7 @@ class Matrix {
     static_assert(Rows == Cols,
                   "operator* requires square matrices; use multiply() for "
                   "non-square matrix multiplication");
-    Matrix<T, Rows, Cols> result;
+    auto result = Matrix<T, Rows, Cols>::uninitialized();
     TimesHelper(*this, m, &result);
     return result;
   }
@@ -587,7 +631,7 @@ class Matrix {
   ///      Use inverseWithDeterminantCheck() when invertibility is uncertain.
   /// @return Matrix containing the result.
   inline Matrix<T, Rows, Cols> inverse() const {
-    Matrix<T, Rows, Cols> inverse;
+    auto inverse = Matrix<T, Rows, Cols>::uninitialized();
     bool invertible = inverseHelper<true>(
         *this, &inverse, Constants<T>::getDeterminantThreshold());
     assert(invertible);
@@ -620,7 +664,7 @@ class Matrix {
   ///
   /// @return The transpose of the specified Matrix.
   constexpr Matrix<T, Cols, Rows> transpose() const {
-    Matrix<T, Cols, Rows> transpose;
+    auto transpose = Matrix<T, Cols, Rows>::uninitialized();
     MATHKATA_UNROLLED_LOOP(
         i, Cols,
         MATHKATA_UNROLLED_LOOP(j, Rows,
@@ -1191,7 +1235,7 @@ constexpr void TimesHelper(const Matrix<T, size1, size2>& m1,
                            Matrix<T, size1, size3>* out_m) {
   for (int i = 0; i < size1; i++) {
     for (int j = 0; j < size3; j++) {
-      Vector<T, size2> row;
+      auto row = Vector<T, size2>::uninitialized();
       for (int k = 0; k < size2; k++) {
         row[k] = m1(i, k);
       }
@@ -1295,7 +1339,7 @@ constexpr void TimesHelper(const Matrix<T, 4, 4>& m1, const Matrix<T, 4, 4>& m2,
 template <class T, int R1, int C1, int C2>
 constexpr Matrix<T, R1, C2> multiply(const Matrix<T, R1, C1>& m1,
                                      const Matrix<T, C1, C2>& m2) {
-  Matrix<T, R1, C2> result;
+  auto result = Matrix<T, R1, C2>::uninitialized();
   for (int c = 0; c < C2; ++c) {
     for (int r = 0; r < R1; ++r) {
       T sum = T(0);
@@ -1497,8 +1541,9 @@ bool inverseHelper(const Matrix<T, 4, 4>& m, Matrix<T, 4, 4>* const inverse,
   int pivot_elem = findLargestPivotElem(m);
   // This will perform the pivot and find the row, column, and 3x3 submatrix
   // for this pivot.
-  Vector<T, 3> row, column;
-  Matrix<T, 3> matrix;
+  auto row = Vector<T, 3>::uninitialized();
+  auto column = Vector<T, 3>::uninitialized();
+  auto matrix = Matrix<T, 3>::uninitialized();
   if (pivot_elem == 0) {
     row = Vector<T, 3>(m[4], m[8], m[12]);
     column = Vector<T, 3>(m[1], m[2], m[3]);
@@ -1529,7 +1574,7 @@ bool inverseHelper(const Matrix<T, 4, 4>& m, Matrix<T, 4, 4>* const inverse,
   T inv = T(-1) / pivot_value;
   row *= inv;
   matrix += Matrix<T, 3>::outerProduct(column, row);
-  Matrix<T, 3> mat_inverse;
+  auto mat_inverse = Matrix<T, 3>::uninitialized();
   if (!inverseHelper<check_invertible>(matrix, &mat_inverse, det_thresh)
       && check_invertible) {
     return false;
@@ -1664,8 +1709,8 @@ template <class T, Handedness H>
 static inline Matrix<T, 4, 4> lookAtHelper(const Vector<T, 3>& at,
                                            const Vector<T, 3>& eye,
                                            const Vector<T, 3>& up) {
-  Vector<T, 3> axes[4];
-  LookAtHelperCalculateAxes<T, H>(at, eye, up, axes);
+  UninitializedArray<Vector<T, 3>, 4> axes;
+  LookAtHelperCalculateAxes<T, H>(at, eye, up, axes.data());
   const Vector<T, 4> column0(axes[0][0], axes[1][0], axes[2][0], 0);
   const Vector<T, 4> column1(axes[0][1], axes[1][1], axes[2][1], 0);
   const Vector<T, 4> column2(axes[0][2], axes[1][2], axes[2][2], 0);
@@ -1710,7 +1755,7 @@ static inline bool unProjectHelper(const Vector<T, 3>& window_coord,
     return false;
   }
   Matrix<T, 4, 4> mvp = projection * model_view;
-  Matrix<T, 4, 4> matrix;
+  auto matrix = Matrix<T, 4, 4>::uninitialized();
   if (!mvp.inverseWithDeterminantCheck(&matrix)) {
     return false;
   }
@@ -1738,11 +1783,11 @@ static inline Matrix<T, Rows, Cols> fromTypeHelper(
   // Use memcpy to safely reinterpret between compatible types without
   // undefined behavior. The compiler will optimize memcpy of small types
   // into simple register moves.
-  VectorPacked<T, Rows> packed[Cols];
+  UninitializedArray<VectorPacked<T, Rows>, Cols> packed;
   static_assert(sizeof(compatible) == sizeof(packed),
                 "Conversion size mismatch.");
-  std::memcpy(static_cast<void*>(packed), &compatible, sizeof(packed));
-  return Matrix<T, Rows, Cols>(packed);
+  std::memcpy(static_cast<void*>(packed.data()), &compatible, sizeof(packed));
+  return Matrix<T, Rows, Cols>(packed.data());
 }
 /// @endcond
 
@@ -1752,12 +1797,13 @@ static inline CompatibleT toTypeHelper(const Matrix<T, Rows, Cols>& m) {
   // Use memcpy to safely reinterpret between compatible types without
   // undefined behavior. The compiler will optimize memcpy of small types
   // into simple register moves.
-  VectorPacked<T, Rows> packed[Cols];
+  UninitializedArray<VectorPacked<T, Rows>, Cols> packed;
   static_assert(sizeof(CompatibleT) == sizeof(packed),
                 "Conversion size mismatch.");
-  m.pack(packed);
+  m.pack(packed.data());
   CompatibleT compatible;
-  std::memcpy(&compatible, static_cast<const void*>(packed), sizeof(packed));
+  std::memcpy(&compatible, static_cast<const void*>(packed.data()),
+              sizeof(packed));
   return compatible;
 }
 /// @endcond

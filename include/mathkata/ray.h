@@ -32,10 +32,35 @@ namespace mathkata {
 /// @tparam Dims number of dimensions.
 template <class T, int Dims>
 struct Ray {
-  /// @brief Create an uninitialized Ray.
+ private:
+  /// Selects the constructor that leaves the members unassigned. Private,
+  /// so uninitialized() is the only way to reach it.
+  struct UninitializedTag {};
+
+  /// @brief Create a Ray without assigning the members.
   ///
-  /// The members are left uninitialized and have indeterminate values.
-  Ray() {}
+  /// @param tag Unused; selects this constructor.
+  explicit Ray(UninitializedTag tag)
+      : origin(Vector<T, Dims>::uninitialized()),
+        direction(Vector<T, Dims>::uninitialized()) {
+    static_cast<void>(tag);
+  }
+
+ public:
+  /// @brief Deleted; give the members, or call uninitialized() to skip
+  ///        assigning them on purpose.
+  Ray() = delete;
+
+  /// @brief Create a Ray without assigning the members.
+  ///
+  /// Reading any of the members before assigning it is undefined behavior.
+  /// This is for code that fills every one of them immediately, where zeroing
+  /// first would be a wasted store.
+  ///
+  /// @return A Ray with indeterminate members.
+  static inline Ray<T, Dims> uninitialized() {
+    return Ray<T, Dims>(UninitializedTag{});
+  }
 
   /// @brief Create a Ray from an origin and a direction.
   ///
@@ -91,10 +116,35 @@ constexpr bool operator!=(const Ray<T, Dims>& r1, const Ray<T, Dims>& r2) {
 /// @tparam Dims number of dimensions.
 template <class T, int Dims>
 struct Line {
-  /// @brief Create an uninitialized Line.
+ private:
+  /// Selects the constructor that leaves the members unassigned. Private,
+  /// so uninitialized() is the only way to reach it.
+  struct UninitializedTag {};
+
+  /// @brief Create a Line without assigning the members.
   ///
-  /// The members are left uninitialized and have indeterminate values.
-  Line() {}
+  /// @param tag Unused; selects this constructor.
+  explicit Line(UninitializedTag tag)
+      : point(Vector<T, Dims>::uninitialized()),
+        direction(Vector<T, Dims>::uninitialized()) {
+    static_cast<void>(tag);
+  }
+
+ public:
+  /// @brief Deleted; give the members, or call uninitialized() to skip
+  ///        assigning them on purpose.
+  Line() = delete;
+
+  /// @brief Create a Line without assigning the members.
+  ///
+  /// Reading any of the members before assigning it is undefined behavior.
+  /// This is for code that fills every one of them immediately, where zeroing
+  /// first would be a wasted store.
+  ///
+  /// @return A Line with indeterminate members.
+  static inline Line<T, Dims> uninitialized() {
+    return Line<T, Dims>(UninitializedTag{});
+  }
 
   /// @brief Create a Line from a point and a direction.
   ///
@@ -158,10 +208,35 @@ constexpr bool operator!=(const Line<T, Dims>& l1, const Line<T, Dims>& l2) {
 /// @tparam Dims number of dimensions.
 template <class T, int Dims>
 struct LineSegment {
-  /// @brief Create an uninitialized LineSegment.
+ private:
+  /// Selects the constructor that leaves the members unassigned. Private,
+  /// so uninitialized() is the only way to reach it.
+  struct UninitializedTag {};
+
+  /// @brief Create a LineSegment without assigning the members.
   ///
-  /// The members are left uninitialized and have indeterminate values.
-  LineSegment() {}
+  /// @param tag Unused; selects this constructor.
+  explicit LineSegment(UninitializedTag tag)
+      : start(Vector<T, Dims>::uninitialized()),
+        end(Vector<T, Dims>::uninitialized()) {
+    static_cast<void>(tag);
+  }
+
+ public:
+  /// @brief Deleted; give the members, or call uninitialized() to skip
+  ///        assigning them on purpose.
+  LineSegment() = delete;
+
+  /// @brief Create a LineSegment without assigning the members.
+  ///
+  /// Reading any of the members before assigning it is undefined behavior.
+  /// This is for code that fills every one of them immediately, where zeroing
+  /// first would be a wasted store.
+  ///
+  /// @return A LineSegment with indeterminate members.
+  static inline LineSegment<T, Dims> uninitialized() {
+    return LineSegment<T, Dims>(UninitializedTag{});
+  }
 
   /// @brief Create a LineSegment from two endpoints.
   ///

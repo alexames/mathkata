@@ -16,6 +16,7 @@
 #include "mathkata/ray.h"
 
 #include <cmath>
+#include <type_traits>
 
 #include "gtest/gtest.h"
 #include "precision.h"
@@ -46,9 +47,12 @@ class RayTests : public ::testing::Test {
 template <class T, int Dims>
 void RayConstruction_Test(T precision) {
   (void)precision;
-  // Default construction (uninitialized, just verify it compiles).
-  mathkata::Ray<T, Dims> r1;
-  (void)r1;
+  // Inside the template so it runs for every T and Dims the suite
+  // instantiates.
+  static_assert(!std::is_default_constructible_v<mathkata::Ray<T, Dims>>);
+  auto r1 = mathkata::Ray<T, Dims>::uninitialized();
+  r1.origin = mathkata::Vector<T, Dims>(static_cast<T>(4));
+  EXPECT_EQ(r1.origin[0], static_cast<T>(4));
 
   // Construction from origin and direction.
   mathkata::Vector<T, Dims> origin(static_cast<T>(0));
@@ -112,9 +116,12 @@ TEST_ALL_F(RayEquality)
 template <class T, int Dims>
 void LineConstruction_Test(T precision) {
   (void)precision;
-  // Default construction.
-  mathkata::Line<T, Dims> l1;
-  (void)l1;
+  // Inside the template so it runs for every T and Dims the suite
+  // instantiates.
+  static_assert(!std::is_default_constructible_v<mathkata::Line<T, Dims>>);
+  auto l1 = mathkata::Line<T, Dims>::uninitialized();
+  l1.point = mathkata::Vector<T, Dims>(static_cast<T>(4));
+  EXPECT_EQ(l1.point[0], static_cast<T>(4));
 
   // Construction from point and direction.
   mathkata::Vector<T, Dims> point(static_cast<T>(0));
@@ -194,9 +201,13 @@ TEST_ALL_F(LineEquality)
 template <class T, int Dims>
 void LineSegmentConstruction_Test(T precision) {
   (void)precision;
-  // Default construction.
-  mathkata::LineSegment<T, Dims> s1;
-  (void)s1;
+  // Inside the template so it runs for every T and Dims the suite
+  // instantiates.
+  static_assert(
+      !std::is_default_constructible_v<mathkata::LineSegment<T, Dims>>);
+  auto s1 = mathkata::LineSegment<T, Dims>::uninitialized();
+  s1.start = mathkata::Vector<T, Dims>(static_cast<T>(4));
+  EXPECT_EQ(s1.start[0], static_cast<T>(4));
 
   // Construction from two points.
   mathkata::Vector<T, Dims> start(static_cast<T>(1));
