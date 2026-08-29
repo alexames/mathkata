@@ -202,12 +202,12 @@ class Constants<double> {
 template <class T, int Rows, int Cols>
 class Matrix {
  public:
-  /// @brief Construct a Matrix of uninitialized values.
+  /// @brief Create a Matrix without assigning its elements.
   ///
-  /// The elements of the Matrix are left uninitialized and have indeterminate
-  /// values. This is intentional for performance: use Matrix(T), identity(),
-  /// or one of the factory methods if you need specific values.
-  constexpr Matrix() {}
+  /// Default-initialization (Matrix<T, Rows, Cols> m;) leaves the elements
+  /// indeterminate; value-initialization (Matrix<T, Rows, Cols> m{}) zeroes the
+  /// elements. Neither spelling yields the identity; identity() does.
+  constexpr Matrix() = default;
 
   /// @brief Construct a Matrix from another Matrix copying each element.
   ////

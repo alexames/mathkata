@@ -21,9 +21,15 @@ floating point type of each element in the class:
 
 ## Initialization  {#mathkata_guide_quaternions_initialization}
 
-For efficiency, [Quaternion][] is uninitialized when constructed.  Constructors
-are provided to initialize the class from a set of scalars, a 3-dimensional
-[Vector][] and a scalar or another [Quaternion][].
+A default-initialized [Quaternion][] (`mathkata::quat q;`) is left
+uninitialized for efficiency, while a value-initialized one (`mathkata::quat
+q{};`) is zeroed. The same holds for a [Quaternion][] member of an enclosing
+object that is value-initialized, unless that object's own default constructor
+is user-provided -- a constructor defaulted on its first declaration is not,
+and keeps the zeroing. A zeroed [Quaternion][] is not the identity rotation;
+use `Quaternion::identity` for that. Constructors are provided to initialize
+the class from a set of scalars, a 3-dimensional [Vector][] and a scalar or
+another [Quaternion][].
 
 For example, to initialize a [Quaternion][] using a set of scalars:
 

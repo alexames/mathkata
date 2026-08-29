@@ -34,12 +34,13 @@ struct Plane {
   Vector<T, 3> normal;
   T distance;
 
-  /// @brief Create an uninitialized Plane.
+  /// @brief Create a Plane without assigning its members.
   ///
-  /// The members of the Plane are left uninitialized and have indeterminate
-  /// values. This is intentional for performance: use one of the other
-  /// constructors or factory methods if you need specific values.
-  Plane() {}
+  /// Default-initialization (Plane<T> plane;) leaves the members indeterminate;
+  /// value-initialization (Plane<T> plane{}) zeroes the members. A zeroed Plane
+  /// reports every point as lying exactly on it, since its signed distance is
+  /// then zero everywhere; fromPointNormal builds one that separates.
+  Plane() = default;
 
   /// @brief Create a plane from a normal vector and distance.
   ///

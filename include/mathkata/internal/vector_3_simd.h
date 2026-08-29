@@ -75,12 +75,13 @@ class Vector<float, 3> {
   typedef float Scalar;
   static constexpr int kDims = 3;
 
-  /// @brief Create an uninitialized Vector.
+  /// @brief Create a Vector without assigning its elements.
   ///
-  /// The elements of the Vector are left uninitialized and have indeterminate
-  /// values. This is intentional for performance: use Vector(float) or the
-  /// component constructor if you need specific values.
-  inline Vector() {}
+  /// Default-initialization (Vector<float, 3> v;) leaves the elements
+  /// indeterminate; value-initialization (Vector<float, 3> v{}) zeroes the
+  /// elements. Under MATHKATA_COMPILE_WITH_PADDING the zeroing covers the
+  /// fourth lane as well, so simd3 reads as four zeroes.
+  Vector() = default;
 
   inline Vector(const Vector<float, 3>& v) {
 #ifdef MATHKATA_COMPILE_WITH_PADDING

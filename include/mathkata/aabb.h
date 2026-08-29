@@ -37,12 +37,13 @@ struct AABB {
   /// Maximum corner of the bounding box.
   Vector<T, N> max;
 
-  /// @brief Create an uninitialized AABB.
+  /// @brief Create an AABB without assigning its corners.
   ///
-  /// The elements of the AABB are left uninitialized and have indeterminate
-  /// values. This is intentional for performance: use one of the other
-  /// constructors if you need specific values.
-  AABB() {}
+  /// Default-initialization (AABB<T, N> box;) leaves the corners indeterminate;
+  /// value-initialization (AABB<T, N> box{}) zeroes the corners. A zeroed AABB
+  /// is the degenerate box at the origin, so it contains the origin rather than
+  /// nothing.
+  AABB() = default;
 
   /// @brief Create an AABB from min and max corner vectors.
   ///

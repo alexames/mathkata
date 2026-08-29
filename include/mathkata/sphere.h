@@ -45,12 +45,12 @@ struct Sphere {
   /// @brief The radius of the sphere.
   T radius;
 
-  /// @brief Create an uninitialized Sphere.
+  /// @brief Create a Sphere without assigning its members.
   ///
-  /// The elements of the Sphere are left uninitialized and have indeterminate
-  /// values. This is intentional for performance: use Sphere(center, radius) if
-  /// you need specific values.
-  Sphere() {}
+  /// Default-initialization (Sphere<T, N> sphere;) leaves the members
+  /// indeterminate; value-initialization (Sphere<T, N> sphere{}) zeroes the
+  /// members. A zeroed Sphere is the point sphere at the origin.
+  Sphere() = default;
 
   /// @brief Create a sphere from a center point and radius.
   ///

@@ -31,6 +31,10 @@ namespace mathkata {
 /// Rect contains two 2D <b>Vector</b>s of type <b>T</b> representing position
 /// (pos) and size.
 ///
+/// Every parameter of the four-scalar constructor defaults to zero, so that
+/// constructor is also the default constructor and a default-initialized Rect
+/// is already the zero rect.
+///
 /// @tparam T type of Rect elements.
 template <class T>
 struct Rect {

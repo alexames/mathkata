@@ -41,12 +41,12 @@ class Vector<float, 4> {
   typedef float Scalar;
   static constexpr int kDims = 4;
 
-  /// @brief Create an uninitialized Vector.
+  /// @brief Create a Vector without assigning its elements.
   ///
-  /// The elements of the Vector are left uninitialized and have indeterminate
-  /// values. This is intentional for performance: use Vector(float) or the
-  /// component constructor if you need specific values.
-  inline Vector() {}
+  /// Default-initialization (Vector<float, 4> v;) leaves the elements
+  /// indeterminate; value-initialization (Vector<float, 4> v{}) zeroes the
+  /// elements.
+  Vector() = default;
 
   inline Vector(const Vector<float, 4>& v) { simd4 = v.simd4; }
 

@@ -43,13 +43,13 @@ namespace mathkata {
 template <class T>
 class Quaternion {
  public:
-  /// @brief Construct an uninitialized Quaternion.
+  /// @brief Construct a Quaternion without assigning its components.
   ///
-  /// The scalar and vector components of the Quaternion are left uninitialized
-  /// and have indeterminate values. This is intentional for performance: use
-  /// Quaternion(T, T, T, T) or Quaternion::identity if you need specific
-  /// values.
-  constexpr Quaternion() {}
+  /// Default-initialization (Quaternion<T> q;) leaves the components
+  /// indeterminate; value-initialization (Quaternion<T> q{}) zeroes the
+  /// components. A zeroed Quaternion is not the identity rotation;
+  /// Quaternion::identity is.
+  constexpr Quaternion() = default;
 
   /// @brief Construct a Quaternion from a copy.
   /// @param q Quaternion to copy.

@@ -36,11 +36,12 @@ struct Capsule {
   Vector<T, N> end;
   T radius;
 
-  /// @brief Create an uninitialized Capsule.
+  /// @brief Create a Capsule without assigning its members.
   ///
-  /// The elements of the Capsule are left uninitialized and have indeterminate
-  /// values.
-  Capsule() {}
+  /// Default-initialization (Capsule<T, N> capsule;) leaves the members
+  /// indeterminate; value-initialization (Capsule<T, N> capsule{}) zeroes the
+  /// members.
+  Capsule() = default;
 
   /// @brief Create a Capsule from start and end points and a radius.
   ///

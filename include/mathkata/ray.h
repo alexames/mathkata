@@ -32,10 +32,12 @@ namespace mathkata {
 /// @tparam Dims number of dimensions.
 template <class T, int Dims>
 struct Ray {
-  /// @brief Create an uninitialized Ray.
+  /// @brief Create a Ray without assigning its members.
   ///
-  /// The members are left uninitialized and have indeterminate values.
-  Ray() {}
+  /// Default-initialization (Ray<T, Dims> ray;) leaves the members
+  /// indeterminate; value-initialization (Ray<T, Dims> ray{}) zeroes the
+  /// members.
+  Ray() = default;
 
   /// @brief Create a Ray from an origin and a direction.
   ///
@@ -91,10 +93,12 @@ constexpr bool operator!=(const Ray<T, Dims>& r1, const Ray<T, Dims>& r2) {
 /// @tparam Dims number of dimensions.
 template <class T, int Dims>
 struct Line {
-  /// @brief Create an uninitialized Line.
+  /// @brief Create a Line without assigning its members.
   ///
-  /// The members are left uninitialized and have indeterminate values.
-  Line() {}
+  /// Default-initialization (Line<T, Dims> line;) leaves the members
+  /// indeterminate; value-initialization (Line<T, Dims> line{}) zeroes the
+  /// members.
+  Line() = default;
 
   /// @brief Create a Line from a point and a direction.
   ///
@@ -158,10 +162,12 @@ constexpr bool operator!=(const Line<T, Dims>& l1, const Line<T, Dims>& l2) {
 /// @tparam Dims number of dimensions.
 template <class T, int Dims>
 struct LineSegment {
-  /// @brief Create an uninitialized LineSegment.
+  /// @brief Create a LineSegment without assigning its members.
   ///
-  /// The members are left uninitialized and have indeterminate values.
-  LineSegment() {}
+  /// Default-initialization (LineSegment<T, Dims> segment;) leaves the members
+  /// indeterminate; value-initialization (LineSegment<T, Dims> segment{})
+  /// zeroes the members.
+  LineSegment() = default;
 
   /// @brief Create a LineSegment from two endpoints.
   ///

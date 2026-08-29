@@ -29,7 +29,12 @@ class Vector<T, 4> {
   static constexpr int Dims = 4;
   static constexpr int kDims = 4;
 
-  constexpr Vector() {}
+  /// @brief Create a Vector without assigning its elements.
+  ///
+  /// Default-initialization (Vector<T, 4> v;) leaves the elements
+  /// indeterminate; value-initialization (Vector<T, 4> v{}) zeroes the
+  /// elements.
+  constexpr Vector() = default;
 
   constexpr Vector(const Vector<T, 4>& v) : x(v.x), y(v.y), z(v.z), w(v.w) {}
 
@@ -188,8 +193,12 @@ class Vector<T, 4> {
 
 template <class T>
 struct VectorPacked<T, 4> {
-  /// Create an uninitialized VectorPacked.
-  VectorPacked() {}
+  /// @brief Create a VectorPacked without assigning its elements.
+  ///
+  /// Default-initialization (VectorPacked<T, 4> v;) leaves the elements
+  /// indeterminate; value-initialization (VectorPacked<T, 4> v{}) zeroes the
+  /// elements.
+  VectorPacked() = default;
 
   /// Create a VectorPacked from a Vector.
   ///

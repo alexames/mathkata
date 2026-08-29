@@ -52,12 +52,14 @@ struct Frustum {
   /// @brief The six planes that define the frustum.
   Plane<T> planes[kPlaneCount];
 
-  /// @brief Create an uninitialized Frustum.
+  /// @brief Create a Frustum without assigning its planes.
   ///
-  /// The planes of the Frustum are left uninitialized and have indeterminate
-  /// values. This is intentional for performance: use one of the factory
-  /// methods or the explicit constructor if you need specific values.
-  Frustum() {}
+  /// Default-initialization (Frustum<T> frustum;) leaves the planes
+  /// indeterminate; value-initialization (Frustum<T> frustum{}) zeroes the
+  /// planes. A zeroed Frustum culls nothing rather than everything: with six
+  /// zero normals every distance is zero, so the intersection tests accept
+  /// whatever they are handed.
+  Frustum() = default;
 
   /// @brief Create a Frustum from six explicit Plane objects.
   ///

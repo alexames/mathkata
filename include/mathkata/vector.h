@@ -122,13 +122,12 @@ static inline CompatibleT toTypeHelper(const Vector<T, Dims>& v);
 /// @tparam Dims dimensions (number of elements) in the VectorPacked structure.
 template <class T, int Dims>
 struct VectorPacked {
-  /// @brief Create an uninitialized VectorPacked.
+  /// @brief Create a VectorPacked without assigning its elements.
   ///
-  /// The elements of the VectorPacked are left uninitialized and have
-  /// indeterminate values. This is intentional for performance: use
-  /// VectorPacked(const Vector&) or aggregate initialization if you need
-  /// specific values.
-  VectorPacked() {}
+  /// Default-initialization (VectorPacked<T, Dims> v;) leaves the elements
+  /// indeterminate; value-initialization (VectorPacked<T, Dims> v{}) zeroes the
+  /// elements.
+  VectorPacked() = default;
 
   /// Create a VectorPacked from a Vector.
   ///
@@ -190,12 +189,12 @@ class Vector {
   /// @brief The number of dimensions in this Vector.
   static constexpr int kDims = Dims;
 
-  /// @brief Create an uninitialized Vector.
+  /// @brief Create a Vector without assigning its elements.
   ///
-  /// The elements of the Vector are left uninitialized and have indeterminate
-  /// values. This is intentional for performance: use Vector(T) or one of the
-  /// component constructors if you need specific values.
-  constexpr Vector() {}
+  /// Default-initialization (Vector<T, Dims> v;) leaves the elements
+  /// indeterminate; value-initialization (Vector<T, Dims> v{}) zeroes the
+  /// elements.
+  constexpr Vector() = default;
 
   /// @brief Create a vector from another vector copying each element.
   ///

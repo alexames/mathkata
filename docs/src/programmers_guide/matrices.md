@@ -46,9 +46,15 @@ using the following:
 
 ## Initialization  {#mathkata_guide_matrices_initialization}
 
-For efficiency, [Matrix][] is uninitialized when constructed.  Constructors
-are provided for common matrix sizes that allow initialization on construction.
-For example, to initialize a 2x2 floating point matrix:
+A default-initialized [Matrix][] (`mathkata::mat2 m;`) is left uninitialized
+for efficiency, while a value-initialized one (`mathkata::mat2 m{};`) is
+zeroed. The same holds for a [Matrix][] member of an enclosing object that is
+value-initialized, unless that object's own default constructor is
+user-provided -- a constructor defaulted on its first declaration is not, and
+keeps the zeroing. Neither spelling yields the identity; use `identity()` for
+that. Constructors are provided for common matrix sizes that allow
+initialization on construction. For example, to initialize a 2x2 floating point
+matrix:
 
 ~~~{.cpp}
     mathkata::mat2 matrix(1.0f, 2.0f,  // column 0
