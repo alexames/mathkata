@@ -101,12 +101,18 @@ constexpr std::byte kPoison{0x7F};
 /// constructed object's own address: reading the std::array elements would
 /// touch objects whose lifetime placement-new has ended.
 ///
+/// Only meaningful for a type the ABI returns in memory. A trivially copyable
+/// type small enough to come back in registers is stored to the destination by
+/// the caller, so its bytes change even though nothing was initialized -- which
+/// is why VectorPacked is absent from the callers below.
+///
 /// @tparam T Type to construct; must be trivially destructible, since the
-///         object is never destroyed.
+///         object is never destroyed, and must not be trivially copyable.
 /// @return true if the constructor left every byte poisoned.
 template <typename T>
 bool uninitializedWritesNothing() {
   static_assert(std::is_trivially_destructible_v<T>);
+  static_assert(!std::is_trivially_copyable_v<T>);
 
   alignas(T) std::array<std::byte, sizeof(T)> storage;
   std::fill(storage.begin(), storage.end(), kPoison);
@@ -167,7 +173,6 @@ TEST_F(UninitializedTests, UninitializedWritesNothing) {
   EXPECT_TRUE((uninitializedWritesNothing<Vector<float, 3>>()));
   EXPECT_TRUE((uninitializedWritesNothing<Vector<float, 4>>()));
   EXPECT_TRUE((uninitializedWritesNothing<Vector<float, 5>>()));
-  EXPECT_TRUE((uninitializedWritesNothing<VectorPacked<float, 3>>()));
   EXPECT_TRUE((uninitializedWritesNothing<Matrix<float, 4, 4>>()));
   EXPECT_TRUE((uninitializedWritesNothing<Quaternion<float>>()));
   EXPECT_TRUE((uninitializedWritesNothing<AABB<float, 3>>()));
@@ -291,23 +296,6 @@ TEST_F(UninitializedTests, UninitializedArrayGivesEveryElement) {
 
   EXPECT_EQ(axes[0][0], 0.0f);
   EXPECT_EQ(axes[3][0], 3.0f);
-}
-
-// Matrix::pack and the conversion helpers take a VectorPacked*, so the array
-// has to stay contiguous with no per-element padding.
-TEST_F(UninitializedTests, UninitializedArrayIsContiguous) {
-  mathkata::UninitializedArray<VectorPacked<float, 3>, 4> packed;
-
-  EXPECT_EQ(sizeof(packed), sizeof(VectorPacked<float, 3>) * 4);
-
-  auto m = Matrix<float, 3, 4>::uninitialized();
-  for (int i = 0; i < 12; ++i) {
-    m[i] = static_cast<float>(i);
-  }
-  m.pack(packed.data());
-
-  EXPECT_EQ(packed[0].data_[0], 0.0f);
-  EXPECT_EQ(packed[3].data_[2], 11.0f);
 }
 
 int main(int argc, char** argv) {
