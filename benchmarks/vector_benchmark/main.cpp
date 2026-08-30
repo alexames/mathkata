@@ -17,6 +17,7 @@
 #include <cmath>
 #include <cstdio>
 #include <random>
+#include <vector>
 
 #include "benchmark_common.h"
 #include "mathkata/utilities.h"
@@ -48,7 +49,8 @@ int main(int argc, char** argv) {
   (void)argc;
   (void)argv;
   // Create a array of vectors
-  Vector<T, 3>* vectors = new Vector<T, 3>[kVectorSize];
+  std::vector<Vector<T, 3>> vectors;
+  vectors.reserve(kVectorSize);
   T final_sum = 0;
   Vector<T, 3> sum(0.0f);
   for (size_t i = 0; i < kVectorSize; i++) {
@@ -56,7 +58,7 @@ int main(int argc, char** argv) {
     if (vec.lengthSquared() == static_cast<T>(0.0)) {
       vec.x = static_cast<T>(1.0);
     }
-    vectors[i] = vec;
+    vectors.push_back(vec);
   }
   printf("Running vector benchmark (%s)...\n", MATHKATA_BUILD_OPTIONS_STRING);
   // Start vector performance code. Run a number of loops for more accurate
@@ -81,6 +83,5 @@ int main(int argc, char** argv) {
   // End vector performance code
   double elapsed = timer.GetElapsedSeconds();
   printf("Took %f seconds\n", elapsed);
-  delete[] vectors;
   return 0;
 }

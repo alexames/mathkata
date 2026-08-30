@@ -166,7 +166,7 @@ is enabled:
 - `<name>_simd_no_padding_tests` - SIMD + no padding
 - `<name>_no_simd_tests` - SIMD disabled
 
-This produces 5347 total test cases across 13 test modules.
+This produces 5386 total test cases across 16 test modules.
 
 Test files are in `unit_tests/<type>_test/<type>_test.cpp` with a shared
 `unit_tests/precision.h` header for floating-point comparison tolerances.

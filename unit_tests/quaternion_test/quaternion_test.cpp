@@ -258,7 +258,7 @@ TEST_ALL_F(ConstScalarAccessor)
 template <class T>
 void ScalarMutator_Test(const T& precision) {
   (void)precision;
-  mathkata::Quaternion<T> quaternion;
+  auto quaternion = mathkata::Quaternion<T>::uninitialized();
   quaternion.set_scalar(static_cast<T>(0.38));
   EXPECT_EQ(static_cast<T>(0.38), quaternion[0]);
 }
@@ -295,7 +295,7 @@ TEST_ALL_F(ConstVectorAccessor)
 template <class T>
 void VectorMutator_Test(const T& precision) {
   (void)precision;
-  mathkata::Quaternion<T> quaternion;
+  auto quaternion = mathkata::Quaternion<T>::uninitialized();
   quaternion.set_vector(mathkata::Vector<T, 3>(
       static_cast<T>(0.38), static_cast<T>(0.76), static_cast<T>(0.50)));
   EXPECT_EQ(static_cast<T>(0.38), quaternion.vector()[0]);
@@ -325,7 +325,7 @@ void Conversion_Test(const T& precision) {
   T angle = static_cast<T>(1.2);
   mathkata::Quaternion<T> qaa(
       mathkata::Quaternion<T>::fromAngleAxis(angle, axis));
-  mathkata::Vector<T, 3> convertedAxis;
+  auto convertedAxis = mathkata::Vector<T, 3>::uninitialized();
   T convertedAngle;
   qaa.toAngleAxis(&convertedAngle, &convertedAxis);
   EXPECT_NEAR(angle, convertedAngle, precision);
@@ -410,7 +410,7 @@ void Mult_Test(const T& precision) {
       mathkata::Quaternion<T>::fromAngleAxis(angle2, axis));
   mathkata::Quaternion<T> qaa3(
       mathkata::Quaternion<T>::fromAngleAxis(angle3, axis));
-  mathkata::Vector<T, 3> convertedAxis;
+  auto convertedAxis = mathkata::Vector<T, 3>::uninitialized();
   T convertedAngle;
   // This will verify that multiplying two quaternions corresponds to the sum
   // of the rotations.
@@ -618,7 +618,7 @@ void ToAngleAxisReturnsSmallQuat_Test(const T& precision) {
 
   {
     T angle;
-    Vector3 axis;
+    auto axis = Vector3::uninitialized();
     k350Left.toAngleAxis(&angle, &axis);
     EXPECT_NEAR(k10Degrees, angle, epsilon);
     EXPECT_NEAR_VEC3(kDown, axis, epsilon);
@@ -626,7 +626,7 @@ void ToAngleAxisReturnsSmallQuat_Test(const T& precision) {
   }
   {
     T angle;
-    Vector3 axis;
+    auto axis = Vector3::uninitialized();
     k350Left.toAngleAxisFull(&angle, &axis);
     EXPECT_NEAR(k350Degrees, angle, epsilon);
     EXPECT_NEAR_VEC3(kUp, axis, epsilon);

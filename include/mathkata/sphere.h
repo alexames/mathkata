@@ -45,12 +45,34 @@ struct Sphere {
   /// @brief The radius of the sphere.
   T radius;
 
-  /// @brief Create an uninitialized Sphere.
+ private:
+  /// Selects the constructor that leaves the members unassigned. Private,
+  /// so uninitialized() is the only way to reach it.
+  struct UninitializedTag {};
+
+  /// @brief Create a Sphere without assigning the members.
   ///
-  /// The elements of the Sphere are left uninitialized and have indeterminate
-  /// values. This is intentional for performance: use Sphere(center, radius) if
-  /// you need specific values.
-  Sphere() {}
+  /// @param tag Unused; selects this constructor.
+  explicit Sphere(UninitializedTag tag)
+      : center(Vector<T, N>::uninitialized()) {
+    static_cast<void>(tag);
+  }
+
+ public:
+  /// @brief Deleted; give the members, or call uninitialized() to skip
+  ///        assigning them on purpose.
+  Sphere() = delete;
+
+  /// @brief Create a Sphere without assigning the members.
+  ///
+  /// Reading any of the members before assigning it is undefined behavior.
+  /// This is for code that fills every one of them immediately, where zeroing
+  /// first would be a wasted store.
+  ///
+  /// @return A Sphere with indeterminate members.
+  static inline Sphere<T, N> uninitialized() {
+    return Sphere<T, N>(UninitializedTag{});
+  }
 
   /// @brief Create a sphere from a center point and radius.
   ///

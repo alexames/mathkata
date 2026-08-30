@@ -37,12 +37,34 @@ struct AABB {
   /// Maximum corner of the bounding box.
   Vector<T, N> max;
 
-  /// @brief Create an uninitialized AABB.
+ private:
+  /// Selects the constructor that leaves the corners unassigned. Private,
+  /// so uninitialized() is the only way to reach it.
+  struct UninitializedTag {};
+
+  /// @brief Create an AABB without assigning the corners.
   ///
-  /// The elements of the AABB are left uninitialized and have indeterminate
-  /// values. This is intentional for performance: use one of the other
-  /// constructors if you need specific values.
-  AABB() {}
+  /// @param tag Unused; selects this constructor.
+  explicit AABB(UninitializedTag tag)
+      : min(Vector<T, N>::uninitialized()), max(Vector<T, N>::uninitialized()) {
+    static_cast<void>(tag);
+  }
+
+ public:
+  /// @brief Deleted; give the corners, or call uninitialized() to skip
+  ///        assigning them on purpose.
+  AABB() = delete;
+
+  /// @brief Create an AABB without assigning the corners.
+  ///
+  /// Reading any of the corners before assigning it is undefined behavior.
+  /// This is for code that fills every one of them immediately, where zeroing
+  /// first would be a wasted store.
+  ///
+  /// @return An AABB with indeterminate corners.
+  static inline AABB<T, N> uninitialized() {
+    return AABB<T, N>(UninitializedTag{});
+  }
 
   /// @brief Create an AABB from min and max corner vectors.
   ///

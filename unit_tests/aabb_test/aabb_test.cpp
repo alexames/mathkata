@@ -16,6 +16,7 @@
 #include "mathkata/aabb.h"
 
 #include <cstdio>
+#include <type_traits>
 
 #include "gtest/gtest.h"
 #include "mathkata/utilities.h"
@@ -45,12 +46,19 @@ class AABBTests : public ::testing::Test {
 // --- Construction tests ---
 
 template <class T, int N>
-void ConstructDefault_Test(T /*precision*/) {
-  // Default constructor should compile and not crash.
-  mathkata::AABB<T, N> box;
-  (void)box;
+void ConstructUninitialized_Test(T /*precision*/) {
+  // Inside the template so it runs for every T and N the suite
+  // instantiates.
+  static_assert(!std::is_default_constructible_v<mathkata::AABB<T, N>>);
+
+  auto box = mathkata::AABB<T, N>::uninitialized();
+  box.min = mathkata::Vector<T, N>(static_cast<T>(1));
+  box.max = mathkata::Vector<T, N>(static_cast<T>(2));
+
+  EXPECT_EQ(box.min[0], static_cast<T>(1));
+  EXPECT_EQ(box.max[0], static_cast<T>(2));
 }
-TEST_ALL_AABB_F(ConstructDefault)
+TEST_ALL_AABB_F(ConstructUninitialized)
 
 template <class T, int N>
 void ConstructMinMax_Test(T precision) {

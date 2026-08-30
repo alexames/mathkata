@@ -22,6 +22,7 @@
 #include <sstream>
 #include <string>
 #include <type_traits>
+#include <vector>
 
 #include "gtest/gtest.h"
 #include "mathkata/io.h"
@@ -196,13 +197,13 @@ TEST_SCALAR_F(InitializePerDimension, FLOAT_PRECISION, DOUBLE_PRECISION)
 template <class T, int d>
 void InitializePacked_Test(const T& precision) {
   (void)precision;
-  mathkata::VectorPacked<T, d> packed[d];
+  mathkata::UninitializedArray<mathkata::VectorPacked<T, d>, d> packed;
   for (int i = 0; i < d; ++i) {
     for (int j = 0; j < d; ++j) {
       packed[i].data_[j] = static_cast<T>((i * d) + j);
     }
   }
-  mathkata::Matrix<T, d> matrix(packed);
+  mathkata::Matrix<T, d> matrix(packed.data());
   for (int i = 0; i < d * d; ++i) {
     EXPECT_NEAR(packed[i / d].data_[i % d], matrix[i], static_cast<T>(0))
         << "Element " << i;
@@ -214,12 +215,12 @@ TEST_ALL_F(InitializePacked, FLOAT_PRECISION, DOUBLE_PRECISION)
 template <class T, int d>
 void PackedSerialization_Test(const T& precision) {
   (void)precision;
-  mathkata::Matrix<T, d> matrix;
+  auto matrix = mathkata::Matrix<T, d>::uninitialized();
   for (int i = 0; i < d * d; ++i) {
     matrix[i] = static_cast<T>(i);
   }
-  mathkata::VectorPacked<T, d> packed[d];
-  matrix.pack(packed);
+  mathkata::UninitializedArray<mathkata::VectorPacked<T, d>, d> packed;
+  matrix.pack(packed.data());
   for (int i = 0; i < d * d; ++i) {
     EXPECT_NEAR(matrix[i], packed[i / d].data_[i % d], static_cast<T>(0))
         << "Element " << i;
@@ -368,7 +369,7 @@ void InverseNonInvertible_Test(const T& precision) {
   // Verify that it's not possible to invert the matrix.
   {
     mathkata::Matrix<T, d> matrix(m);
-    mathkata::Matrix<T, d> inverse_matrix;
+    auto inverse_matrix = mathkata::Matrix<T, d>::uninitialized();
     EXPECT_FALSE(matrix.inverseWithDeterminantCheck(&inverse_matrix));
     EXPECT_FALSE(matrix.inverseWithDeterminantCheck(
         &inverse_matrix, kDeterminantThresholdSmall));
@@ -379,7 +380,7 @@ void InverseNonInvertible_Test(const T& precision) {
   for (size_t i = 0; i < matrix_size; ++i) m[i] = kDeterminantThreshold;
   {
     mathkata::Matrix<T, d> matrix(m);
-    mathkata::Matrix<T, d> inverse_matrix;
+    auto inverse_matrix = mathkata::Matrix<T, d>::uninitialized();
     EXPECT_FALSE(matrix.inverseWithDeterminantCheck(&inverse_matrix));
     EXPECT_FALSE(matrix.inverseWithDeterminantCheck(
         &inverse_matrix, kDeterminantThresholdSmall));
@@ -402,7 +403,7 @@ void InverseNonInvertible_Test(const T& precision) {
     m[matrix_size - 1] = kDeterminantThresholdInverseLarge;
     {
       mathkata::Matrix<T, d> matrix(m);
-      mathkata::Matrix<T, d> inverse_matrix;
+      auto inverse_matrix = mathkata::Matrix<T, d>::uninitialized();
       EXPECT_FALSE(matrix.inverseWithDeterminantCheck(&inverse_matrix));
       EXPECT_FALSE(matrix.inverseWithDeterminantCheck(
           &inverse_matrix, kDeterminantThresholdSmall));
@@ -433,7 +434,7 @@ void InverseSmallScale_Test(const T& precision) {
   static const T kScaleMin = pow(kDeterminantThreshold, kDeterminantPower);
 
   mathkata::Matrix<T, d> matrix = mathkata::Matrix<T, d>::identity();
-  mathkata::Matrix<T, d> inverse_matrix;
+  auto inverse_matrix = mathkata::Matrix<T, d>::uninitialized();
 
   // scale too small - non-invertible.
   {
@@ -533,7 +534,7 @@ TEST_SCALAR_F(translationVector2D, FLOAT_PRECISION, DOUBLE_PRECISION)
 template <class T, int d>
 void fromScaleVector_Test(const T& precision) {
   mathkata::Vector<T, d> ones(static_cast<T>(1));
-  mathkata::Vector<T, d - 1> v;
+  auto v = mathkata::Vector<T, d - 1>::uninitialized();
 
   // Tests that the scale vector is placed in the correct order in the matrix.
   for (int i = 0; i < d - 1; ++i) {
@@ -1043,7 +1044,7 @@ void unProject_Test(const T& precision) {
                         0,          0,   static_cast<T>(-1.00001991), -1,
                         0,          0,  static_cast<T>(-0.200001985),  0);
   // clang-format on
-  mathkata::Vector<T, 3> result;
+  auto result = mathkata::Vector<T, 3>::uninitialized();
   bool success = mathkata::Matrix<T, 4, 4>::unProject(
       mathkata::Vector<T, 3>(754, 1049, 1), modelView, projection, 1600, 1200,
       &result);
@@ -1063,7 +1064,7 @@ void UnProject_SingularMatrix_Test(const T& precision) {
       mathkata::Matrix<T, 4, 4>(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
   mathkata::Matrix<T, 4, 4> identity = mathkata::Matrix<T, 4, 4>::identity();
   mathkata::Vector<T, 3> window_coord(400, 300, static_cast<T>(0.5));
-  mathkata::Vector<T, 3> result;
+  auto result = mathkata::Vector<T, 3>::uninitialized();
   // Singular model-view matrix.
   bool success_mv = mathkata::Matrix<T, 4, 4>::unProject(
       window_coord, singular, identity, 800, 600, &result);
@@ -1079,7 +1080,7 @@ TEST_SCALAR_F(UnProject_SingularMatrix, FLOAT_PRECISION, DOUBLE_PRECISION)
 template <class T, int d>
 void transpose_Test(const T& precision) {
   (void)precision;
-  mathkata::Matrix<T, d> matrix;
+  auto matrix = mathkata::Matrix<T, d>::uninitialized();
   for (int i = 0; i < d * d; ++i) {
     matrix[i] = static_cast<T>(i);
   }
@@ -1097,7 +1098,7 @@ TEST_ALL_F(transpose, FLOAT_PRECISION, DOUBLE_PRECISION)
 template <class T, int d>
 void getColumn_Test(const T& precision) {
   (void)precision;
-  mathkata::Matrix<T, d> matrix;
+  auto matrix = mathkata::Matrix<T, d>::uninitialized();
   for (int i = 0; i < d * d; ++i) {
     matrix[i] = static_cast<T>(i);
   }
@@ -1117,7 +1118,7 @@ void GetColumnMutable_Test(const T& precision) {
   (void)precision;
   mathkata::Matrix<T, d> matrix(static_cast<T>(0));
   for (int col = 0; col < d; ++col) {
-    mathkata::Vector<T, d> new_col;
+    auto new_col = mathkata::Vector<T, d>::uninitialized();
     for (int row = 0; row < d; ++row) {
       new_col[row] = static_cast<T>(col * d + row + 1);
     }
@@ -1136,7 +1137,7 @@ TEST_ALL_F(GetColumnMutable, FLOAT_PRECISION, DOUBLE_PRECISION)
 template <class T, int d>
 void getRow_Test(const T& precision) {
   (void)precision;
-  mathkata::Matrix<T, d> matrix;
+  auto matrix = mathkata::Matrix<T, d>::uninitialized();
   for (int i = 0; i < d * d; ++i) {
     matrix[i] = static_cast<T>(i);
   }
@@ -1155,7 +1156,7 @@ TEST_ALL_F(getRow, FLOAT_PRECISION, DOUBLE_PRECISION)
 template <class T, int d>
 void GetRowColumnConsistency_Test(const T& precision) {
   (void)precision;
-  mathkata::Matrix<T, d> matrix;
+  auto matrix = mathkata::Matrix<T, d>::uninitialized();
   for (int i = 0; i < d * d; ++i) {
     matrix[i] = static_cast<T>(i * 3 + 1);
   }
@@ -1486,8 +1487,8 @@ TEST_SCALAR_F(RotationPrecision, FLOAT_PRECISION, DOUBLE_PRECISION)
 // Test hadamardProduct (component-wise multiplication).
 template <class T, int d>
 void hadamardProduct_Test(const T& precision) {
-  mathkata::Matrix<T, d> m1;
-  mathkata::Matrix<T, d> m2;
+  auto m1 = mathkata::Matrix<T, d>::uninitialized();
+  auto m2 = mathkata::Matrix<T, d>::uninitialized();
   for (int i = 0; i < d * d; ++i) {
     m1[i] = static_cast<T>(i + 1);
     m2[i] = static_cast<T>(d * d - i);
@@ -1529,7 +1530,7 @@ TEST_F(MatrixTests, MatrixSample) {
 // to the number of rows and columns.
 template <class T, int d>
 void Equal_Test(const T& precision) {
-  mathkata::Matrix<T, d> expected;
+  auto expected = mathkata::Matrix<T, d>::uninitialized();
   for (int i = 0; i < d * d; ++i) {
     expected[i] = static_cast<T>(i * precision);
   }
@@ -1545,7 +1546,7 @@ TEST_ALL_F(Equal, FLOAT_PRECISION, DOUBLE_PRECISION)
 // to the number of rows and columns.
 template <class T, int d>
 void NotEqual_Test(const T& precision) {
-  mathkata::Matrix<T, d> expected;
+  auto expected = mathkata::Matrix<T, d>::uninitialized();
   for (int i = 0; i < d * d; ++i) {
     expected[i] = static_cast<T>(i * precision);
   }
@@ -1564,7 +1565,7 @@ TEST_ALL_F(NotEqual, FLOAT_PRECISION, DOUBLE_PRECISION)
 template <class T, int d>
 void EqualityPerElement_Test(const T& precision) {
   (void)precision;
-  mathkata::Matrix<T, d> base;
+  auto base = mathkata::Matrix<T, d>::uninitialized();
   for (int i = 0; i < d * d; ++i) {
     base[i] = static_cast<T>(i + 1);
   }
@@ -1628,7 +1629,7 @@ void toType_Test(const T& precision) {
   typedef SimpleMatrix<T, d> CompatibleT;
   typedef mathkata::Matrix<T, d> MatrixT;
 
-  MatrixT matrix;
+  auto matrix = MatrixT::uninitialized();
   for (int i = 0; i < d * d; ++i) {
     matrix[i] = static_cast<T>(i * precision);
   }
@@ -1685,7 +1686,7 @@ TEST_ALL_F(FromTypeToTypeRoundtrip, 0.0f, 0.0)
 
 template <class T, int d>
 void OutputStream_Test(const T&) {
-  mathkata::Matrix<T, d> matrix;
+  auto matrix = mathkata::Matrix<T, d>::uninitialized();
   for (int i = 0; i < d * d; ++i) {
     matrix[i] = static_cast<T>(i);
   }

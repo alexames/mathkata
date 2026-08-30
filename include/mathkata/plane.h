@@ -34,12 +34,33 @@ struct Plane {
   Vector<T, 3> normal;
   T distance;
 
-  /// @brief Create an uninitialized Plane.
+ private:
+  /// Selects the constructor that leaves the members unassigned. Private,
+  /// so uninitialized() is the only way to reach it.
+  struct UninitializedTag {};
+
+  /// @brief Create a Plane without assigning the members.
   ///
-  /// The members of the Plane are left uninitialized and have indeterminate
-  /// values. This is intentional for performance: use one of the other
-  /// constructors or factory methods if you need specific values.
-  Plane() {}
+  /// @param tag Unused; selects this constructor.
+  explicit Plane(UninitializedTag tag) : normal(Vector<T, 3>::uninitialized()) {
+    static_cast<void>(tag);
+  }
+
+ public:
+  /// @brief Deleted; give the members, or call uninitialized() to skip
+  ///        assigning them on purpose.
+  Plane() = delete;
+
+  /// @brief Create a Plane without assigning the members.
+  ///
+  /// Reading any of the members before assigning it is undefined behavior.
+  /// This is for code that fills every one of them immediately, where zeroing
+  /// first would be a wasted store.
+  ///
+  /// @return A Plane with indeterminate members.
+  static inline Plane<T> uninitialized() {
+    return Plane<T>(UninitializedTag{});
+  }
 
   /// @brief Create a plane from a normal vector and distance.
   ///

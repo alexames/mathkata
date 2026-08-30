@@ -28,7 +28,33 @@ class Vector<T, 3> {
   static constexpr int Dims = 3;
   static constexpr int kDims = 3;
 
-  constexpr Vector() {}
+ private:
+  /// Selects the constructor that leaves the elements unassigned. Private,
+  /// so uninitialized() is the only way to reach it.
+  struct UninitializedTag {};
+
+  /// @brief Create a Vector without assigning the elements.
+  ///
+  /// @param tag Unused; selects this constructor.
+  explicit constexpr Vector(UninitializedTag tag) { static_cast<void>(tag); }
+
+ public:
+  /// @brief Deleted; give the elements, or call uninitialized() to skip
+  ///        assigning them on purpose.
+  Vector() = delete;
+
+  /// @brief Create a Vector without assigning the elements.
+  ///
+  /// Reading any of the elements before assigning it is undefined behavior.
+  /// This is for code that fills every one of them immediately, where zeroing
+  /// first would be a wasted store. It is constexpr so that constexpr functions
+  /// can call it, but the result can never be a constant itself: reading an
+  /// unassigned element in a constant expression is ill-formed.
+  ///
+  /// @return A Vector with indeterminate elements.
+  static constexpr Vector<T, 3> uninitialized() {
+    return Vector<T, 3>(UninitializedTag{});
+  }
 
   constexpr Vector(const Vector<T, 3>& v) : x(v.x), y(v.y), z(v.z) {}
 
@@ -181,8 +207,31 @@ class Vector<T, 3> {
 
 template <class T>
 struct VectorPacked<T, 3> {
-  /// Create an uninitialized VectorPacked.
-  VectorPacked() {}
+ private:
+  /// Selects the constructor that leaves the elements unassigned. Private,
+  /// so uninitialized() is the only way to reach it.
+  struct UninitializedTag {};
+
+  /// @brief Create a VectorPacked without assigning the elements.
+  ///
+  /// @param tag Unused; selects this constructor.
+  explicit VectorPacked(UninitializedTag tag) { static_cast<void>(tag); }
+
+ public:
+  /// @brief Deleted; give the elements, or call uninitialized() to skip
+  ///        assigning them on purpose.
+  VectorPacked() = delete;
+
+  /// @brief Create a VectorPacked without assigning the elements.
+  ///
+  /// Reading any of the elements before assigning it is undefined behavior.
+  /// This is for code that fills every one of them immediately, where zeroing
+  /// first would be a wasted store.
+  ///
+  /// @return A VectorPacked with indeterminate elements.
+  static inline VectorPacked<T, 3> uninitialized() {
+    return VectorPacked<T, 3>(UninitializedTag{});
+  }
 
   /// Create a VectorPacked from a Vector.
   ///

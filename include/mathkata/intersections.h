@@ -200,7 +200,7 @@ template <class T, int N>
 constexpr bool sphereIntersectsAABB(const Sphere<T, N>& sphere,
                                     const AABB<T, N>& aabb) {
   // Find the closest point on the AABB to the sphere center.
-  Vector<T, N> closest;
+  auto closest = Vector<T, N>::uninitialized();
   for (int i = 0; i < N; ++i) {
     closest[i] = clamp(sphere.center[i], aabb.min[i], aabb.max[i]);
   }

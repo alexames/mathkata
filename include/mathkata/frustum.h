@@ -17,6 +17,8 @@
 #define MATHKATA_FRUSTUM_H_
 
 #include <cmath>
+#include <cstddef>
+#include <utility>
 
 #include "mathkata/aabb.h"
 #include "mathkata/matrix.h"
@@ -52,12 +54,45 @@ struct Frustum {
   /// @brief The six planes that define the frustum.
   Plane<T> planes[kPlaneCount];
 
-  /// @brief Create an uninitialized Frustum.
+ private:
+  /// Selects the constructors that leave the planes unassigned. Private, so
+  /// uninitialized() is the only way to reach them.
+  struct UninitializedTag {};
+
+  /// @brief Create a Frustum with every plane left unassigned.
   ///
-  /// The planes of the Frustum are left uninitialized and have indeterminate
-  /// values. This is intentional for performance: use one of the factory
-  /// methods or the explicit constructor if you need specific values.
-  Frustum() {}
+  /// @param tag Unused; selects this constructor.
+  /// @param sequence Unused; its pack expands the initializer once per
+  ///        plane, which is what constructs each one in place.
+  /// @tparam Is Index pack covering the planes.
+  template <std::size_t... Is>
+  explicit Frustum(UninitializedTag tag, std::index_sequence<Is...> sequence)
+      : planes{(static_cast<void>(Is), Plane<T>::uninitialized())...} {
+    static_cast<void>(tag);
+    static_cast<void>(sequence);
+  }
+
+  /// @brief Create a Frustum without assigning the planes.
+  ///
+  /// @param tag Unused; selects this constructor.
+  explicit Frustum(UninitializedTag tag)
+      : Frustum(tag, std::make_index_sequence<kPlaneCount>{}) {}
+
+ public:
+  /// @brief Deleted; give the planes, or call uninitialized() to skip assigning
+  ///        them on purpose.
+  Frustum() = delete;
+
+  /// @brief Create a Frustum without assigning the planes.
+  ///
+  /// Reading any of the planes before assigning it is undefined behavior. This
+  /// is for code that fills every one of them immediately, where zeroing first
+  /// would be a wasted store.
+  ///
+  /// @return A Frustum with indeterminate planes.
+  static inline Frustum<T> uninitialized() {
+    return Frustum<T>(UninitializedTag{});
+  }
 
   /// @brief Create a Frustum from six explicit Plane objects.
   ///
@@ -69,7 +104,8 @@ struct Frustum {
   /// @param bottom_plane The bottom clipping plane.
   constexpr Frustum(const Plane<T>& near_plane, const Plane<T>& far_plane,
                     const Plane<T>& left_plane, const Plane<T>& right_plane,
-                    const Plane<T>& top_plane, const Plane<T>& bottom_plane) {
+                    const Plane<T>& top_plane, const Plane<T>& bottom_plane)
+      : Frustum(UninitializedTag{}) {
     planes[kNear] = near_plane;
     planes[kFar] = far_plane;
     planes[kLeft] = left_plane;
@@ -87,7 +123,7 @@ struct Frustum {
   /// @param vp The combined view-projection matrix.
   /// @return A Frustum with normalized planes extracted from the matrix.
   static inline Frustum<T> fromViewProjection(const Matrix<T, 4, 4>& vp) {
-    Frustum<T> frustum;
+    auto frustum = Frustum<T>::uninitialized();
 
     // Extract rows of the matrix. In mathkata, operator()(row, col) accesses
     // the element at the given row and column.
@@ -155,7 +191,7 @@ struct Frustum {
     for (int i = 0; i < kPlaneCount; ++i) {
       // Find the positive vertex: for each axis, pick the component of min
       // or max that is most in the direction of the plane normal.
-      Vector<T, 3> p_vertex;
+      auto p_vertex = Vector<T, 3>::uninitialized();
       for (int j = 0; j < 3; ++j) {
         p_vertex[j] = (planes[i].normal[j] >= static_cast<T>(0)) ? aabb.max[j]
                                                                  : aabb.min[j];
